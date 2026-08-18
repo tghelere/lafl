@@ -21,13 +21,18 @@ docs/                 # arquitetura, proteção de dados, domínio, convenções
 
 ## Setup local — com Docker
 
-Pré-requisito: Docker com Compose v2 (`docker compose version`). **Não foi validado nesta
-sessão** — o ambiente de desenvolvimento usado para construir esta fatia não tinha Docker
-disponível (WSL sem a integração do Docker Desktop ativa). O `docker-compose.yml` e o
-Dockerfile foram escritos e revisados, mas o primeiro `docker compose up` real ainda precisa
-ser conferido por quem tiver Docker à mão.
+Pré-requisito: Docker Desktop rodando, com a **integração WSL ativa para a distro do
+projeto** (Docker Desktop → Settings → Resources → WSL Integration → habilitar a distro →
+Apply & Restart). Sem esse toggle específico, o Postgres/Redis/Mailpit sobem normalmente,
+mas o container `app` falha ao montar `./backend` (erro de "distro mount service") — foi
+exatamente o que aconteceu ao validar nesta sessão: o daemon do Docker Desktop não estava
+nem rodando, eu consegui iniciá-lo via `docker.exe` diretamente, `postgres`/`redis`/`mailpit`
+subiram e passaram por um smoke test completo (migrations, seeder, login via Sanctum contra
+Redis real, suíte Pest inteira contra Postgres real), mas o `app` não sobe sem esse toggle,
+que só existe na interface gráfica do Docker Desktop.
 
 ```bash
+cp .env.example .env                               # portas do compose, ver abaixo
 cp backend/.env.example backend/.env
 cp frontend-admin/.env.example frontend-admin/.env
 cp frontend-site/.env.example frontend-site/.env
@@ -41,6 +46,10 @@ docker compose exec app php artisan migrate:fresh --seed
 cd frontend-admin && npm install && npm run dev    # http://localhost:5173
 cd frontend-site  && npm install && npm run dev    # http://localhost:3000
 ```
+
+Se alguma porta padrão (5432, 6379, 8000, 8025, 1025) já estiver em uso por outro serviço
+local, redefina em `.env` na raiz — ex. `DB_FORWARD_PORT=5433` (`APP_FORWARD_PORT`,
+`DB_FORWARD_PORT`, `REDIS_FORWARD_PORT`, `MAILPIT_UI_PORT`, `MAILPIT_SMTP_PORT`).
 
 Ainda faltam gerar `FIELD_ENCRYPTION_KEY` e `BLIND_INDEX_KEY` em `backend/.env` — ver seção
 "Chaves de criptografia" abaixo.
@@ -160,7 +169,11 @@ Registradas com justificativa nos commits correspondentes; resumo:
 
 ## Pendências conhecidas
 
-- `docker compose up` completo não foi validado nesta sessão (sem Docker no ambiente).
+- `docker compose up` completo (incluindo o container `app`) não foi validado — falta ativar
+  a integração WSL do Docker Desktop para esta distro (só dá pra fazer pela interface
+  gráfica). `postgres`, `redis` e `mailpit` já foram validados de verdade nesta sessão
+  (subiram saudáveis, e o backend nativo rodou migrations, seeder e a suíte Pest inteira
+  contra esse Postgres/Redis reais, via `docker.exe` chamado diretamente do WSL).
 - Fluxo de login não foi verificado num navegador real (sem navegador disponível neste
   ambiente) — validado via testes automatizados (Pest) e via `curl` reproduzindo o fluxo
   completo do Sanctum SPA mode (csrf-cookie → login → rota protegida → logout → 401).
