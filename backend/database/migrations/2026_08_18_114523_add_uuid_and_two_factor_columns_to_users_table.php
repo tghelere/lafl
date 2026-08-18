@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            // Identificador público — rotas e payloads usam apenas o uuid (ver CLAUDE.md).
+            $table->uuid('uuid')->after('id')->unique();
+
+            // 2FA: só schema nesta fatia, sem fluxo de setup/desafio. Cast `encrypted`
+            // padrão (chave = APP_KEY) — segredo de conta de usuário, não dado pessoal de
+            // assistido/responsável (ver docs/protecao-de-dados.md).
+            $table->text('two_factor_secret')->nullable()->after('password');
+            $table->text('two_factor_recovery_codes')->nullable()->after('two_factor_secret');
+            $table->timestamp('two_factor_confirmed_at')->nullable()->after('two_factor_recovery_codes');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn([
+                'uuid',
+                'two_factor_secret',
+                'two_factor_recovery_codes',
+                'two_factor_confirmed_at',
+            ]);
+        });
+    }
+};
