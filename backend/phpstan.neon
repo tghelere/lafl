@@ -1,0 +1,16 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - config
+        - database
+        - routes
+
+    level: 8
+
+    excludePaths:
+        - app/Providers/*ServiceProvider.php
+
+    checkOctaneCompatibility: true
