@@ -1,0 +1,64 @@
+name: lar-analia-franco
+
+services:
+  app:
+    build:
+      context: ./docker/php
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - MAIL_HOST=mailpit
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - lar
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=${DB_DATABASE:-lar_analia_franco}
+      - POSTGRES_USER=${DB_USERNAME:-lar}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-lar}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-lar}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - lar
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - lar
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025" # UI
+      - "1025:1025" # SMTP
+    networks:
+      - lar
+
+networks:
+  lar:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
