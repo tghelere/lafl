@@ -24,12 +24,13 @@ docs/                 # arquitetura, proteção de dados, domínio, convenções
 Pré-requisito: Docker Desktop rodando, com a **integração WSL ativa para a distro do
 projeto** (Docker Desktop → Settings → Resources → WSL Integration → habilitar a distro →
 Apply & Restart). Sem esse toggle específico, o Postgres/Redis/Mailpit sobem normalmente,
-mas o container `app` falha ao montar `./backend` (erro de "distro mount service") — foi
-exatamente o que aconteceu ao validar nesta sessão: o daemon do Docker Desktop não estava
-nem rodando, eu consegui iniciá-lo via `docker.exe` diretamente, `postgres`/`redis`/`mailpit`
-subiram e passaram por um smoke test completo (migrations, seeder, login via Sanctum contra
-Redis real, suíte Pest inteira contra Postgres real), mas o `app` não sobe sem esse toggle,
-que só existe na interface gráfica do Docker Desktop.
+mas o container `app` falha ao montar `./backend` (erro de "distro mount service").
+
+**Validado de ponta a ponta nesta sessão**, com o toggle ativado: os quatro serviços sobem,
+`composer install` + `migrate:fresh --seed` rodam dentro do container `app`, e o fluxo
+completo do Sanctum SPA mode funciona contra Postgres/Redis reais (csrf-cookie → login →
+rota protegida → logout → 401), com a suíte Pest inteira (30/30) passando dentro do
+container.
 
 ```bash
 cp .env.example .env                               # portas do compose, ver abaixo
@@ -166,14 +167,17 @@ Registradas com justificativa nos commits correspondentes; resumo:
 - **`sitemap.xml`/`robots.txt` como rotas Nitro dinâmicas**, não arquivos estáticos nem
   módulo de terceiros — evita depender de conteúdo que ainda não existe (`pages`/`posts`) ou
   instalar um pacote novo sem necessidade real ainda.
+- **`docker/php/Dockerfile` usa `php -S` direto no `CMD`, não `php artisan serve`** —
+  descoberto validando o compose de ponta a ponta: `artisan serve` spawna um subprocesso PHP
+  para o servidor embutido que **não herda o ambiente do container** (só repassa `APP_ENV` e
+  `PATH`), então `DB_HOST`/`REDIS_HOST`/`MAIL_HOST` injetados via `environment:` do compose
+  desapareciam silenciosamente e a app caía de volta em `127.0.0.1`. `php -S` roda como PID 1
+  e herda o ambiente real do container. Também removi `opcache` da lista de extensões do
+  Dockerfile — o build quebra nesta combinação PHP 8.5-alpine/PECL; não é necessário para
+  `php -S` em dev (só importa na imagem de produção com php-fpm).
 
 ## Pendências conhecidas
 
-- `docker compose up` completo (incluindo o container `app`) não foi validado — falta ativar
-  a integração WSL do Docker Desktop para esta distro (só dá pra fazer pela interface
-  gráfica). `postgres`, `redis` e `mailpit` já foram validados de verdade nesta sessão
-  (subiram saudáveis, e o backend nativo rodou migrations, seeder e a suíte Pest inteira
-  contra esse Postgres/Redis reais, via `docker.exe` chamado diretamente do WSL).
 - Fluxo de login não foi verificado num navegador real (sem navegador disponível neste
   ambiente) — validado via testes automatizados (Pest) e via `curl` reproduzindo o fluxo
   completo do Sanctum SPA mode (csrf-cookie → login → rota protegida → logout → 401).

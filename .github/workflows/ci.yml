@@ -50,7 +50,10 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          # 8.5, não 8.3: composer.lock foi resolvido com PHP 8.5 e trava uma dependência em
+          # ">= 8.4.1" — descoberto validando o docker-compose (ver README, seção
+          # "Divergências"). Mantido em sincronia com docker/php/Dockerfile.
+          php-version: '8.5'
           extensions: pdo_pgsql, pgsql, mbstring, intl, exif, gd, bcmath, zip, redis
           coverage: none
 
