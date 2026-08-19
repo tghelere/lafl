@@ -79,6 +79,11 @@ conscientemente, não bug a corrigir. Dificultar consulta em massa é proteção
 Normalização antes do hash: minúsculas, sem acento, espaços colapsados. A função de
 normalização precisa ser única e centralizada, senão o índice quebra silenciosamente.
 
+A normalização (`App\Support\StringNormalizer`) é autocontida e congelada por design —
+não depende de tabela de transliteração de nenhum pacote de terceiro, só de uma tabela
+própria e da Política de Estabilidade Unicode. Mudar essa normalização exige re-hash de
+toda a base já gravada; ver `docs/decisoes/0001-normalizacao-blind-index-autocontida.md`.
+
 **Chaves:**
 
 - Chave de campo **separada do `APP_KEY`**, fora do repositório, em gerenciador de segredos
