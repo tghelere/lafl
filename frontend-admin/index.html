@@ -9,6 +9,32 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      // Algumas extensões de navegador (bloqueadores de rastreamento, "anti-fingerprint")
+      // fazem window.localStorage LANÇAR exceção em vez de simplesmente não existir. Libs
+      // como @vue/devtools-kit (dependência transitiva do Pinia) só tratam o caso
+      // "localStorage === undefined", não o caso "acessar localStorage lança erro" — isso
+      // derruba a avaliação do módulo antes do Vue montar, deixando a tela em branco.
+      // Shim silencioso em memória cobre esse caso sem mudar nada para o usuário comum.
+      try {
+        window.localStorage.getItem('__lar_analia_franco_storage_probe__')
+      } catch {
+        const memory = new Map()
+        Object.defineProperty(window, 'localStorage', {
+          configurable: true,
+          value: {
+            getItem: (key) => (memory.has(key) ? memory.get(key) : null),
+            setItem: (key, value) => memory.set(key, String(value)),
+            removeItem: (key) => memory.delete(key),
+            clear: () => memory.clear(),
+            key: (index) => Array.from(memory.keys())[index] ?? null,
+            get length() {
+              return memory.size
+            },
+          },
+        })
+      }
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
