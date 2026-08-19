@@ -18,6 +18,10 @@ use App\Support\StringNormalizer;
  * Cobre apenas o índice de igualdade (`{campo}_hash`). Busca por token
  * (`{campo}_tokens`, ver matriz de classificação) é uma extensão específica de domínio, a
  * implementar quando a entidade real existir.
+ *
+ * Campo cujo atributo não está carregado (ex.: model veio de um `select()` parcial que
+ * omitiu a coluna cifrada) é pulado — recalcular o hash nesse caso gravaria `null` e
+ * corromperia silenciosamente o índice de um registro cujo dado cifrado continua intacto.
  */
 /**
  * O model que usa este trait deve declarar a property abaixo — não é declarada aqui porque
@@ -37,6 +41,10 @@ trait HasBlindIndex
     protected function syncBlindIndexes(): void
     {
         foreach ($this->blindIndexes as $field => $hashColumn) {
+            if (! array_key_exists($field, $this->attributes)) {
+                continue;
+            }
+
             $value = $this->getAttribute($field);
 
             $this->setAttribute(

@@ -46,6 +46,7 @@ beforeEach(function (): void {
         $table->id();
         $table->text('name')->nullable();
         $table->char('name_hash', 64)->nullable();
+        $table->text('notes')->nullable();
     });
 });
 
@@ -98,6 +99,53 @@ test('HasBlindIndex sincroniza o hash automaticamente ao criar e atualizar', fun
 
 test('HasBlindIndex mantém o hash nulo quando o campo é nulo', function (): void {
     $model = makeExampleEncryptedRecordModel();
+    $model->name = null;
+    $model->save();
+
+    expect($model->name_hash)->toBeNull();
+});
+
+test('HasBlindIndex não corrompe o hash quando o model foi carregado com select() parcial sem o campo cifrado', function (): void {
+    $model = makeExampleEncryptedRecordModel();
+    $model->name = 'Maria da Silva';
+    $model->save();
+
+    $originalHash = DB::table('example_encrypted_records')->where('id', $model->id)->value('name_hash');
+
+    $partial = makeExampleEncryptedRecordModel()->newQuery()
+        ->select(['id', 'notes'])
+        ->find($model->id);
+
+    $partial->notes = 'observação qualquer';
+    $partial->save();
+
+    $hashAfterSave = DB::table('example_encrypted_records')->where('id', $model->id)->value('name_hash');
+
+    expect($hashAfterSave)->toBe($originalHash)->not->toBeNull();
+});
+
+test('HasBlindIndex recalcula o hash normalmente quando o campo é alterado num model completo', function (): void {
+    $model = makeExampleEncryptedRecordModel();
+    $model->name = 'Maria da Silva';
+    $model->save();
+
+    $firstHash = $model->name_hash;
+
+    $model->name = 'Maria de Souza';
+    $model->save();
+
+    $expectedHash = app(BlindIndexService::class)->hash(StringNormalizer::normalize('Maria de Souza'));
+
+    expect($model->name_hash)
+        ->toBe($expectedHash)
+        ->not->toBe($firstHash);
+});
+
+test('HasBlindIndex zera o hash quando o campo é definido explicitamente como null', function (): void {
+    $model = makeExampleEncryptedRecordModel();
+    $model->name = 'Maria da Silva';
+    $model->save();
+
     $model->name = null;
     $model->save();
 
