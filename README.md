@@ -176,11 +176,22 @@ Registradas com justificativa nos commits correspondentes; resumo:
   Dockerfile — o build quebra nesta combinação PHP 8.5-alpine/PECL; não é necessário para
   `php -S` em dev (só importa na imagem de produção com php-fpm).
 
+## Troubleshooting
+
+- **Tela do painel admin em branco, sem erro visível na UI** — alguma extensão de navegador
+  (bloqueador de rastreamento, "anti-fingerprint") pode fazer `window.localStorage` **lançar
+  exceção** em vez de simplesmente não existir. Isso derruba bibliotecas de terceiros
+  (`@vue/devtools-kit`, via Pinia) antes do Vue montar. `frontend-admin/index.html` já tem um
+  shim silencioso para esse caso — se ainda assim a tela ficar em branco, olha o console do
+  navegador antes de mais nada.
+- **"CSRF token mismatch" no login, mesmo com a senha certa** — cookie de sessão antigo,
+  cifrado com uma `APP_KEY` que não é mais a atual (acontece sempre que `APP_KEY` é trocada,
+  o backend reinicia com uma chave nova, ou o `docker compose down -v` recria o volume do
+  Postgres/sessão). Limpa os cookies de `localhost` (DevTools → Application → Storage →
+  Clear site data) e tenta de novo.
+
 ## Pendências conhecidas
 
-- Fluxo de login não foi verificado num navegador real (sem navegador disponível neste
-  ambiente) — validado via testes automatizados (Pest) e via `curl` reproduzindo o fluxo
-  completo do Sanctum SPA mode (csrf-cookie → login → rota protegida → logout → 401).
 - 2FA: só as colunas existem em `users`; fluxo de setup/desafio/recovery codes fica para
   quando houver papel com acesso a dado de assistido (ver `docs/arquitetura.md`).
 - Domínio de assistidos (`assisted_minors`, `guardians`, `consents` etc.) ainda não
