@@ -19,7 +19,7 @@ detalhe de conformidade — é a restrição central que molda schema, autoriza�
 | Auth | Laravel Sanctum em **SPA mode** (cookie `httpOnly`, `SameSite=Lax`, CSRF) |
 | Permissões | `spatie/laravel-permission` + Policies |
 | Auditoria | `spatie/laravel-activitylog` |
-| Site público | Nuxt 3 (SSR/SSG) — SEO é requisito de missão |
+| Site público | Nuxt 4 (SSR/SSG) — SEO é requisito de missão. Ver `docs/decisoes/0005-nuxt-4-em-vez-de-nuxt-3.md` |
 | Painel admin | Vue 3 SPA + Vite + Pinia — `noindex`, atrás de login |
 | Docs de API | Scramble (OpenAPI 3 gerado do código, sem annotation manual) |
 | Cache/filas | Redis |

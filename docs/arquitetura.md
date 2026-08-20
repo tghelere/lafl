@@ -13,7 +13,7 @@ lar-analia-franco/
 │   └── lgpd/
 │       └── inventario-de-dados.md      # a preencher com a instituição
 ├── backend/                            # Laravel
-├── frontend-site/                      # Nuxt 3 — público
+├── frontend-site/                      # Nuxt 4 — público
 ├── frontend-admin/                     # Vue 3 SPA — administrativo
 └── docker/                             # compose para dev (postgres, redis, umami)
 ```
@@ -24,7 +24,8 @@ Vue 3 SPA e SEO não convivem bem: o Google renderiza JavaScript com fila e atra
 Bing/WhatsApp/redes sociais praticamente não renderizam. Para uma instituição que depende de
 ser encontrada por doadores e famílias, isso é problema de missão.
 
-- `frontend-site/` — Nuxt 3, SSR/SSG. Páginas institucionais como SSG; notícias com ISR.
+- `frontend-site/` — Nuxt 4, SSR/SSG. Páginas institucionais como SSG; notícias com ISR. Ver
+  `docs/decisoes/0005-nuxt-4-em-vez-de-nuxt-3.md`.
 - `frontend-admin/` — Vue 3 SPA. SEO irrelevante, `noindex`, atrás de login.
 
 Ambos usam a mesma sintaxe (Vue 3 `<script setup>`, Pinia), então o custo cognitivo de manter
