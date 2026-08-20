@@ -51,6 +51,13 @@
 - [x] Direção visual (paleta, tipografia, componentes base) — ver
       `docs/decisoes/0009-direcao-visual.md`
 - [ ] Eventos Umami nos CTAs
+- [ ] O menu principal (`AppHeader.vue`) e o rodapé (`AppFooter.vue`) já linkam as seis
+      seções de `docs/estrutura-site.md` §1.1 que ainda não existem como página
+      (`/educacao-infantil`, `/contraturno`, `/bazar`, `/como-ajudar`, `/transparencia`,
+      `/contato`). Isso gera avisos `[VUE_ROUTER_R0004] No match found` no console do
+      navegador em `nuxt dev` — esperado, não é bug (`crawlLinks: false` em
+      `nuxt.config.ts` já impede que isso quebre `nuxt generate`, ver ADR 0009). O aviso some
+      sozinho conforme cada seção ganhar página própria.
 - [ ] **Bloqueia publicação:** a linha de registro (`LedgerLine.vue`, assinatura visual do
       sistema) exibe número institucional + data, sem fonte externa. Os valores usados até
       agora (250 crianças, 63 anos, 40% do orçamento) vêm de `docs/contexto.md` marcados

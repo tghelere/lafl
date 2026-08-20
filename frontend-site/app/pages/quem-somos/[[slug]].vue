@@ -30,7 +30,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <article v-if="page">
+  <article v-if="page" class="prose">
     <h1>{{ page.title }}</h1>
     <!-- Conteúdo vem do CMS, escrito por usuário autenticado do painel — não há input de
          visitante aqui. Sanitização no backend é entregável de sessão futura (ver

@@ -16,6 +16,7 @@ const year = new Date().getFullYear()
             <li><NuxtLink to="/quem-somos/nossa-historia">Nossa história</NuxtLink></li>
             <li><NuxtLink to="/quem-somos/governanca">Governança</NuxtLink></li>
             <li><NuxtLink to="/quem-somos/o-lar-hoje">O Lar hoje</NuxtLink></li>
+            <li><NuxtLink to="/contato">Contato</NuxtLink></li>
           </ul>
         </div>
 
@@ -42,7 +43,6 @@ const year = new Date().getFullYear()
           <ul>
             <li><NuxtLink to="/transparencia">Prestação de contas</NuxtLink></li>
             <li><NuxtLink to="/transparencia/documentos">Documentos</NuxtLink></li>
-            <li><NuxtLink to="/contato">Contato</NuxtLink></li>
           </ul>
         </div>
       </div>

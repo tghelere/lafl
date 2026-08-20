@@ -7,7 +7,9 @@
     <AppHeader />
 
     <main id="main" class="layout__main">
-      <slot />
+      <div class="container">
+        <slot />
+      </div>
     </main>
 
     <AppFooter />
