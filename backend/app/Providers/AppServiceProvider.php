@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,6 +31,16 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
 
         $this->configureRateLimiting();
+        $this->configureAuthorization();
+    }
+
+    /**
+     * super_admin sempre passa — é a única conta com acesso total a todo recurso (ver
+     * docs/estrutura-site.md §4.4). Policies individuais não precisam repetir esse caso.
+     */
+    private function configureAuthorization(): void
+    {
+        Gate::before(fn (User $user, string $ability): ?bool => $user->hasRole(Role::SuperAdmin->value) ? true : null);
     }
 
     private function configureRateLimiting(): void

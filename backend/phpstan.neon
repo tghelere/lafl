@@ -10,6 +10,12 @@ parameters:
 
     level: 8
 
+    # Modelos deste projeto usam o método casts() (Laravel 11+), não a propriedade $casts —
+    # sem esta flag o Larastan infere o tipo bruto da coluna (ex.: string) em vez do tipo
+    # após o cast (ex.: App\Enums\PageStatus), e gera falso positivo em toda comparação ou
+    # chamada de método sobre um atributo castado.
+    parseModelCastsMethod: true
+
     excludePaths:
         - app/Providers/*ServiceProvider.php
 
