@@ -93,6 +93,24 @@ settings, etc., quando existirem). Não afrouxar `serializable_classes` globalme
 contornar isso — é uma trava de segurança deliberada contra injeção de objeto via cache
 envenenado, e vale para o projeto inteiro, não só para este caso de uso.
 
+### Limitações conhecidas de `pages` — aceitáveis no volume atual
+
+- **`DeletePage` não impede apagar uma página-mãe que tenha filhas.** Excluir
+  `quem-somos` com `quem-somos/nossa-historia` ainda existindo deixa a filha com slug
+  órfão (o primeiro segmento não resolve mais a lugar nenhum). Consequência do modelo de
+  slug plano (ver decisão em `docs/roadmap.md`, "Formato do slug", e
+  `App\Actions\Content\SavePage::assertValidSlugDepth`, que só valida na escrita da
+  filha, não na exclusão da mãe).
+- **Renomear a mãe não propaga para as filhas.** `SavePage` grava histórico e invalida
+  cache só do slug que está sendo salvo; renomear `quem-somos` para `sobre-nos` não move
+  `quem-somos/nossa-historia` para `sobre-nos/nossa-historia` — a filha continua
+  respondendo no prefixo antigo, que passa a não ter mãe.
+
+Ambos aceitáveis com cinco páginas. Revisitar se o número de páginas crescer — provável
+que a Fase de conteúdo com `posts`/mais seções de `docs/estrutura-site.md` §1.2 seja o
+gatilho natural para decidir entre validar em cascata (bloquear exclusão/rename com
+filhas) ou migrar para hierarquia real (`parent_id`).
+
 ## Fase 2 — bloqueada
 
 - [ ] Cadastro de assistidos (`assisted_minors`, `guardians`, `guardianships`, `consents`,
