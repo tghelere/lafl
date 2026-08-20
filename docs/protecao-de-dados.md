@@ -22,16 +22,10 @@ dados além do estritamente necessário. Minimização aqui é obrigação, não
 próprio.
 
 **LGPD art. 16, I** — obrigação legal de guarda pode prevalecer sobre pedido de eliminação.
-Prestação de contas a órgãos públicos, convênios e histórico de acolhimento entram aqui.
+Prestação de contas a órgãos públicos e ao convênio com a Secretaria Municipal de Educação
+entra aqui.
 
 **ECA art. 17 e 18** — direito ao respeito, à imagem e à identidade.
-
-**ECA art. 143** — vedada divulgação de identidade de menor a quem se atribua ato
-infracional. Se houver encaminhamento do Conselho Tutelar ou do Judiciário, o campo existe e
-tem sigilo reforçado.
-
-**Medida protetiva, acolhimento ou disputa de guarda:** endereço e escola tornam-se dados de
-acesso restritíssimo. Há casos em que a exposição é risco físico real.
 
 ## Matriz de classificação de dados
 
@@ -42,8 +36,7 @@ Antes de criar qualquer coluna com dado pessoal, classifique aqui.
 | Nome do assistido | Criptografado + blind index (normalizado e por tokens) | Palavra exata |
 | CPF, RG, CNS, NIS, certidão | Criptografado + blind index HMAC | Igualdade exata |
 | Endereço, escola | Criptografado, Policy restrita | Não |
-| Saúde, laudos, medicação, evolução | Criptografado, **tabela separada** | Não |
-| Origem de encaminhamento, medida protetiva | Criptografado, papel dedicado, auditoria obrigatória | Não |
+| Alergia, restrição alimentar, medicação de uso contínuo | Criptografado, **tabela separada** | Não |
 | Dados de responsável legal | Criptografado + blind index | Igualdade exata |
 | Data de nascimento | Texto puro (necessária para faixa etária e maioridade) | Sim |
 | Código interno, iniciais | Texto puro | Sim |
@@ -90,6 +83,11 @@ toda a base já gravada; ver `docs/decisoes/0001-normalizacao-blind-index-autoco
 - Chave do HMAC dos blind indexes separada da chave de criptografia
 - Rotação planejada desde o início (`APP_PREVIOUS_KEYS` + comando de re-encriptação em lote)
 - Backup da chave em local distinto do backup do banco — **perder a chave é perder os dados**
+
+**Convenção de escrita:** campo cifrado é escrito **apenas via instância de model**, nunca
+por query builder (`Model::query()->update()`, `upsert()`, `insert()` em massa) — esses
+caminhos não disparam o hook que sincroniza o blind index, e ainda gravariam texto puro por
+não passarem pelo cast.
 
 ## Padrão de exposição na interface
 

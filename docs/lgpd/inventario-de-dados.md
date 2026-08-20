@@ -11,4 +11,5 @@ Este documento deve listar, para cada campo pessoal de assistido/responsável:
 | _a preencher_ | | | | |
 
 Sem este inventário preenchido, nenhuma entidade do domínio de assistidos (`assisted_minors`,
-`guardians`, `health_records`, `referrals`, etc.) deve ser implementada em produção.
+`guardians`, `guardianships`, `consents`, `health_records`, etc.) deve ser implementada em
+produção.
