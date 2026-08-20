@@ -2,17 +2,15 @@
 
 <template>
   <div class="layout">
-    <header class="layout__header">
-      <strong>Lar Anália Franco</strong>
-    </header>
+    <a class="skip-link" href="#main">Pular para o conteúdo</a>
 
-    <main class="layout__main">
+    <AppHeader />
+
+    <main id="main" class="layout__main">
       <slot />
     </main>
 
-    <footer class="layout__footer">
-      <p>Lar Anália Franco — conteúdo institucional em construção.</p>
-    </footer>
+    <AppFooter />
   </div>
 </template>
 
@@ -23,13 +21,25 @@
   flex-direction: column;
 }
 
-.layout__header,
-.layout__footer {
-  padding: 1rem 1.5rem;
-}
-
 .layout__main {
   flex: 1;
-  padding: 1.5rem;
+  padding-block: var(--space-7);
+}
+
+/* Só aparece com foco de teclado — primeiro elemento tabulável da página, antes do menu. */
+.skip-link {
+  position: fixed;
+  top: -3rem;
+  left: var(--space-4);
+  z-index: 50;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+.skip-link:focus-visible {
+  top: var(--space-4);
 }
 </style>

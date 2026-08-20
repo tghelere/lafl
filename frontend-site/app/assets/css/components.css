@@ -1,0 +1,474 @@
+/* Componentes base do sistema de design. Cada bloco só declara margem/espaçamento que lhe
+   pertence — layout de página (frontend-site/app/layouts/default.vue) usa padding para
+   separar cabeçalho/main/rodapé, nunca margem, para não competir com o ritmo vertical de
+   base.css dentro do conteúdo. */
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+/* Botão — duas variantes, quatro estados cada */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.btn--primary {
+  background: var(--color-quadra);
+  color: var(--color-surface);
+  border-color: var(--color-quadra);
+}
+
+.btn--primary:hover {
+  background: var(--color-quadra-dark);
+  border-color: var(--color-quadra-dark);
+}
+
+.btn--primary:active {
+  background: var(--color-quadra-darker);
+  border-color: var(--color-quadra-darker);
+}
+
+.btn--primary:disabled,
+.btn--primary[aria-disabled='true'] {
+  background: var(--color-linha);
+  border-color: var(--color-linha);
+  color: var(--color-surface);
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.btn--secondary:hover {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.btn--secondary:active {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-linha);
+}
+
+.btn--secondary:disabled,
+.btn--secondary[aria-disabled='true'] {
+  color: var(--color-linha);
+  border-color: var(--color-border);
+  background: transparent;
+  cursor: not-allowed;
+}
+
+/* Card */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.card > :last-child {
+  margin-bottom: 0;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  margin-bottom: var(--space-6);
+}
+
+.breadcrumb ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-linha);
+}
+
+.breadcrumb li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.breadcrumb li:not(:last-child)::after {
+  content: '/';
+  color: var(--color-border);
+}
+
+.breadcrumb a {
+  color: var(--color-ink-soft);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--color-quadra);
+  text-decoration: underline;
+}
+
+.breadcrumb [aria-current='page'] {
+  color: var(--color-ink);
+}
+
+/* Prose — corpo de texto vindo do CMS (parágrafo, lista, subtítulo, citação, link). Não
+   redefine margem de p/ul/ol/h2/h3 — reaproveita a de base.css para não ter duas fontes de
+   margem para o mesmo elemento. */
+.prose {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ink);
+  max-width: 68ch;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+.prose blockquote {
+  margin-left: 0;
+  padding: var(--space-1) 0 var(--space-1) var(--space-5);
+  border-left: 3px solid var(--color-quadra);
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose strong {
+  font-weight: var(--weight-semibold);
+}
+
+/* Cabeçalho do site */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.site-header__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+}
+
+.site-header__mark {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  color: var(--color-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header__mark:hover {
+  color: var(--color-ink);
+}
+
+.site-header__nav {
+  display: none;
+}
+
+.site-header__nav ul {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-header__nav a {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink-soft);
+  text-decoration: none;
+  padding: var(--space-2) 0;
+}
+
+.site-header__nav a:hover,
+.site-header__nav a.router-link-active {
+  color: var(--color-quadra);
+}
+
+.site-header__cta {
+  display: none;
+}
+
+.site-header__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.site-header__toggle-icon {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  position: relative;
+}
+
+.site-header__toggle-icon::before,
+.site-header__toggle-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+}
+
+.site-header__toggle-icon::before {
+  top: -6px;
+}
+
+.site-header__toggle-icon::after {
+  top: 6px;
+}
+
+/* Menu mobile — painel de tela cheia, some via display quando fechado (não fica no fluxo
+   nem no foco do teclado). A transição de entrada é zerada por prefers-reduced-motion no
+   base.css. */
+.mobile-nav {
+  position: fixed;
+  inset: 0;
+  top: 61px;
+  background: var(--color-paper);
+  overflow-y: auto;
+  padding: var(--space-6) var(--container-padding);
+}
+
+.mobile-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.mobile-nav a {
+  display: block;
+  padding: var(--space-4) 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-xl);
+  color: var(--color-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mobile-nav a:hover,
+.mobile-nav a.router-link-active {
+  color: var(--color-quadra);
+}
+
+.mobile-nav__cta {
+  margin-top: var(--space-6);
+}
+
+.mobile-nav-enter-active,
+.mobile-nav-leave-active {
+  transition:
+    opacity var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+}
+
+.mobile-nav-enter-from,
+.mobile-nav-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+@media (min-width: 64rem) {
+  .site-header__nav {
+    display: block;
+  }
+
+  .site-header__cta {
+    display: inline-flex;
+  }
+
+  .site-header__toggle {
+    display: none;
+  }
+}
+
+/* Rodapé */
+.site-footer {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding-block: var(--space-8);
+  margin-top: auto;
+}
+
+/* Dentro do rodapé escuro, o anel de foco padrão (verde sobre verde) não garante 3:1 — troca
+   para paper, que tem ~19:1 de contraste contra o fundo ink. */
+.site-footer :focus-visible {
+  outline-color: var(--color-paper);
+}
+
+.site-footer__grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+}
+
+.site-footer h2 {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-linha);
+  margin: 0 0 var(--space-3);
+}
+
+.site-footer ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.site-footer a {
+  color: var(--color-paper);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--color-ocre);
+  text-decoration: underline;
+}
+
+.site-footer__base {
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid rgb(242 244 241 / 15%);
+  font-size: var(--text-xs);
+  color: var(--color-linha);
+}
+
+/* Linha de registro — a assinatura do sistema. Todo número institucional é um item de
+   linha: numeral em Bitter, rótulo em versalete, data alinhada à direita, hairline. NUNCA
+   cita fonte externa (a instituição é a fonte dos seus próprios números — ver ADR 0009);
+   a data é sempre a única anotação. Valores reais dependem de validação — ver
+   docs/roadmap.md. */
+.ledger {
+  border-top: 1px solid var(--color-border);
+}
+
+.ledger__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ledger__figure {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.ledger__value {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-2xl);
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.ledger__label {
+  font-size: var(--text-sm);
+  color: var(--color-ink-soft);
+  overflow-wrap: break-word;
+}
+
+.ledger__date {
+  font-size: var(--text-xs);
+  color: var(--color-linha);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Variante "entry" — usada na cronologia do Lar hoje: data à esquerda, descrição no lugar
+   do numeral, sem valor grande em destaque. */
+.ledger__item--entry .ledger__figure {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.ledger__item--entry .ledger__value {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+}
+
+.ledger__item--entry .ledger__label {
+  color: var(--color-ink);
+}
+
+/* Ocre nunca é cor de texto sobre paper — contraste ~2,9:1, abaixo até do mínimo AA para
+   texto grande. Aqui ele entra só como fundo tintado; quem garante leitura é o ink por
+   cima. */
+.ledger__badge {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: rgb(184 134 43 / 18%);
+  border-radius: var(--radius-full);
+  padding: 0.15em 0.6em;
+  margin-bottom: var(--space-1);
+}

@@ -1,0 +1,77 @@
+/* Tokens de design — única fonte de verdade para cor, tipografia, espaçamento, raio e
+   sombra. Ver docs/decisoes/0009-direcao-visual.md para a justificativa de cada escolha. */
+
+:root {
+  /* Cor */
+  --color-ink: #1e2321;
+  --color-ink-soft: #3f4644;
+  --color-paper: #f2f4f1;
+  --color-surface: #ffffff;
+  --color-quadra: #1b6e4c;
+  --color-quadra-dark: #14432b;
+  --color-quadra-darker: #0f3c2a;
+  --color-ocre: #b8862b;
+  --color-linha: #8b968e;
+  --color-border: #d8ddd7;
+  --color-focus: var(--color-quadra);
+  --color-scrim: rgb(30 35 33 / 60%);
+
+  /* Tipografia — display com restrição (H1–H3, numeral da linha de registro), texto no
+     resto. Ver ADR 0009 para a decisão de trocar Zilla Slab por Bitter. */
+  --font-display: 'Bitter', Georgia, 'Times New Roman', serif;
+  --font-body:
+    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  --text-xs: 0.8125rem; /* 13px — legenda, timestamp, breadcrumb */
+  --text-sm: 0.9375rem; /* 15px — navegação, UI pequena */
+  --text-base: 1.0625rem; /* 17px — corpo de texto */
+  --text-lg: 1.25rem; /* 20px — lead, corpo grande */
+  --text-xl: 1.625rem; /* 26px — H3 */
+  --text-2xl: 2rem; /* 32px — H2 */
+  --text-3xl: 2.75rem; /* 44px — H1 */
+  --text-4xl: 3.5rem; /* 56px — numeral de destaque */
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+
+  /* Espaçamento — escala de 4px */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Raio — deliberadamente contido, sem cantos muito arredondados (ver alerta de "fofice"
+     no ADR 0009) */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-full: 999px;
+
+  /* Sombra — uso mínimo */
+  --shadow-sm: 0 1px 2px rgb(30 35 33 / 8%);
+  --shadow-md: 0 4px 16px rgb(30 35 33 / 12%);
+
+  /* Layout */
+  --container-max: 72rem;
+  --container-padding: clamp(1rem, 4vw, 2rem);
+
+  /* Movimento — neutralizado inteiro em prefers-reduced-motion (ver base.css) */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}

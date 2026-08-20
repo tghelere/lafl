@@ -3,6 +3,14 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  // Ordem importa: fontes antes de tokens, tokens antes de base, base antes de componentes.
+  css: [
+    '~/assets/css/fonts.css',
+    '~/assets/css/tokens.css',
+    '~/assets/css/base.css',
+    '~/assets/css/components.css',
+  ],
+
   runtimeConfig: {
     public: {
       // Preenchidos via NUXT_PUBLIC_* no .env — ver .env.example.
@@ -20,10 +28,16 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    // O crawler do `nuxt generate` só segue links de página — robots.txt e sitemap.xml são
-    // rotas do Nitro sem link nenhum apontando pra elas, então precisam ser listadas aqui
-    // para entrar no output estático (SSG).
     prerender: {
+      // O cabeçalho (AppHeader.vue) já linka os sete itens do menu principal de
+      // docs/estrutura-site.md §1.1, mas só "Quem somos" existe como página de fato — as
+      // outras seis (educação infantil, contraturno, bazar, como ajudar, transparência)
+      // ainda não têm rota implementada (ver docs/roadmap.md). Com o crawler padrão
+      // (`crawlLinks: true`), `nuxt generate` seguiria esses links e falharia tentando
+      // prerenderizar uma rota sem página. `crawlLinks: false` faz o generate prerenderizar
+      // só o que está listado abaixo — mesma lógica manual que "Quem somos" já usa: quando
+      // uma rota nova entrar, ela entra nesta lista.
+      crawlLinks: false,
       routes: [
         '/robots.txt',
         '/sitemap.xml',

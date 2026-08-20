@@ -48,8 +48,15 @@
 - [ ] `sitemap.xml`/`robots.txt` consumindo conteúdo real (hoje geram só a partir de
       `NUXT_PUBLIC_SITE_URL`, sem `pages`/`posts`)
 - [ ] JSON-LD `NGO`/`Organization`
-- [ ] Direção visual (paleta, tipografia) — proposta e aprovação antes de estilizar
+- [x] Direção visual (paleta, tipografia, componentes base) — ver
+      `docs/decisoes/0009-direcao-visual.md`
 - [ ] Eventos Umami nos CTAs
+- [ ] **Bloqueia publicação:** a linha de registro (`LedgerLine.vue`, assinatura visual do
+      sistema) exibe número institucional + data, sem fonte externa. Os valores usados até
+      agora (250 crianças, 63 anos, 40% do orçamento) vêm de `docs/contexto.md` marcados
+      `[CONFIRMAR]`/`[VALIDAR]` — não podem ir ao ar como estão. Toda instância do componente
+      fora de exemplo marcado (`example` prop) precisa de número validado pela instituição
+      antes do deploy.
 
 ### Painel administrativo (Vue)
 

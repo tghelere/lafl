@@ -1,0 +1,150 @@
+/* Reset e estilos base. Ritmo vertical: todo elemento de bloco usa margin-bottom; títulos
+   somam margin-top. Como são irmãos em fluxo normal (nenhum container aqui é flex/grid), as
+   margens colapsam pela regra padrão do CSS — o maior valor vence, não a soma. Isso evita o
+   dobro de espaço entre seção e título que a especificidade costuma causar quando duas
+   regras diferentes aplicam margem ao mesmo elemento; aqui só uma direção por regra, nunca
+   duas fontes de margem para o mesmo lado. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--weight-regular);
+  text-rendering: optimizeLegibility;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-ink);
+  margin: var(--space-8) 0 var(--space-4);
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child,
+h5:first-child,
+h6:first-child {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: var(--text-3xl);
+}
+
+h2 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+}
+
+h3 {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+
+/* H4 em diante sai da família de display — Bitter "com restrição" fica só para os três
+   primeiros níveis, onde a personalidade da face realmente aparece. */
+h4,
+h5,
+h6 {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+}
+
+p,
+ul,
+ol,
+blockquote,
+table,
+dl {
+  margin: 0 0 var(--space-4);
+}
+
+ul,
+ol {
+  padding-left: var(--space-6);
+}
+
+li + li {
+  margin-top: var(--space-2);
+}
+
+a {
+  color: var(--color-quadra);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: var(--color-quadra-dark);
+}
+
+a:active {
+  color: var(--color-quadra-darker);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Indicador de foco único e visível em todo elemento interativo — sem exceção. Trocado por
+   um contorno claro dentro de superfícies escuras (ver .site-footer em components.css). */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::selection {
+  background: var(--color-quadra);
+  color: var(--color-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
