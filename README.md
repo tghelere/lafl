@@ -189,6 +189,11 @@ Registradas com justificativa nos commits correspondentes; resumo:
   o backend reinicia com uma chave nova, ou o `docker compose down -v` recria o volume do
   Postgres/sessão). Limpa os cookies de `localhost` (DevTools → Application → Storage →
   Clear site data) e tenta de novo.
+- **`SecurityError` de `localStorage` ao rodar `npm run dev` do site público, no Chrome com
+  extensões de privacidade instaladas** — vem do próprio cliente de dev do Vite (HMR),
+  não do código do site, e não acontece em produção. Para QA visual do site público em dev,
+  usar Firefox ou testar o build gerado (`npm run build && npm run preview`, ou `npm run
+  generate` e servir `.output/public`).
 
 ## Pendências conhecidas
 

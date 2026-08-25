@@ -39,6 +39,7 @@ export default defineNuxtConfig({
       // uma rota nova entrar, ela entra nesta lista.
       crawlLinks: false,
       routes: [
+        '/',
         '/robots.txt',
         '/sitemap.xml',
         // "Quem somos" e as quatro subpáginas de docs/estrutura-site.md §1.2 — slugs atuais
