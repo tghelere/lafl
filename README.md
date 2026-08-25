@@ -132,7 +132,7 @@ cd backend && php artisan tinker --execute="dump(\Spatie\Activitylog\Models\Acti
 # backend/
 php artisan test
 ./vendor/bin/pint
-./vendor/bin/phpstan analyse
+./vendor/bin/phpstan analyse --memory-limit=512M   # 128M (padrão do PHP) estoura com o volume atual de código
 
 # frontend-admin/
 npm run lint
