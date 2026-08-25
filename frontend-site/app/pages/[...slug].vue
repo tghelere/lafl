@@ -1,11 +1,19 @@
 <script setup lang="ts">
-// [[slug]] (parâmetro único opcional, não catch-all) casa só com "/quem-somos" e
-// "/quem-somos/:um-segmento" — o mesmo limite de dois níveis que a Action SavePage garante
-// no backend. Uma URL de três níveis nem chega a resolver esta rota.
+// Catch-all: serve qualquer página do CMS pelo slug (docs/estrutura-site.md §1.2 e §3.1),
+// respeitando o limite de dois níveis que App\Actions\Content\SavePage já garante no
+// backend. Uma rota com página própria (ex.: /transparencia/documentos) tem prioridade sobre
+// esta, por precedência padrão do roteador do Nuxt — rota estática sempre vence catch-all.
 const route = useRoute()
 
-const slugParam = route.params.slug as string | undefined
-const slug = slugParam ? `quem-somos/${slugParam}` : 'quem-somos'
+const rawSlug = route.params.slug
+const segments = Array.isArray(rawSlug) ? rawSlug : rawSlug ? [rawSlug] : []
+
+if (segments.length === 0 || segments.length > 2) {
+  throw createError({ statusCode: 404, statusMessage: 'Página não encontrada', fatal: true })
+}
+
+const slug = segments.join('/')
+const parentSlug = segments.length === 2 ? segments[0] : null
 
 const { data, error } = await usePublicPage(slug)
 
@@ -14,23 +22,29 @@ if (error.value) {
 }
 
 if (data.value && 'redirect_to' in data.value) {
-  // Slug histórico: o 301 real e visível ao navegador acontece aqui, não na API (ver
-  // App\Http\Controllers\Api\V1\Public\PageController).
+  // 301 real e visível ao navegador acontece aqui, não na API (ver
+  // App\Http\Controllers\Api\V1\Public\PageController, que devolve 200 nesse hop
+  // servidor-a-servidor).
   await navigateTo(`/${data.value.redirect_to}`, { redirectCode: 301, external: false })
 }
 
 const page = computed(() => (data.value && 'data' in data.value ? data.value.data : null))
 
-// Trilha de navegação: derivada da presença do parâmetro de slug, não de dado novo — a
-// última posição nunca é link (é a página atual).
+// Título da página-mãe só é buscado quando existe segundo nível — evita um fetch extra nas
+// páginas de primeiro nível, que são a maioria.
+const { data: parentData } = parentSlug ? await usePublicPage(parentSlug) : { data: ref(null) }
+const parentPage = computed(() =>
+  parentData.value && 'data' in parentData.value ? parentData.value.data : null,
+)
+
+// Trilha de navegação derivada do slug: um segmento vira "Início / Título"; dois segmentos
+// viram "Início / Título da mãe / Título atual". A última posição nunca é link.
 const breadcrumbItems = computed(() => {
   const items: Array<{ label: string; to?: string }> = [{ label: 'Início', to: '/' }]
-  if (slugParam) {
-    items.push({ label: 'Quem somos', to: '/quem-somos' })
-    items.push({ label: page.value?.title ?? '' })
-  } else {
-    items.push({ label: 'Quem somos' })
+  if (parentSlug) {
+    items.push({ label: parentPage.value?.title ?? '', to: `/${parentSlug}` })
   }
+  items.push({ label: page.value?.title ?? '' })
   return items
 })
 

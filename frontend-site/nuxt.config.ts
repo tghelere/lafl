@@ -30,23 +30,24 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       // O cabeçalho (AppHeader.vue) já linka os sete itens do menu principal de
-      // docs/estrutura-site.md §1.1, mas só "Quem somos" existe como página de fato — as
-      // outras seis (educação infantil, contraturno, bazar, como ajudar, transparência)
-      // ainda não têm rota implementada (ver docs/roadmap.md). Com o crawler padrão
-      // (`crawlLinks: true`), `nuxt generate` seguiria esses links e falharia tentando
-      // prerenderizar uma rota sem página. `crawlLinks: false` faz o generate prerenderizar
-      // só o que está listado abaixo — mesma lógica manual que "Quem somos" já usa: quando
-      // uma rota nova entrar, ela entra nesta lista.
+      // docs/estrutura-site.md §1.1, mas nem toda seção tem página própria ainda (ver
+      // docs/roadmap.md). Com o crawler padrão (`crawlLinks: true`), `nuxt generate` seguiria
+      // esses links e falharia tentando prerenderizar uma rota sem página ou sem página do
+      // CMS correspondente. `crawlLinks: false` faz o generate prerenderizar só o que está
+      // listado abaixo. Toda página do CMS é servida pela rota genérica `[...slug].vue`
+      // (Etapa 1 do roadmap) — generalizar isso é responsabilidade do template, não deste
+      // arquivo; aqui ainda listamos cada slug manualmente porque não existe endpoint público
+      // de listagem de páginas (só `GET /pages/{slug}`, ver docs/estrutura-site.md §3.1) para
+      // descobrir as rotas publicadas em tempo de build.
       crawlLinks: false,
       routes: [
         '/',
         '/robots.txt',
         '/sitemap.xml',
-        // "Quem somos" e as quatro subpáginas de docs/estrutura-site.md §1.2 — slugs atuais
-        // conhecidos no momento do build. Renomear uma delas exige rodar `nuxt generate` de
-        // novo para o novo slug entrar no output estático; o slug antigo só resolve com 301
-        // se o site estiver rodando com o servidor Nitro (`nuxt build` + node), não em
-        // hospedagem 100% estática (ver docs/roadmap.md).
+        // Slugs atuais conhecidos no momento do build. Renomear um deles exige rodar `nuxt
+        // generate` de novo para o novo slug entrar no output estático; o slug antigo só
+        // resolve com 301 se o site estiver rodando com o servidor Nitro (`nuxt build` +
+        // node), não em hospedagem 100% estática (ver docs/roadmap.md).
         '/quem-somos',
         '/quem-somos/nossa-historia',
         '/quem-somos/missao-visao-valores',
