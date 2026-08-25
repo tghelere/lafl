@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
+use App\Http\Controllers\Api\V1\Public\TransparencyDocumentController as PublicTransparencyDocumentController;
+use App\Http\Controllers\Api\V1\TransparencyDocumentController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->name('auth.')->group(function (): void {
@@ -26,8 +28,16 @@ Route::prefix('public')->name('public.')->group(function (): void {
     Route::get('/pages/{slug}', [PublicPageController::class, 'show'])
         ->where('slug', '.*')
         ->name('pages.show');
+
+    Route::get('/transparency-documents', [PublicTransparencyDocumentController::class, 'index'])
+        ->name('transparency-documents.index');
+    Route::get('/transparency-documents/{uuid}/download', [PublicTransparencyDocumentController::class, 'download'])
+        ->where('uuid', '[0-9a-fA-F-]{36}')
+        ->name('transparency-documents.download');
 });
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::apiResource('pages', PageController::class)->parameters(['pages' => 'page']);
+    Route::apiResource('transparency-documents', TransparencyDocumentController::class)
+        ->parameters(['transparency-documents' => 'transparencyDocument']);
 });
