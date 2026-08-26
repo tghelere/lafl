@@ -1,0 +1,78 @@
+/* Tokens de design do painel — mesma paleta e mesmas famílias do site público (ver
+   docs/decisoes/0009-direcao-visual.md): é a mesma instituição, e inventar uma segunda
+   linguagem visual para o painel seria retrabalho sem motivo. A escala tipográfica é menor e
+   o Bitter (display) fica restrito ao título de cada tela — painel é ferramenta de trabalho
+   densa, não peça editorial. Espaçamento, raio e sombra são os mesmos tokens do site: a
+   densidade maior vem de qual token os componentes escolhem usar (space-2/3/4 em vez de
+   space-5/6/7), não de uma escala numérica diferente. */
+
+:root {
+  /* Cor — idêntica ao site público */
+  --color-ink: #1e2321;
+  --color-ink-soft: #3f4644;
+  --color-paper: #f2f4f1;
+  --color-surface: #ffffff;
+  --color-quadra: #1b6e4c;
+  --color-quadra-dark: #14432b;
+  --color-quadra-darker: #0f3c2a;
+  --color-ocre: #b8862b;
+  --color-linha: #8b968e;
+  --color-border: #d8ddd7;
+  --color-focus: var(--color-quadra);
+  --color-scrim: rgb(30 35 33 / 60%);
+  --color-error: #b3261e;
+  --color-error-bg: rgb(179 38 30 / 8%);
+
+  /* Tipografia — Bitter só no título da tela (h1); o resto do painel é IBM Plex Sans. Escala
+     um nível abaixo da do site (base 14px, não 17px) — painel administrativo é lido de perto,
+     por quem já conhece a interface, em sessões mais longas. */
+  --font-display: 'Bitter', Georgia, 'Times New Roman', serif;
+  --font-body:
+    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  --text-xs: 0.75rem; /* 12px — legenda, timestamp, badge */
+  --text-sm: 0.8125rem; /* 13px — UI pequena, tabela */
+  --text-base: 0.875rem; /* 14px — corpo de texto */
+  --text-lg: 1rem; /* 16px — lead */
+  --text-xl: 1.25rem; /* 20px — h3 */
+  --text-2xl: 1.5rem; /* 24px — h2 */
+  --text-3xl: 2rem; /* 32px — h1, título de tela */
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+
+  /* Espaçamento — mesma escala de 4px do site */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgb(30 35 33 / 8%);
+  --shadow-md: 0 4px 16px rgb(30 35 33 / 12%);
+
+  /* Layout do painel */
+  --sidebar-width: 15rem;
+  --content-max: 72rem;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}

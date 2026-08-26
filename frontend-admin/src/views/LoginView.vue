@@ -35,31 +35,35 @@ async function handleSubmit(): Promise<void> {
 <template>
   <main class="login">
     <form
-      class="login__form"
+      class="login__form card"
       @submit.prevent="handleSubmit"
     >
-      <h1>Lar Anália Franco</h1>
-      <p class="login__subtitle">
+      <p class="login__eyebrow">
         Painel administrativo
       </p>
+      <h1>Lar Anália Franco</h1>
 
-      <label for="email">E-mail</label>
-      <input
-        id="email"
-        v-model="email"
-        type="email"
-        autocomplete="username"
-        required
-      >
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input
+          id="email"
+          v-model="email"
+          type="email"
+          autocomplete="username"
+          required
+        >
+      </div>
 
-      <label for="password">Senha</label>
-      <input
-        id="password"
-        v-model="password"
-        type="password"
-        autocomplete="current-password"
-        required
-      >
+      <div class="field">
+        <label for="password">Senha</label>
+        <input
+          id="password"
+          v-model="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
 
       <p
         v-if="errorMessage"
@@ -71,9 +75,10 @@ async function handleSubmit(): Promise<void> {
 
       <button
         type="submit"
+        class="btn btn--primary login__submit"
         :disabled="isSubmitting"
       >
-        {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
+        {{ isSubmitting ? 'Entrando…' : 'Entrar' }}
       </button>
     </form>
   </main>
@@ -85,36 +90,37 @@ async function handleSubmit(): Promise<void> {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 1rem;
+  padding: var(--space-4);
+  background: var(--color-paper);
 }
 
 .login__form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
   width: 100%;
-  max-width: 320px;
+  max-width: 22rem;
 }
 
-.login__subtitle {
-  margin: 0 0 1rem;
-  color: #666;
+.login__eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-linha);
+  margin: 0 0 var(--space-2);
+}
+
+.login__form h1 {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-5);
 }
 
 .login__error {
-  color: #b91c1c;
-  margin: 0;
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-4);
 }
 
-input {
-  padding: 0.5rem;
-  font-size: 1rem;
-}
-
-button {
-  margin-top: 1rem;
-  padding: 0.6rem;
-  font-size: 1rem;
-  cursor: pointer;
+.login__submit {
+  width: 100%;
+  margin-top: var(--space-2);
 }
 </style>
