@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Jobs\PurgeCompletedPickupRequestAddresses;
 use App\Jobs\PurgeExpiredFormSubmissions;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -15,3 +16,7 @@ Artisan::command('inspire', function () {
 // docs/estrutura-site.md §2.2). Depende de `php artisan schedule:work` (ou cron real em
 // produção) estar rodando — não dispara sozinho.
 Schedule::job(new PurgeExpiredFormSubmissions)->daily();
+
+// Endereço de pickup_requests some assim que a coleta é concluída, não só ao fim da retenção
+// geral (ver docs/dominio.md) — roda mais vezes ao dia que o expurgo geral por isso.
+Schedule::job(new PurgeCompletedPickupRequestAddresses)->hourly();

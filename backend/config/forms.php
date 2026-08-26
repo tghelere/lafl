@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\EnrollmentInterest;
+use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
 
 return [
@@ -21,6 +22,7 @@ return [
     'submission_models' => [
         EnrollmentInterest::class,
         ProgramApplication::class,
+        PickupRequest::class,
     ],
 
     /*

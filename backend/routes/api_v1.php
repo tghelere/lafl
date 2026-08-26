@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\Public\EnrollmentInterestController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
+use App\Http\Controllers\Api\V1\Public\PickupRequestController;
 use App\Http\Controllers\Api\V1\Public\ProgramApplicationController;
 use App\Http\Controllers\Api\V1\Public\TransparencyDocumentController as PublicTransparencyDocumentController;
 use App\Http\Controllers\Api\V1\TransparencyDocumentController;
@@ -44,6 +45,8 @@ Route::prefix('public')->name('public.')->group(function (): void {
             ->name('enrollment-interests.store');
         Route::post('/program-applications', [ProgramApplicationController::class, 'store'])
             ->name('program-applications.store');
+        Route::post('/pickup-requests', [PickupRequestController::class, 'store'])
+            ->name('pickup-requests.store');
     });
 });
 
