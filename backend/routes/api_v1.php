@@ -6,9 +6,11 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\Public\EnrollmentInterestController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
+use App\Http\Controllers\Api\V1\Public\PartnershipInquiryController;
 use App\Http\Controllers\Api\V1\Public\PickupRequestController;
 use App\Http\Controllers\Api\V1\Public\ProgramApplicationController;
 use App\Http\Controllers\Api\V1\Public\TransparencyDocumentController as PublicTransparencyDocumentController;
+use App\Http\Controllers\Api\V1\Public\VolunteerApplicationController;
 use App\Http\Controllers\Api\V1\TransparencyDocumentController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +49,10 @@ Route::prefix('public')->name('public.')->group(function (): void {
             ->name('program-applications.store');
         Route::post('/pickup-requests', [PickupRequestController::class, 'store'])
             ->name('pickup-requests.store');
+        Route::post('/volunteer-applications', [VolunteerApplicationController::class, 'store'])
+            ->name('volunteer-applications.store');
+        Route::post('/partnership-inquiries', [PartnershipInquiryController::class, 'store'])
+            ->name('partnership-inquiries.store');
     });
 });
 

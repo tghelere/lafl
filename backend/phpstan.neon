@@ -20,11 +20,3 @@ parameters:
         - app/Providers/*ServiceProvider.php
 
     checkOctaneCompatibility: true
-
-    ignoreErrors:
-        -
-            # HasBlindIndex é infraestrutura sem consumidor de domínio ainda por decisão
-            # explícita desta fatia (ver docs/protecao-de-dados.md e o model de exemplo em
-            # tests/Feature/DataProtection) — não é código morto a remover.
-            identifier: trait.unused
-            path: app/Models/Concerns/HasBlindIndex.php

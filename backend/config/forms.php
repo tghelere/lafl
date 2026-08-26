@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\EnrollmentInterest;
+use App\Models\PartnershipInquiry;
 use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
+use App\Models\VolunteerApplication;
 
 return [
 
@@ -23,6 +25,8 @@ return [
         EnrollmentInterest::class,
         ProgramApplication::class,
         PickupRequest::class,
+        VolunteerApplication::class,
+        PartnershipInquiry::class,
     ],
 
     /*
