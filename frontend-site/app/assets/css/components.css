@@ -474,3 +474,95 @@
   padding: 0.15em 0.6em;
   margin-bottom: var(--space-1);
 }
+
+/* Formulários públicos — os seis de docs/estrutura-site.md Parte 2. `<form method="post">`
+   de verdade, sem framework de formulário: o navegador já faz o trabalho sem JavaScript. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 34rem;
+  margin-top: var(--space-6);
+}
+
+.form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form__field label {
+  font-weight: var(--weight-medium);
+  font-size: var(--text-sm);
+}
+
+.form__field input,
+.form__field select,
+.form__field textarea {
+  font: inherit;
+  font-size: var(--text-base);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.form__field textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.form__field--invalid input,
+.form__field--invalid select,
+.form__field--invalid textarea {
+  border-color: var(--color-error);
+}
+
+.form__hint {
+  font-size: var(--text-xs);
+  color: var(--color-linha);
+}
+
+.form__error {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-error);
+}
+
+.form__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-ink-soft);
+}
+
+.form__consent input {
+  margin-top: 0.3em;
+}
+
+/* Honeypot: fora da tela, mas continua no fluxo de leitura de leitor de tela com rótulo
+   explícito para ignorar — não usar display:none/visibility:hidden, que alguns leitores de
+   tela também pulam, e não interfere na navegação por Tab (tabindex="-1"). */
+.form__honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.form-alert {
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-error);
+  background: var(--color-error-bg);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+}
+
+.form-alert p {
+  margin: 0;
+}

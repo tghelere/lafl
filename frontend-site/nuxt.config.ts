@@ -76,6 +76,26 @@ export default defineNuxtConfig({
         '/como-ajudar/nota-parana',
         '/como-ajudar/parceiros',
         '/transparencia',
+        '/politica-de-privacidade',
+        // Os seis formulários (ver docs/estrutura-site.md Parte 2) NÃO entram aqui, de
+        // propósito — mesmo raciocínio de /transparencia/documentos: cada página lê
+        // route.query (erro=1&campos=...) para reexibir erro de validação sem JavaScript
+        // (ver App\Support\useFormErrorState.ts e server/api/forms/[tipo].post.ts). Uma
+        // página prerenderizada vira arquivo estático servido por caminho, ignorando query
+        // string — colocá-las aqui já causou bug real nesta sessão: o Nitro passou a
+        // devolver sempre o snapshot sem erro, não importa a query. As seis rotas continuam
+        // funcionando normalmente porque o servidor Nitro faz SSR delas a cada request (o
+        // mesmo servidor que já é exigido para o proxy de formulário e para
+        // /transparencia/documentos).
+        //
+        // Confirmação pós-formulário, noindex — as seis variações são enumeráveis, então
+        // prerenderizamos todas por completude (ver App\Enums\FormSubmissionType no backend).
+        '/obrigado/matricula',
+        '/obrigado/inscricao',
+        '/obrigado/coleta',
+        '/obrigado/voluntariado',
+        '/obrigado/parceria',
+        '/obrigado/contato',
       ],
     },
   },

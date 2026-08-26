@@ -16,6 +16,12 @@
   --color-focus: var(--color-quadra);
   --color-scrim: rgb(30 35 33 / 60%);
 
+  /* Estado de erro — introduzido nesta sessão para os seis formulários públicos; o sistema
+     não tinha nenhum token de erro até aqui. ~5,9:1 sobre --color-paper, cumpre AA para texto
+     normal (ao contrário de --color-ocre, que só entra como fundo tintado). */
+  --color-error: #b3261e;
+  --color-error-bg: rgb(179 38 30 / 8%);
+
   /* Tipografia — display com restrição (H1–H3, numeral da linha de registro), texto no
      resto. Ver ADR 0009 para a decisão de trocar Zilla Slab por Bitter. */
   --font-display: 'Bitter', Georgia, 'Times New Roman', serif;
