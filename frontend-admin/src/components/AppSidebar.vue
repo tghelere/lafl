@@ -19,12 +19,16 @@ function hasAnyRole(...names: string[]): boolean {
 
 const showAtendimento = computed(() => hasAnyRole('atendimento', 'direcao', 'super_admin'))
 const showBazar = computed(() => hasAnyRole('bazar', 'direcao', 'super_admin'))
+
+function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
+  return { name: 'submissions.index', params: { resource } }
+}
 </script>
 
 <template>
   <aside class="app-sidebar">
     <RouterLink
-      to="/"
+      to="/admin"
       class="app-sidebar__brand"
     >
       Lar Anália Franco
@@ -38,7 +42,7 @@ const showBazar = computed(() => hasAnyRole('bazar', 'direcao', 'super_admin'))
         Início
       </p>
       <RouterLink
-        to="/"
+        to="/admin"
         class="app-sidebar__link"
       >
         Pendências
@@ -49,31 +53,31 @@ const showBazar = computed(() => hasAnyRole('bazar', 'direcao', 'super_admin'))
           Atendimento
         </p>
         <RouterLink
-          to="/atendimento/enrollment-interests"
+          :to="resourceRoute('enrollment-interests')"
           class="app-sidebar__link"
         >
           Interesses de matrícula
         </RouterLink>
         <RouterLink
-          to="/atendimento/program-applications"
+          :to="resourceRoute('program-applications')"
           class="app-sidebar__link"
         >
           Inscrições do contraturno
         </RouterLink>
         <RouterLink
-          to="/atendimento/partnership-inquiries"
+          :to="resourceRoute('partnership-inquiries')"
           class="app-sidebar__link"
         >
           Propostas de apoio
         </RouterLink>
         <RouterLink
-          to="/atendimento/volunteer-applications"
+          :to="resourceRoute('volunteer-applications')"
           class="app-sidebar__link"
         >
           Voluntários
         </RouterLink>
         <RouterLink
-          to="/atendimento/contact-messages"
+          :to="resourceRoute('contact-messages')"
           class="app-sidebar__link"
         >
           Mensagens de contato
@@ -85,7 +89,7 @@ const showBazar = computed(() => hasAnyRole('bazar', 'direcao', 'super_admin'))
           Bazar
         </p>
         <RouterLink
-          to="/bazar/pickup-requests"
+          :to="resourceRoute('pickup-requests')"
           class="app-sidebar__link"
         >
           Pedidos de coleta
