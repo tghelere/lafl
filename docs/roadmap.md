@@ -41,6 +41,28 @@
 - [x] `/transparencia/documentos`: filtro por ano e tipo via `<form method="get">`, renderizado
       no servidor a cada request, funciona sem JavaScript. Seed com 12 documentos de exemplo
       (PDFs de uma página em branco, gerados em tempo de seed, nunca commitados).
+- [x] Seis formulários públicos ponta a ponta (ver docs/dominio.md, "Formulários recebidos"):
+      `enrollment_interests`, `program_applications`, `pickup_requests`,
+      `volunteer_applications`, `partnership_inquiries`, `contact_messages`. Base comum
+      (`IsFormSubmission`, `FormSubmissionColumns`, honeypot, rate limit por IP) mais as seis
+      entidades (migration, model, Policy, Action, FormRequest, endpoint público, testes).
+      `PickupRequest` expurga o endereço assim que a coleta é concluída, à parte do expurgo
+      geral por `expires_at` que as outras cinco também têm. `PartnershipInquiry` tem blind
+      index de CNPJ. Policy compartilhada (`FormSubmissionPolicy`) segue a matriz de
+      `docs/estrutura-site.md` §4.4 — `bazar` só acessa `pickup_requests`, `comunicacao`
+      nenhum formulário, testado explicitamente.
+- [x] Notificação por e-mail via fila (`App\Mail\FormSubmissionReceived`), sem dado pessoal no
+      corpo, destinatário por tipo via `config('forms.notification_recipients')`. Testado de
+      ponta a ponta contra Mailpit real (docker-compose), não só com `Mail::fake()`.
+- [x] Backend confia no site público como proxy de IP (`TRUSTED_PROXIES`, `bootstrap/app.php`)
+      — necessário para o rate limit por IP funcionar quando o formulário passa pelo proxy do
+      Nuxt em vez de chamar a API direto.
+- [x] Site público: as seis páginas de formulário, `/obrigado/[tipo]` (noindex),
+      `/politica-de-privacidade` e o redirect `/como-ajudar/doar-itens → /bazar/agendar-coleta`
+      (pendente desde a sessão anterior, agora com destino). `<form method="post">` de
+      verdade, funciona sem JavaScript via proxy servidor-a-servidor
+      (`server/api/forms/[tipo].post.ts`) que decide redirect de sucesso ou reexibição de erro
+      — a API Laravel continua REST puro, sem view.
 
 ## Em andamento
 
@@ -58,23 +80,16 @@
 - [ ] `testimonials`, `partners`, `institution_stats`
 - [ ] `settings`
 - [ ] `bazaar_showcase_items`
-- [ ] Formulários recebidos: `enrollment_interests`, `program_applications`,
-      `pickup_requests`, `volunteer_applications`, `partnership_inquiries`, `contact_messages`
-      — com rate limit, honeypot, job de descarte por `expires_at`
-- [ ] Teste Pest explícito de que `comunicacao` não acessa nenhum formulário recebido — ainda
-      não escrito porque nenhum formulário existe no código ainda; não há o que testar até a
-      primeira entidade de formulário ser criada. `TransparencyDocumentPolicy` já restringe
-      documentos de transparência a só `direcao` (testado), mas isso não é um "formulário
-      recebido" no sentido do domínio.
+- [ ] Leitura administrativa dos seis formulários recebidos (listagem, detalhe, mudança de
+      status, anotação interna) — adiada de propósito nesta sessão ("a leitura desses dados
+      virá depois"). As Policies já existem e estão testadas (`viewAny`/`view`/`update`/
+      `delete`), só falta o Controller/Resource/rota administrativa que as use — mesmo padrão
+      já usado em `pages` e `transparency-documents`.
+- [ ] Fotos opcionais em `pickup_requests` (`media_ids` no domínio) — depende da entidade
+      `media`, fora de escopo
 
 ### Site público (Nuxt)
 
-- [ ] Formulários e rotas dependentes de formulário — nenhum implementado nesta sessão por
-      escopo explícito: `/educacao-infantil/matricula`, `/contraturno/inscricao`,
-      `/contraturno/apoiar`, `/bazar/agendar-coleta`, `/como-ajudar/voluntariado`, `/contato`
-- [ ] `/como-ajudar/doar-itens` (redirect 301 → `/bazar/agendar-coleta`) — não implementado
-      porque o destino ainda não existe (é rota de formulário); criar o redirect junto da
-      página de agendamento de coleta
 - [ ] `/bazar/novidades` (vitrine do bazar) — fora de escopo desta sessão, depende de
       `bazaar_showcase_items` e ainda tem `[VALIDAR]` pendente (preço, quem alimenta)
 - [ ] Seção de notícias (`/noticias`, `/noticias/:slug`) — depende de `posts`
@@ -108,12 +123,16 @@
       acolhimento) é entregável em aberto a validar com a instituição
 - [x] Direção visual (paleta, tipografia, componentes base) — ver
       `docs/decisoes/0009-direcao-visual.md`
-- [ ] O menu principal (`AppHeader.vue`) e o rodapé (`AppFooter.vue`) ainda linkam algumas
-      rotas sem página própria: `/como-ajudar/doar-itens` (redirect pendente, ver acima) e as
-      rotas de formulário listadas no início desta seção. O aviso
-      `[VUE_ROUTER_R0004] No match found` no console do `nuxt dev` para essas rotas é esperado
-      (`crawlLinks: false` em `nuxt.config.ts` já impede que isso quebre `nuxt generate`, ver
-      ADR 0009) e some conforme cada uma ganhar página.
+- [x] O menu principal (`AppHeader.vue`) e o rodapé (`AppFooter.vue`) linkavam rotas sem
+      página própria (`/como-ajudar/doar-itens`, as seis rotas de formulário) — todas
+      resolvidas nesta sessão. Nenhum link conhecido do header/footer aponta para rota
+      inexistente no momento.
+- [ ] As páginas de conteúdo (`/educacao-infantil`, `/contraturno`, `/bazar/o-que-aceitamos`,
+      `/como-ajudar`) ainda não têm CTA direto para os formulários correspondentes
+      (`matricula`, `inscricao`, `agendar-coleta`, `voluntariado`) — só o rodapé linka. Editar
+      o `ContentPagesSeeder` para adicionar essas chamadas é uma melhoria de conteúdo pequena,
+      não fechada nesta sessão por não estar no escopo pedido (só as seis páginas de
+      formulário e o redirect).
 - [ ] **Bloqueia publicação:** a linha de registro (`LedgerLine.vue`) na home exibe três
       números institucionais (250 crianças, 63 anos, 40% do orçamento) em modo `example` —
       vêm de `docs/contexto.md` sem marca `[CONFIRMAR]` explícita, mas tratados como não
@@ -143,6 +162,32 @@
 - [ ] Preview de SERP nos campos de SEO
 - [ ] Tela de upload de documento de transparência (a API já existe e está testada — só falta
       a interface)
+- [ ] Tela de atendimento para os seis formulários recebidos (listagem, status, anotação
+      interna) — Policies já existem e testadas, falta o Controller/rota/tela
+
+### Formulários públicos — decisões e pendências desta sessão
+
+- [ ] `[LACUNA]` Endereços reais de notificação por tipo de formulário — hoje
+      `config('forms.notification_recipients')` usa placeholders em domínio `.invalid`
+      (RFC 2606). Definir via `FORM_RECIPIENT_*` no `.env` de cada ambiente quando a
+      instituição informar quem recebe cada tipo (secretaria do CEI, coordenação do
+      contraturno, bazar, etc.)
+- [ ] `TRUSTED_PROXIES` (`bootstrap/app.php`) está com o default de loopback, correto só para
+      dev onde site público e API rodam no mesmo host. Em produção, precisa do IP/CIDR real do
+      serviço do site público (Nuxt) — sem isso, o rate limit por IP dos seis formulários passa
+      a ver sempre o IP do próprio Nuxt, não o do visitante
+      (ver `frontend-site/server/api/forms/[tipo].post.ts`)
+- [ ] `/politica-de-privacidade` é rascunho de trabalho — mesmo tratamento do resto do
+      conteúdo institucional (ver `docs/contexto.md`): precisa de validação jurídica antes de
+      produção (já registrado como pendência geral em `docs/protecao-de-dados.md`), e de um
+      Encarregado/DPO nomeado antes de publicar um canal de contato específico para isso
+- [ ] `php artisan queue:work` (ou `schedule:work` para os jobs de expurgo) precisa estar
+      rodando em produção — nada disparado por este código roda sozinho sem um worker; ver
+      `docker-compose.yml`, que hoje não tem um serviço dedicado a isso
+- [ ] As páginas de conteúdo do CMS ainda não linkam diretamente para os formulários
+      correspondentes (ver nota na seção "Site público" acima)
+- [ ] Prazos de retenção usados (12/12/6/24/36/6 meses, ver `docs/estrutura-site.md` §2.2) são
+      os sugeridos no documento, não confirmados pela instituição — ver `[VALIDAR]` abaixo
 
 ### Validações pendentes com a instituição
 
@@ -171,6 +216,23 @@
       de código — rodar sempre com `./vendor/bin/phpstan analyse --memory-limit=512M`. Vale
       considerar fixar isso em `phpstan.neon` ou num script composer numa sessão futura, para
       não depender de lembrar a flag.
+- [ ] **Armadilha de `nitro.prerender.routes` descoberta nesta sessão**: uma rota
+      prerenderizada vira arquivo estático servido por caminho — o Nitro nunca reexecuta o
+      SSR para ela em produção, então qualquer página cujo conteúdo dependa de query string
+      (`route.query`) nunca pode entrar nessa lista, senão serve sempre o mesmo snapshot
+      independente da URL real pedida. Foi um bug real: os seis formulários entraram na lista
+      por engano e o reaproveitamento de erro (`?erro=1&campos=...`) parou de funcionar antes
+      de eu perceber e reverter. `/transparencia/documentos` já seguia essa regra
+      corretamente; os formulários não seguiam. Checar isso antes de adicionar qualquer rota
+      nova a `nitro.prerender.routes` daqui pra frente.
+- [ ] Larastan/PHPStan (`parseModelCastsMethod: true`) infere `$this->coluna` automaticamente
+      só *dentro do próprio arquivo do model* (via `casts()` + schema do banco). Não propaga
+      isso para um parâmetro genérico em outra classe, nem via `Model $model`, nem via
+      interface com `@property`, nem via `Model&Interface` — só funciona quando o `@property`
+      está no próprio model ou numa trait que o model usa. Descrição completa e o porquê da
+      trait `StampsSubmissionMetadata` ter sido descartada (três linhas repetidas em seis
+      Actions, não valia a complexidade) está no commit "enrollment_interests e
+      program_applications" desta sessão.
 
 ### Armadilha de infraestrutura descoberta em sessão anterior — vale para toda entidade futura
 
