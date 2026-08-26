@@ -16,6 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+
+        // O site público (Nuxt) faz proxy servidor-a-servidor dos seis formulários (ver
+        // frontend-site/server/api/forms/[tipo].post.ts) para que o "Redirect para
+        // /obrigado/:tipo" e o reaproveitamento de erro funcionem sem JavaScript — a API em
+        // si continua REST puro, sem view (ver CLAUDE.md). Sem confiar nesse proxy,
+        // `$request->ip()` veria sempre o IP do Nuxt, não do visitante, e o rate limit por
+        // IP (ver App\Providers\AppServiceProvider) ficaria inútil. Confiar só em '*' abriria
+        // brecha: qualquer chamada direta à API poderia forjar X-Forwarded-For para escapar
+        // do limite — por isso só os IPs em TRUSTED_PROXIES (loopback por padrão, o mesmo
+        // host do Nuxt em dev) são confiados.
+        $middleware->trustProxies(at: array_filter(explode(',', (string) env('TRUSTED_PROXIES', '127.0.0.1,::1'))));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
