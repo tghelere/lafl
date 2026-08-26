@@ -14,7 +14,8 @@
 **Lar Anália Franco de Londrina** — associação civil sem fins lucrativos, Londrina/PR.
 CNPJ 78.614.096/0001-75. Fundada em **1963** por um grupo espírita, originalmente como
 orfanato. O atendimento hoje é laico. Sede na Av. Anália Franco, 33, Bairro Aeroporto, em
-terreno de aproximadamente 33.000 m².
+terreno de aproximadamente 33.000 m² `[CONFIRMAR]` — mesma pesquisa de fonte única dos demais
+números tratados como não confirmados neste documento.
 
 Recebeu a **Medalha Ouro Verde** da Câmara Municipal de Londrina em 2016, a maior honraria do
 município.
@@ -89,7 +90,34 @@ Público do Paraná por maus-tratos no **serviço de acolhimento institucional**
 abrigo). A decisão determinou o afastamento de nove ex-dirigentes e a dissolução do Lar
 enquanto entidade de acolhimento. Uma nova diretoria assumiu na sequência.
 
+`[LACUNA]` **Status processual atual.** Decisão de primeira instância não é definitiva, e
+estamos em 2026 — quatro anos depois. Não sabemos se houve recurso, em que instância o
+processo está hoje, nem se a decisão de 2022 transitou em julgado. Nenhum texto do site deve
+tratar a condenação de primeira instância como fato encerrado sem essa confirmação; ver a
+nota de bloqueio em `/quem-somos/o-lar-hoje` no `ContentPagesSeeder`.
+
 **A creche seguiu funcionando normalmente e cresceu desde então** — de 120 para 250 crianças.
+
+### Controles adotados após 2022 — lacuna de maior valor do projeto
+
+`[LACUNA]` O que falta para `/quem-somos/o-lar-hoje` dizer algo concreto além de "uma nova
+diretoria assumiu, o acolhimento foi encerrado, a creche cresceu". Quem tranquiliza um
+visitante desconfiado é o controle concreto, não a alegação genérica — e nada disto foi
+levantado ainda em fonte pública. Perguntas a fazer à instituição:
+
+- Que controles internos foram criados desde 2022 (financeiros, de conduta, de atendimento)?
+- Quem fiscaliza a instituição hoje, além da prestação de contas pública — órgão externo,
+  auditoria independente, conselho fiscal?
+- Que protocolos de proteção à criança e ao adolescente foram adotados ou reforçados desde
+  então?
+- Como a equipe que atua com crianças e adolescentes é hoje selecionada, formada e
+  supervisionada?
+- Há acompanhamento por algum órgão do sistema de garantia de direitos (Conselho Tutelar,
+  CMDCA, Ministério Público) desde a mudança de diretoria?
+
+Esta é a lacuna de maior valor pendente do projeto: sem essas respostas, a página mais
+sensível do site só pode descrever o que mudou estruturalmente, nunca o que foi construído
+para evitar repetição — que é exatamente o que tranquilizaria quem chega desconfiado.
 
 ### Por que isso importa para este projeto
 

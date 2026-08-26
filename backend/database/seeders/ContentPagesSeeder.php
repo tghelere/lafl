@@ -70,8 +70,8 @@ class ContentPagesSeeder extends Seeder
                 'meta_description' => 'O Lar Anália Franco é uma associação sem fins lucrativos de Londrina, fundada em 1963, com três frentes: creche, contraturno e bazar beneficente.',
                 'content' => <<<'HTML'
                     <p>O Lar Anália Franco de Londrina é uma associação civil sem fins lucrativos fundada em
-                    1963. A sede fica na Av. Anália Franco, 33, no Bairro Aeroporto, em um terreno de cerca
-                    de 33.000 m².</p>
+                    1963. A sede fica na Av. Anália Franco, 33, no Bairro Aeroporto — a área exata do
+                    terreno está em confirmação com a instituição.</p>
                     <p>Hoje a instituição opera três frentes distintas: o Centro de Educação Infantil "Tio
                     Pedro", creche e pré-escola conveniada com a Prefeitura de Londrina; a Escola de
                     Contraturno, com aulas de informática e inteligência artificial para adolescentes; e o
@@ -120,13 +120,13 @@ class ContentPagesSeeder extends Seeder
                     pelo próprio trabalho da instituição.</p>
                     <h2>Visão</h2>
                     <p>Ser reconhecida em Londrina como uma instituição que presta contas do que arrecada e
-                    do que faz — não apenas por seus mais de sessenta anos de existência.</p>
+                    do que faz.</p>
                     <h2>Valores</h2>
                     <ul>
                     <li>Transparência: os documentos de prestação de contas são públicos, não apenas
                     entregues ao órgão fiscalizador.</li>
-                    <li>Continuidade: a creche funciona desde 2002 sem interrupção, mesmo durante a
-                    reestruturação da instituição.</li>
+                    <li>Continuidade: a creche funciona desde 2002 sem interrupção, inclusive durante a
+                    troca de diretoria e o fim do acolhimento institucional em 2022.</li>
                     <li>Autossustentação: o Bazar Beneficente existe desde 1968 para custear o que o
                     convênio público não cobre.</li>
                     </ul>
@@ -139,8 +139,8 @@ class ContentPagesSeeder extends Seeder
                 'content' => <<<'HTML'
                     <p>O Lar Anália Franco é uma associação civil sem fins lucrativos, CNPJ
                     78.614.096/0001-75, administrada por uma diretoria eleita pelos associados.</p>
-                    <p>Em 2022, após a condenação em primeira instância por irregularidades no antigo
-                    serviço de acolhimento institucional (ver <a href="/quem-somos/o-lar-hoje">O Lar
+                    <p>Em 2022, após uma decisão de primeira instância que reconheceu irregularidades no
+                    antigo serviço de acolhimento institucional (ver <a href="/quem-somos/o-lar-hoje">O Lar
                     hoje</a>), a diretoria anterior foi afastada por decisão judicial e uma nova diretoria
                     assumiu a gestão da instituição.</p>
                     <p>A prestação de contas da instituição — balanços, atas e editais — está reunida na
@@ -154,15 +154,18 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'O Lar Hoje',
                 'meta_description' => 'O que aconteceu em 2022 no Lar Anália Franco, o que mudou desde então e por que a transparência é a resposta da instituição.',
                 'content' => <<<'HTML'
-                    <p>Quem pesquisa pelo nome do Lar Anália Franco costuma encontrar, entre os primeiros
-                    resultados, notícias sobre um processo de 2022. É importante explicar o que aconteceu e
-                    o que mudou desde então.</p>
+                    <!-- BLOQUEADO PARA PUBLICAÇÃO: exige revisão jurídica antes de ir ao ar -->
+                    <p>O Lar Anália Franco passou por uma reconstrução profunda desde 2022. Esta página
+                    explica o que aconteceu e o que mudou desde então.</p>
                     <h2>O que aconteceu</h2>
-                    <p>Em janeiro de 2022, a instituição foi condenada em primeira instância em ação movida
-                    pelo Ministério Público do Paraná, por maus-tratos identificados no antigo serviço de
+                    <p>Em janeiro de 2022, uma ação movida pelo Ministério Público do Paraná resultou numa
+                    decisão de primeira instância que reconheceu irregularidades no antigo serviço de
                     acolhimento institucional — o abrigo que a instituição mantinha até então. A decisão
                     determinou o afastamento de nove ex-dirigentes e a dissolução do Lar como entidade de
                     acolhimento.</p>
+                    <p>Decisão de primeira instância não é definitiva. O status processual atual — se houve
+                    recurso e qual o resultado — está em confirmação junto à instituição e será atualizado
+                    aqui assim que validado.</p>
                     <h2>O que mudou</h2>
                     <p>Uma nova diretoria assumiu a gestão logo em seguida. O serviço de acolhimento foi
                     encerrado — a instituição não recebe mais crianças e adolescentes em regime de abrigo, e
@@ -170,10 +173,9 @@ class ContentPagesSeeder extends Seeder
                     <p>A creche seguiu funcionando durante todo o processo e cresceu desde então. Em 2026, a
                     instituição também inaugurou a Escola de Contraturno, sua operação mais nova.</p>
                     <h2>O que a instituição está fazendo diferente</h2>
-                    <p>A aposta deste site é tornar pública, de forma indexável por buscadores, a prestação
-                    de contas que já existia mas era de difícil acesso — ver
-                    <a href="/transparencia">Transparência</a>. Não é possível apagar o que aconteceu; o
-                    compromisso é mostrar, com documentos, o que a instituição faz hoje.</p>
+                    <p>Não é possível apagar o que aconteceu. O compromisso da direção atual é manter a
+                    prestação de contas pública e verificável, documento por documento — ver
+                    <a href="/transparencia">Transparência</a>.</p>
                     HTML,
             ],
         ];
@@ -195,8 +197,8 @@ class ContentPagesSeeder extends Seeder
                     das 7h30 às 17h30, com convênio junto à Secretaria Municipal de Educação de
                     Londrina.</p>
                     <p>O CEI Tio Pedro foi criado em 2002 e tem autorização de funcionamento renovada até
-                    janeiro de 2028. As famílias atendidas destacam, nas avaliações públicas da instituição,
-                    as aulas de inglês, a educação física, a horta e a quadra poliesportiva do terreno.</p>
+                    janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra
+                    poliesportiva do terreno.</p>
                     <p>As páginas desta seção detalham a proposta pedagógica, a alimentação e a estrutura
                     física do CEI.</p>
                     HTML,
@@ -222,8 +224,7 @@ class ContentPagesSeeder extends Seeder
                     integral, das 7h30 às 17h30, sob convênio com a Secretaria Municipal de Educação de
                     Londrina.</p>
                     <p>Fazem parte da rotina aulas de inglês, educação física, atividades na horta da
-                    instituição e uso da quadra poliesportiva do terreno — os pontos mais citados pelas
-                    famílias nas avaliações públicas do CEI.</p>
+                    instituição e uso da quadra poliesportiva do terreno.</p>
                     <p>O currículo pedagógico detalhado (eixos de aprendizagem, avaliação, calendário
                     letivo) ainda não está disponível para publicação e será adicionado após validação da
                     coordenação pedagógica.</p>
@@ -245,14 +246,14 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil/estrutura',
                 'title' => 'Estrutura',
-                'meta_description' => 'O CEI Tio Pedro funciona no terreno de 33.000 m² do Lar Anália Franco, com horta e quadra poliesportiva entre os espaços mais usados.',
+                'meta_description' => 'O CEI Tio Pedro funciona no terreno do Lar Anália Franco, com horta e quadra poliesportiva entre os espaços mais usados.',
                 'content' => <<<'HTML'
-                    <p>O CEI Tio Pedro funciona no terreno da instituição, de cerca de 33.000 m², na Av.
-                    Anália Franco, 33, no Bairro Aeroporto, em Londrina.</p>
-                    <p>Entre os espaços mais citados pelas famílias atendidas estão a horta, usada nas
-                    atividades pedagógicas, e a quadra poliesportiva, também usada pela Escola de
-                    Contraturno e, fora do horário de aula, alugada como fonte de receita da
+                    <p>O CEI Tio Pedro funciona no terreno da instituição, na Av. Anália Franco, 33, no
+                    Bairro Aeroporto, em Londrina — a área exata do terreno está em confirmação com a
                     instituição.</p>
+                    <p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, também
+                    usada pela Escola de Contraturno e, fora do horário de aula, alugada como fonte de
+                    receita da instituição.</p>
                     <p>Uma galeria de fotos da estrutura será publicada aqui assim que o cadastro de mídia
                     do site estiver pronto.</p>
                     HTML,
@@ -263,8 +264,7 @@ class ContentPagesSeeder extends Seeder
                 'meta_description' => 'O CEI Tio Pedro tem avaliação pública de 4,5 estrelas no Google. Depoimentos individuais só entram aqui com autorização de quem os deu.',
                 'content' => <<<'HTML'
                     <p>O CEI Tio Pedro tem avaliação pública de 4,5 estrelas, com mais de duas centenas de
-                    avaliações, no perfil do Google da instituição. As aulas de inglês, a educação física, a
-                    horta e a quadra poliesportiva estão entre os pontos mais citados pelas famílias.</p>
+                    avaliações, no perfil do Google da instituição.</p>
                     <p>Depoimentos de pais e responsáveis só entram nesta página com autorização expressa de
                     quem os deu — nenhuma avaliação pública é reproduzida aqui sem esse consentimento. Esta
                     seção será preenchida à medida que a instituição colher essas autorizações.</p>
@@ -518,14 +518,12 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'transparencia',
                 'title' => 'Transparência',
-                'meta_description' => 'O acervo de prestação de contas do Lar Anália Franco — balanços, atas e editais — agora indexável por buscadores.',
+                'meta_description' => 'O acervo de prestação de contas do Lar Anália Franco — balanços, atas e editais — organizado e público.',
                 'content' => <<<'HTML'
                     <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas,
                     editais e relatórios — hoje com cerca de 70 documentos.</p>
-                    <p>Esse acervo já existia antes deste site, mas ficava numa pasta pública carregada por
-                    JavaScript, invisível para os buscadores. Um dos objetivos deste redesenho é justamente
-                    tornar esses documentos encontráveis por qualquer pessoa que pesquise pelo nome da
-                    instituição — inclusive por quem busca informação sobre o processo de 2022 (ver
+                    <p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o
+                    que precisa, incluindo quem busca informação sobre o processo de 2022 (ver
                     <a href="/quem-somos/o-lar-hoje">O Lar hoje</a>).</p>
                     <p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro
                     de Educação Infantil "Tio Pedro", também exige prestação de contas periódica.</p>

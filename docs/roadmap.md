@@ -63,6 +63,16 @@
       verdade, funciona sem JavaScript via proxy servidor-a-servidor
       (`server/api/forms/[tipo].post.ts`) que decide redirect de sucesso ou reexibição de erro
       — a API Laravel continua REST puro, sem view.
+- [x] Correção de conteúdo institucional no `ContentPagesSeeder` (revisão de voz e risco
+      jurídico, sem mudança de funcionalidade): removida a estratégia de SEO/indexação da voz
+      da própria instituição (`quem-somos/o-lar-hoje`, `transparencia`); atribuída em vez de
+      afirmada a decisão de primeira instância sobre o caso de 2022
+      (`quem-somos/o-lar-hoje`, `quem-somos/governanca`), com bloqueio de publicação explícito
+      na primeira; removidas três menções não confirmadas de `33.000 m²` (duas no corpo, uma
+      em `meta_description`); removidas quatro paráfrases de avaliações do Google atribuídas a
+      "famílias" sem autorização; dois ajustes de tom (autocrítica na Visão, eufemismo nos
+      Valores). Ver `docs/contexto.md` para as duas lacunas novas (status processual do caso
+      de 2022, controles adotados desde então) e a seção "BLOQUEIO DE PUBLICAÇÃO" abaixo.
 
 ## Em andamento
 
@@ -70,6 +80,28 @@
       abaixo
 
 ## Pendente
+
+### BLOQUEIO DE PUBLICAÇÃO — `/quem-somos/o-lar-hoje`
+
+**Esta é a única página do site com essa restrição.** `/quem-somos/o-lar-hoje` não pode ir ao
+ar sem:
+
+1. **Revisão de advogado** do texto sobre o caso de 2022 — decisão de primeira instância não é
+   decisão definitiva, e o texto precisa refletir isso com precisão jurídica, não só
+   institucional.
+2. **Confirmação do status processual atual** — se houve recurso, em que instância o processo
+   está hoje, se houve trânsito em julgado. Ver `[LACUNA]` em `docs/contexto.md`, seção
+   "Histórico recente".
+
+O bloco de conteúdo da página, no `ContentPagesSeeder`, já carrega o comentário
+`<!-- BLOQUEADO PARA PUBLICAÇÃO: exige revisão jurídica antes de ir ao ar -->` logo no início
+do HTML. **Não remover esse comentário** até as duas condições acima estarem satisfeitas.
+
+Ver também `docs/contexto.md`, "Controles adotados após 2022": a lacuna de maior valor
+pendente do projeto. Sem saber quais controles internos, protocolos de proteção e supervisão
+foram adotados desde 2022, a página não pode dizer nada concreto além de "uma nova diretoria
+assumiu" — o que tranquilizaria de fato um visitante desconfiado é exatamente o que falta
+levantar.
 
 ### Backend — entidades da Fase 1 restantes
 
@@ -99,9 +131,12 @@
 - [ ] Eventos Umami nos CTAs
 - [ ] `/educacao-infantil/estrutura` menciona uma galeria de fotos que ainda não existe —
       depende da entidade `media`
-- [ ] `/educacao-infantil/depoimentos` descreve o que as famílias destacam publicamente, mas
-      não tem depoimentos individuais reais — depende de `testimonials` e de autorização
-      registrada por família (ver `docs/contexto.md`, "Regras de conteúdo")
+- [ ] `/educacao-infantil/depoimentos` só cita a avaliação agregada pública (4,5★ no Google) —
+      não tem depoimentos individuais reais, que dependem de `testimonials` e de autorização
+      registrada por família (ver `docs/contexto.md`, "Regras de conteúdo"). Corrigido nesta
+      sessão: a página chegou a parafrasear avaliações do Google atribuindo opinião a
+      "famílias" sem autorização — removido, ver commit "corrige voz institucional e risco
+      jurídico".
 - [ ] `/bazar/visite-a-loja` não tem horário de funcionamento nem mapa — `[LACUNA]`, pendente
       de confirmação com a administração do bazar
 - [ ] `/como-ajudar/doar` não tem chave PIX nem QR code — bloqueado por `[LACUNA]` em
