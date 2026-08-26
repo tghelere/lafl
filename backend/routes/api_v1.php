@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\PageController;
+use App\Http\Controllers\Api\V1\Public\ContactMessageController;
 use App\Http\Controllers\Api\V1\Public\EnrollmentInterestController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
 use App\Http\Controllers\Api\V1\Public\PartnershipInquiryController;
@@ -53,6 +54,8 @@ Route::prefix('public')->name('public.')->group(function (): void {
             ->name('volunteer-applications.store');
         Route::post('/partnership-inquiries', [PartnershipInquiryController::class, 'store'])
             ->name('partnership-inquiries.store');
+        Route::post('/contact-messages', [ContactMessageController::class, 'store'])
+            ->name('contact-messages.store');
     });
 });
 

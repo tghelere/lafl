@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\ContactMessage;
 use App\Models\EnrollmentInterest;
 use App\Models\PartnershipInquiry;
 use App\Models\PickupRequest;
@@ -27,6 +28,7 @@ return [
         PickupRequest::class,
         VolunteerApplication::class,
         PartnershipInquiry::class,
+        ContactMessage::class,
     ],
 
     /*
