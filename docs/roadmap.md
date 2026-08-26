@@ -73,6 +73,21 @@
       "famílias" sem autorização; dois ajustes de tom (autocrítica na Visão, eufemismo nos
       Valores). Ver `docs/contexto.md` para as duas lacunas novas (status processual do caso
       de 2022, controles adotados desde então) e a seção "BLOQUEIO DE PUBLICAÇÃO" abaixo.
+- [x] Leitura administrativa dos seis formulários recebidos, ponta a ponta: endpoints
+      (listagem paginada com filtro por status/período, detalhe, mudança de status com
+      anotação interna, um endpoint agregado de painel com contagem de pendentes por papel) e
+      as telas correspondentes no `frontend-admin` (Início, Atendimento, Bazar — ver
+      `docs/estrutura-site.md` §4.2/§4.3). Listagem devolve dado **mascarado** (primeiro nome,
+      últimos dígitos do telefone, domínio do e-mail); valor completo só no detalhe, e todo
+      acesso ao detalhe é auditado (`activity('forms')->event('viewed')`) — registrado quem,
+      quando e de qual IP, nunca o valor descriptografado. `comunicacao` recebe 403/404 nos
+      seis recursos e painel vazio com mensagem explicativa; `bazar` só acessa
+      `pickup_requests`. `frontend-admin` ganhou seu primeiro sistema de design (reaproveita
+      tokens do site público, densidade maior, Bitter só em título de tela) e sua primeira
+      arquitetura de tela genérica orientada a configuração (`SUBMISSION_RESOURCES`), em vez de
+      seis pares de tela quase idênticos. Nenhuma verificação em navegador real ocorreu nesta
+      sessão (sem acesso a browser) — ver `docs/relatorio-sessao-6.md` para a lista completa do
+      que precisa de conferência visual antes de considerar essas telas prontas.
 
 ## Em andamento
 
@@ -112,13 +127,13 @@ levantar.
 - [ ] `testimonials`, `partners`, `institution_stats`
 - [ ] `settings`
 - [ ] `bazaar_showcase_items`
-- [ ] Leitura administrativa dos seis formulários recebidos (listagem, detalhe, mudança de
-      status, anotação interna) — adiada de propósito nesta sessão ("a leitura desses dados
-      virá depois"). As Policies já existem e estão testadas (`viewAny`/`view`/`update`/
-      `delete`), só falta o Controller/Resource/rota administrativa que as use — mesmo padrão
-      já usado em `pages` e `transparency-documents`.
 - [ ] Fotos opcionais em `pickup_requests` (`media_ids` no domínio) — depende da entidade
       `media`, fora de escopo
+- [ ] Endpoint para **definir** `pickup_requests.scheduled_for` (agendar data de coleta) — a
+      tela do Bazar (sessão 6) já ordena e exibe a agenda por data, mas só lê; não existe
+      Controller/rota para o time do bazar marcar uma data de coleta, só a mudança de
+      status/anotação interna genérica das seis entidades. Sem isso, "agenda por data" no
+      painel é hoje só ordenação de pedidos sem data nenhuma preenchida.
 
 ### Site público (Nuxt)
 
@@ -190,15 +205,21 @@ levantar.
 
 ### Painel administrativo (Vue)
 
-- [ ] Todas as telas de `docs/estrutura-site.md` §4.2/§4.3 — nesta fase só existe API
-      administrativa (`pages`, `transparency-documents`), sem tela nenhuma no painel ainda
+- [ ] Gestão de conteúdo (`pages`, `posts`, mídia) e de documentos de transparência ainda não
+      têm tela — a API de `pages`/`transparency-documents` já existe e está testada desde
+      sessões anteriores, só falta a interface. As telas de leitura dos seis formulários
+      recebidos (Início/Atendimento/Bazar) foram construídas na sessão 6; conteúdo,
+      transparência e usuários seguem fora de escopo.
 - [ ] Editor de texto rico com sanitização no backend (Tiptap, a justificar como nova
       dependência quando a tela existir)
 - [ ] Preview de SERP nos campos de SEO
 - [ ] Tela de upload de documento de transparência (a API já existe e está testada — só falta
       a interface)
-- [ ] Tela de atendimento para os seis formulários recebidos (listagem, status, anotação
-      interna) — Policies já existem e testadas, falta o Controller/rota/tela
+- [ ] `frontend-admin` não tem nenhuma ferramenta de teste (Vitest, Testing Library ou
+      equivalente) — a sessão 6 construiu a primeira fatia de UI real do painel sem nenhum
+      teste automatizado do lado do front, só Pest no backend e verificação manual via
+      `php artisan tinker` (sem navegador disponível na sessão). Vale considerar antes da
+      próxima leva de telas, quando a superfície ficar grande demais para revisão visual pura.
 
 ### Formulários públicos — decisões e pendências desta sessão
 
@@ -268,6 +289,25 @@ levantar.
       trait `StampsSubmissionMetadata` ter sido descartada (três linhas repetidas em seis
       Actions, não valia a complexidade) está no commit "enrollment_interests e
       program_applications" desta sessão.
+- [ ] **Duas armadilhas novas de Larastan descobertas na sessão 6**, mesma limitação de fundo
+      da anterior, casos diferentes:
+      1. A inferência automática de tipo de coluna via `casts()` **não propaga através de
+         `@mixin ModelClass` numa Resource externa quando o cast é um enum PHP** — a Resource
+         via `$this->campo->value` falha com "Cannot access property $value on string", mesmo
+         a coluna estando corretamente tipada como enum no model. Casts customizados (ex.:
+         `FieldEncrypted`) propagam normalmente pelo `@mixin`; só o caso de enum falhou.
+         Contornado com `@property EnumType $campo` explícito direto no model (não na
+         Resource) — ver `EnrollmentInterest`, `PartnershipInquiry`, `PickupRequest`.
+      2. **Declarar qualquer `@property` explícito numa classe/trait suspende a inferência
+         automática de todas as outras propriedades daquela classe** que não estejam
+         explicitamente listadas. Ao adicionar `@property` dos enums acima, `created_at`/
+         `updated_at` — nunca declarados explicitamente antes, sempre inferidos — passaram a
+         falhar como "Access to an undefined property" em todo lugar que os usava via
+         `@mixin`. Corrigido declarando-os também, e como `Carbon|null` (não `Carbon` puro)
+         para não gerar o aviso oposto ("nullsafe call on non-nullable type") nos ~40 pontos
+         que já usavam `?->` nesses campos. Moral: uma vez que se opta por `@property`
+         explícito numa classe, é preciso listar **todas** as propriedades usadas por quem a
+         consome via `@mixin`, não só a que motivou a anotação.
 
 ### Armadilha de infraestrutura descoberta em sessão anterior — vale para toda entidade futura
 
