@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Actions\Forms;
 
 use App\Actions\Forms\Data\PartnershipInquiryData;
+use App\Enums\FormSubmissionType;
 use App\Models\PartnershipInquiry;
 use App\Services\BlindIndexService;
 
 final class CreatePartnershipInquiry
 {
+    public function __construct(private readonly NotifyFormSubmissionReceived $notify) {}
+
     public function handle(PartnershipInquiryData $data): PartnershipInquiry
     {
         $inquiry = new PartnershipInquiry([
@@ -28,6 +31,8 @@ final class CreatePartnershipInquiry
 
         // tax_id_hash é calculado automaticamente pelo HasBlindIndex ao salvar.
         $inquiry->save();
+
+        $this->notify->handle(FormSubmissionType::PartnershipInquiry, $inquiry->uuid);
 
         return $inquiry;
     }

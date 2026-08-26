@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Actions\Forms;
 
 use App\Actions\Forms\Data\VolunteerApplicationData;
+use App\Enums\FormSubmissionType;
 use App\Models\VolunteerApplication;
 use App\Services\BlindIndexService;
 
 final class CreateVolunteerApplication
 {
+    public function __construct(private readonly NotifyFormSubmissionReceived $notify) {}
+
     public function handle(VolunteerApplicationData $data): VolunteerApplication
     {
         $application = new VolunteerApplication([
@@ -26,6 +29,8 @@ final class CreateVolunteerApplication
         $application->ip_hash = app(BlindIndexService::class)->hash($data->ip);
 
         $application->save();
+
+        $this->notify->handle(FormSubmissionType::VolunteerApplication, $application->uuid);
 
         return $application;
     }

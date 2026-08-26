@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Actions\Forms;
 
 use App\Actions\Forms\Data\EnrollmentInterestData;
+use App\Enums\FormSubmissionType;
 use App\Models\EnrollmentInterest;
 use App\Services\BlindIndexService;
 
 final class CreateEnrollmentInterest
 {
+    public function __construct(private readonly NotifyFormSubmissionReceived $notify) {}
+
     public function handle(EnrollmentInterestData $data): EnrollmentInterest
     {
         $interest = new EnrollmentInterest([
@@ -29,6 +32,8 @@ final class CreateEnrollmentInterest
         $interest->ip_hash = app(BlindIndexService::class)->hash($data->ip);
 
         $interest->save();
+
+        $this->notify->handle(FormSubmissionType::EnrollmentInterest, $interest->uuid);
 
         return $interest;
     }

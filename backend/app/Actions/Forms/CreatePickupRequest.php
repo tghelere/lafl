@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Actions\Forms;
 
 use App\Actions\Forms\Data\PickupRequestData;
+use App\Enums\FormSubmissionType;
 use App\Models\PickupRequest;
 use App\Services\BlindIndexService;
 
 final class CreatePickupRequest
 {
+    public function __construct(private readonly NotifyFormSubmissionReceived $notify) {}
+
     public function handle(PickupRequestData $data): PickupRequest
     {
         $request = new PickupRequest([
@@ -25,6 +28,8 @@ final class CreatePickupRequest
         $request->ip_hash = app(BlindIndexService::class)->hash($data->ip);
 
         $request->save();
+
+        $this->notify->handle(FormSubmissionType::PickupRequest, $request->uuid);
 
         return $request;
     }
