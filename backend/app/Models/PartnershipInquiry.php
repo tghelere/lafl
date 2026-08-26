@@ -20,6 +20,11 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
  * docs/dominio.md). CNPJ com blind index para checagem de duplicidade. Retenção: 36 meses
  * (ver docs/estrutura-site.md §2.2).
  *
+ * `@property` abaixo pela mesma limitação do Larastan registrada em
+ * App\Models\Concerns\IsFormSubmission (não propaga tipo de enum cast para `@mixin` externo).
+ *
+ * @property PartnershipSupportType $support_type
+ *
  * @use HasFactory<PartnershipInquiryFactory>
  */
 #[Fillable(['company_name', 'tax_id', 'contact_name', 'phone', 'email', 'support_type', 'message'])]

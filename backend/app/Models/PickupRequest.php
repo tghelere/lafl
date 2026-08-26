@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 /**
@@ -19,6 +20,8 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
  * mais sensível desta fase (ver docs/dominio.md) — expurgado assim que a coleta é concluída
  * (status `done`), via App\Jobs\PurgeCompletedPickupRequestAddresses, além (não em vez) do
  * expurgo geral por `expires_at` que as outras cinco entidades também têm.
+ *
+ * @property Carbon|null $scheduled_for
  *
  * @use HasFactory<PickupRequestFactory>
  */

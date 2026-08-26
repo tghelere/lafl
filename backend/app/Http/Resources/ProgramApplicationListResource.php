@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Resources;
+
+use App\Models\ProgramApplication;
+use App\Support\FieldMasking;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/**
+ * @mixin ProgramApplication
+ */
+final class ProgramApplicationListResource extends JsonResource
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'uuid' => $this->uuid,
+            'guardian_name' => FieldMasking::firstName($this->guardian_name),
+            'phone' => FieldMasking::lastDigits($this->phone),
+            'email' => FieldMasking::email($this->email),
+            'teen_age' => $this->teen_age,
+            'school' => $this->school,
+            'status' => $this->status->value,
+            'status_label' => $this->status->label(),
+            'handled_by' => $this->whenLoaded('handledBy', fn () => $this->handledBy?->name),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'expires_at' => $this->expires_at?->toIso8601String(),
+        ];
+    }
+}

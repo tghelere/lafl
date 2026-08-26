@@ -28,15 +28,22 @@ use Spatie\Activitylog\Support\LogOptions;
  * dentro do próprio model (via `casts()` + schema), mas não propaga isso para código externo
  * que recebe o model como parâmetro. Manter em sincronia com FormSubmissionColumns::addCommon().
  *
+ * Timestamps declarados `|null`, mesmo nunca sendo null na prática num registro já
+ * persistido — só para poder seguir usando `?->` como o resto do código já faz para
+ * `created_at` em outros models (ver App\Http\Resources\PageResource), sem o Larastan
+ * reclamar de "nullsafe desnecessário" por causa desta anotação explícita mais estrita.
+ *
  * @property string $uuid
  * @property FormSubmissionStatus $status
  * @property string $consent_terms_version
- * @property Carbon $consented_at
+ * @property Carbon|null $consented_at
  * @property string $ip_hash
  * @property int|null $handled_by
  * @property Carbon|null $handled_at
  * @property string|null $internal_note
- * @property Carbon $expires_at
+ * @property Carbon|null $expires_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 trait IsFormSubmission
 {

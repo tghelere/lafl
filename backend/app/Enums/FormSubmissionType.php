@@ -4,11 +4,19 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Models\ContactMessage;
+use App\Models\EnrollmentInterest;
+use App\Models\PartnershipInquiry;
+use App\Models\PickupRequest;
+use App\Models\ProgramApplication;
+use App\Models\VolunteerApplication;
+
 /**
  * Um caso por entidade de formulário recebido (ver docs/dominio.md). Centraliza o que varia
  * só por tipo — rótulo em português, slug de `/obrigado/:tipo` (ver docs/estrutura-site.md
- * §1.3) e nome do recurso no painel administrativo — para as seis Actions de criação e o
- * e-mail de notificação não repetirem essa tabela cada uma a seu modo.
+ * §1.3), model correspondente e nome do recurso no painel administrativo — para as seis
+ * Actions de criação, o e-mail de notificação e o painel de pendências (Etapa 1 da sessão 6)
+ * não repetirem essa tabela cada um a seu modo.
  */
 enum FormSubmissionType: string
 {
@@ -60,6 +68,21 @@ enum FormSubmissionType: string
             self::VolunteerApplication => 'volunteer-applications',
             self::PartnershipInquiry => 'partnership-inquiries',
             self::ContactMessage => 'contact-messages',
+        };
+    }
+
+    /**
+     * @return class-string<EnrollmentInterest|ProgramApplication|PickupRequest|VolunteerApplication|PartnershipInquiry|ContactMessage>
+     */
+    public function modelClass(): string
+    {
+        return match ($this) {
+            self::EnrollmentInterest => EnrollmentInterest::class,
+            self::ProgramApplication => ProgramApplication::class,
+            self::PickupRequest => PickupRequest::class,
+            self::VolunteerApplication => VolunteerApplication::class,
+            self::PartnershipInquiry => PartnershipInquiry::class,
+            self::ContactMessage => ContactMessage::class,
         };
     }
 }

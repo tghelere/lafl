@@ -19,6 +19,13 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
  * nenhum dado identificável da criança (ver ADR 0007). Retenção: 12 meses após contato (ver
  * docs/estrutura-site.md §2.2).
  *
+ * `@property` dos dois campos abaixo por causa da mesma limitação do Larastan registrada em
+ * App\Models\Concerns\IsFormSubmission: o tipo inferido de `casts()` não propaga para código
+ * externo ao model (ex.: os Resources administrativos, via `@mixin`).
+ *
+ * @property ChildAgeRange $child_age_range
+ * @property DesiredPeriod $desired_period
+ *
  * @use HasFactory<EnrollmentInterestFactory>
  */
 #[Fillable(['guardian_name', 'phone', 'email', 'child_age_range', 'desired_period', 'message'])]
