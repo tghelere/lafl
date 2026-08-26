@@ -52,5 +52,11 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute(5)->by($request->ip().'|'.$email);
         });
+
+        // Proteção comum dos seis formulários públicos (ver docs/estrutura-site.md §2.3) —
+        // sem CAPTCHA de terceiro, só honeypot (App\Support\Honeypot) e este limite por IP.
+        RateLimiter::for('public-forms', function (Request $request): Limit {
+            return Limit::perMinute(5)->by($request->ip());
+        });
     }
 }
