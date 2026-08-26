@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Models\EnrollmentInterest;
+use App\Models\ProgramApplication;
+
 return [
 
     /*
@@ -16,7 +19,8 @@ return [
     */
 
     'submission_models' => [
-        // Preenchido conforme cada entidade é criada (ver docs/roadmap.md, Etapa 2).
+        EnrollmentInterest::class,
+        ProgramApplication::class,
     ],
 
     /*

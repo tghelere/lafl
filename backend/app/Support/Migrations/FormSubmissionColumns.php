@@ -39,6 +39,8 @@ final class FormSubmissionColumns
         $table->text('internal_note')->nullable()->comment('Cifrado — App\Casts\FieldEncrypted.');
 
         $table->timestamp('expires_at')->index();
+
+        $table->timestamps();
     }
 
     public static function addStatusCheckConstraint(string $table): void

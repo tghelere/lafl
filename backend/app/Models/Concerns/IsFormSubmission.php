@@ -9,6 +9,7 @@ use App\Enums\FormSubmissionStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Support\LogOptions;
 
@@ -21,6 +22,21 @@ use Spatie\Activitylog\Support\LogOptions;
  * `docs/estrutura-site.md` §2.2. `pickup_requests` também depende de um expurgo específico do
  * endereço na conclusão da coleta — isso não mora aqui, é responsabilidade só daquele model
  * (ver App\Models\PickupRequest).
+ *
+ * Os `@property` abaixo existem só para o PHPStan/Larastan enxergar as colunas comuns dentro
+ * desta trait e das seis Actions de criação — ele infere `$this->coluna` automaticamente
+ * dentro do próprio model (via `casts()` + schema), mas não propaga isso para código externo
+ * que recebe o model como parâmetro. Manter em sincronia com FormSubmissionColumns::addCommon().
+ *
+ * @property string $uuid
+ * @property FormSubmissionStatus $status
+ * @property string $consent_terms_version
+ * @property Carbon $consented_at
+ * @property string $ip_hash
+ * @property int|null $handled_by
+ * @property Carbon|null $handled_at
+ * @property string|null $internal_note
+ * @property Carbon $expires_at
  */
 trait IsFormSubmission
 {

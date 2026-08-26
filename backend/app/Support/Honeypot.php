@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /**
  * Proteção comum aos seis formulários públicos (ver docs/estrutura-site.md §2.3): sem
@@ -23,5 +24,18 @@ final class Honeypot
     public static function triggered(Request $request): bool
     {
         return $request->filled(self::FIELD);
+    }
+
+    /**
+     * Objeto forjado com o mesmo formato de App\Http\Resources\Public\FormSubmissionResource,
+     * para as seis rotas de criação devolverem uma resposta indistinguível de sucesso sem
+     * gravar nada quando o honeypot dispara.
+     */
+    public static function decoySubmission(): object
+    {
+        return (object) [
+            'uuid' => (string) Str::uuid(),
+            'created_at' => now(),
+        ];
     }
 }

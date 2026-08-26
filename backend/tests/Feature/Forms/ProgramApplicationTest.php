@@ -1,0 +1,80 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Enums\Role;
+use App\Models\ProgramApplication;
+use Illuminate\Support\Facades\DB;
+
+function programApplicationPayload(array $overrides = []): array
+{
+    return [...[
+        'guardian_name' => 'João Pereira',
+        'phone' => '(43) 98888-0000',
+        'email' => 'joao@example.com',
+        'teen_age' => 14,
+        'school' => 'Escola Municipal X',
+        'message' => 'Meu filho tem interesse nas aulas de informática.',
+        'consent' => true,
+    ], ...$overrides];
+}
+
+test('envio válido cria o registro e devolve só uuid e data', function (): void {
+    $response = $this->postJson('/api/v1/public/program-applications', programApplicationPayload());
+
+    $response->assertCreated()->assertJsonStructure(['data' => ['uuid', 'created_at']]);
+
+    expect(ProgramApplication::count())->toBe(1);
+
+    $application = ProgramApplication::first();
+    expect($application->guardian_name)->toBe('João Pereira')
+        ->and($application->teen_age)->toBe(14)
+        ->and($application->status->value)->toBe('new')
+        ->and($application->expires_at->diffInDays(now(), true))->toBeGreaterThan(300);
+});
+
+test('dado pessoal nunca é gravado em texto puro', function (): void {
+    $this->postJson('/api/v1/public/program-applications', programApplicationPayload())->assertCreated();
+
+    $raw = DB::table('program_applications')->first();
+
+    expect($raw->guardian_name)->not->toContain('João Pereira')
+        ->and($raw->email)->not->toContain('joao@example.com');
+});
+
+test('idade fora da faixa é rejeitada', function (): void {
+    $this->postJson('/api/v1/public/program-applications', programApplicationPayload(['teen_age' => 5]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('teen_age');
+});
+
+test('sem consentimento é rejeitado', function (): void {
+    $this->postJson('/api/v1/public/program-applications', programApplicationPayload(['consent' => false]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('consent');
+
+    expect(ProgramApplication::count())->toBe(0);
+});
+
+test('escola é opcional', function (): void {
+    $payload = programApplicationPayload();
+    unset($payload['school']);
+
+    $this->postJson('/api/v1/public/program-applications', $payload)->assertCreated();
+
+    expect(ProgramApplication::first()->school)->toBeNull();
+});
+
+test('honeypot preenchido devolve sucesso mas não grava nada', function (): void {
+    $response = $this->postJson('/api/v1/public/program-applications', programApplicationPayload(['website' => 'https://bot.example']));
+
+    $response->assertCreated();
+    expect(ProgramApplication::count())->toBe(0);
+});
+
+test('direcao e atendimento podem ver o formulário, comunicacao e bazar não', function (): void {
+    expect(userWithRole(Role::Direcao->value)->can('viewAny', ProgramApplication::class))->toBeTrue()
+        ->and(userWithRole(Role::Atendimento->value)->can('viewAny', ProgramApplication::class))->toBeTrue()
+        ->and(userWithRole(Role::Comunicacao->value)->can('viewAny', ProgramApplication::class))->toBeFalse()
+        ->and(userWithRole(Role::Bazar->value)->can('viewAny', ProgramApplication::class))->toBeFalse();
+});
