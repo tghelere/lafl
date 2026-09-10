@@ -463,54 +463,30 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'como-ajudar',
                 'title' => 'Como Ajudar',
-                'meta_description' => 'Formas de apoiar o Lar Anália Franco: doação de itens, Imposto de Renda, Nota Paraná, voluntariado e parceria empresarial.',
+                'meta_description' => 'Formas de apoiar o Lar Anália Franco: PIX, transferência bancária, doação de itens, voluntariado e parceria empresarial.',
                 'content' => <<<'HTML'
                     <p>O Lar Anália Franco não opera gateway de pagamento no site — as formas de contribuir
                     hoje passam por canais já existentes, explicados nas páginas desta seção.</p>
-                    <p>É possível apoiar a instituição doando itens para o Bazar Beneficente, destinando
-                    parte do Imposto de Renda, usando o Nota Paraná em compras do dia a dia, ou se tornando
-                    voluntário. Empresas também podem apoiar diretamente os programas da instituição.</p>
+                    <p>É possível apoiar a instituição via PIX ou transferência bancária, doando itens para
+                    o Bazar Beneficente, ou se tornando voluntário. Empresas também podem apoiar diretamente
+                    os programas da instituição.</p>
                     HTML,
             ],
             [
                 'slug' => 'como-ajudar/doar',
                 'title' => 'Doar',
-                'meta_description' => 'O Lar Anália Franco ainda não processa doações em dinheiro pelo site. Veja os canais de doação já disponíveis.',
+                'meta_description' => 'Doe para o Lar Anália Franco via PIX ou transferência bancária.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco ainda não processa doações em dinheiro diretamente pelo site. Uma
-                    chave PIX institucional está em confirmação com a instituição e será publicada aqui
-                    assim que disponível.</p>
-                    <p>Enquanto isso, as formas de contribuir financeiramente incluem a destinação de parte
-                    do Imposto de Renda ao fundo da criança e do adolescente e o uso do Nota Paraná — ambas
-                    explicadas nas páginas seguintes desta seção. Doações de itens para o Bazar Beneficente
-                    também sustentam diretamente a instituição.</p>
-                    HTML,
-            ],
-            [
-                'slug' => 'como-ajudar/empresas-ir',
-                'title' => 'Empresas e Imposto de Renda',
-                'meta_description' => 'Como destinar parte do Imposto de Renda ao fundo da criança e do adolescente, e como empresas podem apoiar os pilares do Lar Anália Franco.',
-                'content' => <<<'HTML'
-                    <p>Pessoas físicas podem destinar parte do Imposto de Renda devido a fundos municipais
-                    como o fundo da criança e do adolescente, escolhendo instituições como o Lar Anália
-                    Franco como destino.</p>
-                    <p>Os detalhes de como fazer essa destinação — prazos, percentual permitido e se a
-                    instituição está cadastrada nesse fundo em Londrina — estão em confirmação e serão
-                    publicados nesta página. Empresas interessadas em apoiar diretamente algum dos três
-                    pilares (creche, contraturno ou bazar) podem entrar em contato pela seção de
-                    parceiros.</p>
-                    HTML,
-            ],
-            [
-                'slug' => 'como-ajudar/nota-parana',
-                'title' => 'Nota Paraná',
-                'meta_description' => 'Como direcionar créditos do programa Nota Paraná ao Lar Anália Franco — cadastro em confirmação com a instituição.',
-                'content' => <<<'HTML'
-                    <p>O programa Nota Paraná, do governo do Estado, devolve parte do ICMS pago em compras a
-                    quem cadastra o CPF na nota fiscal — e permite direcionar uma fatia desse valor a uma
-                    instituição social cadastrada.</p>
-                    <p>O cadastro do Lar Anália Franco no Nota Paraná e o passo a passo para direcionar os
-                    créditos estão em confirmação e serão publicados nesta página.</p>
+                    <p>O Lar Anália Franco ainda não processa doações em dinheiro diretamente pelo site.
+                    Doe por PIX ou transferência bancária:</p>
+                    <ul>
+                    <li><strong>PIX</strong> (chave CNPJ): 78.614.096/0001-75 — nome exibido: LAR ANALIA
+                    FRANCO DE LONDRINA</li>
+                    <li><strong>Transferência:</strong> Banco do Brasil (001), agência 2755-3, conta
+                    corrente 4963-8</li>
+                    </ul>
+                    <p>Doações de itens para o Bazar Beneficente também sustentam diretamente a
+                    instituição.</p>
                     HTML,
             ],
             [

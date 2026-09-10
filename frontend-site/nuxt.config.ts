@@ -72,8 +72,6 @@ export default defineNuxtConfig({
         '/bazar/sua-compra-vira-educacao',
         '/como-ajudar',
         '/como-ajudar/doar',
-        '/como-ajudar/empresas-ir',
-        '/como-ajudar/nota-parana',
         '/como-ajudar/parceiros',
         '/transparencia',
         '/politica-de-privacidade',

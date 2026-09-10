@@ -156,8 +156,8 @@ levantar.
       jurídico".
 - [ ] `/bazar/visite-a-loja` não tem horário de funcionamento nem mapa — `[LACUNA]`, pendente
       de confirmação com a administração do bazar
-- [ ] `/como-ajudar/doar` não tem chave PIX nem QR code — bloqueado por `[LACUNA]` em
-      `docs/contexto.md` (chave PIX institucional)
+- [ ] `/como-ajudar/doar` publica a chave PIX e os dados bancários como texto (confirmados em
+      10/09/2026, ver `docs/contexto.md`) — ainda não tem QR code
 - [ ] `/educacao-infantil/dia-da-crianca` tem conteúdo muito magro (dois parágrafos genéricos)
       — não há nenhum fato confirmado sobre a edição do evento em `docs/contexto.md`; revisar
       assim que houver informação real, ou considerar remover a página até lá
@@ -253,12 +253,14 @@ levantar.
 - [ ] `[VALIDAR]` Prazos de retenção exatos de cada formulário
 - [ ] `[VALIDAR]` Convênio com a Secretaria Municipal de Educação impõe campo ou relatório?
 - [ ] `[CONFIRMAR]` Faixa etária exata e critérios de seleção do Contraturno
-- [ ] `[LACUNA]` Chave PIX institucional e dados bancários (para `/como-ajudar/doar`)
 - [ ] `[LACUNA]` Horário de funcionamento do Bazar — endereço e telefones já confirmados em
       10/09/2026 (ver `docs/contexto.md`), só falta horário e mapa de acesso para
       `/bazar/visite-a-loja`
-- [ ] Cadastro da instituição no Nota Paraná e no fundo municipal da criança e do adolescente,
-      e o passo a passo de cada um (para `/como-ajudar/nota-parana` e `/como-ajudar/empresas-ir`)
+- [ ] Nota Paraná e destinação de Imposto de Renda (fundo da criança e do adolescente/FMDCA)
+      — o cliente confirmou em 10/09/2026 que nenhuma das duas opções está disponível hoje.
+      `/como-ajudar/nota-parana` e `/como-ajudar/empresas-ir` foram removidas do
+      `ContentPagesSeeder`; voltam ao escopo só quando a instituição avisar (ver
+      `docs/contexto.md`)
 - [ ] Texto final de missão, visão e valores (o publicado é rascunho de trabalho explícito)
 - [ ] Preencher `docs/lgpd/inventario-de-dados.md` — bloqueia toda a Fase 2
 

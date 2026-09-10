@@ -107,14 +107,22 @@ um dia.
 - **~60%** convênio com a Prefeitura de Londrina — destinado **exclusivamente à creche**
 - **~40%** Bazar Beneficente — sustenta o restante
 
-Outras fontes já existentes, hoje mal exploradas no site: destinação de Imposto de Renda via
-fundo da criança e do adolescente, Nota Paraná, urna de doações em estabelecimentos
-parceiros, aluguel da quadra poliesportiva, doações diretas e voluntariado.
+Outras fontes já existentes, hoje mal exploradas no site: urna de doações em
+estabelecimentos parceiros, aluguel da quadra poliesportiva, doações diretas e voluntariado.
 
 **Não há gateway de pagamento no escopo.** O site precisa explicar bem os caminhos que já
 existem.
 
-`[LACUNA]` Chave PIX institucional e dados bancários para doação.
+**PIX e transferência bancária — confirmados pelo cliente em 10/09/2026:**
+
+- PIX (chave CNPJ): 78.614.096/0001-75 — nome exibido: LAR ANALIA FRANCO DE LONDRINA
+- Transferência: Banco do Brasil (001), agência 2755-3, conta corrente 4963-8
+
+**Removido em 10/09/2026, por instrução do cliente:** menção a Nota Paraná e a qualquer
+destinação de Imposto de Renda (fundo da criança e do adolescente, FMDCA, lei de incentivo).
+Nenhuma dessas opções está disponível hoje — as páginas `/como-ajudar/nota-parana` e
+`/como-ajudar/empresas-ir` foram removidas do `ContentPagesSeeder`, sem deixar rascunho.
+Voltam ao escopo quando a instituição avisar.
 
 ## Histórico recente — informação sensível
 

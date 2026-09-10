@@ -67,8 +67,6 @@ já é o limite do que cabe em desktop sem quebrar.
 | `/como-ajudar` | SSG | CMS | — |
 | `/como-ajudar/doar` | SSG | CMS (PIX, QR) | — |
 | `/como-ajudar/doar-itens` | — | Redirect 301 → `/bazar/agendar-coleta` | — |
-| `/como-ajudar/empresas-ir` | SSG | CMS | — |
-| `/como-ajudar/nota-parana` | SSG | CMS | — |
 | `/como-ajudar/voluntariado` | SSR | CMS + form | **Sim** |
 | `/como-ajudar/parceiros` | SSG | CMS | — |
 | **Transparência** | | | |
@@ -79,6 +77,11 @@ já é o limite do que cabe em desktop sem quebrar.
 | `/noticias/:slug` | ISR | CMS | — |
 | **Contato** | | | |
 | `/contato` | SSR | CMS + form | **Sim** |
+
+`/como-ajudar/empresas-ir` e `/como-ajudar/nota-parana` existiam nesta tabela e foram
+removidas em 10/09/2026: o cliente confirmou que nem a destinação de Imposto de
+Renda/FMDCA nem o Nota Paraná estão disponíveis hoje. Voltam ao escopo quando a
+instituição avisar (ver `docs/contexto.md`).
 
 ## 1.3 Rotas fora do menu
 
