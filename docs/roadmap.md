@@ -142,7 +142,9 @@ levantar.
 - [ ] Seção de notícias (`/noticias`, `/noticias/:slug`) — depende de `posts`
 - [ ] `sitemap.xml`/`robots.txt` consumindo conteúdo real (hoje geram só a partir de
       `NUXT_PUBLIC_SITE_URL`, sem `pages`/`posts`/`transparency-documents`)
-- [ ] JSON-LD `NGO`/`Organization`
+- [ ] JSON-LD `NGO`/`Organization` — modelar Sede/CEI e Bazar como dois locais distintos
+      (`location`/`department` separados), não um endereço só; ver os dois endereços
+      confirmados em `docs/contexto.md`
 - [ ] Eventos Umami nos CTAs
 - [ ] `/educacao-infantil/estrutura` menciona uma galeria de fotos que ainda não existe —
       depende da entidade `media`
@@ -252,8 +254,9 @@ levantar.
 - [ ] `[VALIDAR]` Convênio com a Secretaria Municipal de Educação impõe campo ou relatório?
 - [ ] `[CONFIRMAR]` Faixa etária exata e critérios de seleção do Contraturno
 - [ ] `[LACUNA]` Chave PIX institucional e dados bancários (para `/como-ajudar/doar`)
-- [ ] `[LACUNA]` Horário de funcionamento e endereço de acesso detalhado do Bazar (a página
-      `/bazar/visite-a-loja` já existe, só falta o dado)
+- [ ] `[LACUNA]` Horário de funcionamento do Bazar — endereço e telefones já confirmados em
+      10/09/2026 (ver `docs/contexto.md`), só falta horário e mapa de acesso para
+      `/bazar/visite-a-loja`
 - [ ] Cadastro da instituição no Nota Paraná e no fundo municipal da criança e do adolescente,
       e o passo a passo de cada um (para `/como-ajudar/nota-parana` e `/como-ajudar/empresas-ir`)
 - [ ] Texto final de missão, visão e valores (o publicado é rascunho de trabalho explícito)

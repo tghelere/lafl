@@ -15,9 +15,17 @@
 e de natureza espírita (estatuto consolidado em 11/06/2022, art. 1º), Londrina/PR. CNPJ
 78.614.096/0001-75. Fundada em **12/07/1953** (art. 1º do estatuto) por um grupo espírita,
 originalmente como orfanato — corrigido pelo cliente em 10/09/2026; este documento e o
-repositório traziam **1963** até então. O atendimento hoje é laico. Sede na Av. Anália
-Franco, 33, Bairro Aeroporto, em terreno de aproximadamente 33.000 m² `[CONFIRMAR]` — mesma
-pesquisa de fonte única dos demais números tratados como não confirmados neste documento.
+repositório traziam **1963** até então. O atendimento hoje é laico.
+
+**Dois locais distintos, confirmados pelo cliente em 10/09/2026** — não são a mesma entidade
+de endereço, o que afeta seeder, `/contato` e qualquer marcação schema.org futura (JSON-LD
+`NGO`/`Organization`, ver `docs/roadmap.md`):
+
+- **Sede / CEI Anália Franco:** Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR —
+  (43) 3325-8060. Terreno de aproximadamente 33.000 m² `[CONFIRMAR]` — mesma pesquisa de
+  fonte única dos demais números tratados como não confirmados neste documento.
+- **Bazar:** Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR — (43) 3322-2373 e
+  (43) 99950-0183 (WhatsApp).
 
 Recebeu a **Medalha Ouro Verde** da Câmara Municipal de Londrina em 2016, a maior honraria do
 município.

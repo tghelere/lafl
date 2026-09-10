@@ -22,6 +22,19 @@ useSeoMeta({
       Dúvidas, sugestões ou pedidos de imprensa — escreva para a gente.
     </p>
 
+    <div class="contact-locations">
+      <div class="card">
+        <h2>Sede / CEI Anália Franco</h2>
+        <p>Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR</p>
+        <p>(43) 3325-8060</p>
+      </div>
+      <div class="card">
+        <h2>Bazar Beneficente</h2>
+        <p>Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR</p>
+        <p>(43) 3322-2373 — WhatsApp (43) 99950-0183</p>
+      </div>
+    </div>
+
     <div v-if="hasError" class="form-alert" role="alert">
       <p>Não foi possível enviar sua mensagem. Confira os campos abaixo e tente novamente.</p>
     </div>
@@ -68,3 +81,25 @@ useSeoMeta({
     </form>
   </div>
 </template>
+
+<style scoped>
+.contact-locations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-5);
+  margin-block: var(--space-6);
+}
+
+.contact-locations h2 {
+  margin-top: 0;
+  font-size: var(--text-lg);
+}
+
+.contact-locations p {
+  margin: 0;
+}
+
+.contact-locations p + p {
+  margin-top: var(--space-2);
+}
+</style>

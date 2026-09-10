@@ -1,7 +1,8 @@
 <script setup lang="ts">
-// Endereço e CNPJ vêm de docs/contexto.md — dados confirmados, sem marca [CONFIRMAR]. Não
-// inventar número novo aqui; qualquer outro dado institucional (telefone, e-mail, PIX) fica
-// para quando /api/v1/public/settings existir (ver docs/estrutura-site.md §3.1).
+// Endereços, telefones e CNPJ vêm de docs/contexto.md — dados confirmados, sem marca
+// [CONFIRMAR]. Sede/CEI e Bazar são dois locais distintos, não um só (ver docs/contexto.md).
+// Não inventar número novo aqui; qualquer outro dado institucional (e-mail, PIX) fica para
+// quando /api/v1/public/settings existir (ver docs/estrutura-site.md §3.1).
 const year = new Date().getFullYear()
 </script>
 
@@ -48,9 +49,12 @@ const year = new Date().getFullYear()
       </div>
 
       <div class="site-footer__base">
+        <p>LAR ANÁLIA FRANCO DE LONDRINA — CNPJ 78.614.096/0001-75.</p>
         <p>
-          LAR ANÁLIA FRANCO DE LONDRINA — Av. Anália Franco, 33, Bairro Aeroporto, Londrina/PR.
-          CNPJ 78.614.096/0001-75.
+          Sede / CEI: Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR — (43) 3325-8060
+        </p>
+        <p>
+          Bazar: Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR — (43) 3322-2373
         </p>
         <p>
           © {{ year }} Lar Anália Franco.

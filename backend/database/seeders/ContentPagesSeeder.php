@@ -74,8 +74,9 @@ class ContentPagesSeeder extends Seeder
                 'meta_description' => 'O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza espírita de Londrina, com três frentes: creche, contraturno e bazar beneficente.',
                 'content' => <<<'HTML'
                     <p>O Lar Anália Franco de Londrina é uma associação civil beneficente, filantrópica e de
-                    natureza espírita. A sede fica na Av. Anália Franco, 33, no Bairro Aeroporto — a área
-                    exata do terreno está em confirmação com a instituição.</p>
+                    natureza espírita. A sede, onde também funciona o CEI Anália Franco, fica na Av. Anália
+                    Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060. A área exata do
+                    terreno está em confirmação com a instituição.</p>
                     <p>Hoje a instituição opera três frentes distintas: o Centro de Educação Infantil Anália
                     Franco (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina;
                     a Escola de Contraturno, com aulas de informática e inteligência artificial para
@@ -266,8 +267,8 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Estrutura',
                 'meta_description' => 'O CEI Anália Franco funciona no terreno do Lar Anália Franco, com horta e quadra poliesportiva entre os espaços mais usados.',
                 'content' => <<<'HTML'
-                    <p>O CEI Anália Franco funciona no terreno da instituição, na Av. Anália Franco, 33, no
-                    Bairro Aeroporto, em Londrina — a área exata do terreno está em confirmação com a
+                    <p>O CEI Anália Franco funciona no terreno da instituição, na Av. Anália Franco, 33,
+                    Jd. Aeroporto, Londrina/PR — a área exata do terreno está em confirmação com a
                     instituição.</p>
                     <p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, também
                     usada pela Escola de Contraturno e, fora do horário de aula, alugada como fonte de
@@ -402,10 +403,11 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'bazar/visite-a-loja',
                 'title' => 'Visite a Loja',
-                'meta_description' => 'O Bazar Beneficente funciona na sede do Lar Anália Franco, na Av. Anália Franco, 33, Bairro Aeroporto, em Londrina/PR.',
+                'meta_description' => 'O Bazar Beneficente funciona em endereço próprio, na Rua Rosa Siqueira, 152, Jd. Aeroporto, em Londrina/PR — separado da sede do Lar Anália Franco.',
                 'content' => <<<'HTML'
-                    <p>O Bazar Beneficente funciona na sede do Lar Anália Franco, na Av. Anália Franco, 33,
-                    Bairro Aeroporto, em Londrina/PR.</p>
+                    <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália
+                    Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou
+                    WhatsApp (43) 99950-0183.</p>
                     <p>A loja está atualmente em obra de duplicação. Horário de funcionamento e um mapa de
                     acesso serão publicados aqui assim que confirmados com a administração do bazar.</p>
                     HTML,
