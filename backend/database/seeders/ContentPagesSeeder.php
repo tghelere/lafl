@@ -148,10 +148,23 @@ class ContentPagesSeeder extends Seeder
                     antigo serviço de acolhimento institucional (ver <a href="/quem-somos/o-lar-hoje">O Lar
                     hoje</a>), a diretoria anterior foi afastada por decisão judicial e uma nova diretoria
                     assumiu a gestão da instituição.</p>
+                    <h2>Diretoria — gestão 2026–2027</h2>
+                    <h3>Diretoria Executiva</h3>
+                    <ul>
+                    <li>Presidente: Valdomiro Ferreira dos Santos</li>
+                    <li>Vice-presidente: Sidnei Pereira do Nascimento</li>
+                    <li>Secretário: Marcos Aurélio Batyras</li>
+                    <li>Diretor de Patrimônio: Domingos Geraldo Stersa Junior</li>
+                    <li>1º Tesoureiro: Marcos Adriano Dornelas Pinheiro</li>
+                    <li>2º Tesoureiro: Ângelo Pamplona da Costa</li>
+                    </ul>
+                    <h3>Conselho Deliberativo</h3>
+                    <ul>
+                    <li>Presidente: André Luiz Gonçalves Salvador</li>
+                    <li>Vice-presidente: Jonatas Beranger</li>
+                    </ul>
                     <p>A prestação de contas da instituição — balanços, atas e editais — está reunida na
                     seção <a href="/transparencia">Transparência</a>.</p>
-                    <p>Nomes e cargos da diretoria atual estão em processo de confirmação junto à
-                    instituição e entrarão nesta página assim que validados.</p>
                     HTML,
             ],
             [

@@ -165,9 +165,6 @@ levantar.
       página-pilar se não crescerem). Mantidas separadas por ora porque a decisão é de
       conteúdo, não de arquitetura, e não bloqueia a implementação; reavaliar se o texto não
       crescer numa próxima rodada de conteúdo.
-- [ ] `/quem-somos/governanca` não cita nomes da diretoria atual — "Júlio Palmiro" e "Sidnei
-      Pereira do Nascimento" estão marcados `[CONFIRMAR]` em `docs/contexto.md`; adicionar
-      só após confirmação
 - [ ] `/quem-somos/missao-visao-valores` é explicitamente um rascunho de trabalho, não texto
       final — `docs/contexto.md` registra que reescrever a missão (a atual descreve o antigo
       acolhimento) é entregável em aberto a validar com a instituição
@@ -253,7 +250,6 @@ levantar.
       semanalmente? (schema já esboçado com `price` nullable — ver `docs/dominio.md`)
 - [ ] `[VALIDAR]` Prazos de retenção exatos de cada formulário
 - [ ] `[VALIDAR]` Convênio com a Secretaria Municipal de Educação impõe campo ou relatório?
-- [ ] `[CONFIRMAR]` Nomes e cargos da diretoria atual (para `/quem-somos/governanca`)
 - [ ] `[CONFIRMAR]` Faixa etária exata e critérios de seleção do Contraturno
 - [ ] `[LACUNA]` Chave PIX institucional e dados bancários (para `/como-ajudar/doar`)
 - [ ] `[LACUNA]` Horário de funcionamento e endereço de acesso detalhado do Bazar (a página

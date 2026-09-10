@@ -27,8 +27,28 @@ filantropa que criou mais de 70 escolas e 23 asilos para crianças órfãs no Br
 
 Cerca de **72 a 75 funcionários**, além de voluntários.
 
-Diretoria: presidente **Júlio Palmiro**; vice-presidente e presidente em exercício **Sidnei
-Pereira do Nascimento**. `[CONFIRMAR]`
+**Diretoria confirmada pelo cliente em 10/09/2026** — gestão eleita em assembleia de
+05/10/2025 (ata 05/2025), biênio 2026–2027, posse em 15/01/2026. Substitui o registro
+anterior deste documento (presidente "Júlio Palmiro", `[CONFIRMAR]`).
+
+Diretoria Executiva:
+
+- Presidente: Valdomiro Ferreira dos Santos
+- Vice-presidente: Sidnei Pereira do Nascimento
+- Secretário: Marcos Aurélio Batyras
+- Diretor de Patrimônio: Domingos Geraldo Stersa Junior
+- 1º Tesoureiro: Marcos Adriano Dornelas Pinheiro
+- 2º Tesoureiro: Ângelo Pamplona da Costa
+
+Conselho Deliberativo:
+
+- Presidente: André Luiz Gonçalves Salvador
+- Vice-presidente: Jonatas Beranger
+
+No site público, escrever sempre "gestão 2026–2027", nunca datas de início/fim de mandato.
+A ata de origem contém RG, CPF, estado civil, profissão e endereço residencial de cada
+membro — **nada disso entra no repositório, em seeder ou em qualquer arquivo versionado**,
+em nenhuma hipótese. Publicar apenas nome e cargo.
 
 ## Os três pilares
 
