@@ -49,7 +49,7 @@ const year = new Date().getFullYear()
 
       <div class="site-footer__base">
         <p>
-          Lar Anália Franco de Londrina — Av. Anália Franco, 33, Bairro Aeroporto, Londrina/PR.
+          LAR ANÁLIA FRANCO DE LONDRINA — Av. Anália Franco, 33, Bairro Aeroporto, Londrina/PR.
           CNPJ 78.614.096/0001-75.
         </p>
         <p>

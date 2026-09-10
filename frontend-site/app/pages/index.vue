@@ -5,10 +5,10 @@
 useSeoMeta({
   title: 'Lar Anália Franco — creche, contraturno e bazar em Londrina',
   description:
-    'Associação sem fins lucrativos em Londrina desde 1963. Creche conveniada, escola de contraturno e bazar beneficente, com prestação de contas pública.',
+    'Associação civil beneficente, filantrópica e de natureza espírita em Londrina. Creche conveniada, escola de contraturno e bazar beneficente, com prestação de contas pública.',
   ogTitle: 'Lar Anália Franco',
   ogDescription:
-    'Associação sem fins lucrativos em Londrina desde 1963. Creche conveniada, escola de contraturno e bazar beneficente, com prestação de contas pública.',
+    'Associação civil beneficente, filantrópica e de natureza espírita em Londrina. Creche conveniada, escola de contraturno e bazar beneficente, com prestação de contas pública.',
 })
 
 // Peso visual igual entre os três pilares — quem chegou pelo bazar não precisa entender o
@@ -17,9 +17,9 @@ const pillars = [
   {
     label: 'Educação Infantil',
     description:
-      'CEI Tio Pedro: creche e pré-escola conveniada com a Prefeitura de Londrina, período integral, para crianças de 1 a 5 anos.',
+      'CEI Anália Franco: creche e pré-escola conveniada com a Prefeitura de Londrina, período integral, para crianças de 1 a 5 anos.',
     to: '/educacao-infantil',
-    cta: 'Conhecer o CEI Tio Pedro',
+    cta: 'Conhecer o CEI Anália Franco',
   },
   {
     label: 'Contraturno',
@@ -41,7 +41,7 @@ const pillars = [
 <template>
   <div class="home">
     <section class="home__hero">
-      <p class="home__eyebrow">Londrina, desde 1963</p>
+      <p class="home__eyebrow">Londrina</p>
       <h1>Uma creche, uma escola de contraturno e um bazar — sustentados pelo mesmo trabalho.</h1>
       <p class="home__lead">
         O Lar Anália Franco atende crianças na educação infantil, adolescentes no contraturno,
@@ -70,7 +70,6 @@ const pillars = [
       </p>
       <div class="ledger">
         <LedgerLine value="250" label="Crianças atendidas na creche" date="ago/2026" example />
-        <LedgerLine value="63" label="Anos de atuação em Londrina" date="1963–2026" example />
         <LedgerLine
           value="40%"
           label="Do orçamento vindo do Bazar Beneficente"
@@ -83,7 +82,7 @@ const pillars = [
     <section class="home__ctas" aria-label="Como participar">
       <div class="card">
         <h2>Quer matricular sua criança?</h2>
-        <p>O CEI Tio Pedro atende crianças de 1 a 5 anos, em período integral.</p>
+        <p>O CEI Anália Franco atende crianças de 1 a 5 anos, em período integral.</p>
         <NuxtLink to="/educacao-infantil" class="btn btn--secondary">Conhecer o CEI</NuxtLink>
       </div>
       <div class="card">

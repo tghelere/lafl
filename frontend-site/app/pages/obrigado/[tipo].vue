@@ -6,7 +6,7 @@ type ThankYouType = 'matricula' | 'inscricao' | 'coleta' | 'voluntariado' | 'par
 const MESSAGES: Record<ThankYouType, { title: string; body: string }> = {
   matricula: {
     title: 'Manifestação de interesse recebida',
-    body: 'Recebemos seu interesse na matrícula do CEI Tio Pedro. A secretaria entrará em contato para os próximos passos.',
+    body: 'Recebemos seu interesse na matrícula do CEI Anália Franco. A secretaria entrará em contato para os próximos passos.',
   },
   inscricao: {
     title: 'Inscrição recebida',

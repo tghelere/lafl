@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Manifestação de interesse na matrícula do CEI Tio Pedro — titular é o responsável
+     * Manifestação de interesse na matrícula do CEI Anália Franco — titular é o responsável
      * (adulto), nunca a criança (ver ADR 0007 e docs/estrutura-site.md §2.1).
      */
     public function up(): void

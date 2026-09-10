@@ -7,7 +7,7 @@ namespace App\Enums;
 /**
  * Faixa etária da criança, nunca data de nascimento — regra não negociável desta fase (ver
  * ADR 0007 e docs/estrutura-site.md §2.1: o titular do formulário é o responsável, e nenhum
- * dado identificável de menor entra pela web). O CEI Tio Pedro atende de 1 a 5 anos, turmas
+ * dado identificável de menor entra pela web). O CEI Anália Franco atende de 1 a 5 anos, turmas
  * C1 a P5 (ver docs/contexto.md).
  */
 enum ChildAgeRange: string

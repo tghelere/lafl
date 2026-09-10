@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 /**
- * Manifestação de interesse na matrícula do CEI Tio Pedro. Titular é o responsável adulto —
+ * Manifestação de interesse na matrícula do CEI Anália Franco. Titular é o responsável adulto —
  * nenhum dado identificável da criança (ver ADR 0007). Retenção: 12 meses após contato (ver
  * docs/estrutura-site.md §2.2).
  *

@@ -11,11 +11,13 @@
 
 ## A instituição
 
-**Lar Anália Franco de Londrina** — associação civil sem fins lucrativos, Londrina/PR.
-CNPJ 78.614.096/0001-75. Fundada em **1963** por um grupo espírita, originalmente como
-orfanato. O atendimento hoje é laico. Sede na Av. Anália Franco, 33, Bairro Aeroporto, em
-terreno de aproximadamente 33.000 m² `[CONFIRMAR]` — mesma pesquisa de fonte única dos demais
-números tratados como não confirmados neste documento.
+**Razão social: LAR ANÁLIA FRANCO DE LONDRINA** — associação civil beneficente, filantrópica
+e de natureza espírita (estatuto consolidado em 11/06/2022, art. 1º), Londrina/PR. CNPJ
+78.614.096/0001-75. Fundada em **12/07/1953** (art. 1º do estatuto) por um grupo espírita,
+originalmente como orfanato — corrigido pelo cliente em 10/09/2026; este documento e o
+repositório traziam **1963** até então. O atendimento hoje é laico. Sede na Av. Anália
+Franco, 33, Bairro Aeroporto, em terreno de aproximadamente 33.000 m² `[CONFIRMAR]` — mesma
+pesquisa de fonte única dos demais números tratados como não confirmados neste documento.
 
 Recebeu a **Medalha Ouro Verde** da Câmara Municipal de Londrina em 2016, a maior honraria do
 município.
@@ -32,7 +34,10 @@ Pereira do Nascimento**. `[CONFIRMAR]`
 
 O site e o sistema se organizam em torno de três operações distintas.
 
-### 1. Centro de Educação Infantil "Tio Pedro"
+### 1. Centro de Educação Infantil Anália Franco (CEI Anália Franco)
+
+> Nome corrigido pelo cliente em 10/09/2026. O repositório trazia "CEI Tio Pedro" até então —
+> nome errado, substituído em todas as ocorrências.
 
 Creche e pré-escola (C1 a P5), crianças de **1 a 5 anos**, período integral das 7h30 às
 17h30. Criado em 2002. Convênio com a Secretaria Municipal de Educação de Londrina.

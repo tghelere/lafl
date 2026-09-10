@@ -5,7 +5,7 @@
 
 ## Escopo
 
-A instituição opera **três pilares**: creche (CEI Tio Pedro), escola de contraturno e bazar
+A instituição opera **três pilares**: creche (CEI Anália Franco), escola de contraturno e bazar
 beneficente. O serviço de acolhimento institucional foi **encerrado em 2022** — não existem
 no sistema medida protetiva, prontuário de acolhimento, dados de guarda ou vínculo com vara
 da infância.

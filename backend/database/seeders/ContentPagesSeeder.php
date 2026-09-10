@@ -13,11 +13,15 @@ class ContentPagesSeeder extends Seeder
     /**
      * Conteúdo institucional para o esqueleto do site público — só roda em local/testing,
      * nunca dado real de assistido (ver CLAUDE.md, regra 10; aqui não há dado de assistido,
-     * é conteúdo institucional). Usa apenas fatos confirmados em docs/contexto.md — fundação
-     * em 1963, os três pilares, CEI Tio Pedro, o bazar desde 1968, endereço, CNPJ. Nenhum
-     * dado marcado `[CONFIRMAR]` (nomes de diretoria, faixa etária exata do contraturno) ou
-     * `[LACUNA]` (chave PIX) entra aqui — onde falta o dado, o texto diz explicitamente que
-     * está pendente de confirmação com a instituição, em vez de inventar.
+     * é conteúdo institucional). Usa apenas fatos confirmados em docs/contexto.md — os três
+     * pilares, CEI Anália Franco, o bazar desde 1968, endereço, CNPJ. Nenhum dado marcado
+     * `[CONFIRMAR]` ou `[LACUNA]` entra aqui — onde falta o dado, o texto diz explicitamente
+     * que está pendente de confirmação com a instituição, em vez de inventar.
+     *
+     * Ano de fundação: o estatuto (art. 1º) registra 12/07/1953, divergindo do que este
+     * repositório publicava antes (1963). O cliente confirmou 1953 em 10/09/2026, mas nenhuma
+     * página publica ano de fundação até essa correção ser validada de forma definitiva — ver
+     * docs/contexto.md.
      *
      * Cada página termina com o comentário HTML `rascunho: validar com a instituição` —
      * nenhum texto aqui foi aprovado pelo Lar Anália Franco.
@@ -67,15 +71,16 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'quem-somos',
                 'title' => 'Quem Somos',
-                'meta_description' => 'O Lar Anália Franco é uma associação sem fins lucrativos de Londrina, fundada em 1963, com três frentes: creche, contraturno e bazar beneficente.',
+                'meta_description' => 'O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza espírita de Londrina, com três frentes: creche, contraturno e bazar beneficente.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco de Londrina é uma associação civil sem fins lucrativos fundada em
-                    1963. A sede fica na Av. Anália Franco, 33, no Bairro Aeroporto — a área exata do
-                    terreno está em confirmação com a instituição.</p>
-                    <p>Hoje a instituição opera três frentes distintas: o Centro de Educação Infantil "Tio
-                    Pedro", creche e pré-escola conveniada com a Prefeitura de Londrina; a Escola de
-                    Contraturno, com aulas de informática e inteligência artificial para adolescentes; e o
-                    Bazar Beneficente, loja de doações que sustenta boa parte do orçamento da casa.</p>
+                    <p>O Lar Anália Franco de Londrina é uma associação civil beneficente, filantrópica e de
+                    natureza espírita. A sede fica na Av. Anália Franco, 33, no Bairro Aeroporto — a área
+                    exata do terreno está em confirmação com a instituição.</p>
+                    <p>Hoje a instituição opera três frentes distintas: o Centro de Educação Infantil Anália
+                    Franco (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina;
+                    a Escola de Contraturno, com aulas de informática e inteligência artificial para
+                    adolescentes; e o Bazar Beneficente, loja de doações que sustenta boa parte do orçamento
+                    da casa.</p>
                     <p>As páginas desta seção contam a história da instituição, sua estrutura de governança e
                     o que ela é hoje — inclusive os pontos em que precisou se reconstruir.</p>
                     HTML,
@@ -83,17 +88,16 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'quem-somos/nossa-historia',
                 'title' => 'Nossa História',
-                'meta_description' => 'De orfanato fundado em 1963 a instituição com creche, contraturno e bazar: a linha do tempo do Lar Anália Franco de Londrina.',
+                'meta_description' => 'De orfanato a instituição com creche, contraturno e bazar: a linha do tempo do Lar Anália Franco de Londrina.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco nasceu em 1963, criado por um grupo espírita de Londrina,
-                    originalmente como orfanato. O atendimento que a instituição presta hoje é laico.</p>
+                    <p>O Lar Anália Franco foi criado por um grupo espírita de Londrina, originalmente como
+                    orfanato. O atendimento que a instituição presta hoje é laico.</p>
                     <p>O nome é uma homenagem a Anália Franco (1853–1919), educadora, jornalista,
                     abolicionista e filantropa que fundou mais de 70 escolas e 23 asilos para crianças
                     órfãs no Brasil.</p>
                     <ul>
-                    <li>1963 — fundação da instituição, como orfanato.</li>
                     <li>1968 — início do Bazar Beneficente, em funcionamento ininterrupto desde então.</li>
-                    <li>2002 — criação do Centro de Educação Infantil "Tio Pedro", com convênio junto à
+                    <li>2002 — criação do Centro de Educação Infantil Anália Franco, com convênio junto à
                     Secretaria Municipal de Educação de Londrina.</li>
                     <li>2016 — recebe a Medalha Ouro Verde, maior honraria da Câmara Municipal de
                     Londrina.</li>
@@ -135,10 +139,11 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'quem-somos/governanca',
                 'title' => 'Governança',
-                'meta_description' => 'Como o Lar Anália Franco é administrado: associação civil sem fins lucrativos, diretoria eleita e prestação de contas pública.',
+                'meta_description' => 'Como o Lar Anália Franco é administrado: associação civil beneficente, filantrópica e de natureza espírita, diretoria eleita e prestação de contas pública.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco é uma associação civil sem fins lucrativos, CNPJ
-                    78.614.096/0001-75, administrada por uma diretoria eleita pelos associados.</p>
+                    <p>O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza
+                    espírita, CNPJ 78.614.096/0001-75, administrada por uma diretoria eleita pelos
+                    associados.</p>
                     <p>Em 2022, após uma decisão de primeira instância que reconheceu irregularidades no
                     antigo serviço de acolhimento institucional (ver <a href="/quem-somos/o-lar-hoje">O Lar
                     hoje</a>), a diretoria anterior foi afastada por decisão judicial e uma nova diretoria
@@ -190,13 +195,13 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil',
                 'title' => 'Educação Infantil',
-                'meta_description' => 'CEI Tio Pedro: creche e pré-escola do Lar Anália Franco para crianças de 1 a 5 anos, período integral, conveniada com a Prefeitura de Londrina.',
+                'meta_description' => 'CEI Anália Franco: creche e pré-escola do Lar Anália Franco para crianças de 1 a 5 anos, período integral, conveniada com a Prefeitura de Londrina.',
                 'content' => <<<'HTML'
-                    <p>O Centro de Educação Infantil "Tio Pedro" é a creche e pré-escola do Lar Anália
+                    <p>O Centro de Educação Infantil Anália Franco é a creche e pré-escola do Lar Anália
                     Franco, para crianças de 1 a 5 anos (turmas de C1 a P5). Funciona em período integral,
                     das 7h30 às 17h30, com convênio junto à Secretaria Municipal de Educação de
                     Londrina.</p>
-                    <p>O CEI Tio Pedro foi criado em 2002 e tem autorização de funcionamento renovada até
+                    <p>O CEI Anália Franco foi criado em 2002 e tem autorização de funcionamento renovada até
                     janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra
                     poliesportiva do terreno.</p>
                     <p>As páginas desta seção detalham a proposta pedagógica, a alimentação e a estrutura
@@ -206,9 +211,9 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil/dia-da-crianca',
                 'title' => 'Dia da Criança',
-                'meta_description' => 'Programação especial de Dia da Criança do CEI Tio Pedro — detalhes da edição deste ano ainda em confirmação com a coordenação.',
+                'meta_description' => 'Programação especial de Dia da Criança do CEI Anália Franco — detalhes da edição deste ano ainda em confirmação com a coordenação.',
                 'content' => <<<'HTML'
-                    <p>O Centro de Educação Infantil "Tio Pedro" reserva uma programação especial para o Dia
+                    <p>O Centro de Educação Infantil Anália Franco reserva uma programação especial para o Dia
                     da Criança, em outubro, para as crianças atendidas pela creche.</p>
                     <p>Detalhes da edição deste ano — atividades, parcerias e como a comunidade pode
                     contribuir — ainda serão confirmados com a coordenação do CEI e publicados nesta
@@ -218,9 +223,9 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil/proposta-pedagogica',
                 'title' => 'Proposta Pedagógica',
-                'meta_description' => 'Rotina do CEI Tio Pedro: aulas de inglês, educação física, horta e quadra poliesportiva, em período integral para crianças de 1 a 5 anos.',
+                'meta_description' => 'Rotina do CEI Anália Franco: aulas de inglês, educação física, horta e quadra poliesportiva, em período integral para crianças de 1 a 5 anos.',
                 'content' => <<<'HTML'
-                    <p>O CEI Tio Pedro atende crianças de 1 a 5 anos (turmas de C1 a P5) em período
+                    <p>O CEI Anália Franco atende crianças de 1 a 5 anos (turmas de C1 a P5) em período
                     integral, das 7h30 às 17h30, sob convênio com a Secretaria Municipal de Educação de
                     Londrina.</p>
                     <p>Fazem parte da rotina aulas de inglês, educação física, atividades na horta da
@@ -233,9 +238,9 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil/alimentacao-e-saude',
                 'title' => 'Alimentação e Saúde',
-                'meta_description' => 'O CEI Tio Pedro serve cinco refeições diárias com cardápio de nutricionista e registra alergias e restrições alimentares informadas na matrícula.',
+                'meta_description' => 'O CEI Anália Franco serve cinco refeições diárias com cardápio de nutricionista e registra alergias e restrições alimentares informadas na matrícula.',
                 'content' => <<<'HTML'
-                    <p>O CEI Tio Pedro serve cinco refeições diárias, com cardápio elaborado por
+                    <p>O CEI Anália Franco serve cinco refeições diárias, com cardápio elaborado por
                     nutricionista, para todas as crianças em período integral.</p>
                     <p>Restrições alimentares e alergias informadas pela família na matrícula são
                     registradas e levadas em conta no preparo das refeições da criança.</p>
@@ -246,9 +251,9 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil/estrutura',
                 'title' => 'Estrutura',
-                'meta_description' => 'O CEI Tio Pedro funciona no terreno do Lar Anália Franco, com horta e quadra poliesportiva entre os espaços mais usados.',
+                'meta_description' => 'O CEI Anália Franco funciona no terreno do Lar Anália Franco, com horta e quadra poliesportiva entre os espaços mais usados.',
                 'content' => <<<'HTML'
-                    <p>O CEI Tio Pedro funciona no terreno da instituição, na Av. Anália Franco, 33, no
+                    <p>O CEI Anália Franco funciona no terreno da instituição, na Av. Anália Franco, 33, no
                     Bairro Aeroporto, em Londrina — a área exata do terreno está em confirmação com a
                     instituição.</p>
                     <p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, também
@@ -261,9 +266,9 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil/depoimentos',
                 'title' => 'Depoimentos',
-                'meta_description' => 'O CEI Tio Pedro tem avaliação pública de 4,5 estrelas no Google. Depoimentos individuais só entram aqui com autorização de quem os deu.',
+                'meta_description' => 'O CEI Anália Franco tem avaliação pública de 4,5 estrelas no Google. Depoimentos individuais só entram aqui com autorização de quem os deu.',
                 'content' => <<<'HTML'
-                    <p>O CEI Tio Pedro tem avaliação pública de 4,5 estrelas, com mais de duas centenas de
+                    <p>O CEI Anália Franco tem avaliação pública de 4,5 estrelas, com mais de duas centenas de
                     avaliações, no perfil do Google da instituição.</p>
                     <p>Depoimentos de pais e responsáveis só entram nesta página com autorização expressa de
                     quem os deu — nenhuma avaliação pública é reproduzida aqui sem esse consentimento. Esta
@@ -421,10 +426,10 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'bazar/sua-compra-vira-educacao',
                 'title' => 'Sua Compra Vira Educação',
-                'meta_description' => 'Cada peça comprada no Bazar Beneficente ajuda a sustentar o CEI Tio Pedro e a Escola de Contraturno do Lar Anália Franco.',
+                'meta_description' => 'Cada peça comprada no Bazar Beneficente ajuda a sustentar o CEI Anália Franco e a Escola de Contraturno do Lar Anália Franco.',
                 'content' => <<<'HTML'
                     <p>Cada peça comprada no Bazar Beneficente ajuda a sustentar o Centro de Educação
-                    Infantil "Tio Pedro" e a Escola de Contraturno — as duas operações educacionais do Lar
+                    Infantil Anália Franco e a Escola de Contraturno — as duas operações educacionais do Lar
                     Anália Franco.</p>
                     <p>O convênio da instituição com a Prefeitura de Londrina cobre a creche, mas não cobre
                     tudo. É a receita do bazar que completa o que falta, e que bancou a criação da Escola de
@@ -501,7 +506,7 @@ class ContentPagesSeeder extends Seeder
                     <p>O Lar Anália Franco mantém parcerias que sustentam seus três pilares — da doação de
                     equipamentos de informática pelo Centro de Recondicionamento de Computadores, programa
                     do governo federal, ao convênio com a Secretaria Municipal de Educação de Londrina para
-                    o Centro de Educação Infantil "Tio Pedro".</p>
+                    o Centro de Educação Infantil Anália Franco.</p>
                     <p>A lista completa de parceiros e apoiadores da instituição está sendo consolidada e
                     será publicada nesta página.</p>
                     HTML,
@@ -526,7 +531,7 @@ class ContentPagesSeeder extends Seeder
                     que precisa, incluindo quem busca informação sobre o processo de 2022 (ver
                     <a href="/quem-somos/o-lar-hoje">O Lar hoje</a>).</p>
                     <p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro
-                    de Educação Infantil "Tio Pedro", também exige prestação de contas periódica.</p>
+                    de Educação Infantil Anália Franco, também exige prestação de contas periódica.</p>
                     <p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por
                     ano e por tipo.</p>
                     HTML,

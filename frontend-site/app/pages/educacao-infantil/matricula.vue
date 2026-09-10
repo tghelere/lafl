@@ -7,7 +7,7 @@ const { hasError, fieldFailed } = useFormErrorState()
 
 useSeoMeta({
   title: 'Matrícula — Educação Infantil — Lar Anália Franco',
-  description: 'Manifeste interesse na matrícula do CEI Tio Pedro. Os dados completos da criança são coletados presencialmente.',
+  description: 'Manifeste interesse na matrícula do CEI Anália Franco. Os dados completos da criança são coletados presencialmente.',
 })
 </script>
 
@@ -23,7 +23,7 @@ useSeoMeta({
 
     <h1>Matrícula</h1>
     <p class="prose">
-      Preencha seus dados que a secretaria do CEI Tio Pedro entra em contato. Os dados da
+      Preencha seus dados que a secretaria do CEI Anália Franco entra em contato. Os dados da
       criança — nome, data de nascimento, documentos — são coletados presencialmente, junto
       com o termo de consentimento, no momento da matrícula efetiva.
     </p>
