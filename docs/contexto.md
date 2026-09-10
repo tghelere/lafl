@@ -33,7 +33,9 @@ município.
 O nome homenageia Anália Franco (1853–1919), educadora, abolicionista, jornalista e
 filantropa que criou mais de 70 escolas e 23 asilos para crianças órfãs no Brasil.
 
-Cerca de **72 a 75 funcionários**, além de voluntários.
+`[CONFIRMAR]` Total de funcionários: o repositório trazia "72 a 75 funcionários" — o cliente
+desmentiu ou não confirmou esse número em 10/09/2026. Removido de todo o site; não publicar
+sem confirmação.
 
 **Diretoria confirmada pelo cliente em 10/09/2026** — gestão eleita em assembleia de
 05/10/2025 (ata 05/2025), biênio 2026–2027, posse em 15/01/2026. Substitui o registro
@@ -70,8 +72,16 @@ O site e o sistema se organizam em torno de três operações distintas.
 Creche e pré-escola (C1 a P5), crianças de **1 a 5 anos**, período integral das 7h30 às
 17h30. Criado em 2002. Convênio com a Secretaria Municipal de Educação de Londrina.
 
-**250 crianças** atendidas hoje — eram 120 em 2022. Meta de 300+ para 2027. Cinco refeições
-diárias com cardápio de nutricionista. Autorização de funcionamento renovada até 01/01/2028.
+**Números confirmados pelo cliente em 10/09/2026, com fonte documental** — substituem os
+"250 crianças hoje" e "meta de 300+ para 2027" que este documento trazia antes, nunca
+validados (fonte única/entrevista):
+
+- **213 crianças** atendidas no CEI em **abril de 2023**
+- **15 turmas** no CEI (plano de trabalho do Termo de Colaboração 06/2022, exercício 2026)
+- Previsão de **308 crianças** de 1 a 5 anos em **2027**
+
+Cinco refeições diárias com cardápio de nutricionista. Autorização de funcionamento renovada
+até 01/01/2028.
 
 Pais destacam nas avaliações públicas: aulas de inglês, educação física, horta e quadra
 poliesportiva.
@@ -104,8 +114,15 @@ um dia.
 
 ## Sustentação financeira
 
-- **~60%** convênio com a Prefeitura de Londrina — destinado **exclusivamente à creche**
-- **~40%** Bazar Beneficente — sustenta o restante
+`[CONFIRMAR]` Divisão percentual do orçamento entre convênio e bazar: este documento trazia
+"~60% convênio / ~40% bazar" e o `LedgerLine` da home publicava "40% do orçamento vindo do
+Bazar Beneficente". O cliente desmentiu ou não confirmou nenhuma divisão percentual
+(50/50, 40%, 74/26) em 10/09/2026 — removida de todo o site. O convênio com a Prefeitura de
+Londrina cobre a creche; o Bazar Beneficente sustenta o que o convênio não cobre (ver
+"Os três pilares" acima) — sem número de proporção até confirmação.
+
+**Repasse municipal 2026 — confirmado, dado de transparência:** R$ 2.819.892,84 (Termo de
+Colaboração 06/2022 com a Secretaria Municipal de Educação de Londrina).
 
 Outras fontes já existentes, hoje mal exploradas no site: urna de doações em
 estabelecimentos parceiros, aluguel da quadra poliesportiva, doações diretas e voluntariado.
@@ -137,7 +154,10 @@ processo está hoje, nem se a decisão de 2022 transitou em julgado. Nenhum text
 tratar a condenação de primeira instância como fato encerrado sem essa confirmação; ver a
 nota de bloqueio em `/quem-somos/o-lar-hoje` no `ContentPagesSeeder`.
 
-**A creche seguiu funcionando normalmente e cresceu desde então** — de 120 para 250 crianças.
+**A creche seguiu funcionando normalmente durante todo o processo** — documentos de abril de
+2023 registram 213 crianças atendidas (ver "Os três pilares" acima). Não há, por ora, número
+confirmado de matrículas imediatamente antes ou depois de 2022 para sustentar uma alegação de
+crescimento específica.
 
 ### Controles adotados após 2022 — lacuna de maior valor do projeto
 

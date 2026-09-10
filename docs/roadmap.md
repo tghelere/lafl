@@ -182,11 +182,6 @@ levantar.
       o `ContentPagesSeeder` para adicionar essas chamadas é uma melhoria de conteúdo pequena,
       não fechada nesta sessão por não estar no escopo pedido (só as seis páginas de
       formulário e o redirect).
-- [ ] **Bloqueia publicação:** a linha de registro (`LedgerLine.vue`) na home exibe três
-      números institucionais (250 crianças, 63 anos, 40% do orçamento) em modo `example` —
-      vêm de `docs/contexto.md` sem marca `[CONFIRMAR]` explícita, mas tratados como não
-      validados por decisão desta e da sessão anterior (o levantamento em si veio de fonte
-      única/entrevista). Não publicar sem validação institucional.
 - [ ] Cache Redis + ETag para os demais endpoints públicos — implementado só para `pages`.
       `public/transparency-documents` (listagem) não está cacheado nesta sessão: o volume
       atual (12 documentos de exemplo) não justificou o risco de repetir o cuidado com

@@ -48,8 +48,8 @@ Google **não** pode ser publicado sem consentimento do autor.
 **`institution_stats`** — números da home
 `uuid`, `key`, `label`, `value`, `year`, `display_order`
 
-Editável no painel. Evita número desatualizado codificado no front — 250 crianças hoje, meta
-de 300+ em 2027.
+Editável no painel. Evita número desatualizado codificado no front — 213 crianças em
+abr/2023, previsão de 308 em 2027 (ver `docs/contexto.md`).
 
 **`transparency_documents`** — prestação de contas
 `uuid`, `title`, `year`, `type` (enum: `balance`, `bylaws`, `minutes`, `certificate`,

@@ -65,17 +65,12 @@ const pillars = [
     <section class="home__ledger" aria-labelledby="home-ledger-heading">
       <h2 id="home-ledger-heading">A instituição em números</h2>
       <p class="home__ledger-note">
-        Os valores abaixo mostram o formato da linha de registro — ainda aguardam validação da
-        instituição antes de ir ao ar (ver <NuxtLink to="/transparencia">Transparência</NuxtLink>).
+        Números com fonte documental — veja o acervo completo em
+        <NuxtLink to="/transparencia">Transparência</NuxtLink>.
       </p>
       <div class="ledger">
-        <LedgerLine value="250" label="Crianças atendidas na creche" date="ago/2026" example />
-        <LedgerLine
-          value="40%"
-          label="Do orçamento vindo do Bazar Beneficente"
-          date="ago/2026"
-          example
-        />
+        <LedgerLine value="213" label="Crianças atendidas no CEI Anália Franco" date="abr/2023" />
+        <LedgerLine value="308" label="Previsão de crianças de 1 a 5 anos em 2027" date="2027" />
       </div>
     </section>
 

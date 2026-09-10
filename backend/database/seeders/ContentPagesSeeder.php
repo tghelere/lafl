@@ -209,12 +209,12 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil',
                 'title' => 'Educação Infantil',
-                'meta_description' => 'CEI Anália Franco: creche e pré-escola do Lar Anália Franco para crianças de 1 a 5 anos, período integral, conveniada com a Prefeitura de Londrina.',
+                'meta_description' => 'CEI Anália Franco: creche e pré-escola do Lar Anália Franco para crianças de 1 a 5 anos, 15 turmas, período integral, conveniada com a Prefeitura de Londrina.',
                 'content' => <<<'HTML'
                     <p>O Centro de Educação Infantil Anália Franco é a creche e pré-escola do Lar Anália
-                    Franco, para crianças de 1 a 5 anos (turmas de C1 a P5). Funciona em período integral,
-                    das 7h30 às 17h30, com convênio junto à Secretaria Municipal de Educação de
-                    Londrina.</p>
+                    Franco, para crianças de 1 a 5 anos, em 15 turmas (C1 a P5, plano de trabalho do Termo
+                    de Colaboração 06/2022, exercício 2026). Funciona em período integral, das 7h30 às
+                    17h30, com convênio junto à Secretaria Municipal de Educação de Londrina.</p>
                     <p>O CEI Anália Franco foi criado em 2002 e tem autorização de funcionamento renovada até
                     janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra
                     poliesportiva do terreno.</p>
@@ -522,7 +522,9 @@ class ContentPagesSeeder extends Seeder
                     que precisa, incluindo quem busca informação sobre o processo de 2022 (ver
                     <a href="/quem-somos/o-lar-hoje">O Lar hoje</a>).</p>
                     <p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro
-                    de Educação Infantil Anália Franco, também exige prestação de contas periódica.</p>
+                    de Educação Infantil Anália Franco, também exige prestação de contas periódica. O
+                    repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração
+                    06/2022).</p>
                     <p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por
                     ano e por tipo.</p>
                     HTML,
