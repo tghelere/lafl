@@ -88,6 +88,24 @@
       seis pares de tela quase idênticos. Nenhuma verificação em navegador real ocorreu nesta
       sessão (sem acesso a browser) — ver `docs/relatorio-sessao-6.md` para a lista completa do
       que precisa de conferência visual antes de considerar essas telas prontas.
+- [x] **Ajuste de escopo de três páginas (sessão 7)**, com fatos novos confirmados pelo
+      cliente em 13/09/2026 (`docs/contexto.md`): Contraturno reescrito por completo como
+      programa em preparação (público de 6 a 15 anos, renda até 3 salários mínimos, meta de
+      100 atendidos, parceria com o SENAI, ginásio, auditório, oficinas previstas, início
+      previsto para 2027) — nenhuma página afirma operação, turma ou aluno matriculado; o
+      formulário de inscrição virou aviso de interesse (só nome e telefone do responsável,
+      `email`/`teen_age`/`school`/`message` removidos do schema). Matrícula do CEI passou a
+      apontar exclusivamente para a Central de Vagas da Prefeitura, e o formulário
+      `enrollment_interests` foi removido por completo (migration, model, Action,
+      FormRequest, Resources, Policy, factory, testes, rotas, painel administrativo — reduz
+      de seis para cinco formulários recebidos, ver ADR 0007 atualizada). Bazar: WhatsApp
+      (43) 99950-0183 passou a ser a chamada principal de `/bazar/agendar-coleta`, formulário
+      existente virou caminho secundário. Confirmado que nenhuma página publica ano de
+      fundação, conforme pendência deixada pela sessão anterior. Backend com Pint/PHPStan/
+      Pest verdes; `frontend-site` com `build`/`generate` verdes; `frontend-admin` com
+      `lint`/`build` (`vue-tsc`) verdes. Conferência visual feita via requisição HTTP ao
+      servidor de desenvolvimento (conteúdo renderizado confirmado), não em navegador real —
+      Playwright não tinha Chromium disponível neste ambiente.
 
 ## Em andamento
 
@@ -132,7 +150,7 @@ levantar.
 - [ ] Endpoint para **definir** `pickup_requests.scheduled_for` (agendar data de coleta) — a
       tela do Bazar (sessão 6) já ordena e exibe a agenda por data, mas só lê; não existe
       Controller/rota para o time do bazar marcar uma data de coleta, só a mudança de
-      status/anotação interna genérica das seis entidades. Sem isso, "agenda por data" no
+      status/anotação interna genérica das cinco entidades. Sem isso, "agenda por data" no
       painel é hoje só ordenação de pedidos sem data nenhuma preenchida.
 
 ### Site público (Nuxt)
@@ -144,7 +162,9 @@ levantar.
       `NUXT_PUBLIC_SITE_URL`, sem `pages`/`posts`/`transparency-documents`)
 - [ ] JSON-LD `NGO`/`Organization` — modelar Sede/CEI e Bazar como dois locais distintos
       (`location`/`department` separados), não um endereço só; ver os dois endereços
-      confirmados em `docs/contexto.md`
+      confirmados em `docs/contexto.md`. Quando chegar a vez de `/contraturno`: descrição
+      institucional apenas, nunca marcada como serviço em operação nem como oferta ativa — o
+      programa ainda não abriu (ver `docs/contexto.md`)
 - [ ] Eventos Umami nos CTAs
 - [ ] `/educacao-infantil/estrutura` menciona uma galeria de fotos que ainda não existe —
       depende da entidade `media`
@@ -161,12 +181,13 @@ levantar.
 - [ ] `/educacao-infantil/dia-da-crianca` tem conteúdo muito magro (dois parágrafos genéricos)
       — não há nenhum fato confirmado sobre a edição do evento em `docs/contexto.md`; revisar
       assim que houver informação real, ou considerar remover a página até lá
-- [ ] Quatro páginas de Contraturno (`para-quem-e`, `como-funciona`, `parceiros`,
-      `o-que-vem-por-ai`) ficaram abaixo de ~300 palavras — esperado dado que o programa é
-      novo (ver `docs/estrutura-site.md` §1.4, que já previa esse risco e autoriza unir à
-      página-pilar se não crescerem). Mantidas separadas por ora porque a decisão é de
-      conteúdo, não de arquitetura, e não bloqueia a implementação; reavaliar se o texto não
-      crescer numa próxima rodada de conteúdo.
+- [x] Quatro páginas de Contraturno (`para-quem-e`, `como-funciona`, `parceiros`,
+      `o-que-vem-por-ai`) estavam abaixo de ~300 palavras — resolvido nesta sessão com fatos
+      novos confirmados pelo cliente em 13/09/2026 (público de 6 a 15 anos, renda até 3
+      salários mínimos, meta de 100 atendidos, parceria com o SENAI, ginásio, auditório,
+      lista de oficinas previstas — ver `docs/contexto.md`). Todas as páginas reescritas no
+      presente para o que já existe e no futuro só para início de turmas/inscrições
+      (previsto para 2027), sem afirmar operação, turma ou aluno matriculado.
 - [ ] `/quem-somos/missao-visao-valores` é explicitamente um rascunho de trabalho, não texto
       final — `docs/contexto.md` registra que reescrever a missão (a atual descreve o antigo
       acolhimento) é entregável em aberto a validar com a instituição
@@ -224,7 +245,7 @@ levantar.
       contraturno, bazar, etc.)
 - [ ] `TRUSTED_PROXIES` (`bootstrap/app.php`) está com o default de loopback, correto só para
       dev onde site público e API rodam no mesmo host. Em produção, precisa do IP/CIDR real do
-      serviço do site público (Nuxt) — sem isso, o rate limit por IP dos seis formulários passa
+      serviço do site público (Nuxt) — sem isso, o rate limit por IP dos cinco formulários passa
       a ver sempre o IP do próprio Nuxt, não o do visitante
       (ver `frontend-site/server/api/forms/[tipo].post.ts`)
 - [ ] `/politica-de-privacidade` é rascunho de trabalho — mesmo tratamento do resto do
@@ -234,23 +255,34 @@ levantar.
 - [ ] `php artisan queue:work` (ou `schedule:work` para os jobs de expurgo) precisa estar
       rodando em produção — nada disparado por este código roda sozinho sem um worker; ver
       `docker-compose.yml`, que hoje não tem um serviço dedicado a isso
-- [ ] As páginas de conteúdo do CMS ainda não linkam diretamente para os formulários
-      correspondentes (ver nota na seção "Site público" acima)
-- [ ] Prazos de retenção usados (12/12/6/24/36/6 meses, ver `docs/estrutura-site.md` §2.2) são
+- [x] As páginas de conteúdo do CMS não linkavam diretamente para os formulários
+      correspondentes — corrigido para Contraturno (CTA "Avise-me quando abrir" no pilar e em
+      "O Que Vem por Aí"), Bazar (WhatsApp em destaque e link para o formulário em "O Que
+      Aceitamos") e Educação Infantil (link para a nova página de Matrícula). Notícias,
+      Voluntariado e Contato ainda dependem de página própria que não existe.
+- [ ] Prazos de retenção usados (12/6/24/36/6 meses, ver `docs/estrutura-site.md` §2.2) são
       os sugeridos no documento, não confirmados pela instituição — ver `[VALIDAR]` abaixo
 
 ### Validações pendentes com a instituição
 
-- [ ] `[VALIDAR]` Campo `school` em `program_applications` — nome do rótulo e obrigatoriedade
-      (o campo em si já está decidido: existe, `enc`, nullable — ver `docs/dominio.md`)
+- [x] `[VALIDAR]` Campo `school` em `program_applications` — obsoleto: o formulário deixou de
+      ser uma inscrição e virou um aviso de "me avise quando abrir" (ver ADR 0007,
+      atualização de 13/09/2026); `school`, `email`, `teen_age` e `message` foram removidos,
+      só resta nome e telefone do responsável
 - [ ] `[VALIDAR]` Vitrine do bazar (`bazaar_showcase_items`) terá preço? Há quem alimente
       semanalmente? (schema já esboçado com `price` nullable — ver `docs/dominio.md`)
 - [ ] `[VALIDAR]` Prazos de retenção exatos de cada formulário
 - [ ] `[VALIDAR]` Convênio com a Secretaria Municipal de Educação impõe campo ou relatório?
-- [ ] `[CONFIRMAR]` Faixa etária exata e critérios de seleção do Contraturno
+- [x] `[CONFIRMAR]` Faixa etária do Contraturno — confirmada em 13/09/2026: 6 a 15 anos,
+      famílias com renda de até 3 salários mínimos, meta de 100 atendidos (ver
+      `docs/contexto.md`). `[VALIDAR]` ainda em aberto: critérios de seleção além de faixa
+      etária e renda, quando a inscrição efetiva abrir
 - [ ] `[LACUNA]` Horário de funcionamento do Bazar — endereço e telefones já confirmados em
       10/09/2026 (ver `docs/contexto.md`), só falta horário e mapa de acesso para
       `/bazar/visite-a-loja`
+- [ ] `[LACUNA]` Telefone da Central de Vagas da Prefeitura de Londrina — endereço confirmado
+      em 13/09/2026 (Rua Benjamin Constant, 800, Centro), `/educacao-infantil/matricula`
+      publica só o endereço até o telefone ser confirmado
 - [ ] Nota Paraná e destinação de Imposto de Renda (fundo da criança e do adolescente/FMDCA)
       — o cliente confirmou em 10/09/2026 que nenhuma das duas opções está disponível hoje.
       `/como-ajudar/nota-parana` e `/como-ajudar/empresas-ir` foram removidas do
