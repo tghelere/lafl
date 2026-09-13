@@ -14,8 +14,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
@@ -29,15 +29,15 @@ svg {
   max-width: 100%;
 }
 
-/* Bitter só no h1 — título de tela (ver docs/decisoes/0009-direcao-visual.md e a nota em
-   tokens.css). h2/h3 em diante ficam em IBM Plex Sans, mais compatível com a densidade de uma
+/* Poppins só no h1 — título de tela (ver docs/decisoes/0009-direcao-visual.md e a nota em
+   tokens.css). h2/h3 em diante ficam em Lora, mais compatível com a densidade de uma
    tela de trabalho do que com uma peça editorial. */
 h1 {
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   font-size: var(--text-3xl);
   line-height: var(--leading-tight);
-  color: var(--color-ink);
+  color: var(--color-heading);
   margin: 0 0 var(--space-5);
 }
 
@@ -47,7 +47,7 @@ h4 {
   font-family: var(--font-body);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-snug);
-  color: var(--color-ink);
+  color: var(--color-heading);
   margin: var(--space-6) 0 var(--space-3);
 }
 
@@ -73,14 +73,17 @@ p {
   margin: 0 0 var(--space-3);
 }
 
+/* --color-accent (laranja-500) não atinge 4,5:1 como texto sobre --color-surface (~2,8:1) —
+   por isso o link usa --color-focus (laranja-700, o degrau mais escuro da mesma família),
+   o único tom da marca que passa em contraste de texto. Ver relatório desta sessão. */
 a {
-  color: var(--color-quadra);
+  color: var(--color-focus);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
 a:hover {
-  color: var(--color-quadra-dark);
+  color: var(--color-accent-hover);
 }
 
 button {

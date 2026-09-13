@@ -11,7 +11,11 @@
   padding-inline: var(--container-padding);
 }
 
-/* Botão — duas variantes, quatro estados cada */
+/* Botão — duas variantes. --color-accent (laranja-500) mantém o tom exato da marca como
+   fundo; o rótulo usa --color-heading (não branco: branco sobre --color-accent dá só
+   ~2,96:1, abaixo do mínimo AA — --color-heading dá 5,54:1). Só dois tons de estado (não
+   três): hover e active reaproveitam --color-accent-hover — a escala de marca não define um
+   terceiro degrau para "pressionado". */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -33,49 +37,39 @@
 }
 
 .btn--primary {
-  background: var(--color-quadra);
-  color: var(--color-surface);
-  border-color: var(--color-quadra);
+  background: var(--color-accent);
+  color: var(--color-heading);
+  border-color: var(--color-accent);
 }
 
-.btn--primary:hover {
-  background: var(--color-quadra-dark);
-  border-color: var(--color-quadra-dark);
-}
-
+.btn--primary:hover,
 .btn--primary:active {
-  background: var(--color-quadra-darker);
-  border-color: var(--color-quadra-darker);
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
 }
 
 .btn--primary:disabled,
 .btn--primary[aria-disabled='true'] {
-  background: var(--color-linha);
-  border-color: var(--color-linha);
-  color: var(--color-surface);
+  background: var(--color-border);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
   cursor: not-allowed;
 }
 
 .btn--secondary {
   background: transparent;
-  color: var(--color-ink);
-  border-color: var(--color-ink);
+  color: var(--color-text);
+  border-color: var(--color-text);
 }
 
-.btn--secondary:hover {
-  background: var(--color-ink);
-  color: var(--color-surface);
-}
-
+.btn--secondary:hover,
 .btn--secondary:active {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
-  color: var(--color-linha);
+  background: var(--color-surface-raised);
 }
 
 .btn--secondary:disabled,
 .btn--secondary[aria-disabled='true'] {
-  color: var(--color-linha);
+  color: var(--color-text-muted);
   border-color: var(--color-border);
   background: transparent;
   cursor: not-allowed;
@@ -83,7 +77,7 @@
 
 /* Card */
 .card {
-  background: var(--color-surface);
+  background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
@@ -109,7 +103,7 @@
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--color-linha);
+  color: var(--color-text-muted);
 }
 
 .breadcrumb li {
@@ -124,17 +118,17 @@
 }
 
 .breadcrumb a {
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
   text-decoration: none;
 }
 
 .breadcrumb a:hover {
-  color: var(--color-quadra);
+  color: var(--color-focus);
   text-decoration: underline;
 }
 
 .breadcrumb [aria-current='page'] {
-  color: var(--color-ink);
+  color: var(--color-text);
 }
 
 /* Prose — corpo de texto vindo do CMS (parágrafo, lista, subtítulo, citação, link). Não
@@ -143,7 +137,7 @@
 .prose {
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
-  color: var(--color-ink);
+  color: var(--color-text);
   max-width: 68ch;
 }
 
@@ -154,9 +148,9 @@
 .prose blockquote {
   margin-left: 0;
   padding: var(--space-1) 0 var(--space-1) var(--space-5);
-  border-left: 3px solid var(--color-quadra);
+  border-left: 3px solid var(--color-accent);
   font-style: italic;
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
 }
 
 .prose blockquote > :last-child {
@@ -172,7 +166,7 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  background: var(--color-paper);
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -188,13 +182,13 @@
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   font-size: var(--text-lg);
-  color: var(--color-ink);
+  color: var(--color-heading);
   text-decoration: none;
   white-space: nowrap;
 }
 
 .site-header__mark:hover {
-  color: var(--color-ink);
+  color: var(--color-heading);
 }
 
 .site-header__nav {
@@ -213,14 +207,14 @@
 .site-header__nav a {
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
   text-decoration: none;
   padding: var(--space-2) 0;
 }
 
 .site-header__nav a:hover,
 .site-header__nav a.router-link-active {
-  color: var(--color-quadra);
+  color: var(--color-focus);
 }
 
 .site-header__cta {
@@ -237,7 +231,7 @@
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  color: var(--color-ink);
+  color: var(--color-text);
   cursor: pointer;
 }
 
@@ -274,7 +268,7 @@
   position: fixed;
   inset: 0;
   top: 61px;
-  background: var(--color-paper);
+  background: var(--color-surface);
   overflow-y: auto;
   padding: var(--space-4) var(--container-padding) var(--space-5);
 }
@@ -295,14 +289,14 @@
   font-weight: var(--weight-medium);
   font-size: var(--text-lg);
   line-height: var(--leading-snug);
-  color: var(--color-ink);
+  color: var(--color-text);
   text-decoration: none;
   border-bottom: 1px solid var(--color-border);
 }
 
 .mobile-nav a:hover,
 .mobile-nav a.router-link-active {
-  color: var(--color-quadra);
+  color: var(--color-focus);
 }
 
 .mobile-nav__cta {
@@ -337,18 +331,24 @@
   }
 }
 
-/* Rodapé */
+/* Rodapé — fundo escuro (--color-heading, o token mais escuro da paleta; não é um uso
+   textual, é reaproveitado aqui como preenchimento porque não existe um token semântico de
+   "superfície invertida" — ver relatório desta sessão) com texto claro (--color-surface-raised,
+   pelo mesmo motivo). Sem estado de hover colorido nos links: nenhum tom da marca é ao
+   mesmo tempo "claro o bastante para ler sobre fundo escuro" e "um token semântico
+   existente" — o hover aqui é só sublinhado. */
 .site-footer {
-  background: var(--color-ink);
-  color: var(--color-paper);
+  background: var(--color-heading);
+  color: var(--color-surface-raised);
   padding-block: var(--space-8);
   margin-top: auto;
 }
 
-/* Dentro do rodapé escuro, o anel de foco padrão (verde sobre verde) não garante 3:1 — troca
-   para paper, que tem ~19:1 de contraste contra o fundo ink. */
+/* Dentro do rodapé escuro, o anel de foco padrão (laranja-700 sobre laranja-700) não
+   garante 3:1 — troca para o texto claro do próprio rodapé, que tem contraste alto contra o
+   fundo escuro. */
 .site-footer :focus-visible {
-  outline-color: var(--color-paper);
+  outline-color: var(--color-surface-raised);
 }
 
 .site-footer__grid {
@@ -363,7 +363,7 @@
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--color-linha);
+  color: var(--color-surface-raised);
   margin: 0 0 var(--space-3);
 }
 
@@ -377,26 +377,25 @@
 }
 
 .site-footer a {
-  color: var(--color-paper);
+  color: var(--color-surface-raised);
   font-size: var(--text-sm);
   text-decoration: none;
 }
 
 .site-footer a:hover {
-  color: var(--color-ocre);
   text-decoration: underline;
 }
 
 .site-footer__base {
   margin-top: var(--space-7);
   padding-top: var(--space-5);
-  border-top: 1px solid rgb(242 244 241 / 15%);
+  border-top: 1px solid color-mix(in srgb, var(--color-surface-raised) 15%, transparent);
   font-size: var(--text-xs);
-  color: var(--color-linha);
+  color: color-mix(in srgb, var(--color-surface-raised) 65%, transparent);
 }
 
 /* Linha de registro — a assinatura do sistema. Todo número institucional é um item de
-   linha: numeral em Bitter, rótulo em versalete, data alinhada à direita, hairline. NUNCA
+   linha: numeral em Poppins, rótulo em versalete, data alinhada à direita, hairline. NUNCA
    cita fonte externa (a instituição é a fonte dos seus próprios números — ver ADR 0009);
    a data é sempre a única anotação. Valores reais dependem de validação — ver
    docs/roadmap.md. */
@@ -424,19 +423,19 @@
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   font-size: var(--text-2xl);
-  color: var(--color-ink);
+  color: var(--color-heading);
   white-space: nowrap;
 }
 
 .ledger__label {
   font-size: var(--text-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
   overflow-wrap: break-word;
 }
 
 .ledger__date {
   font-size: var(--text-xs);
-  color: var(--color-linha);
+  color: var(--color-text-muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -455,12 +454,9 @@
 }
 
 .ledger__item--entry .ledger__label {
-  color: var(--color-ink);
+  color: var(--color-text);
 }
 
-/* Ocre nunca é cor de texto sobre paper — contraste ~2,9:1, abaixo até do mínimo AA para
-   texto grande. Aqui ele entra só como fundo tintado; quem garante leitura é o ink por
-   cima. */
 .ledger__badge {
   display: inline-block;
   font-family: var(--font-body);
@@ -468,8 +464,8 @@
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--color-ink);
-  background: rgb(184 134 43 / 18%);
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-accent) 18%, var(--color-surface));
   border-radius: var(--radius-full);
   padding: 0.15em 0.6em;
   margin-bottom: var(--space-1);
@@ -504,8 +500,8 @@
   padding: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-ink);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
 }
 
 .form__field textarea {
@@ -521,7 +517,7 @@
 
 .form__hint {
   font-size: var(--text-xs);
-  color: var(--color-linha);
+  color: var(--color-text-muted);
 }
 
 .form__error {
@@ -535,7 +531,7 @@
   align-items: flex-start;
   gap: var(--space-3);
   font-size: var(--text-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
 }
 
 .form__consent input {
@@ -559,7 +555,7 @@
   border: 1px solid var(--color-error);
   background: var(--color-error-bg);
   border-radius: var(--radius-md);
-  color: var(--color-ink);
+  color: var(--color-text);
   font-size: var(--text-sm);
 }
 

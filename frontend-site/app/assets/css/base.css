@@ -18,8 +18,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
@@ -45,7 +45,7 @@ h6 {
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   line-height: var(--leading-tight);
-  color: var(--color-ink);
+  color: var(--color-heading);
   margin: var(--space-8) 0 var(--space-4);
 }
 
@@ -72,7 +72,7 @@ h3 {
   font-weight: var(--weight-semibold);
 }
 
-/* H4 em diante sai da família de display — Bitter "com restrição" fica só para os três
+/* H4 em diante sai da família de display — Poppins "com restrição" fica só para os três
    primeiros níveis, onde a personalidade da face realmente aparece. */
 h4,
 h5,
@@ -100,18 +100,19 @@ li + li {
   margin-top: var(--space-2);
 }
 
+/* --color-accent (laranja-500) não atinge 4,5:1 como texto sobre --color-surface (~2,8:1) —
+   por isso o link usa --color-focus (laranja-700, o degrau mais escuro da mesma família),
+   o único tom da marca que passa em contraste de texto. Ver nota de decisão em
+   docs/decisoes/0009-direcao-visual.md (pendente) e o relatório desta sessão. */
 a {
-  color: var(--color-quadra);
+  color: var(--color-focus);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
-a:hover {
-  color: var(--color-quadra-dark);
-}
-
+a:hover,
 a:active {
-  color: var(--color-quadra-darker);
+  color: var(--color-accent-hover);
 }
 
 button {
@@ -131,8 +132,8 @@ button {
 }
 
 ::selection {
-  background: var(--color-quadra);
-  color: var(--color-surface);
+  background: var(--color-accent);
+  color: var(--color-heading);
 }
 
 @media (prefers-reduced-motion: reduce) {
