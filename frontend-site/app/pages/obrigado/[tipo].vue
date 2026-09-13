@@ -9,8 +9,8 @@ const MESSAGES: Record<ThankYouType, { title: string; body: string }> = {
     body: 'Recebemos seu interesse na matrícula do CEI Anália Franco. A secretaria entrará em contato para os próximos passos.',
   },
   inscricao: {
-    title: 'Inscrição recebida',
-    body: 'Recebemos a inscrição no contraturno. A coordenação entrará em contato.',
+    title: 'Contato recebido',
+    body: 'Vamos avisar você assim que as inscrições da Escola de Contraturno abrirem.',
   },
   coleta: {
     title: 'Agendamento recebido',

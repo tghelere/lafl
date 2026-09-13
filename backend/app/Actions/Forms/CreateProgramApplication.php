@@ -18,10 +18,6 @@ final class CreateProgramApplication
         $application = new ProgramApplication([
             'guardian_name' => $data->guardianName,
             'phone' => $data->phone,
-            'email' => $data->email,
-            'teen_age' => $data->teenAge,
-            'school' => $data->school,
-            'message' => $data->message,
         ]);
 
         $application->consent_terms_version = config('forms.consent_terms_version');

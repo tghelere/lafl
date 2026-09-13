@@ -13,13 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 /**
- * Inscrição na Escola de Contraturno. Titular é o responsável adulto — nenhum dado
- * identificável do adolescente (ver ADR 0007). `teen_age` é número inteiro, nunca data de
- * nascimento. Retenção: 12 meses (ver docs/estrutura-site.md §2.2).
+ * Aviso de interesse na Escola de Contraturno. Titular é o responsável adulto — o programa
+ * ainda não abriu inscrições (ver docs/contexto.md), então o único propósito do registro é
+ * avisar quando abrirem; nenhum dado da criança ou adolescente é coletado (ver ADR 0007).
+ * Retenção: 12 meses (ver docs/estrutura-site.md §2.2).
  *
  * @use HasFactory<ProgramApplicationFactory>
  */
-#[Fillable(['guardian_name', 'phone', 'email', 'teen_age', 'school', 'message'])]
+#[Fillable(['guardian_name', 'phone'])]
 class ProgramApplication extends Model
 {
     /** @use HasFactory<ProgramApplicationFactory> */
@@ -41,10 +42,6 @@ class ProgramApplication extends Model
             ...$this->commonFormCasts(),
             'guardian_name' => FieldEncrypted::class,
             'phone' => FieldEncrypted::class,
-            'email' => FieldEncrypted::class,
-            'teen_age' => 'integer',
-            'school' => FieldEncrypted::class,
-            'message' => FieldEncrypted::class,
         ];
     }
 }

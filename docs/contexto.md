@@ -88,16 +88,41 @@ poliesportiva.
 
 ### 2. Escola de Contraturno
 
-**Operação nova**: sala de informática inaugurada em 28/07/2026. Aulas de informática básica
-e inteligência artificial para **adolescentes em situação de vulnerabilidade social**.
-Previsão inicial de duas turmas de cerca de 20 alunos. Equipamentos doados pelo Centro de
-Recondicionamento de Computadores, programa do governo federal; a iniciativa foi viabilizada
-pela receita do bazar.
+**Programa em preparação, ainda sem turma nem aluno matriculado.** Nenhuma página do site
+pode afirmar que o programa está em funcionamento — ver `ContentPagesSeeder`.
 
-`[CONFIRMAR]` Faixa etária exata. As fontes indicam 12 a 17 anos, mas convém validar.
+**Confirmado pelo cliente em 13/09/2026**, substitui a faixa etária `[CONFIRMAR]` de 12 a 17
+anos e a "previsão inicial de duas turmas de cerca de 20 alunos" que este documento trazia
+antes:
 
-`[LACUNA]` Como funciona a inscrição, critérios de seleção, frequência das aulas, se há
-vínculo com a escola regular do adolescente.
+- **Público:** crianças e adolescentes de **6 a 15 anos**, de famílias com renda de até **3
+  salários mínimos**.
+- **Meta:** atender **100** crianças e adolescentes.
+- **Estrutura já existente:** laboratório de informática com **20 computadores** doados pelo
+  Centro de Recondicionamento de Computadores (programa do governo federal); parceria com o
+  **SENAI**; ginásio de esportes; auditório. Tudo no terreno da instituição.
+- **Oficinas previstas:** produção audiovisual, produção de podcast, grafite, patrimônio
+  histórico-cultural, capoeira, música, dança, literatura, tecnologias criativas, informática
+  básica e um time de futebol.
+- **Início das turmas e abertura das inscrições:** previsto para **2027**. Sem data exata —
+  o texto do site usa "início previsto para 2027", nunca "em breve".
+- **Nome oficial do programa ainda não definido.** O slug `/contraturno` é provisório; a
+  troca de slug quando o nome for definido já é coberta pelo mecanismo existente de histórico
+  de slug (`App\Models\PageSlugHistory`), sem exigir mudança de código.
+- **Financiamento:** viabilizado pela receita do Bazar Beneficente, como já registrado abaixo.
+
+`[LACUNA]` Como funciona a inscrição efetiva quando abrir, critérios de seleção além de
+faixa etária e renda, frequência das oficinas, se há vínculo com a escola regular da criança
+ou adolescente.
+
+`[DECIDIDO]` Enquanto o programa não abre inscrições, o site coleta apenas nome e telefone do
+responsável, para avisar quando abrirem — nunca dado da criança ou adolescente (ver ADR 0007
+e `App\Http\Requests\Forms\StoreProgramApplicationRequest`).
+
+`[PENDENTE]` Quando o site implementar marcação schema.org, a página `/contraturno` deve
+trazer só descrição institucional — nunca marcada como serviço em operação nem como oferta
+ativa, porque o programa ainda não abriu. Registrado aqui para não se perder até a
+implementação existir.
 
 Há intenção declarada de estender cursos de acessibilidade digital para pessoas acima de 60
 anos no futuro — fora do escopo atual, mas o sistema não deveria assumir que todo atendido é

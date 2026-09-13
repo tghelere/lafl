@@ -11,10 +11,6 @@ function programApplicationPayload(array $overrides = []): array
     return [...[
         'guardian_name' => 'João Pereira',
         'phone' => '(43) 98888-0000',
-        'email' => 'joao@example.com',
-        'teen_age' => 14,
-        'school' => 'Escola Municipal X',
-        'message' => 'Meu filho tem interesse nas aulas de informática.',
         'consent' => true,
     ], ...$overrides];
 }
@@ -28,7 +24,7 @@ test('envio válido cria o registro e devolve só uuid e data', function (): voi
 
     $application = ProgramApplication::first();
     expect($application->guardian_name)->toBe('João Pereira')
-        ->and($application->teen_age)->toBe(14)
+        ->and($application->phone)->toBe('(43) 98888-0000')
         ->and($application->status->value)->toBe('new')
         ->and($application->expires_at->diffInDays(now(), true))->toBeGreaterThan(300);
 });
@@ -39,13 +35,25 @@ test('dado pessoal nunca é gravado em texto puro', function (): void {
     $raw = DB::table('program_applications')->first();
 
     expect($raw->guardian_name)->not->toContain('João Pereira')
-        ->and($raw->email)->not->toContain('joao@example.com');
+        ->and($raw->phone)->not->toContain('98888-0000');
 });
 
-test('idade fora da faixa é rejeitada', function (): void {
-    $this->postJson('/api/v1/public/program-applications', programApplicationPayload(['teen_age' => 5]))
+test('sem nome é rejeitado', function (): void {
+    $payload = programApplicationPayload();
+    unset($payload['guardian_name']);
+
+    $this->postJson('/api/v1/public/program-applications', $payload)
         ->assertStatus(422)
-        ->assertJsonValidationErrors('teen_age');
+        ->assertJsonValidationErrors('guardian_name');
+});
+
+test('sem telefone é rejeitado', function (): void {
+    $payload = programApplicationPayload();
+    unset($payload['phone']);
+
+    $this->postJson('/api/v1/public/program-applications', $payload)
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('phone');
 });
 
 test('sem consentimento é rejeitado', function (): void {
@@ -54,15 +62,6 @@ test('sem consentimento é rejeitado', function (): void {
         ->assertJsonValidationErrors('consent');
 
     expect(ProgramApplication::count())->toBe(0);
-});
-
-test('escola é opcional', function (): void {
-    $payload = programApplicationPayload();
-    unset($payload['school']);
-
-    $this->postJson('/api/v1/public/program-applications', $payload)->assertCreated();
-
-    expect(ProgramApplication::first()->school)->toBeNull();
 });
 
 test('honeypot preenchido devolve sucesso mas não grava nada', function (): void {

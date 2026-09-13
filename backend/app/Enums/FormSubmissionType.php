@@ -31,7 +31,7 @@ enum FormSubmissionType: string
     {
         return match ($this) {
             self::EnrollmentInterest => 'Interesse em matrícula',
-            self::ProgramApplication => 'Inscrição no contraturno',
+            self::ProgramApplication => 'Aviso de interesse no contraturno',
             self::PickupRequest => 'Agendamento de coleta',
             self::VolunteerApplication => 'Candidatura de voluntariado',
             self::PartnershipInquiry => 'Proposta de parceria',

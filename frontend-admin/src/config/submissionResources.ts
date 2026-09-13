@@ -44,21 +44,14 @@ export const SUBMISSION_RESOURCES: Record<string, SubmissionResourceConfig> = {
   },
   'program-applications': {
     slug: 'program-applications',
-    title: 'Inscrições no contraturno',
+    title: 'Avisos de interesse no contraturno',
     listColumns: [
       { key: 'guardian_name', label: 'Responsável' },
       { key: 'phone', label: 'Telefone' },
-      { key: 'email', label: 'E-mail' },
-      { key: 'teen_age', label: 'Idade' },
-      { key: 'school', label: 'Escola' },
     ],
     detailFields: [
       { key: 'guardian_name', label: 'Responsável' },
       { key: 'phone', label: 'Telefone' },
-      { key: 'email', label: 'E-mail' },
-      { key: 'teen_age', label: 'Idade do adolescente' },
-      { key: 'school', label: 'Escola' },
-      { key: 'message', label: 'Mensagem' },
     ],
   },
   'pickup-requests': {

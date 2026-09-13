@@ -7,6 +7,11 @@ namespace App\Http\Requests\Forms;
 use App\Actions\Forms\Data\ProgramApplicationData;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Aviso de interesse na Escola de Contraturno — o programa ainda não abriu inscrições (ver
+ * docs/contexto.md), então só coleta contato do responsável para avisar quando abrirem.
+ * Nenhum dado da criança ou adolescente entra aqui (ver ADR 0007).
+ */
 final class StoreProgramApplicationRequest extends FormRequest
 {
     public function authorize(): bool
@@ -22,13 +27,6 @@ final class StoreProgramApplicationRequest extends FormRequest
         return [
             'guardian_name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:30'],
-            'email' => ['required', 'email', 'max:255'],
-            // Faixa etária exata do programa é [CONFIRMAR] (ver docs/contexto.md); os limites
-            // abaixo são só uma checagem de sanidade de formulário, não um critério oficial.
-            'teen_age' => ['required', 'integer', 'min:10', 'max:19'],
-            // Rótulo e obrigatoriedade [VALIDAR] com a instituição (ver docs/roadmap.md).
-            'school' => ['nullable', 'string', 'max:255'],
-            'message' => ['nullable', 'string', 'max:2000'],
             'consent' => ['required', 'accepted'],
         ];
     }
@@ -41,10 +39,6 @@ final class StoreProgramApplicationRequest extends FormRequest
         return [
             'guardian_name.required' => 'Informe seu nome.',
             'phone.required' => 'Informe um telefone para contato.',
-            'email.required' => 'Informe um e-mail para contato.',
-            'email.email' => 'Informe um e-mail válido.',
-            'teen_age.required' => 'Informe a idade do adolescente.',
-            'teen_age.integer' => 'Informe a idade em anos completos.',
             'consent.accepted' => 'É preciso concordar com a política de privacidade para enviar.',
         ];
     }
@@ -54,10 +48,6 @@ final class StoreProgramApplicationRequest extends FormRequest
         return new ProgramApplicationData(
             guardianName: $this->string('guardian_name')->value(),
             phone: $this->string('phone')->value(),
-            email: $this->string('email')->value(),
-            teenAge: $this->integer('teen_age'),
-            school: $this->filled('school') ? $this->string('school')->value() : null,
-            message: $this->filled('message') ? $this->string('message')->value() : null,
             ip: (string) $this->ip(),
         );
     }

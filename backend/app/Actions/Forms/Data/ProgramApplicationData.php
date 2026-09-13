@@ -9,10 +9,6 @@ final readonly class ProgramApplicationData
     public function __construct(
         public string $guardianName,
         public string $phone,
-        public string $email,
-        public int $teenAge,
-        public ?string $school,
-        public ?string $message,
         public string $ip,
     ) {}
 }

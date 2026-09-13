@@ -62,7 +62,7 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           :to="resourceRoute('program-applications')"
           class="app-sidebar__link"
         >
-          Inscrições do contraturno
+          Avisos do contraturno
         </RouterLink>
         <RouterLink
           :to="resourceRoute('partnership-inquiries')"

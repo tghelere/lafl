@@ -22,15 +22,13 @@ test('direcao lista com dado mascarado', function (): void {
     ProgramApplication::factory()->create([
         'guardian_name' => 'João Pereira',
         'phone' => '43988880000',
-        'email' => 'joao@example.com',
     ]);
 
     $response = $this->actingAs($user)->getJson('/api/v1/program-applications');
 
     $response->assertOk();
     expect($response->json('data.0.guardian_name'))->toBe('João')
-        ->and($response->json('data.0.phone'))->toBe('••••0000')
-        ->and($response->json('data.0.email'))->toBe('•••@example.com');
+        ->and($response->json('data.0.phone'))->toBe('••••0000');
 });
 
 test('listagem filtra por status', function (): void {

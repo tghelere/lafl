@@ -1,11 +1,13 @@
 <script setup lang="ts">
-// Inscrição na Escola de Contraturno — titular é o responsável, nunca o adolescente (ver ADR
-// 0007). Idade em número inteiro, nunca data de nascimento.
+// Aviso de interesse na Escola de Contraturno — o programa ainda não abriu inscrições (ver
+// docs/contexto.md), então este NÃO é um formulário de inscrição: coleta só nome e telefone
+// do responsável, para avisar quando as inscrições abrirem. Nenhum dado de criança ou
+// adolescente (ver ADR 0007).
 const { hasError, fieldFailed } = useFormErrorState()
 
 useSeoMeta({
-  title: 'Inscrição — Contraturno — Lar Anália Franco',
-  description: 'Inscreva um adolescente na Escola de Contraturno do Lar Anália Franco.',
+  title: 'Avise-me — Contraturno — Lar Anália Franco',
+  description: 'Deixe seu contato para ser avisado quando as inscrições da Escola de Contraturno abrirem.',
 })
 </script>
 
@@ -15,18 +17,18 @@ useSeoMeta({
       <ol>
         <li><NuxtLink to="/">Início</NuxtLink></li>
         <li><NuxtLink to="/contraturno">Contraturno</NuxtLink></li>
-        <li><span aria-current="page">Inscrição</span></li>
+        <li><span aria-current="page">Avise-me</span></li>
       </ol>
     </nav>
 
-    <h1>Inscrição</h1>
+    <h1>Avise-me quando abrir</h1>
     <p class="prose">
-      Preencha seus dados que a coordenação do contraturno entra em contato. Os dados do
-      adolescente são confirmados presencialmente.
+      A Escola de Contraturno ainda não abriu turmas nem inscrições — início previsto para
+      2027. Deixe seu nome e telefone que avisamos assim que as inscrições abrirem.
     </p>
 
     <div v-if="hasError" class="form-alert" role="alert">
-      <p>Não foi possível enviar sua inscrição. Confira os campos abaixo e tente novamente.</p>
+      <p>Não foi possível enviar seu contato. Confira os campos abaixo e tente novamente.</p>
     </div>
 
     <form method="post" action="/api/forms/inscricao" class="form">
@@ -42,29 +44,6 @@ useSeoMeta({
         <p v-if="fieldFailed('phone')" class="form__error">Informe um telefone válido.</p>
       </div>
 
-      <div class="form__field" :class="{ 'form__field--invalid': fieldFailed('email') }">
-        <label for="email">E-mail</label>
-        <input id="email" name="email" type="email" autocomplete="email" required />
-        <p v-if="fieldFailed('email')" class="form__error">Informe um e-mail válido.</p>
-      </div>
-
-      <div class="form__field" :class="{ 'form__field--invalid': fieldFailed('teen_age') }">
-        <label for="teen_age">Idade do adolescente</label>
-        <input id="teen_age" name="teen_age" type="number" min="10" max="19" required />
-        <p v-if="fieldFailed('teen_age')" class="form__error">Informe a idade em anos completos.</p>
-      </div>
-
-      <div class="form__field">
-        <label for="school">Escola (opcional)</label>
-        <input id="school" name="school" type="text" />
-      </div>
-
-      <div class="form__field">
-        <label for="message">Mensagem (opcional)</label>
-        <textarea id="message" name="message" maxlength="2000" />
-        <p class="form__hint">Não escreva o nome do adolescente aqui.</p>
-      </div>
-
       <div class="form__honeypot" aria-hidden="false">
         <label for="website">Deixe este campo em branco</label>
         <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
@@ -78,7 +57,7 @@ useSeoMeta({
         </span>
       </label>
 
-      <button type="submit" class="btn btn--primary">Enviar inscrição</button>
+      <button type="submit" class="btn btn--primary">Avise-me</button>
     </form>
   </div>
 </template>

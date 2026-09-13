@@ -77,11 +77,11 @@ class ContentPagesSeeder extends Seeder
                     natureza espírita. A sede, onde também funciona o CEI Anália Franco, fica na Av. Anália
                     Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060. A área exata do
                     terreno está em confirmação com a instituição.</p>
-                    <p>Hoje a instituição opera três frentes distintas: o Centro de Educação Infantil Anália
-                    Franco (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina;
-                    a Escola de Contraturno, com aulas de informática e inteligência artificial para
-                    adolescentes; e o Bazar Beneficente, loja de doações que sustenta boa parte do orçamento
-                    da casa.</p>
+                    <p>Hoje a instituição já opera duas frentes — o Centro de Educação Infantil Anália Franco
+                    (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina, e o
+                    Bazar Beneficente, loja de doações que sustenta boa parte do orçamento da casa — e
+                    prepara uma terceira, a Escola de Contraturno, com estrutura pronta e início de turmas
+                    previsto para 2027.</p>
                     <p>As páginas desta seção contam a história da instituição, sua estrutura de governança e
                     o que ela é hoje — inclusive os pontos em que precisou se reconstruir.</p>
                     HTML,
@@ -270,9 +270,9 @@ class ContentPagesSeeder extends Seeder
                     <p>O CEI Anália Franco funciona no terreno da instituição, na Av. Anália Franco, 33,
                     Jd. Aeroporto, Londrina/PR — a área exata do terreno está em confirmação com a
                     instituição.</p>
-                    <p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, também
-                    usada pela Escola de Contraturno e, fora do horário de aula, alugada como fonte de
-                    receita da instituição.</p>
+                    <p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, que
+                    também vai ser usada pela Escola de Contraturno e, fora desse uso, é alugada como fonte
+                    de receita da instituição.</p>
                     <p>Uma galeria de fotos da estrutura será publicada aqui assim que o cadastro de mídia
                     do site estiver pronto.</p>
                     HTML,
@@ -301,80 +301,91 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'contraturno',
                 'title' => 'Escola de Contraturno',
-                'meta_description' => 'Aulas de informática básica e inteligência artificial para adolescentes, na sala inaugurada em julho de 2026 e viabilizada pelo Bazar Beneficente.',
+                'meta_description' => 'Programa em preparação do Lar Anália Franco para crianças e adolescentes de 6 a 15 anos, com meta de 100 atendidos. Início previsto para 2027.',
                 'content' => <<<'HTML'
-                    <p>A Escola de Contraturno é a operação mais nova do Lar Anália Franco: aulas de
-                    informática básica e inteligência artificial para adolescentes em situação de
-                    vulnerabilidade social, na sala de informática inaugurada em 28 de julho de 2026.</p>
-                    <p>Os equipamentos foram doados pelo Centro de Recondicionamento de Computadores,
-                    programa do governo federal, e o projeto foi viabilizado pela receita do Bazar
-                    Beneficente — sem o bazar, segundo a própria direção da instituição, essa e outras
-                    operações não se sustentariam.</p>
-                    <p>A previsão inicial é de duas turmas de cerca de 20 alunos. As páginas desta seção
-                    explicam para quem é o programa, como funciona e o que vem a seguir.</p>
+                    <p>A Escola de Contraturno é um programa em preparação do Lar Anália Franco, para
+                    crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos.
+                    A meta é atender 100 crianças e adolescentes.</p>
+                    <p>A estrutura já existe: laboratório de informática com 20 computadores doados pelo
+                    Centro de Recondicionamento de Computadores, parceria com o SENAI, ginásio de esportes
+                    e auditório, no terreno da instituição.</p>
+                    <p>O programa vai oferecer oficinas de produção audiovisual, produção de podcast,
+                    grafite, patrimônio histórico-cultural, capoeira, música, dança, literatura, tecnologias
+                    criativas, informática básica e um time de futebol.</p>
+                    <p>Início das turmas previsto para 2027. Nenhuma turma funciona ainda, e não há aluno
+                    matriculado — avise-se para saber assim que as inscrições abrirem.</p>
+                    <p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p>
+                    <p>As páginas desta seção detalham para quem é o programa, a estrutura já existente, as
+                    oficinas previstas e o que vem a seguir.</p>
                     HTML,
             ],
             [
                 'slug' => 'contraturno/o-projeto',
                 'title' => 'O Projeto',
-                'meta_description' => 'Como o Bazar Beneficente viabilizou a sala de informática da Escola de Contraturno, inaugurada em julho de 2026 com equipamentos doados.',
+                'meta_description' => 'A Escola de Contraturno nasceu da receita do Bazar Beneficente, de equipamentos doados e de uma parceria com o SENAI — início previsto para 2027.',
                 'content' => <<<'HTML'
-                    <p>O projeto nasceu da combinação de duas coisas que o Lar Anália Franco já tinha: uma
-                    sala disponível no terreno da instituição e a receita do Bazar Beneficente, que
-                    viabilizou o investimento inicial.</p>
-                    <p>Os computadores usados nas aulas foram doados pelo Centro de Recondicionamento de
-                    Computadores, programa federal de reaproveitamento de equipamentos. A sala de
-                    informática foi inaugurada em 28 de julho de 2026.</p>
-                    <p>O programa oferece aulas de informática básica e de inteligência artificial — um
-                    conteúdo pouco comum em iniciativas sociais desse porte em Londrina.</p>
+                    <p>O projeto nasceu da combinação de coisas que o Lar Anália Franco já tinha: espaço
+                    disponível no terreno da instituição e a receita do Bazar Beneficente, que viabilizou o
+                    investimento inicial.</p>
+                    <p>Os computadores do laboratório de informática — 20 ao todo — foram doados pelo Centro
+                    de Recondicionamento de Computadores, programa federal de reaproveitamento de
+                    equipamentos. A instituição também firmou parceria com o SENAI, e o programa vai usar o
+                    ginásio de esportes e o auditório já existentes no terreno.</p>
+                    <p>O programa ainda não abriu turmas — início previsto para 2027. A meta é atender 100
+                    crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos.</p>
                     HTML,
             ],
             [
                 'slug' => 'contraturno/para-quem-e',
                 'title' => 'Para Quem É',
-                'meta_description' => 'A Escola de Contraturno é voltada a adolescentes em situação de vulnerabilidade social — previsão inicial de duas turmas de cerca de 20 alunos.',
+                'meta_description' => 'A Escola de Contraturno é para crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos, com meta de 100 atendidos.',
                 'content' => <<<'HTML'
-                    <p>O programa é voltado a adolescentes em situação de vulnerabilidade social. A previsão
-                    inicial é de duas turmas de cerca de 20 alunos cada.</p>
-                    <p>A faixa etária exata e os critérios de seleção ainda estão em definição junto à
-                    coordenação do programa e serão publicados aqui assim que confirmados.</p>
+                    <p>O programa é para crianças e adolescentes de 6 a 15 anos, de famílias com renda de
+                    até 3 salários mínimos. A meta é atender 100 crianças e adolescentes.</p>
+                    <p>O programa ainda não abriu turmas — início previsto para 2027. Outros critérios de
+                    seleção, além da faixa etária e da renda familiar, ainda estão em definição junto à
+                    coordenação e serão publicados aqui assim que confirmados.</p>
                     HTML,
             ],
             [
                 'slug' => 'contraturno/como-funciona',
                 'title' => 'Como Funciona',
-                'meta_description' => 'As aulas da Escola de Contraturno acontecem na sala de informática inaugurada em julho de 2026. Frequência e inscrição ainda em definição.',
+                'meta_description' => 'A Escola de Contraturno vai oferecer oficinas de produção audiovisual, podcast, grafite, capoeira, música, dança, literatura e informática básica.',
                 'content' => <<<'HTML'
-                    <p>As aulas acontecem na sala de informática da instituição, inaugurada em 28 de julho
-                    de 2026, com equipamentos doados pelo Centro de Recondicionamento de Computadores.</p>
-                    <p>Frequência das aulas, forma de inscrição e se há vínculo com a escola regular do
-                    adolescente são pontos que a instituição ainda está definindo, por se tratar de um
-                    programa recém-criado. Esta página será atualizada assim que esses detalhes forem
-                    confirmados.</p>
+                    <p>O programa vai oferecer oficinas de produção audiovisual, produção de podcast,
+                    grafite, patrimônio histórico-cultural, capoeira, música, dança, literatura, tecnologias
+                    criativas, informática básica e um time de futebol — usando o laboratório de
+                    informática, o ginásio de esportes e o auditório já existentes no terreno da
+                    instituição.</p>
+                    <p>Frequência das oficinas, forma de inscrição e se há vínculo com a escola regular da
+                    criança ou adolescente são pontos que a instituição ainda está definindo, por se tratar
+                    de um programa que ainda não começou — início previsto para 2027. Esta página será
+                    atualizada assim que esses detalhes forem confirmados.</p>
                     HTML,
             ],
             [
                 'slug' => 'contraturno/parceiros',
                 'title' => 'Parceiros',
-                'meta_description' => 'O Centro de Recondicionamento de Computadores, programa federal, doou os equipamentos da sala de informática da Escola de Contraturno.',
+                'meta_description' => 'O Centro de Recondicionamento de Computadores doou os equipamentos do laboratório de informática, e o SENAI é parceiro da Escola de Contraturno.',
                 'content' => <<<'HTML'
                     <p>O Centro de Recondicionamento de Computadores, programa do governo federal de
-                    reaproveitamento de equipamentos, doou os computadores usados na sala de informática da
-                    Escola de Contraturno, inaugurada em 28 de julho de 2026.</p>
-                    <p>A lista de parceiros da instituição — para o contraturno e para os demais pilares —
-                    ainda está sendo consolidada e será publicada nesta página.</p>
+                    reaproveitamento de equipamentos, doou os 20 computadores do laboratório de informática
+                    da Escola de Contraturno.</p>
+                    <p>O SENAI é parceiro do programa. A lista completa de parceiros — para o contraturno e
+                    para os demais pilares — ainda está sendo consolidada e será publicada nesta página.</p>
                     HTML,
             ],
             [
                 'slug' => 'contraturno/o-que-vem-por-ai',
                 'title' => 'O Que Vem por Aí',
-                'meta_description' => 'A direção do Lar Anália Franco já declarou intenção de estender cursos de acessibilidade digital a pessoas acima de 60 anos no futuro.',
+                'meta_description' => 'Início das turmas da Escola de Contraturno previsto para 2027. A direção já declarou intenção de estender cursos de acessibilidade digital a idosos no futuro.',
                 'content' => <<<'HTML'
+                    <p>Início das turmas previsto para 2027. A abertura das inscrições será anunciada aqui e
+                    em contato direto com quem se cadastrar para ser avisado.</p>
                     <p>A direção do Lar Anália Franco já declarou a intenção de, no futuro, estender cursos
-                    de acessibilidade digital a pessoas acima de 60 anos, além dos adolescentes atualmente
-                    atendidos pela Escola de Contraturno.</p>
-                    <p>Essa expansão ainda não tem data nem formato definidos. Esta página será atualizada
-                    quando a instituição confirmar os próximos passos do programa.</p>
+                    de acessibilidade digital a pessoas acima de 60 anos, além das crianças e adolescentes
+                    que o programa vai atender. Essa expansão ainda não tem data nem formato definidos.</p>
+                    <p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p>
                     HTML,
             ],
         ];
@@ -394,8 +405,9 @@ class ContentPagesSeeder extends Seeder
                     <p>O Bazar Beneficente existe desde 1968, sem interrupção. É uma loja física que recebe
                     doações de itens e revende ao público, e financia parte relevante do orçamento do Lar
                     Anália Franco — o que o convênio da creche com a Prefeitura de Londrina não cobre.</p>
-                    <p>Foi a receita do bazar que viabilizou a Escola de Contraturno, criada em 2026. A loja
-                    está em obra de duplicação.</p>
+                    <p>É a receita do bazar que está viabilizando a Escola de Contraturno, programa em
+                    preparação com início de turmas previsto para 2027. A loja está em obra de
+                    duplicação.</p>
                     <p>As páginas desta seção explicam onde fica a loja, o que a instituição aceita em
                     doação e para onde vai o resultado das vendas.</p>
                     HTML,
@@ -432,8 +444,9 @@ class ContentPagesSeeder extends Seeder
                     <p>A receita do Bazar Beneficente sustenta parte relevante do orçamento do Lar Anália
                     Franco — o convênio com a Prefeitura de Londrina cobre a creche, e é o bazar que banca o
                     restante da operação da instituição.</p>
-                    <p>Foi a receita do bazar, por exemplo, que viabilizou a Escola de Contraturno, criada
-                    em 2026 com equipamentos doados pelo Centro de Recondicionamento de Computadores.</p>
+                    <p>É a receita do bazar, por exemplo, que está viabilizando a Escola de Contraturno,
+                    programa em preparação com equipamentos já doados pelo Centro de Recondicionamento de
+                    Computadores e início de turmas previsto para 2027.</p>
                     <p>Os números exatos de arrecadação e destinação estão nos documentos reunidos na seção
                     <a href="/transparencia">Transparência</a>.</p>
                     HTML,
@@ -444,11 +457,11 @@ class ContentPagesSeeder extends Seeder
                 'meta_description' => 'Cada peça comprada no Bazar Beneficente ajuda a sustentar o CEI Anália Franco e a Escola de Contraturno do Lar Anália Franco.',
                 'content' => <<<'HTML'
                     <p>Cada peça comprada no Bazar Beneficente ajuda a sustentar o Centro de Educação
-                    Infantil Anália Franco e a Escola de Contraturno — as duas operações educacionais do Lar
-                    Anália Franco.</p>
+                    Infantil Anália Franco e a Escola de Contraturno — as duas frentes educacionais do Lar
+                    Anália Franco, uma já em funcionamento e outra em preparação.</p>
                     <p>O convênio da instituição com a Prefeitura de Londrina cobre a creche, mas não cobre
-                    tudo. É a receita do bazar que completa o que falta, e que bancou a criação da Escola de
-                    Contraturno em 2026.</p>
+                    tudo. É a receita do bazar que completa o que falta, e que está viabilizando a Escola de
+                    Contraturno, com início de turmas previsto para 2027.</p>
                     HTML,
             ],
         ];
