@@ -67,5 +67,5 @@ test('honeypot disparado não enfileira e-mail nenhum', function (): void {
 });
 
 test('destinatário vem de config, um por tipo de formulário', function (): void {
-    expect(config('forms.notification_recipients.enrollment_interest'))->not->toBe(config('forms.notification_recipients.contact_message'));
+    expect(config('forms.notification_recipients.program_application'))->not->toBe(config('forms.notification_recipients.contact_message'));
 });

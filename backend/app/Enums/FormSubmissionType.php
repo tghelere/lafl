@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Enums;
 
 use App\Models\ContactMessage;
-use App\Models\EnrollmentInterest;
 use App\Models\PartnershipInquiry;
 use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
@@ -14,13 +13,12 @@ use App\Models\VolunteerApplication;
 /**
  * Um caso por entidade de formulário recebido (ver docs/dominio.md). Centraliza o que varia
  * só por tipo — rótulo em português, slug de `/obrigado/:tipo` (ver docs/estrutura-site.md
- * §1.3), model correspondente e nome do recurso no painel administrativo — para as seis
+ * §1.3), model correspondente e nome do recurso no painel administrativo — para as cinco
  * Actions de criação, o e-mail de notificação e o painel de pendências (Etapa 1 da sessão 6)
  * não repetirem essa tabela cada um a seu modo.
  */
 enum FormSubmissionType: string
 {
-    case EnrollmentInterest = 'enrollment_interest';
     case ProgramApplication = 'program_application';
     case PickupRequest = 'pickup_request';
     case VolunteerApplication = 'volunteer_application';
@@ -30,7 +28,6 @@ enum FormSubmissionType: string
     public function label(): string
     {
         return match ($this) {
-            self::EnrollmentInterest => 'Interesse em matrícula',
             self::ProgramApplication => 'Aviso de interesse no contraturno',
             self::PickupRequest => 'Agendamento de coleta',
             self::VolunteerApplication => 'Candidatura de voluntariado',
@@ -45,7 +42,6 @@ enum FormSubmissionType: string
     public function thankYouSlug(): string
     {
         return match ($this) {
-            self::EnrollmentInterest => 'matricula',
             self::ProgramApplication => 'inscricao',
             self::PickupRequest => 'coleta',
             self::VolunteerApplication => 'voluntariado',
@@ -62,7 +58,6 @@ enum FormSubmissionType: string
     public function adminResourceSlug(): string
     {
         return match ($this) {
-            self::EnrollmentInterest => 'enrollment-interests',
             self::ProgramApplication => 'program-applications',
             self::PickupRequest => 'pickup-requests',
             self::VolunteerApplication => 'volunteer-applications',
@@ -72,12 +67,11 @@ enum FormSubmissionType: string
     }
 
     /**
-     * @return class-string<EnrollmentInterest|ProgramApplication|PickupRequest|VolunteerApplication|PartnershipInquiry|ContactMessage>
+     * @return class-string<ProgramApplication|PickupRequest|VolunteerApplication|PartnershipInquiry|ContactMessage>
      */
     public function modelClass(): string
     {
         return match ($this) {
-            self::EnrollmentInterest => EnrollmentInterest::class,
             self::ProgramApplication => ProgramApplication::class,
             self::PickupRequest => PickupRequest::class,
             self::VolunteerApplication => VolunteerApplication::class,

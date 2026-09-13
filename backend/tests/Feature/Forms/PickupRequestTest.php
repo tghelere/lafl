@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Enums\Role;
 use App\Jobs\PurgeCompletedPickupRequestAddresses;
-use App\Models\EnrollmentInterest;
 use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +80,5 @@ test('bazar só acessa pickup_requests entre os formulários recebidos', functio
     $bazar = userWithRole(Role::Bazar->value);
 
     expect($bazar->can('viewAny', PickupRequest::class))->toBeTrue()
-        ->and($bazar->can('viewAny', EnrollmentInterest::class))->toBeFalse()
         ->and($bazar->can('viewAny', ProgramApplication::class))->toBeFalse();
 });

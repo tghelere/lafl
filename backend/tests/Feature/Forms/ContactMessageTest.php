@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Enums\Role;
 use App\Models\ContactMessage;
-use App\Models\EnrollmentInterest;
 use App\Models\PartnershipInquiry;
 use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
@@ -66,11 +65,10 @@ test('direcao e atendimento podem ver o formulário, comunicacao e bazar não', 
         ->and(userWithRole(Role::Bazar->value)->can('viewAny', ContactMessage::class))->toBeFalse();
 });
 
-test('comunicacao não acessa nenhum dos seis formulários recebidos', function (): void {
+test('comunicacao não acessa nenhum dos cinco formulários recebidos', function (): void {
     $user = userWithRole(Role::Comunicacao->value);
 
-    expect($user->can('viewAny', EnrollmentInterest::class))->toBeFalse()
-        ->and($user->can('viewAny', ProgramApplication::class))->toBeFalse()
+    expect($user->can('viewAny', ProgramApplication::class))->toBeFalse()
         ->and($user->can('viewAny', PickupRequest::class))->toBeFalse()
         ->and($user->can('viewAny', VolunteerApplication::class))->toBeFalse()
         ->and($user->can('viewAny', PartnershipInquiry::class))->toBeFalse()

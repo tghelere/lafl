@@ -86,6 +86,18 @@ até 01/01/2028.
 Pais destacam nas avaliações públicas: aulas de inglês, educação física, horta e quadra
 poliesportiva.
 
+**Matrícula — confirmado pelo cliente em 13/09/2026, decisão de arquitetura, não só de
+conteúdo:** a matrícula é feita **exclusivamente pela Central de Vagas da Prefeitura de
+Londrina**, na Rua Benjamin Constant, 800, Centro. O Lar Anália Franco não recebe pedido de
+vaga diretamente. Por isso o formulário de manifestação de interesse que o site tinha (ADR
+0007, `enrollment_interests`) foi **removido por completo** — coletar contato que a
+instituição não pode atender geraria dado pessoal sem finalidade, o que a LGPD não permite.
+`/educacao-infantil/matricula` virou uma página só informativa, que explica o caminho pela
+Central de Vagas.
+
+`[LACUNA]` Telefone da Central de Vagas — a página publica só o endereço até a instituição
+confirmar o telefone.
+
 ### 2. Escola de Contraturno
 
 **Programa em preparação, ainda sem turma nem aluno matriculado.** Nenhuma página do site

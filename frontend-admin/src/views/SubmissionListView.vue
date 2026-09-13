@@ -15,7 +15,7 @@ import { STATUS_OPTIONS } from '@/types/forms'
 import type { SubmissionListItem } from '@/types/submission'
 
 /**
- * Uma tela só para as seis listagens (Atendimento + Bazar, ver docs/estrutura-site.md §4.2) —
+ * Uma tela só para as cinco listagens (Atendimento + Bazar, ver docs/estrutura-site.md §4.2) —
  * o que muda por recurso é só a config em src/config/submissionResources.ts. A autorização de
  * verdade é sempre da API: se o papel do usuário não tem acesso, a chamada abaixo devolve 403
  * e cai no estado de erro, mesmo que o link nunca apareça na navegação lateral.

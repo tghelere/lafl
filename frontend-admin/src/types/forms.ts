@@ -1,6 +1,6 @@
 /**
  * Compartilhado pelas telas de Atendimento e Bazar (ver docs/estrutura-site.md §4.2) — status
- * é o mesmo enum nas seis entidades de formulário recebido (ver App\Enums\FormSubmissionStatus
+ * é o mesmo enum nas cinco entidades de formulário recebido (ver App\Enums\FormSubmissionStatus
  * no backend).
  */
 export type StatusOption = { value: string; label: string }

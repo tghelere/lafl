@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 use App\Enums\Role;
 use App\Models\ContactMessage;
-use App\Models\EnrollmentInterest;
 use App\Models\PartnershipInquiry;
 use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
 use App\Models\VolunteerApplication;
 
 /**
- * Prova explícita pedida na Etapa 1 da sessão 6: comunicacao não acessa nenhum dos seis
+ * Prova explícita pedida na Etapa 1 da sessão 6: comunicacao não acessa nenhum dos cinco
  * formulários pela API administrativa, e bazar só acessa pickup_requests — desta vez batendo
  * na API de verdade (índice, detalhe, status), não só na Policy diretamente (isso já foi
  * testado na sessão 5, ver tests/Feature/Forms/ContactMessageTest.php).
  */
 dataset('formularios', [
-    'enrollment-interests' => ['enrollment-interests', EnrollmentInterest::class],
     'program-applications' => ['program-applications', ProgramApplication::class],
     'pickup-requests' => ['pickup-requests', PickupRequest::class],
     'volunteer-applications' => ['volunteer-applications', VolunteerApplication::class],
@@ -25,7 +23,7 @@ dataset('formularios', [
     'contact-messages' => ['contact-messages', ContactMessage::class],
 ]);
 
-test('comunicacao recebe 403 em índice, detalhe e status de todos os seis formulários', function (string $resource, string $modelClass): void {
+test('comunicacao recebe 403 em índice, detalhe e status de todos os cinco formulários', function (string $resource, string $modelClass): void {
     $user = userWithRole(Role::Comunicacao->value);
     $submission = $modelClass::factory()->create();
 
@@ -35,7 +33,7 @@ test('comunicacao recebe 403 em índice, detalhe e status de todos os seis formu
         ->assertForbidden();
 })->with('formularios');
 
-test('bazar só acessa pickup-requests entre os seis formulários', function (string $resource, string $modelClass): void {
+test('bazar só acessa pickup-requests entre os cinco formulários', function (string $resource, string $modelClass): void {
     $user = userWithRole(Role::Bazar->value);
     $submission = $modelClass::factory()->create();
 

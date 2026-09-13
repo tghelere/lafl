@@ -82,13 +82,17 @@ Base comum a todos: `uuid`, `status` (enum: `new`, `in_progress`, `done`, `disca
 `guardian_name` (enc), `phone` (enc), `email` (enc), `child_age_range` (enum),
 `desired_period` (enum), `message` (enc)
 
-**`program_applications`** — inscrição no contraturno
-`guardian_name` (enc), `phone` (enc), `email` (enc), `teen_age` (int), `school` (enc,
-nullable), `message` (enc)
+**`program_applications`** — aviso de interesse no contraturno
+`guardian_name` (enc), `phone` (enc)
 
-Para ambos: **faixa etária, nunca data de nascimento** — data identifica, faixa não. O campo
-`message` é criptografado por precaução, porque alguém escreverá o nome do filho ali mesmo o
-rótulo pedindo para não escrever.
+A Escola de Contraturno ainda não abriu inscrições (ver `docs/contexto.md`) — o formulário
+não é uma inscrição de fato, só um aviso de "me avise quando abrir". Por isso não coleta
+nenhum dado da criança ou adolescente, nem faixa etária: só o contato do responsável.
+
+**`enrollment_interests` foi removida** (ver `docs/estrutura-site.md` §2.1): a matrícula do
+CEI é feita exclusivamente pela Central de Vagas da Prefeitura, e a instituição não atende
+diretamente esse fluxo — coletar contato que ela não pode atender geraria dado pessoal sem
+finalidade.
 
 **`pickup_requests`** — agendamento de coleta do bazar
 `donor_name` (enc), `phone` (enc), `address` (enc), `items_description`,

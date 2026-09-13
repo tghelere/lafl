@@ -5,13 +5,11 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ContactMessageController;
 use App\Http\Controllers\Api\V1\DashboardController;
-use App\Http\Controllers\Api\V1\EnrollmentInterestController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\PartnershipInquiryController;
 use App\Http\Controllers\Api\V1\PickupRequestController;
 use App\Http\Controllers\Api\V1\ProgramApplicationController;
 use App\Http\Controllers\Api\V1\Public\ContactMessageController as PublicContactMessageController;
-use App\Http\Controllers\Api\V1\Public\EnrollmentInterestController as PublicEnrollmentInterestController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
 use App\Http\Controllers\Api\V1\Public\PartnershipInquiryController as PublicPartnershipInquiryController;
 use App\Http\Controllers\Api\V1\Public\PickupRequestController as PublicPickupRequestController;
@@ -48,11 +46,9 @@ Route::prefix('public')->name('public.')->group(function (): void {
         ->where('uuid', '[0-9a-fA-F-]{36}')
         ->name('transparency-documents.download');
 
-    // Seis formulários públicos (ver docs/estrutura-site.md §3.2). Rate limit por IP e
+    // Cinco formulários públicos (ver docs/estrutura-site.md §3.2). Rate limit por IP e
     // honeypot em vez de CAPTCHA de terceiro (ver docs/roadmap.md e App\Support\Honeypot).
     Route::middleware('throttle:public-forms')->group(function (): void {
-        Route::post('/enrollment-interests', [PublicEnrollmentInterestController::class, 'store'])
-            ->name('enrollment-interests.store');
         Route::post('/program-applications', [PublicProgramApplicationController::class, 'store'])
             ->name('program-applications.store');
         Route::post('/pickup-requests', [PublicPickupRequestController::class, 'store'])
@@ -73,15 +69,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
 
-    // Leitura administrativa dos seis formulários recebidos (ver docs/estrutura-site.md
+    // Leitura administrativa dos cinco formulários recebidos (ver docs/estrutura-site.md
     // §4.5): listagem, detalhe e mudança de status com anotação — nada de criação/exclusão
     // aqui, os registros só nascem pelo formulário público (ver Parte 3 daquele documento).
-    Route::apiResource('enrollment-interests', EnrollmentInterestController::class)
-        ->only(['index', 'show'])
-        ->parameters(['enrollment-interests' => 'enrollmentInterest']);
-    Route::patch('/enrollment-interests/{enrollmentInterest}/status', [EnrollmentInterestController::class, 'updateStatus'])
-        ->name('enrollment-interests.status');
-
     Route::apiResource('program-applications', ProgramApplicationController::class)
         ->only(['index', 'show'])
         ->parameters(['program-applications' => 'programApplication']);

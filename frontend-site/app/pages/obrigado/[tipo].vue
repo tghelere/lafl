@@ -1,13 +1,9 @@
 <script setup lang="ts">
 // Confirmação pós-formulário, noindex, URL própria por tipo — permite medir conversão no
 // Umami sem depender de JavaScript no formulário em si (ver docs/estrutura-site.md §1.3).
-type ThankYouType = 'matricula' | 'inscricao' | 'coleta' | 'voluntariado' | 'parceria' | 'contato'
+type ThankYouType = 'inscricao' | 'coleta' | 'voluntariado' | 'parceria' | 'contato'
 
 const MESSAGES: Record<ThankYouType, { title: string; body: string }> = {
-  matricula: {
-    title: 'Manifestação de interesse recebida',
-    body: 'Recebemos seu interesse na matrícula do CEI Anália Franco. A secretaria entrará em contato para os próximos passos.',
-  },
   inscricao: {
     title: 'Contato recebido',
     body: 'Vamos avisar você assim que as inscrições da Escola de Contraturno abrirem.',

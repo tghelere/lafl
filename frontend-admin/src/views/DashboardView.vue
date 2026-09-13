@@ -17,9 +17,8 @@ const errorMessage = ref<string | null>(null)
 
 // Mapa reverso tipo -> slug de recurso (ver src/config/submissionResources.ts), só para
 // montar o link "ver lista" de cada card — o backend devolve o tipo (ex.:
-// "enrollment_interest"), a rota usa o slug em kebab-case (ex.: "enrollment-interests").
+// "program_application"), a rota usa o slug em kebab-case (ex.: "program-applications").
 const TYPE_TO_RESOURCE: Record<string, string> = {
-  enrollment_interest: 'enrollment-interests',
   program_application: 'program-applications',
   pickup_request: 'pickup-requests',
   volunteer_application: 'volunteer-applications',
@@ -57,7 +56,7 @@ onMounted(async () => {
       :message="errorMessage"
     />
 
-    <!-- comunicacao (e qualquer papel sem viewAny em nenhum dos seis formulários) recebe uma
+    <!-- comunicacao (e qualquer papel sem viewAny em nenhum dos cinco formulários) recebe uma
          lista vazia da API — nunca uma exceção especial no front, ver
          App\Actions\Dashboard\GetPendingFormSubmissionCounts no backend. -->
     <p v-else-if="entries.length === 0">

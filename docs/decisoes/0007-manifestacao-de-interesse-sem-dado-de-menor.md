@@ -49,3 +49,17 @@ Consequências de modelagem já registradas em `docs/estrutura-site.md` §2.1 e 
 - Se alguém digitar o nome da criança no campo `message`, o registro passa a conter dado de
   menor de fato — por isso `message` é cifrado nesses dois formulários mesmo sendo, em tese,
   um formulário de titular adulto.
+
+## Atualização (13/09/2026)
+
+Os dois formulários que esta decisão previu deixaram de existir na forma descrita acima:
+
+- **Matrícula do CEI:** o formulário de manifestação de interesse (`enrollment_interests`)
+  foi **removido por completo**. A matrícula é feita exclusivamente pela Central de Vagas da
+  Prefeitura de Londrina — a instituição não recebe pedido de vaga diretamente, então
+  qualquer contato coletado pelo site careceria de finalidade (ver `docs/contexto.md`).
+- **Inscrição no contraturno:** o programa ainda não abriu inscrições (`docs/contexto.md`).
+  O que existe hoje (`program_applications`) não é mais uma manifestação de interesse sobre
+  a criança — é um aviso de "me avise quando abrir", que nem pede faixa etária: só nome e
+  telefone do responsável. A principal salvaguarda desta ADR (nenhum dado da criança) segue
+  valendo, agora por um caminho mais simples — o formulário não pergunta nada sobre ela.

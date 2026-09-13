@@ -1,8 +1,8 @@
 /**
  * Um registro por entidade de formulário recebido (ver docs/dominio.md) — o que muda entre as
- * seis telas de listagem/detalhe é só isto: quais colunas mostrar e com qual rótulo. A tela
+ * cinco telas de listagem/detalhe é só isto: quais colunas mostrar e com qual rótulo. A tela
  * em si (SubmissionListView/SubmissionDetailView) é uma só, genérica, para não repetir a
- * mesma estrutura de tabela e grade de detalhe seis vezes.
+ * mesma estrutura de tabela e grade de detalhe cinco vezes.
  *
  * `key` corresponde ao campo devolvido pelos Resources administrativos do backend (ver
  * App\Http\Resources\*ListResource / *Resource) — os `_label` são o texto em português já
@@ -23,25 +23,6 @@ export type SubmissionResourceConfig = {
 }
 
 export const SUBMISSION_RESOURCES: Record<string, SubmissionResourceConfig> = {
-  'enrollment-interests': {
-    slug: 'enrollment-interests',
-    title: 'Interesses de matrícula',
-    listColumns: [
-      { key: 'guardian_name', label: 'Responsável' },
-      { key: 'phone', label: 'Telefone' },
-      { key: 'email', label: 'E-mail' },
-      { key: 'child_age_range_label', label: 'Faixa etária' },
-      { key: 'desired_period_label', label: 'Período' },
-    ],
-    detailFields: [
-      { key: 'guardian_name', label: 'Responsável' },
-      { key: 'phone', label: 'Telefone' },
-      { key: 'email', label: 'E-mail' },
-      { key: 'child_age_range_label', label: 'Faixa etária da criança' },
-      { key: 'desired_period_label', label: 'Período pretendido' },
-      { key: 'message', label: 'Mensagem' },
-    ],
-  },
   'program-applications': {
     slug: 'program-applications',
     title: 'Avisos de interesse no contraturno',

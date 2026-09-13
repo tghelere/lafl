@@ -9,9 +9,9 @@ export type SubmissionListParams = {
 }
 
 /**
- * Camada única de acesso HTTP para os seis formulários recebidos (ver docs/convencoes.md) —
- * genérica por `resource` (o slug da rota, ex.: "enrollment-interests") porque a API já segue
- * o mesmo padrão para as seis (ver docs/estrutura-site.md §4.5).
+ * Camada única de acesso HTTP para os cinco formulários recebidos (ver docs/convencoes.md) —
+ * genérica por `resource` (o slug da rota, ex.: "program-applications") porque a API já segue
+ * o mesmo padrão para os cinco (ver docs/estrutura-site.md §4.5).
  */
 export async function fetchSubmissionList(
   resource: string,

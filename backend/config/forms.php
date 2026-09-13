@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Models\ContactMessage;
-use App\Models\EnrollmentInterest;
 use App\Models\PartnershipInquiry;
 use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
@@ -23,7 +22,6 @@ return [
     */
 
     'submission_models' => [
-        EnrollmentInterest::class,
         ProgramApplication::class,
         PickupRequest::class,
         VolunteerApplication::class,
@@ -43,7 +41,6 @@ return [
     */
 
     'notification_recipients' => [
-        'enrollment_interest' => env('FORM_RECIPIENT_ENROLLMENT_INTEREST', 'secretaria-cei@lar-analia-franco.invalid'),
         'program_application' => env('FORM_RECIPIENT_PROGRAM_APPLICATION', 'contraturno@lar-analia-franco.invalid'),
         'pickup_request' => env('FORM_RECIPIENT_PICKUP_REQUEST', 'bazar@lar-analia-franco.invalid'),
         'volunteer_application' => env('FORM_RECIPIENT_VOLUNTEER_APPLICATION', 'voluntariado@lar-analia-franco.invalid'),

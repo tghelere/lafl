@@ -219,7 +219,7 @@ class ContentPagesSeeder extends Seeder
                     janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra
                     poliesportiva do terreno.</p>
                     <p>As páginas desta seção detalham a proposta pedagógica, a alimentação e a estrutura
-                    física do CEI.</p>
+                    física do CEI, além de como fazer a <a href="/educacao-infantil/matricula">matrícula</a>.</p>
                     HTML,
             ],
             [
@@ -287,6 +287,22 @@ class ContentPagesSeeder extends Seeder
                     <p>Depoimentos de pais e responsáveis só entram nesta página com autorização expressa de
                     quem os deu — nenhuma avaliação pública é reproduzida aqui sem esse consentimento. Esta
                     seção será preenchida à medida que a instituição colher essas autorizações.</p>
+                    HTML,
+            ],
+            [
+                'slug' => 'educacao-infantil/matricula',
+                'title' => 'Matrícula',
+                'meta_description' => 'A matrícula no CEI Anália Franco é feita pela Central de Vagas da Prefeitura de Londrina, na Rua Benjamin Constant, 800, Centro.',
+                'content' => <<<'HTML'
+                    <p>A matrícula no CEI Anália Franco é feita exclusivamente pela Central de Vagas da
+                    Prefeitura de Londrina — o Lar Anália Franco não recebe pedido de vaga diretamente,
+                    nem pelo site nem por telefone.</p>
+                    <p><strong>Central de Vagas</strong><br>
+                    Rua Benjamin Constant, 800 — Centro, Londrina/PR</p>
+                    <p>Telefone da Central em confirmação com a instituição — será publicado aqui assim que
+                    confirmado.</p>
+                    <p>Depois que a Prefeitura encaminha a vaga ao CEI Anália Franco, a secretaria da
+                    instituição entra em contato para os próximos passos da matrícula efetiva.</p>
                     HTML,
             ],
         ];

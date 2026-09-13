@@ -53,12 +53,6 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           Atendimento
         </p>
         <RouterLink
-          :to="resourceRoute('enrollment-interests')"
-          class="app-sidebar__link"
-        >
-          Interesses de matrícula
-        </RouterLink>
-        <RouterLink
           :to="resourceRoute('program-applications')"
           class="app-sidebar__link"
         >

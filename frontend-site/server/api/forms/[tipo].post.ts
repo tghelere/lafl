@@ -7,7 +7,7 @@ import {
   sendRedirect,
 } from 'h3'
 
-// Proxy servidor-a-servidor para os seis formulários públicos (ver docs/estrutura-site.md
+// Proxy servidor-a-servidor para os cinco formulários públicos (ver docs/estrutura-site.md
 // Parte 2). Existe para o <form method="post"> de cada página funcionar sem JavaScript: um
 // POST direto ao backend Laravel devolveria só o JSON da API, nunca o redirect visível para
 // /obrigado/:tipo que a UX exige — e a API precisa continuar REST puro, sem view (ver
@@ -16,10 +16,9 @@ import {
 // Repassa X-Forwarded-For com o IP real do visitante — o backend só confia nesse cabeçalho
 // vindo do próprio host do Nuxt (ver TRUSTED_PROXIES em bootstrap/app.php); sem isso, o rate
 // limit por IP do Laravel veria sempre o IP deste servidor, não o de cada visitante.
-type FormType = 'matricula' | 'inscricao' | 'coleta' | 'voluntariado' | 'parceria' | 'contato'
+type FormType = 'inscricao' | 'coleta' | 'voluntariado' | 'parceria' | 'contato'
 
 const FORM_ROUTES: Record<FormType, { endpoint: string; origin: string }> = {
-  matricula: { endpoint: 'enrollment-interests', origin: '/educacao-infantil/matricula' },
   inscricao: { endpoint: 'program-applications', origin: '/contraturno/inscricao' },
   coleta: { endpoint: 'pickup-requests', origin: '/bazar/agendar-coleta' },
   voluntariado: { endpoint: 'volunteer-applications', origin: '/como-ajudar/voluntariado' },

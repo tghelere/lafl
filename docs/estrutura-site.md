@@ -45,7 +45,7 @@ já é o limite do que cabe em desktop sem quebrar.
 | `/educacao-infantil/alimentacao-e-saude` | SSG | CMS | — |
 | `/educacao-infantil/estrutura` | SSG | CMS + galeria | — |
 | `/educacao-infantil/depoimentos` | SSG | CMS | — |
-| `/educacao-infantil/matricula` | SSR | CMS + form | **Sim** |
+| `/educacao-infantil/matricula` | SSG | CMS (explica o caminho pela Central de Vagas) | — |
 | **Contraturno** | | | |
 | `/contraturno` | SSG | CMS | — |
 | `/contraturno/o-projeto` | SSG | CMS | — |
@@ -53,7 +53,7 @@ já é o limite do que cabe em desktop sem quebrar.
 | `/contraturno/como-funciona` | SSG | CMS | — |
 | `/contraturno/parceiros` | SSG | CMS | — |
 | `/contraturno/o-que-vem-por-ai` | SSG | CMS | — |
-| `/contraturno/inscricao` | SSR | CMS + form | **Sim** |
+| `/contraturno/inscricao` | SSR | CMS + form (aviso de interesse, não inscrição — o programa ainda não abriu) | **Sim** |
 | `/contraturno/apoiar` | SSR | CMS + form | **Sim** |
 | **Bazar** | | | |
 | `/bazar` | SSG | CMS | — |
@@ -95,7 +95,7 @@ instituição avisar (ver `docs/contexto.md`).
 | `/404` | Não | |
 | `/robots.txt`, `/sitemap.xml` | — | Gerados |
 
-`:tipo` ∈ `matricula`, `inscricao`, `coleta`, `voluntariado`, `contato`, `parceria`.
+`:tipo` ∈ `inscricao`, `coleta`, `voluntariado`, `contato`, `parceria`.
 
 ## 1.4 Páginas separadas — decidido
 
@@ -114,42 +114,44 @@ vazia. Decisão de conteúdo, não de arquitetura — não bloqueia a implementa
 
 # Parte 2 — Formulários
 
-Seis formulários. **Dois deles coletam dados de menores** — são a superfície de maior risco
-de todo o projeto.
+Cinco formulários — a matrícula do CEI não é mais um deles (ver `docs/contexto.md` e §1.4
+abaixo): a matrícula é feita exclusivamente pela Central de Vagas da Prefeitura, e a
+instituição não atende esse fluxo diretamente, então coletar contato pelo site geraria dado
+pessoal sem finalidade.
 
-## 2.1 Manifestação de interesse — decidido
+**Nenhum formulário coleta hoje dado identificável nem dado referente a criança ou
+adolescente**, nem mesmo faixa etária. O aviso de interesse no contraturno (§2.2, formulário
+2) é o único dos cinco que se relaciona a um programa para menores, e coleta só o contato do
+responsável — o programa ainda não abriu inscrições, então não há "matrícula" nem "aluno" a
+descrever (ver `docs/contexto.md`).
 
-**Nenhum formulário público coleta dado identificável de criança ou adolescente.**
+## 2.1 Manifestação de interesse — decidido, agora só relevante ao histórico
 
-O site recebe apenas a manifestação de interesse do responsável: nome e contato dele, faixa
-etária da criança, período pretendido. Os dados completos — nome da criança, nascimento,
-documentos, endereço, escola — são coletados **presencialmente**, no momento da matrícula
-efetiva, junto com o termo de consentimento assinado.
+ADR 0007 documentou por que os dois formulários que antes se referiam a uma criança ou
+adolescente (matrícula do CEI e inscrição no contraturno) nunca coletariam dado identificável
+dela — só a manifestação de interesse do responsável. A decisão continua valendo como
+princípio, mas o cenário mudou:
 
-Isso é regra de arquitetura, não preferência de produto. Consequências que valem em todo o
-projeto:
+- **Matrícula do CEI:** o formulário foi **removido**. A matrícula é feita exclusivamente
+  pela Central de Vagas da Prefeitura de Londrina — ver §1.4.
+- **Contraturno:** o programa ainda não abriu inscrições. O que existe hoje não é mais um
+  "formulário de manifestação de interesse na matrícula do adolescente" — é um simples aviso
+  de "me avise quando abrir", e por isso nem pede faixa etária da criança: só nome e telefone
+  do responsável.
 
-- O titular dos formulários 1 e 2 é o **responsável adulto**, não a criança. O art. 14 da
-  LGPD, com sua exigência de consentimento específico de responsável, não se aplica a esses
-  registros — o que simplifica bastante o consentimento web.
-- **Faixa etária**, nunca data de nascimento. Data de nascimento identifica; faixa não.
-- Nenhum campo livre deve induzir o preenchimento do nome da criança. O rótulo do campo de
-  mensagem precisa ser explícito: dados da criança são coletados presencialmente.
-- Se alguém escrever o nome da criança no campo livre mesmo assim, o registro passa a conter
-  dado de menor. O campo de mensagem desses dois formulários é criptografado por precaução.
-
-Nenhuma tabela de assistido é alimentada por endpoint público, em nenhuma hipótese.
+Continua valendo, para o que resta: o titular do formulário de aviso do contraturno é o
+**responsável adulto**, nunca a criança. Nenhuma tabela de assistido é alimentada por
+endpoint público, em nenhuma hipótese.
 
 ## 2.2 Inventário
 
 | # | Formulário | Rota | Titular | Campos | Retenção sugerida |
 |---|---|---|---|---|---|
-| 1 | Matrícula / lista de espera | `/educacao-infantil/matricula` | Responsável (adulto) | Nome, telefone, e-mail, faixa etária da criança, período pretendido, mensagem | 12 meses após contato |
-| 2 | Inscrição contraturno | `/contraturno/inscricao` | Responsável (adulto) | Nome, telefone, e-mail, idade do adolescente, escola `[VALIDAR]`, turno livre | 12 meses |
-| 3 | Agendar coleta | `/bazar/agendar-coleta` | Doador (adulto) | Nome, telefone, endereço, itens, janela de disponibilidade, fotos (opcional) | 6 meses após coleta |
-| 4 | Voluntariado | `/como-ajudar/voluntariado` | Voluntário (adulto) | Nome, telefone, e-mail, disponibilidade, área de interesse | 24 meses |
-| 5 | Apoiar projeto / empresas | `/contraturno/apoiar` | Contato PJ | Empresa, CNPJ, contato, telefone, e-mail, tipo de apoio | 36 meses |
-| 6 | Contato | `/contato` | Visitante | Nome, e-mail, assunto, mensagem | 6 meses |
+| 1 | Aviso de interesse — contraturno | `/contraturno/inscricao` | Responsável (adulto) | Nome, telefone | 12 meses |
+| 2 | Agendar coleta | `/bazar/agendar-coleta` | Doador (adulto) | Nome, telefone, endereço, itens, janela de disponibilidade, fotos (opcional) | 6 meses após coleta |
+| 3 | Voluntariado | `/como-ajudar/voluntariado` | Voluntário (adulto) | Nome, telefone, e-mail, disponibilidade, área de interesse | 24 meses |
+| 4 | Apoiar projeto / empresas | `/contraturno/apoiar` | Contato PJ | Empresa, CNPJ, contato, telefone, e-mail, tipo de apoio | 36 meses |
+| 5 | Contato | `/contato` | Visitante | Nome, e-mail, assunto, mensagem | 6 meses |
 
 ## 2.3 Regras comuns a todos
 
@@ -196,7 +198,6 @@ Todas com rate limit agressivo e honeypot.
 
 | Método | Rota |
 |---|---|
-| POST | `/api/v1/public/enrollment-interests` |
 | POST | `/api/v1/public/program-applications` |
 | POST | `/api/v1/public/pickup-requests` |
 | POST | `/api/v1/public/volunteer-applications` |
@@ -286,7 +287,7 @@ Três níveis de dado no sistema:
 ## 4.5 Endpoints administrativos
 
 CRUD padrão sob `/api/v1/` para: `pages`, `posts`, `media`, `testimonials`, `partners`,
-`transparency-documents`, `stats`, `settings`, `enrollment-interests`,
+`transparency-documents`, `stats`, `settings`,
 `program-applications`, `pickup-requests`, `volunteer-applications`,
 `partnership-inquiries`, `contact-messages`, `users`, `roles`.
 
