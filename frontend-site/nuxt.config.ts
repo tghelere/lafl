@@ -1,11 +1,16 @@
+import { fileURLToPath } from 'node:url'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  // Ordem importa: fontes antes de tokens, tokens antes de base, base antes de componentes.
+  // Ordem importa: fontes antes de tokens de marca (compartilhados — cor e tipografia,
+  // única fonte de verdade com frontend-admin), tokens de marca antes de tokens locais
+  // (espaçamento/raio/sombra/layout), tokens antes de base, base antes de componentes.
   css: [
     '~/assets/css/fonts.css',
+    fileURLToPath(new URL('../shared/design-tokens/tokens.css', import.meta.url)),
     '~/assets/css/tokens.css',
     '~/assets/css/base.css',
     '~/assets/css/components.css',

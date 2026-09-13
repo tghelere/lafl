@@ -1,0 +1,132 @@
+/* Tokens de marca — cor e tipografia — fonte única de verdade para o site público
+   (frontend-site) e o painel administrativo (frontend-admin). Nenhum dos dois deve manter
+   cópia própria destes valores: quem precisa de algo daqui referencia este arquivo (ver
+   frontend-site/nuxt.config.ts e frontend-admin/src/main.ts).
+
+   Paleta extraída da logo do Lar Anália Franco (amarelo da casa + laranja da tipografia).
+   Substitui a paleta verde/ocre de docs/decisoes/0009-direcao-visual.md — decisão desta
+   sessão, ADR de substituição pendente de registro.
+
+   Tokens de espaçamento, raio, sombra e layout continuam locais a cada frontend (não são
+   tokens de marca e não fazem parte do escopo desta sessão) — ver o tokens.css de cada
+   frontend.
+
+   Contraste verificado por cálculo (WCAG 2.x, luminância relativa sRGB), não por estimativa
+   visual — valores ao lado de cada par abaixo. */
+
+:root {
+  /* ---- Escala amarelo (marca — "amarelo da casa") ---- */
+  --color-yellow-50: #fffaf0;
+  --color-yellow-100: #fdecc8;
+  --color-yellow-200: #fcdfa1;
+  --color-yellow-300: #fbd179;
+  --color-yellow-400: #fac452;
+  --color-yellow-500: #f9b62a; /* valor de marca — não alterar */
+  --color-yellow-600: #e89f07;
+  --color-yellow-700: #b57c05;
+  --color-yellow-800: #825904;
+  --color-yellow-900: #4f3602;
+
+  /* ---- Escala laranja (marca — "laranja da tipografia") ---- */
+  --color-orange-50: #fef5f1;
+  --color-orange-100: #fcdaca;
+  --color-orange-200: #f9bfa3;
+  --color-orange-300: #f7a57c;
+  --color-orange-400: #f48a55;
+  --color-orange-500: #f26f2e; /* valor de marca — não alterar */
+  --color-orange-600: #df530e;
+  --color-orange-700: #ae410b;
+  --color-orange-800: #7d2f08;
+  --color-orange-900: #4d1d05;
+
+  /* ---- Escala neutra — matiz quente (~30° de matiz, não cinza puro), para conversar com
+     a paleta em vez de brigar com ela ---- */
+  --color-neutral-50: #f9f9f8;
+  --color-neutral-100: #f2f0ee;
+  --color-neutral-200: #e2deda;
+  --color-neutral-300: #cbc4bd;
+  --color-neutral-400: #aea398;
+  --color-neutral-500: #8f8070;
+  --color-neutral-600: #6d6155;
+  --color-neutral-700: #50473f;
+  --color-neutral-800: #36302b;
+  --color-neutral-900: #221f1b;
+
+  /* ---- Tokens semânticos — componentes consomem estes, nunca a escala direta ----
+
+     Restrição não negociável: amarelo e laranja nunca são --color-text nem
+     --color-text-muted (branco/#F9B62A ≈ 1,79:1; branco/#F26F2E ≈ 2,96:1 — ambos abaixo do
+     mínimo AA mesmo para texto grande). Os dois só entram como --color-accent* (fundo),
+     nunca como cor de texto sobre claro.
+
+     Pares verificados (calculados, não estimados):
+       --color-text            on --color-surface        11,01:1
+       --color-text            on --color-surface-raised  11,6:1
+       --color-text-muted      on --color-surface          5,71:1
+       --color-text-muted      on --color-surface-raised   6,01:1
+       --color-heading         on --color-surface         15,58:1
+       --color-heading         on --color-surface-raised  16,41:1
+       --color-heading         on --color-accent            5,54:1  (rótulo de botão)
+       --color-heading         on --color-accent-hover      4,85:1  (rótulo de botão, hover)
+       --color-focus           on --color-surface            5,6:1  (visibilidade do anel)
+     Todos ≥ 4,5:1 (texto normal). --color-border é divisor não-textual (ver nota abaixo) e
+     não está sujeito a esse mínimo. */
+
+  --color-text: #572e19; /* marrom escuro derivado do matiz do laranja (L baixo, S moderada) — não é --color-orange-900 puro, ajustado para não puxar para "queimado" em corpo de texto */
+  --color-text-muted: var(--color-neutral-600);
+  --color-heading: var(--color-neutral-900);
+
+  --color-surface: var(--color-neutral-50);
+  --color-surface-raised: #ffffff;
+
+  /* Divisor sutil — segue o mesmo tratamento de "hairline" do design anterior (ADR 0009),
+     que também não atingia 3:1. A regra de 4,5:1/3:1 desta sessão é sobre pares de texto;
+     um hairline decorativo não é um componente de UI que dependa só de cor para se explicar. */
+  --color-border: var(--color-neutral-300); /* ~1,64:1 sobre --color-surface — deliberadamente sutil, não redesenhar */
+
+  /* Ação primária — no valor exato de marca (500), vibrante. Usa --color-heading como cor
+     de rótulo em cima (nunca branco: branco sobre --color-accent dá só ~2,96:1). */
+  --color-accent: var(--color-orange-500);
+  --color-accent-hover: #f05b11; /* laranja ~6% mais escuro que 500; calibrado (não é um degrau redondo da escala) para manter --color-heading em cima em >=4,5:1 no hover */
+  --color-focus: var(--color-orange-700); /* mais escuro que --color-accent: em --color-accent (500) o anel de foco ficaria em só ~2,81:1 sobre --color-surface, abaixo do mínimo de 3:1 para elemento de interface */
+
+  /* Estado de erro — inalterado nesta sessão (não faz parte da paleta de marca substituída;
+     ainda ~6,2:1 sobre a nova --color-surface). */
+  --color-error: #b3261e;
+  --color-error-bg: rgb(179 38 30 / 8%);
+
+  /* Overlay de modal/drawer — deriva de --color-heading (novo neutro escuro), não do antigo
+     --color-ink verde-acinzentado. */
+  --color-scrim: rgb(34 31 27 / 60%);
+
+  /* ---- Tipografia ----
+     Título — Poppins (600/700). Corpo — Lora (400/500/600 + itálico 400). Autohospedadas,
+     subset latin, font-display: swap — ver fonts.css de cada frontend. */
+  --font-display: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-body: 'Lora', Georgia, 'Times New Roman', serif;
+
+  /* Escala tipográfica base (site). O painel sobrepõe uma escala mais densa por cima destes
+     mesmos nomes — ver frontend-admin/src/assets/css/tokens.css — sem duplicar os valores
+     de cor/fonte acima. */
+  --text-xs: 0.8125rem; /* 13px — legenda, timestamp, breadcrumb */
+  --text-sm: 0.9375rem; /* 15px — navegação, UI pequena */
+  --text-base: 1.0625rem; /* 17px — corpo de texto */
+  --text-lg: 1.25rem; /* 20px — lead, corpo grande */
+  --text-xl: 1.625rem; /* 26px — H3 */
+  --text-2xl: 2rem; /* 32px — H2 */
+  --text-3xl: 2.75rem; /* 44px — H1 */
+  --text-4xl: 3.5rem; /* 56px — numeral de destaque */
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+}

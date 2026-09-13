@@ -11,4 +11,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    fs: {
+      // src/main.ts importa shared/design-tokens/tokens.css, fora da raiz do projeto (é a
+      // fonte única de tokens de marca, compartilhada com frontend-site — ver main.ts).
+      allow: ['..'],
+    },
+  },
 })
