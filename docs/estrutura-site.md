@@ -148,7 +148,7 @@ endpoint público, em nenhuma hipótese.
 | # | Formulário | Rota | Titular | Campos | Retenção sugerida |
 |---|---|---|---|---|---|
 | 1 | Aviso de interesse — contraturno | `/contraturno/inscricao` | Responsável (adulto) | Nome, telefone | 12 meses |
-| 2 | Agendar coleta | `/bazar/agendar-coleta` | Doador (adulto) | Nome, telefone, endereço, itens, janela de disponibilidade, fotos (opcional) | 6 meses após coleta |
+| 2 | Agendar coleta — caminho secundário; WhatsApp (43) 99950-0183 é o principal (ver `docs/contexto.md`) | `/bazar/agendar-coleta` | Doador (adulto) | Nome, telefone, endereço, itens, janela de disponibilidade, fotos (opcional) | 6 meses após coleta |
 | 3 | Voluntariado | `/como-ajudar/voluntariado` | Voluntário (adulto) | Nome, telefone, e-mail, disponibilidade, área de interesse | 24 meses |
 | 4 | Apoiar projeto / empresas | `/contraturno/apoiar` | Contato PJ | Empresa, CNPJ, contato, telefone, e-mail, tipo de apoio | 36 meses |
 | 5 | Contato | `/contato` | Visitante | Nome, e-mail, assunto, mensagem | 6 meses |

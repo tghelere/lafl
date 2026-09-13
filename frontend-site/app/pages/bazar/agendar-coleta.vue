@@ -2,11 +2,20 @@
 // Agendamento de coleta do Bazar Beneficente — titular é o doador (adulto). Endereço é o
 // dado mais sensível desta fase (ver docs/dominio.md); só existe nesta tela, nunca é exibido
 // de volta.
+//
+// WhatsApp é o canal principal (ver docs/contexto.md) — hoje o agendamento já é feito por
+// telefone e WhatsApp. O formulário abaixo é o caminho secundário, para fora do horário de
+// atendimento; ele já notifica o setor do bazar automaticamente (ver
+// config/forms.php:notification_recipients.pickup_request no backend).
 const { hasError, fieldFailed } = useFormErrorState()
+
+const WHATSAPP_NUMBER = '5543999500183'
+const WHATSAPP_MESSAGE = 'Olá! Gostaria de agendar uma coleta de doação para o Bazar Beneficente.'
+const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
 
 useSeoMeta({
   title: 'Agendar Coleta — Bazar — Lar Anália Franco',
-  description: 'Agende a coleta de itens para doação ao Bazar Beneficente do Lar Anália Franco.',
+  description: 'Agende a coleta de itens para doação ao Bazar Beneficente do Lar Anália Franco pelo WhatsApp (43) 99950-0183.',
 })
 </script>
 
@@ -22,9 +31,26 @@ useSeoMeta({
 
     <h1>Agendar Coleta</h1>
     <p class="prose">
-      Preencha seus dados e o que deseja doar — a equipe do bazar entra em contato para
-      combinar a coleta. Veja em <NuxtLink to="/bazar/o-que-aceitamos">o que aceitamos</NuxtLink>
-      antes de enviar.
+      O jeito mais rápido de agendar é pelo WhatsApp. Veja em
+      <NuxtLink to="/bazar/o-que-aceitamos">o que aceitamos</NuxtLink> antes de chamar.
+    </p>
+
+    <p>
+      <a
+        class="btn btn--primary"
+        :href="whatsappHref"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Chamar no WhatsApp (43) 99950-0183
+      </a>
+    </p>
+
+    <h2>Fora do horário de atendimento</h2>
+    <p class="prose">
+      Prefere deixar por escrito, ou é fora do horário de atendimento? Preencha o formulário
+      abaixo — a equipe do bazar recebe automaticamente e entra em contato para combinar a
+      coleta.
     </p>
 
     <div v-if="hasError" class="form-alert" role="alert">
@@ -83,7 +109,7 @@ useSeoMeta({
         </span>
       </label>
 
-      <button type="submit" class="btn btn--primary">Agendar coleta</button>
+      <button type="submit" class="btn btn--secondary">Enviar pedido de coleta</button>
     </form>
   </div>
 </template>

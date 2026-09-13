@@ -448,8 +448,9 @@ class ContentPagesSeeder extends Seeder
                     <p>O Bazar Beneficente recebe doações de itens para revenda na loja física da
                     instituição.</p>
                     <p>A lista detalhada do que é aceito — e do que não é — está em confirmação com a
-                    equipe do bazar e será publicada nesta página. Para agendar uma coleta, use o
-                    formulário de agendamento (em breve nesta seção).</p>
+                    equipe do bazar e será publicada nesta página. Para
+                    <a href="/bazar/agendar-coleta">agendar uma coleta</a>, o jeito mais rápido é pelo
+                    WhatsApp (43) 99950-0183.</p>
                     HTML,
             ],
             [

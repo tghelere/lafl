@@ -149,6 +149,11 @@ duplicação.
 Frase do vice-presidente que resume o peso do bazar: sem ele, a operação não se sustentaria
 um dia.
 
+**Agendamento de coleta — confirmado pelo cliente em 13/09/2026:** hoje já é feito por
+telefone e WhatsApp. O WhatsApp (43) 99950-0183 é o canal principal da página
+`/bazar/agendar-coleta`; o formulário do site é caminho secundário, para fora do horário de
+atendimento, e notifica automaticamente o setor do bazar.
+
 ## Sustentação financeira
 
 `[CONFIRMAR]` Divisão percentual do orçamento entre convênio e bazar: este documento trazia
