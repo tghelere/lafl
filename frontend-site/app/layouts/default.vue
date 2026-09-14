@@ -34,8 +34,8 @@
   top: -3rem;
   left: var(--space-4);
   z-index: 50;
-  background: var(--color-ink);
-  color: var(--color-paper);
+  background: var(--color-heading);
+  color: var(--color-surface-raised);
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
   text-decoration: none;

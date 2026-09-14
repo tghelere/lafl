@@ -190,7 +190,8 @@ class ContentPagesSeeder extends Seeder
                     encerrado — a instituição não recebe mais crianças e adolescentes em regime de abrigo, e
                     não há mais medida protetiva, guarda ou vínculo com vara da infância.</p>
                     <p>A creche seguiu funcionando durante todo o processo e cresceu desde então. Em 2026, a
-                    instituição também inaugurou a Escola de Contraturno, sua operação mais nova.</p>
+                    instituição também montou a estrutura da Escola de Contraturno — programa em preparação,
+                    que ainda não abriu turmas, com início previsto para 2027.</p>
                     <h2>O que a instituição está fazendo diferente</h2>
                     <p>Não é possível apagar o que aconteceu. O compromisso da direção atual é manter a
                     prestação de contas pública e verificável, documento por documento — ver
@@ -422,8 +423,7 @@ class ContentPagesSeeder extends Seeder
                     doações de itens e revende ao público, e financia parte relevante do orçamento do Lar
                     Anália Franco — o que o convênio da creche com a Prefeitura de Londrina não cobre.</p>
                     <p>É a receita do bazar que está viabilizando a Escola de Contraturno, programa em
-                    preparação com início de turmas previsto para 2027. A loja está em obra de
-                    duplicação.</p>
+                    preparação com início de turmas previsto para 2027.</p>
                     <p>As páginas desta seção explicam onde fica a loja, o que a instituição aceita em
                     doação e para onde vai o resultado das vendas.</p>
                     HTML,
@@ -436,8 +436,8 @@ class ContentPagesSeeder extends Seeder
                     <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália
                     Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou
                     WhatsApp (43) 99950-0183.</p>
-                    <p>A loja está atualmente em obra de duplicação. Horário de funcionamento e um mapa de
-                    acesso serão publicados aqui assim que confirmados com a administração do bazar.</p>
+                    <p>Horário de funcionamento e um mapa de acesso serão publicados aqui assim que
+                    confirmados com a administração do bazar.</p>
                     HTML,
             ],
             [

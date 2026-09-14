@@ -91,7 +91,7 @@ async function handleSubmit(): Promise<void> {
   justify-content: center;
   min-height: 100vh;
   padding: var(--space-4);
-  background: var(--color-paper);
+  background: var(--color-surface);
 }
 
 .login__form {
@@ -104,7 +104,7 @@ async function handleSubmit(): Promise<void> {
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--color-linha);
+  color: var(--color-text-muted);
   margin: 0 0 var(--space-2);
 }
 

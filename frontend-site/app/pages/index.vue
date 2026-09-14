@@ -24,7 +24,7 @@ const pillars = [
   {
     label: 'Contraturno',
     description:
-      'Aulas de informática e inteligência artificial para adolescentes, na sala de informática inaugurada em julho de 2026.',
+      'Programa em preparação para crianças e adolescentes de 6 a 15 anos — oficinas de audiovisual, música, esportes e informática, com início previsto para 2027.',
     to: '/contraturno',
     cta: 'Conhecer o contraturno',
   },
@@ -44,9 +44,11 @@ const pillars = [
       <p class="home__eyebrow">Londrina</p>
       <h1>Uma creche, uma escola de contraturno e um bazar — sustentados pelo mesmo trabalho.</h1>
       <p class="home__lead">
-        O Lar Anália Franco atende crianças na educação infantil, adolescentes no contraturno,
-        e mantém as duas coisas em pé com a receita do próprio bazar beneficente. Esta página
-        reúne as três frentes e a prestação de contas que sustenta cada uma delas.
+        O Lar Anália Franco atende crianças na educação infantil e prepara uma escola de
+        contraturno para adolescentes, com início de turmas previsto para 2027. A creche é
+        custeada pelo Termo de Colaboração com a Prefeitura de Londrina — R$ 2.819.892,84
+        previstos para 2026 — e é o bazar beneficente que cobre o que esse convênio não cobre.
+        Esta página reúne as três frentes e a prestação de contas que sustenta cada uma delas.
       </p>
       <div class="home__hero-ctas">
         <NuxtLink to="/como-ajudar/doar" class="btn btn--primary">Doar</NuxtLink>
@@ -105,7 +107,7 @@ const pillars = [
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--color-linha);
+  color: var(--color-text-muted);
   margin: 0 0 var(--space-3);
 }
 
@@ -116,7 +118,7 @@ const pillars = [
 
 .home__lead {
   font-size: var(--text-lg);
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
   max-width: 58ch;
 }
 
@@ -150,7 +152,7 @@ const pillars = [
   margin-top: auto;
   padding-top: var(--space-3);
   font-weight: var(--weight-medium);
-  color: var(--color-quadra);
+  color: var(--color-focus);
   text-decoration: none;
 }
 
@@ -167,7 +169,7 @@ const pillars = [
 }
 
 .home__ledger-note {
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
   max-width: 58ch;
   margin-bottom: var(--space-5);

@@ -178,7 +178,7 @@ useSeoMeta({
   gap: var(--space-4);
   margin-block: var(--space-6);
   padding: var(--space-5);
-  background: var(--color-surface);
+  background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
 }
@@ -192,7 +192,7 @@ useSeoMeta({
 .doc-filter__field label {
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
 }
 
 .doc-filter__field input,
@@ -202,18 +202,18 @@ useSeoMeta({
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-ink);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
   min-width: 10rem;
 }
 
 .doc-filter__clear {
   font-size: var(--text-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
 }
 
 .doc-empty {
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
 }
 
 .doc-list {
@@ -245,14 +245,14 @@ useSeoMeta({
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--color-quadra);
+  color: var(--color-focus);
 }
 
 .doc-list__year {
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   font-size: var(--text-lg);
-  color: var(--color-ink);
+  color: var(--color-text);
 }
 
 .doc-list__title {
@@ -267,7 +267,7 @@ useSeoMeta({
 .doc-list__details {
   margin: 0;
   font-size: var(--text-xs);
-  color: var(--color-linha);
+  color: var(--color-text-muted);
   white-space: nowrap;
 }
 
@@ -278,6 +278,6 @@ useSeoMeta({
   gap: var(--space-5);
   margin-top: var(--space-7);
   font-size: var(--text-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
 }
 </style>
