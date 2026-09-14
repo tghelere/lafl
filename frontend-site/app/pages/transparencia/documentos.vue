@@ -105,6 +105,8 @@ useSeoMeta({
       </ol>
     </nav>
 
+    <AppSectionNav />
+
     <h1>Documentos</h1>
     <p class="prose">
       Balanços, atas, editais e relatórios do Lar Anália Franco. O filtro abaixo funciona sem

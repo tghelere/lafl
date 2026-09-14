@@ -21,6 +21,8 @@ useSeoMeta({
       </ol>
     </nav>
 
+    <AppSectionNav />
+
     <h1>Avise-me quando abrir</h1>
     <p class="prose">
       A Escola de Contraturno ainda não abriu turmas nem inscrições — início previsto para

@@ -29,6 +29,8 @@ useSeoMeta({
       </ol>
     </nav>
 
+    <AppSectionNav />
+
     <h1>Agendar Coleta</h1>
     <p class="prose">
       O jeito mais rápido de agendar é pelo WhatsApp. Veja em

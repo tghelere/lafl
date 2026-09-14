@@ -67,6 +67,8 @@ useSeoMeta({
       </ol>
     </nav>
 
+    <AppSectionNav />
+
     <article class="prose">
       <h1>{{ page.title }}</h1>
       <!-- Conteúdo vem do CMS, escrito por usuário autenticado do painel — não há input de
