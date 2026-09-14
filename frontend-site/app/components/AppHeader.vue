@@ -1,14 +1,10 @@
 <script setup lang="ts">
-// Sete itens de primeiro nível, peso igual — ver docs/estrutura-site.md §1.1. Cada item
-// (exceto Home) abre um submenu com as páginas filhas, definidas em app/config/siteNav.ts —
-// única fonte de verdade compartilhada com AppSectionNav.vue.
-//
-// O submenu abre só por clique/toque (@click num <button>), nunca por :hover — um botão
-// nativo já responde a mouse, teclado (Enter/Espaço) e toque sem tratamento especial; :hover
-// sozinho não serve toque nenhum. Ver relatório da sessão.
-import { siteNav } from '~/config/siteNav'
-
-const navItems = [{ label: 'Home', to: '/', children: [] }, ...siteNav]
+// Etapa 1 (docs/design/navegacao.md): fonte de dados. A interação completa do painel
+// desktop (medidas, hover com delay, clamp de borda, acessibilidade — spec §4-8) é a Etapa
+// 2; a gaveta mobile em tela cheia (spec §9) é a Etapa 3. Por ora, este componente só lê de
+// app/config/navigation.ts e mantém um disclosure simples por clique, para o site continuar
+// navegável entre as etapas.
+import { ctaItem, navigation } from '~/config/navigation'
 
 const isOpen = ref(false)
 const openSection = ref<string | null>(null)
@@ -52,13 +48,13 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick))
     <div class="container site-header__bar">
       <NuxtLink to="/" class="site-header__mark">Lar Anália Franco</NuxtLink>
 
-      <nav class="site-header__nav" aria-label="Menu principal">
+      <nav class="site-header__nav" aria-label="Navegação principal">
         <ul>
-          <li v-for="item in navItems" :key="item.to" class="site-header__item">
+          <li v-for="item in navigation" :key="item.to" class="site-header__item">
             <div class="site-header__link-group">
               <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
               <button
-                v-if="item.children.length"
+                v-if="item.children?.length"
                 type="button"
                 class="site-header__submenu-toggle"
                 :aria-expanded="openSection === item.to"
@@ -71,7 +67,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick))
               </button>
             </div>
             <ul
-              v-if="item.children.length"
+              v-if="item.children?.length"
               :id="`submenu-${item.to.slice(1)}`"
               v-show="openSection === item.to"
               class="site-header__submenu"
@@ -85,8 +81,8 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick))
         </ul>
       </nav>
 
-      <NuxtLink to="/como-ajudar/doar" class="btn btn--primary site-header__cta">
-        Doar
+      <NuxtLink :to="ctaItem.to" class="btn btn--primary site-header__cta">
+        {{ ctaItem.label }}
       </NuxtLink>
 
       <button
@@ -107,21 +103,21 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick))
         v-if="isOpen"
         id="mobile-nav"
         class="mobile-nav"
-        aria-label="Menu principal (mobile)"
+        aria-label="Navegação principal (mobile)"
         @keydown="onKeydown"
       >
         <ul>
-          <li v-for="item in navItems" :key="item.to">
+          <li v-for="item in navigation" :key="item.to">
             <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
-            <ul v-if="item.children.length" class="mobile-nav__children">
+            <ul v-if="item.children?.length" class="mobile-nav__children">
               <li v-for="child in item.children" :key="child.to">
                 <NuxtLink :to="child.to">{{ child.label }}</NuxtLink>
               </li>
             </ul>
           </li>
         </ul>
-        <NuxtLink to="/como-ajudar/doar" class="btn btn--primary mobile-nav__cta">
-          Doar
+        <NuxtLink :to="ctaItem.to" class="btn btn--primary mobile-nav__cta">
+          {{ ctaItem.label }}
         </NuxtLink>
       </nav>
     </Transition>

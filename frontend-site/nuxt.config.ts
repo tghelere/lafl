@@ -34,8 +34,8 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      // O cabeçalho (AppHeader.vue) já linka os sete itens do menu principal de
-      // docs/estrutura-site.md §1.1, mas nem toda seção tem página própria ainda (ver
+      // O cabeçalho (AppHeader.vue) lê a navegação de app/config/navigation.ts (ver
+      // docs/design/navegacao.md), mas nem toda seção tem página própria ainda (ver
       // docs/roadmap.md). Com o crawler padrão (`crawlLinks: true`), `nuxt generate` seguiria
       // esses links e falharia tentando prerenderizar uma rota sem página ou sem página do
       // CMS correspondente. `crawlLinks: false` faz o generate prerenderizar só o que está
@@ -53,6 +53,8 @@ export default defineNuxtConfig({
         // generate` de novo para o novo slug entrar no output estático; o slug antigo só
         // resolve com 301 se o site estiver rodando com o servidor Nitro (`nuxt build` +
         // node), não em hospedagem 100% estática (ver docs/roadmap.md).
+        '/o-que-fazemos',
+        '/doar',
         '/quem-somos',
         '/quem-somos/nossa-historia',
         '/quem-somos/missao-visao-valores',
@@ -77,7 +79,6 @@ export default defineNuxtConfig({
         '/bazar/para-onde-vai',
         '/bazar/sua-compra-vira-educacao',
         '/como-ajudar',
-        '/como-ajudar/doar',
         '/como-ajudar/parceiros',
         '/transparencia',
         '/politica-de-privacidade',
