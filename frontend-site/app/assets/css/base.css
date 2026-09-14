@@ -133,7 +133,7 @@ button {
 
 ::selection {
   background: var(--color-accent);
-  color: var(--color-heading);
+  color: var(--color-on-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

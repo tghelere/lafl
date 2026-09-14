@@ -68,7 +68,7 @@
 
 .app-sidebar__link.router-link-active {
   background: var(--color-accent);
-  color: var(--color-heading);
+  color: var(--color-on-accent);
 }
 
 .app-sidebar__note {
@@ -147,13 +147,21 @@
 
 .btn--primary {
   background: var(--color-accent);
-  color: var(--color-heading);
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
-.btn--primary:hover {
+/* --color-on-accent repetido em cada estado — ver comentário equivalente no site público
+   (frontend-site/app/assets/css/components.css) sobre por que não basta declarar no base. */
+.btn--primary:hover,
+.btn--primary:active {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
+  color: var(--color-on-accent);
+}
+
+.btn--primary:focus-visible {
+  color: var(--color-on-accent);
 }
 
 .btn--primary:disabled {

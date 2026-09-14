@@ -38,14 +38,22 @@
 
 .btn--primary {
   background: var(--color-accent);
-  color: var(--color-heading);
+  color: var(--color-on-accent);
   border-color: var(--color-accent);
 }
 
+/* --color-on-accent repetido em cada estado, não só no base: sem isso, a regra genérica
+   `a:hover`/`a:active` (base.css) tem especificidade maior que um `color` declarado só em
+   `.btn--primary` e vence, deixando o texto do botão invisível sobre o próprio fundo. */
 .btn--primary:hover,
 .btn--primary:active {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
+  color: var(--color-on-accent);
+}
+
+.btn--primary:focus-visible {
+  color: var(--color-on-accent);
 }
 
 .btn--primary:disabled,

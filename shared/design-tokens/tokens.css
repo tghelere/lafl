@@ -84,11 +84,21 @@
      um hairline decorativo não é um componente de UI que dependa só de cor para se explicar. */
   --color-border: var(--color-neutral-300); /* ~1,64:1 sobre --color-surface — deliberadamente sutil, não redesenhar */
 
-  /* Ação primária — no valor exato de marca (500), vibrante. Usa --color-heading como cor
-     de rótulo em cima (nunca branco: branco sobre --color-accent dá só ~2,96:1). */
+  /* Ação primária — no valor exato de marca (500), vibrante. */
   --color-accent: var(--color-orange-500);
-  --color-accent-hover: #f05b11; /* laranja ~6% mais escuro que 500; calibrado (não é um degrau redondo da escala) para manter --color-heading em cima em >=4,5:1 no hover */
+  --color-accent-hover: #f05b11; /* laranja ~6% mais escuro que 500; calibrado (não é um degrau redondo da escala) para manter --color-on-accent em cima em >=4,5:1 no hover */
   --color-focus: var(--color-orange-700); /* mais escuro que --color-accent: em --color-accent (500) o anel de foco ficaria em só ~2,81:1 sobre --color-surface, abaixo do mínimo de 3:1 para elemento de interface */
+
+  /* Conteúdo (texto, ícone) sobre uma superfície de --color-accent ou --color-accent-hover —
+     nunca branco (branco sobre --color-accent dá só ~2,96:1) e nunca var(--color-text)
+     (~3,92:1 sobre --color-accent, abaixo do mínimo). Fixo — não muda entre normal, hover,
+     foco e ativo, então um componente não pode herdar a cor de link genérica (`a:hover`/
+     `a:active`, que tem especificidade 0-1-1 e vence um `color` declarado só no estado base
+     de uma classe, 0-1-0) nesses estados. Todo componente com fundo --color-accent* deve
+     declarar --color-on-accent explicitamente em CADA estado (normal/hover/foco/ativo), não
+     só no estado base — ver .btn--primary em components.css dos dois frontends.
+     --color-on-accent sobre --color-accent: 5,54:1. Sobre --color-accent-hover: 4,85:1. */
+  --color-on-accent: var(--color-heading);
 
   /* Estado de erro — inalterado nesta sessão (não faz parte da paleta de marca substituída;
      ainda ~6,2:1 sobre a nova --color-surface). */
