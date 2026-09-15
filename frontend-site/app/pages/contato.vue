@@ -88,13 +88,19 @@ useSeoMeta({
     </div>
 
     <form method="post" action="/api/forms/contato" class="form">
-      <div class="form__field" :class="{ 'form__field--invalid': fieldFailed('name') }">
+      <div
+        class="form__field form__field--half"
+        :class="{ 'form__field--invalid': fieldFailed('name') }"
+      >
         <label for="name">Seu nome</label>
         <input id="name" name="name" type="text" autocomplete="name" required />
         <p v-if="fieldFailed('name')" class="form__error">Informe seu nome.</p>
       </div>
 
-      <div class="form__field" :class="{ 'form__field--invalid': fieldFailed('email') }">
+      <div
+        class="form__field form__field--half"
+        :class="{ 'form__field--invalid': fieldFailed('email') }"
+      >
         <label for="email">E-mail</label>
         <input id="email" name="email" type="email" autocomplete="email" required />
         <p v-if="fieldFailed('email')" class="form__error">Informe um e-mail válido.</p>
@@ -205,5 +211,37 @@ useSeoMeta({
   margin-top: var(--space-1);
   font-size: var(--text-xs);
   color: var(--color-text-muted);
+}
+
+/* Sobrescreve .form (components.css, flex de coluna única) só neste formulário — os outros
+   formulários do site continuam com o layout genérico. Nome/e-mail lado a lado, assunto e
+   mensagem em largura cheia; empilha tudo abaixo de md (48rem, mesmo ponto de corte de
+   AppHeader.vue). Largura igual à dos cartões/mapa acima, para não deixar coluna vazia à
+   direita como no layout de coluna única anterior. */
+.form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  max-width: 1088px;
+}
+
+.form__field,
+.form__consent {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 48rem) {
+  .form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form__field--half {
+    grid-column: span 1;
+  }
+}
+
+/* Botão dimensionado ao conteúdo, não esticado pelo grid (justify-items padrão é stretch). */
+.form > .btn {
+  justify-self: start;
 }
 </style>
