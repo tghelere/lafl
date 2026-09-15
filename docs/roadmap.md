@@ -106,6 +106,28 @@
       `lint`/`build` (`vue-tsc`) verdes. Conferência visual feita via requisição HTTP ao
       servidor de desenvolvimento (conteúdo renderizado confirmado), não em navegador real —
       Playwright não tinha Chromium disponível neste ambiente.
+- [x] **Ícones, WhatsApp e mapa (sessão 8).** `@lucide/vue` instalado como dependência do site
+      público (`lucide-vue-next` está deprecado a favor deste pacote desde a sessão — mesma
+      API, trocado na hora da instalação). Ícones aplicados com parcimônia — telefone/endereço
+      no rodapé e nos cartões de `/contato`, download em "Baixar PDF" de
+      `/transparencia/documentos` — todos decorativos (`aria-hidden`), nenhum substitui rótulo
+      de navegação; a seta do menu (CSS próprio) e o ícone da gaveta mobile ficaram como
+      estavam, fora do escopo desta sessão. lucide não tem o glifo do WhatsApp — criado
+      `AppWhatsappIcon.vue` com o SVG oficial da marca. Card do Bazar em `/contato` ganhou
+      botão de WhatsApp (mensagem de contato geral); card da Sede/CEI ficou só com telefone —
+      não há WhatsApp confirmado para a sede, número do bazar não foi reaproveitado. Criado
+      `AppMapaLocal.vue`: ilustração estática própria (sem coordenada real — nenhuma
+      confirmada, inventar arriscaria pino errado) com botão que só então cria o iframe do
+      Google Maps no DOM, mais link "Abrir no aplicativo de mapas" (geo link universal por
+      texto de endereço, sem chave de API); usado nos dois cards de `/contato`. Conferido na
+      aba de rede em navegador real (Chromium via Playwright, disponível nesta sessão): zero
+      requisição a domínio do Google antes do clique, embed geocodifica corretamente o
+      endereço da Sede/CEI depois. Rotas antes quebradas por aninhamento reconferidas em
+      navegador real: `/bazar/agendar-coleta`, `/transparencia/documentos`,
+      `/quem-somos/nossa-historia` — todas com título e conteúdo próprios, sem sinal de
+      fallback do pai. Dois parágrafos de conteúdo do CMS (`bazar/visite-a-loja`,
+      `bazar/o-que-aceitamos`, no `ContentPagesSeeder`) ainda citam o WhatsApp do bazar como
+      texto solto, não como botão — fora do escopo desta sessão (frontend), não convertido.
 
 ## Em andamento
 
@@ -155,6 +177,13 @@ levantar.
 
 ### Site público (Nuxt)
 
+- [ ] O conteúdo do CMS é renderizado via `v-html` (`app/pages/[...slug].vue`), o que impede
+      posicionar imagem dentro do texto pelo painel administrativo — o editor produz HTML puro,
+      sem espaço para um componente Vue no meio. Hoje isso é contornado com página própria por
+      seção sobrepondo a rota genérica (`bazar/index.vue`, `transparencia/index.vue`, etc. — ver
+      docs/fotos.md), que anexa a galeria de fotos depois do conteúdo em vez de intercalar. Se a
+      instituição quiser controlar posicionamento de imagem pelo próprio admin, será preciso
+      trocar por renderização em blocos.
 - [ ] `/bazar/novidades` (vitrine do bazar) — fora de escopo desta sessão, depende de
       `bazaar_showcase_items` e ainda tem `[VALIDAR]` pendente (preço, quem alimenta)
 - [ ] Seção de notícias (`/noticias`, `/noticias/:slug`) — depende de `posts`
