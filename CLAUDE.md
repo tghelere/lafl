@@ -102,6 +102,12 @@ Consulte quando a tarefa exigir:
 - `@docs/dominio.md` — entidades, relacionamentos, papéis e permissões
 - `@docs/convencoes.md` — padrões de código detalhados, backend e frontend
 
+## Armadilhas conhecidas
+
+- Conteúdo público de página é cacheado por 10 minutos (`ResolvePublicPageBySlug`). Depois
+  de reseedar, rode `cache:clear` antes de conferir no navegador — sem isso o site serve o
+  conteúdo anterior e a alteração parece não ter surtido efeito.
+
 ## Como trabalhar neste projeto
 
 - Ao criar entidade que envolva assistido, **leia `@docs/protecao-de-dados.md` antes de
