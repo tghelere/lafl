@@ -44,6 +44,7 @@ useSeoMeta({
         target="_blank"
         rel="noopener noreferrer"
       >
+        <AppWhatsappIcon />
         Chamar no WhatsApp (43) 99950-0183
       </a>
     </p>

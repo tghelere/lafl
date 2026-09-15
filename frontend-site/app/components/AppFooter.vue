@@ -7,6 +7,7 @@
 // Links vêm de app/config/navigation.ts — mesma fonte do header e da gaveta (ver
 // docs/design/navegacao.md §3). Uma coluna por item de topo: o próprio item primeiro, filhos
 // em seguida. Nenhum link solto aqui além destes.
+import { MapPin, Phone } from '@lucide/vue'
 import { navigation } from '~/config/navigation'
 
 const year = new Date().getFullYear()
@@ -29,11 +30,17 @@ const year = new Date().getFullYear()
 
       <div class="site-footer__base">
         <p>LAR ANÁLIA FRANCO DE LONDRINA — CNPJ 78.614.096/0001-75.</p>
-        <p>
-          Sede / CEI: Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR — (43) 3325-8060
+        <p class="site-footer__line">
+          <MapPin :size="14" aria-hidden="true" />
+          Sede / CEI: Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR
+          <Phone :size="14" aria-hidden="true" />
+          (43) 3325-8060
         </p>
-        <p>
-          Bazar: Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR — (43) 3322-2373
+        <p class="site-footer__line">
+          <MapPin :size="14" aria-hidden="true" />
+          Bazar: Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR
+          <Phone :size="14" aria-hidden="true" />
+          (43) 3322-2373
         </p>
         <p>
           © {{ year }} Lar Anália Franco.

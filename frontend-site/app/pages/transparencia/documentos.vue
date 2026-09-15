@@ -5,6 +5,8 @@
 // acervo cresce com o tempo. Funciona sem JavaScript — o filtro é um <form method="get">
 // comum, que recarrega a página com a URL atualizada; os links de paginação e download também
 // são âncoras normais.
+import { Download } from '@lucide/vue'
+
 type TransparencyDocumentType =
   | 'balance'
   | 'bylaws'
@@ -160,7 +162,10 @@ useSeoMeta({
         <p class="doc-list__details">
           {{ formatSize(document.file_size) }} · {{ document.download_count }} downloads
         </p>
-        <a :href="downloadUrl(document.uuid)" class="btn btn--secondary">Baixar PDF</a>
+        <a :href="downloadUrl(document.uuid)" class="btn btn--secondary">
+          <Download :size="16" aria-hidden="true" />
+          Baixar PDF
+        </a>
       </li>
     </ul>
 

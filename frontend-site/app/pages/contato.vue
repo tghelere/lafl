@@ -1,5 +1,7 @@
 <script setup lang="ts">
 // Formulário de contato geral — titular é o próprio visitante (adulto).
+import { MapPin, Phone } from '@lucide/vue'
+
 const { hasError, fieldFailed } = useFormErrorState()
 
 useSeoMeta({
@@ -25,13 +27,25 @@ useSeoMeta({
     <div class="contact-locations">
       <div class="card">
         <h2>Sede / CEI Anália Franco</h2>
-        <p>Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR</p>
-        <p>(43) 3325-8060</p>
+        <p class="contact-locations__line">
+          <MapPin :size="16" aria-hidden="true" />
+          Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR
+        </p>
+        <p class="contact-locations__line">
+          <Phone :size="16" aria-hidden="true" />
+          (43) 3325-8060
+        </p>
       </div>
       <div class="card">
         <h2>Bazar Beneficente</h2>
-        <p>Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR</p>
-        <p>(43) 3322-2373 — WhatsApp (43) 99950-0183</p>
+        <p class="contact-locations__line">
+          <MapPin :size="16" aria-hidden="true" />
+          Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR
+        </p>
+        <p class="contact-locations__line">
+          <Phone :size="16" aria-hidden="true" />
+          (43) 3322-2373
+        </p>
       </div>
     </div>
 
@@ -101,5 +115,16 @@ useSeoMeta({
 
 .contact-locations p + p {
   margin-top: var(--space-2);
+}
+
+.contact-locations__line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.contact-locations__line svg {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
 }
 </style>

@@ -570,6 +570,19 @@
   color: color-mix(in srgb, var(--color-surface-raised) 65%, transparent);
 }
 
+/* Ícones puramente decorativos (aria-hidden) ao lado de endereço/telefone — o texto já diz
+   tudo, o ícone só acelera o reconhecimento visual (ver docs/roadmap.md, sessão de ícones). */
+.site-footer__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+.site-footer__line svg {
+  flex-shrink: 0;
+}
+
 /* Linha de registro — a assinatura do sistema. Todo número institucional é um item de
    linha: numeral em Poppins, rótulo em versalete, data alinhada à direita, hairline. NUNCA
    cita fonte externa (a instituição é a fonte dos seus próprios números — ver ADR 0009);
