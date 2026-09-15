@@ -36,6 +36,8 @@ class ContentPagesSeeder extends Seeder
         }
 
         foreach ($this->pages() as $data) {
+            $status = $data['status'] ?? PageStatus::Published;
+
             Page::query()->updateOrCreate(
                 ['slug' => $data['slug']],
                 [
@@ -43,15 +45,19 @@ class ContentPagesSeeder extends Seeder
                     'content' => $data['content'],
                     'meta_title' => "{$data['title']} — Lar Anália Franco",
                     'meta_description' => $data['meta_description'],
-                    'status' => PageStatus::Published,
-                    'published_at' => now(),
+                    'status' => $status,
+                    'published_at' => $status === PageStatus::Published ? now() : null,
                 ],
             );
         }
     }
 
     /**
-     * @return list<array{slug: string, title: string, content: string, meta_description: string}>
+     * `status` é opcional por página — padrão `PageStatus::Published` (ver `run()`). Único
+     * bloqueio real de publicação é este campo; nada em `content` controla acesso, é só texto
+     * (ver comentário em `quemSomos()` sobre o engano anterior).
+     *
+     * @return list<array{slug: string, title: string, content: string, meta_description: string, status?: PageStatus}>
      */
     private function pages(): array
     {
@@ -174,8 +180,13 @@ class ContentPagesSeeder extends Seeder
                 'slug' => 'quem-somos/o-lar-hoje',
                 'title' => 'O Lar Hoje',
                 'meta_description' => 'O que aconteceu em 2022 no Lar Anália Franco, o que mudou desde então e por que a transparência é a resposta da instituição.',
+                // Bloqueio real de publicação — ver docs/roadmap.md, "BLOQUEIO DE PUBLICAÇÃO".
+                // Volta a Published só depois de revisão de advogado e confirmação do status
+                // processual atual (as duas condições registradas lá). Um comentário dentro de
+                // `content` não bloqueia nada — é só texto; por isso o campo `status` é o único
+                // mecanismo que importa aqui.
+                'status' => PageStatus::Draft,
                 'content' => <<<'HTML'
-                    <!-- BLOQUEADO PARA PUBLICAÇÃO: exige revisão jurídica antes de ir ao ar -->
                     <p>O Lar Anália Franco passou por uma reconstrução profunda desde 2022. Esta página
                     explica o que aconteceu e o que mudou desde então.</p>
                     <h2>O que aconteceu</h2>

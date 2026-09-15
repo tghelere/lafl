@@ -69,7 +69,10 @@ export default defineNuxtConfig({
         '/quem-somos/nossa-historia',
         '/quem-somos/missao-visao-valores',
         '/quem-somos/governanca',
-        '/quem-somos/o-lar-hoje',
+        // '/quem-somos/o-lar-hoje' fora da lista de propósito: status Draft no seeder (ver
+        // docs/roadmap.md, "BLOQUEIO DE PUBLICAÇÃO") — a API pública devolve 404 para ela
+        // agora, e o prerender falha o build inteiro se uma rota aqui não resolver. Devolver
+        // ao array quando a página for liberada (Published) para publicação.
         '/educacao-infantil',
         '/educacao-infantil/dia-da-crianca',
         '/educacao-infantil/proposta-pedagogica',
