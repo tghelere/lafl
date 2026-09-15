@@ -183,16 +183,22 @@ sem necessidade — se mudar aqui, mude lá também, e vice-versa.
 
 ### Contato — `contato/`
 
-**mapa-enderecos** — 1600×1000, larguras 960, 640, 400
+**mapa-enderecos** — 1x 1088×612 (zoom 18), 2x 2176×1224 (zoom 19), mesmo enquadramento
 
-Única exceção do catálogo que não é foto: mosaico de blocos (tiles) do OpenStreetMap,
-composto e gerado por script (não fotografado), com dois alfinetes numerados desenhados por
-cima. Pino 1 (Sede/CEI) usa a coordenada exata de um POI já nomeado no OSM. Pino 2 (Bazar)
-não tem ponto de numeração de casa mapeado no OSM para "Rua Rosa Siqueira, 152" — usa o
-centroide do trecho de rua com o mesmo CEP da Sede/CEI, precisão de rua/quadra, não de
-fachada exata (ver comentário em `app/data/fotos.ts`). Atribuição "© OpenStreetMap
-contributors" exibida como legenda na página (`contato.vue`), não desenhada nos pixels.
+Única exceção do catálogo que não é foto, e a única que não passa por `AppFoto` — passa por
+`AppMapaEnderecos.vue`. Mosaico de blocos (tiles) do OpenStreetMap, composto e gerado por
+script (não fotografado), com dois alfinetes pequenos (ponto sólido + número ao lado, não
+balão) desenhados por cima. Exibido em largura fixa (a do bloco dos dois cartões de
+`/contato`), por isso o srcset é por densidade de pixel (1x/2x) em vez de por largura — cada
+densidade renderizada direto no zoom nativo do OSM, nunca redimensionada depois (redimensionar
+foi a causa do texto de rua borrado numa versão anterior). Pino 1 (Sede/CEI) usa a coordenada
+exata de um POI já nomeado no OSM. Pino 2 (Bazar) não tem ponto de numeração de casa mapeado
+no OSM para "Rua Rosa Siqueira, 152" — usa o centroide do trecho de rua com o mesmo CEP da
+Sede/CEI, precisão de rua/quadra, não de fachada exata (ver comentário em
+`app/data/fotos.ts`, e a ressalva "localização aproximada" no `alt` abaixo e na legenda da
+página). Atribuição "© OpenStreetMap contributors" exibida como legenda na página
+(`contato.vue`), não desenhada nos pixels.
 
 > Mapa de ruas do Jardim Aeroporto, em Londrina/PR, com dois alfinetes numerados: 1, a
-> Sede/CEI Anália Franco, na Avenida Anália Franco; 2, o Bazar Beneficente, na Rua Rosa
-> Siqueira, a poucas quadras de distância
+> Sede/CEI Anália Franco, na Avenida Anália Franco; 2, o Bazar Beneficente (localização
+> aproximada), na Rua Rosa Siqueira, a poucas quadras de distância
