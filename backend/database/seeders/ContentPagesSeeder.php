@@ -296,12 +296,12 @@ class ContentPagesSeeder extends Seeder
                 'meta_description' => 'A matrícula no CEI Anália Franco é feita pela Central de Vagas da Prefeitura de Londrina, na Rua Benjamin Constant, 800, Centro.',
                 'content' => <<<'HTML'
                     <p>A matrícula no CEI Anália Franco é feita exclusivamente pela Central de Vagas da
-                    Prefeitura de Londrina — o Lar Anália Franco não recebe pedido de vaga diretamente,
-                    nem pelo site nem por telefone.</p>
+                    Secretaria Municipal de Educação de Londrina — o Lar Anália Franco não recebe pedido de
+                    vaga diretamente, nem pelo site nem por telefone.</p>
                     <p><strong>Central de Vagas</strong><br>
                     Rua Benjamin Constant, 800 — Centro, Londrina/PR</p>
-                    <p>Telefone da Central em confirmação com a instituição — será publicado aqui assim que
-                    confirmado.</p>
+                    <p>Para telefone, horário de atendimento e outros canais de contato, consulte o site
+                    oficial da Prefeitura de Londrina.</p>
                     <p>Depois que a Prefeitura encaminha a vaga ao CEI Anália Franco, a secretaria da
                     instituição entra em contato para os próximos passos da matrícula efetiva.</p>
                     HTML,

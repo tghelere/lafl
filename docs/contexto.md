@@ -95,8 +95,10 @@ instituição não pode atender geraria dado pessoal sem finalidade, o que a LGP
 `/educacao-infantil/matricula` virou uma página só informativa, que explica o caminho pela
 Central de Vagas.
 
-`[LACUNA]` Telefone da Central de Vagas — a página publica só o endereço até a instituição
-confirmar o telefone.
+`[LACUNA]` Telefone da Central de Vagas — a página publica o endereço e direciona ao site
+oficial da Prefeitura de Londrina para telefone e demais canais, sem citar número, até a
+instituição confirmar o telefone (antes a página dizia "em confirmação com a instituição",
+uma anotação de trabalho visível ao público — corrigido).
 
 ### 2. Escola de Contraturno
 
