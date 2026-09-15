@@ -435,7 +435,7 @@ class ContentPagesSeeder extends Seeder
                 'content' => <<<'HTML'
                     <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália
                     Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou
-                    WhatsApp (43) 99950-0183.</p>
+                    <a href="https://wa.me/5543999500183?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
                     <p>Horário de funcionamento e um mapa de acesso serão publicados aqui assim que
                     confirmados com a administração do bazar.</p>
                     HTML,
@@ -450,7 +450,7 @@ class ContentPagesSeeder extends Seeder
                     <p>A lista detalhada do que é aceito — e do que não é — está em confirmação com a
                     equipe do bazar e será publicada nesta página. Para
                     <a href="/bazar/agendar-coleta">agendar uma coleta</a>, o jeito mais rápido é pelo
-                    WhatsApp (43) 99950-0183.</p>
+                    <a href="https://wa.me/5543999500183?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
                     HTML,
             ],
             [
