@@ -144,6 +144,17 @@
 
 ### BLOQUEIO DE PUBLICAÇÃO — `/quem-somos/o-lar-hoje`
 
+**⚠ Verificado em sessão de correção: o bloqueio não existe de fato. A página está
+`status = published`, `published_at` preenchido, e responde HTTP 200 em
+`/api/v1/public/pages/quem-somos/o-lar-hoje` agora.** O comentário HTML
+`<!-- BLOQUEADO PARA PUBLICAÇÃO -->` no início do conteúdo é só texto — `ContentPagesSeeder::run()`
+seta `'status' => PageStatus::Published` incondicionalmente para todas as páginas do array,
+sem nenhum caso especial para esta. Um comentário dentro de uma string HTML nunca é lido por
+nenhuma lógica da aplicação; ele não é um mecanismo de controle de acesso, é uma nota para
+quem olha o código-fonte do seeder. `scopePublished()` em `App\Models\Page` é o gate real:
+`where('status', PageStatus::Published)->whereNotNull('published_at')` — é esse campo
+`status` que precisa ser `PageStatus::Draft` para a página sair do ar, não o comentário.
+
 **Esta é a única página do site com essa restrição.** `/quem-somos/o-lar-hoje` não pode ir ao
 ar sem:
 
@@ -156,7 +167,11 @@ ar sem:
 
 O bloco de conteúdo da página, no `ContentPagesSeeder`, já carrega o comentário
 `<!-- BLOQUEADO PARA PUBLICAÇÃO: exige revisão jurídica antes de ir ao ar -->` logo no início
-do HTML. **Não remover esse comentário** até as duas condições acima estarem satisfeitas.
+do HTML — mantém valor como nota de contexto para quem lê o código, mas **não faz o bloqueio
+sozinho**. **Não remover esse comentário** até as duas condições acima estarem satisfeitas, e
+ver a entrega pendente acima: até lá, a página segue publicada e acessível — o bloqueio real
+(mudar o `status` desta página para `Draft` no seeder, ou excluí-la do array até liberar)
+ainda não foi implementado.
 
 Ver também `docs/contexto.md`, "Controles adotados após 2022": a lacuna de maior valor
 pendente do projeto. Sem saber quais controles internos, protocolos de proteção e supervisão
