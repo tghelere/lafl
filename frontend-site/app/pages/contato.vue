@@ -42,6 +42,10 @@ useSeoMeta({
           <Phone :size="16" aria-hidden="true" />
           (43) 3325-8060
         </p>
+        <AppMapaLocal
+          label="Sede / CEI Anália Franco"
+          address="Av. Anália Franco, 33, Jd. Aeroporto, Londrina/PR"
+        />
       </div>
       <div class="card">
         <h2>Bazar Beneficente</h2>
@@ -53,6 +57,10 @@ useSeoMeta({
           <Phone :size="16" aria-hidden="true" />
           (43) 3322-2373
         </p>
+        <AppMapaLocal
+          label="Bazar Beneficente"
+          address="Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR"
+        />
         <a
           class="btn btn--secondary contact-locations__whatsapp"
           :href="whatsappHref"
