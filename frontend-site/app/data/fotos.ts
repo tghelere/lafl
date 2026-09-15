@@ -198,12 +198,17 @@ export const fotos = {
     // por AppMapaEnderecos.vue, não por AppFoto: largura de exibição FIXA (a do bloco dos dois
     // cartões de /contato), então o srcset é por densidade (1x/2x), não por largura — `larguras`
     // abaixo é só metadado, sem efeito nesta imagem. `largura`/`altura` são as dimensões do
-    // arquivo 1x (1088×940, zoom 18); o 2x (2176×1880, zoom 19) tem o mesmo enquadramento, cada
-    // densidade renderizada direto no zoom nativo, nunca redimensionada depois. Altura maior
-    // que 16:9 de propósito (ajuste de enquadramento desta sessão): a proporção mais estreita
-    // não cabia a Avenida Anália Franco inteira com folga e os dois pinos aproximadamente
-    // centrados ao mesmo tempo — instrução explícita foi preferir a faixa mais alta a
-    // sacrificar a avenida.
+    // arquivo 1x (1088×450, zoom 18); o 2x (2176×900, zoom 19) tem o mesmo enquadramento, cada
+    // densidade renderizada direto no zoom nativo, nunca redimensionada depois.
+    //
+    // Altura reduzida numa sessão de correção: o mapa é apoio, não protagonista, e 940px
+    // empurrava o formulário para baixo da dobra. Critério de enquadramento revisado, nesta
+    // ordem de prioridade — (1) altura de exibição entre 420 e 480px; (2) os dois pinos
+    // visíveis, com folga acima do pino 2 (o mais ao norte); (3) a Avenida Anália Franco
+    // visível abaixo do pino 1, mesmo sem folga. Pinos não são mais centralizados
+    // verticalmente de propósito — ficam acima do centro, deslocados para dar espaço à
+    // avenida abaixo. Nenhum rótulo de rua foi priorizado nesta rodada; "Rua Helen Keller"
+    // fica parcialmente cortada no topo como consequência aceita.
     //
     // Pino 1 (Sede/CEI) usa a coordenada exata de um POI já nomeado no OSM ("C.E.I. Analia
     // Franco - Lar Anália Franco de Londrina"). Pino 2 (Bazar) não tem ponto de numeração de
@@ -214,7 +219,7 @@ export const fotos = {
     // administração do bazar.
     alt: 'Mapa de ruas do Jardim Aeroporto, em Londrina/PR, com dois alfinetes numerados: 1, a Sede/CEI Anália Franco, na Avenida Anália Franco; 2, o Bazar Beneficente (localização aproximada), na Rua Rosa Siqueira, a poucas quadras de distância',
     largura: 1088,
-    altura: 940,
+    altura: 450,
     larguras: [1088],
   },
 } as const satisfies Record<string, Foto>

@@ -5,11 +5,12 @@
 // largura fixa é por densidade de pixel (1x/2x), não por largura.
 //
 // Arquivos gerados por script direto de tiles do OpenStreetMap, cada densidade na sua própria
-// resolução nativa de zoom — nunca redimensionado depois (era a causa do texto borrado da
-// versão anterior): 1x = zoom 18, 1088×940; 2x = zoom 19, 2176×1880; mesmo enquadramento
-// geográfico nos dois (altura maior que 16:9 de propósito — cabe a Avenida Anália Franco
-// inteira com folga e os dois pinos aproximadamente centrados, ver app/data/fotos.ts). `alt` e
-// as dimensões do 1x vêm de app/data/fotos.ts (mesma fonte de verdade do catálogo de fotos,
+// resolução nativa de zoom — nunca redimensionado depois (era a causa do texto borrado de uma
+// versão anterior): 1x = zoom 18, 1088×450; 2x = zoom 19, 2176×900; mesmo enquadramento
+// geográfico nos dois. Altura baixa de propósito — o mapa é apoio, não protagonista; os pinos
+// não são centralizados verticalmente, ficam com folga acima do pino 2 e a Avenida Anália
+// Franco encostada na borda inferior, sem folga (ver app/data/fotos.ts). `alt` e as dimensões
+// do 1x vêm de app/data/fotos.ts (mesma fonte de verdade do catálogo de fotos,
 // ainda que esta imagem não seja uma foto).
 import { fotos } from '~/data/fotos'
 
