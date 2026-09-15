@@ -75,8 +75,18 @@ const pillars = [
         <NuxtLink to="/transparencia">Transparência</NuxtLink>.
       </p>
       <div class="ledger">
-        <LedgerLine value="213" label="Crianças atendidas no CEI Anália Franco" date="abr/2023" />
-        <LedgerLine value="308" label="Previsão de crianças de 1 a 5 anos em 2027" date="2027" />
+        <LedgerLine
+          value="15"
+          label="Turmas de educação infantil em período integral"
+          date="Plano de trabalho 2026"
+        />
+        <LedgerLine
+          value="R$ 2.819.892,84"
+          label="Repasse do Termo de Colaboração com o Município"
+          date="2026"
+        />
+        <LedgerLine value="1968" label="Bazar beneficente em funcionamento desde" date="58 anos" />
+        <LedgerLine value="1953" label="Fundação da associação" />
       </div>
     </section>
 
