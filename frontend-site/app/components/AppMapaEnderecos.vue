@@ -6,9 +6,11 @@
 //
 // Arquivos gerados por script direto de tiles do OpenStreetMap, cada densidade na sua própria
 // resolução nativa de zoom — nunca redimensionado depois (era a causa do texto borrado da
-// versão anterior): 1x = zoom 18, 1088×612; 2x = zoom 19, 2176×1224; mesmo enquadramento
-// geográfico nos dois. `alt` e as dimensões do 1x vêm de app/data/fotos.ts (mesma fonte de
-// verdade do catálogo de fotos, ainda que esta imagem não seja uma foto).
+// versão anterior): 1x = zoom 18, 1088×940; 2x = zoom 19, 2176×1880; mesmo enquadramento
+// geográfico nos dois (altura maior que 16:9 de propósito — cabe a Avenida Anália Franco
+// inteira com folga e os dois pinos aproximadamente centrados, ver app/data/fotos.ts). `alt` e
+// as dimensões do 1x vêm de app/data/fotos.ts (mesma fonte de verdade do catálogo de fotos,
+// ainda que esta imagem não seja uma foto).
 import { fotos } from '~/data/fotos'
 
 const foto = fotos['mapa-enderecos']

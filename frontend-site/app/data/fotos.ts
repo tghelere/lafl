@@ -198,8 +198,12 @@ export const fotos = {
     // por AppMapaEnderecos.vue, não por AppFoto: largura de exibição FIXA (a do bloco dos dois
     // cartões de /contato), então o srcset é por densidade (1x/2x), não por largura — `larguras`
     // abaixo é só metadado, sem efeito nesta imagem. `largura`/`altura` são as dimensões do
-    // arquivo 1x (1088×612, zoom 18); o 2x (2176×1224, zoom 19) tem o mesmo enquadramento, cada
-    // densidade renderizada direto no zoom nativo, nunca redimensionada depois.
+    // arquivo 1x (1088×940, zoom 18); o 2x (2176×1880, zoom 19) tem o mesmo enquadramento, cada
+    // densidade renderizada direto no zoom nativo, nunca redimensionada depois. Altura maior
+    // que 16:9 de propósito (ajuste de enquadramento desta sessão): a proporção mais estreita
+    // não cabia a Avenida Anália Franco inteira com folga e os dois pinos aproximadamente
+    // centrados ao mesmo tempo — instrução explícita foi preferir a faixa mais alta a
+    // sacrificar a avenida.
     //
     // Pino 1 (Sede/CEI) usa a coordenada exata de um POI já nomeado no OSM ("C.E.I. Analia
     // Franco - Lar Anália Franco de Londrina"). Pino 2 (Bazar) não tem ponto de numeração de
@@ -210,7 +214,7 @@ export const fotos = {
     // administração do bazar.
     alt: 'Mapa de ruas do Jardim Aeroporto, em Londrina/PR, com dois alfinetes numerados: 1, a Sede/CEI Anália Franco, na Avenida Anália Franco; 2, o Bazar Beneficente (localização aproximada), na Rua Rosa Siqueira, a poucas quadras de distância',
     largura: 1088,
-    altura: 612,
+    altura: 940,
     larguras: [1088],
   },
 } as const satisfies Record<string, Foto>

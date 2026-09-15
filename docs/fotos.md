@@ -183,7 +183,7 @@ sem necessidade — se mudar aqui, mude lá também, e vice-versa.
 
 ### Contato — `contato/`
 
-**mapa-enderecos** — 1x 1088×612 (zoom 18), 2x 2176×1224 (zoom 19), mesmo enquadramento
+**mapa-enderecos** — 1x 1088×940 (zoom 18), 2x 2176×1880 (zoom 19), mesmo enquadramento
 
 Única exceção do catálogo que não é foto, e a única que não passa por `AppFoto` — passa por
 `AppMapaEnderecos.vue`. Mosaico de blocos (tiles) do OpenStreetMap, composto e gerado por
@@ -191,7 +191,10 @@ script (não fotografado), com dois alfinetes pequenos (ponto sólido + número 
 balão) desenhados por cima. Exibido em largura fixa (a do bloco dos dois cartões de
 `/contato`), por isso o srcset é por densidade de pixel (1x/2x) em vez de por largura — cada
 densidade renderizada direto no zoom nativo do OSM, nunca redimensionada depois (redimensionar
-foi a causa do texto de rua borrado numa versão anterior). Pino 1 (Sede/CEI) usa a coordenada
+foi a causa do texto de rua borrado numa versão anterior). Altura maior que 16:9 de propósito:
+o enquadramento foi ajustado numa sessão seguinte para caber a Avenida Anália Franco inteira
+com folga e os dois pinos aproximadamente centrados — a proporção mais estreita não permitia
+as duas coisas ao mesmo tempo sem cortar a avenida. Pino 1 (Sede/CEI) usa a coordenada
 exata de um POI já nomeado no OSM. Pino 2 (Bazar) não tem ponto de numeração de casa mapeado
 no OSM para "Rua Rosa Siqueira, 152" — usa o centroide do trecho de rua com o mesmo CEP da
 Sede/CEI, precisão de rua/quadra, não de fachada exata (ver comentário em
