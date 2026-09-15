@@ -4,6 +4,13 @@ import { MapPin, Phone } from '@lucide/vue'
 
 const { hasError, fieldFailed } = useFormErrorState()
 
+// WhatsApp do Bazar (único número confirmado — não há WhatsApp da sede, ver
+// docs/roadmap.md). Mensagem própria do contexto desta página: contato geral, não
+// agendamento de coleta (esse é o texto usado em /bazar/agendar-coleta).
+const WHATSAPP_NUMBER = '5543999500183'
+const WHATSAPP_MESSAGE = 'Olá! Gostaria de falar com o Lar Anália Franco.'
+const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
+
 useSeoMeta({
   title: 'Contato — Lar Anália Franco',
   description: 'Fale com o Lar Anália Franco.',
@@ -46,6 +53,15 @@ useSeoMeta({
           <Phone :size="16" aria-hidden="true" />
           (43) 3322-2373
         </p>
+        <a
+          class="btn btn--secondary contact-locations__whatsapp"
+          :href="whatsappHref"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <AppWhatsappIcon :size="16" />
+          WhatsApp (43) 99950-0183
+        </a>
       </div>
     </div>
 
@@ -126,5 +142,9 @@ useSeoMeta({
 .contact-locations__line svg {
   flex-shrink: 0;
   color: var(--color-text-muted);
+}
+
+.contact-locations__whatsapp {
+  margin-top: var(--space-3);
 }
 </style>
