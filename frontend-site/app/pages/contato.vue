@@ -73,6 +73,15 @@ useSeoMeta({
       </div>
     </div>
 
+    <section class="contact-map">
+      <AppFoto slug="mapa-enderecos" contexto="cheia" />
+      <p class="contact-map__legend">
+        <span><strong>1</strong> Sede / CEI Anália Franco</span>
+        <span><strong>2</strong> Bazar Beneficente</span>
+      </p>
+      <p class="contact-map__credit">© OpenStreetMap contributors</p>
+    </section>
+
     <div v-if="hasError" class="form-alert" role="alert">
       <p>Não foi possível enviar sua mensagem. Confira os campos abaixo e tente novamente.</p>
     </div>
@@ -154,5 +163,35 @@ useSeoMeta({
 
 .contact-locations__whatsapp {
   margin-top: var(--space-3);
+}
+
+.contact-map {
+  margin-block: var(--space-6);
+}
+
+.contact-map :deep(picture) {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.contact-map__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.contact-map__legend strong {
+  color: var(--color-text);
+  margin-right: var(--space-1);
+}
+
+.contact-map__credit {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 </style>

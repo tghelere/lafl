@@ -180,3 +180,19 @@ sem necessidade — se mudar aqui, mude lá também, e vice-versa.
 
 **almoxarifado-limpeza** — 768×1024, larguras 640, 400
 > Almoxarifado de materiais de limpeza e higiene, com prateleiras organizadas
+
+### Contato — `contato/`
+
+**mapa-enderecos** — 1600×1000, larguras 960, 640, 400
+
+Única exceção do catálogo que não é foto: mosaico de blocos (tiles) do OpenStreetMap,
+composto e gerado por script (não fotografado), com dois alfinetes numerados desenhados por
+cima. Pino 1 (Sede/CEI) usa a coordenada exata de um POI já nomeado no OSM. Pino 2 (Bazar)
+não tem ponto de numeração de casa mapeado no OSM para "Rua Rosa Siqueira, 152" — usa o
+centroide do trecho de rua com o mesmo CEP da Sede/CEI, precisão de rua/quadra, não de
+fachada exata (ver comentário em `app/data/fotos.ts`). Atribuição "© OpenStreetMap
+contributors" exibida como legenda na página (`contato.vue`), não desenhada nos pixels.
+
+> Mapa de ruas do Jardim Aeroporto, em Londrina/PR, com dois alfinetes numerados: 1, a
+> Sede/CEI Anália Franco, na Avenida Anália Franco; 2, o Bazar Beneficente, na Rua Rosa
+> Siqueira, a poucas quadras de distância

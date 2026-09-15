@@ -13,6 +13,7 @@ export type Secao =
   | 'bazar'
   | 'quem-somos'
   | 'transparencia'
+  | 'contato'
 
 export type Foto = {
   secao: Secao
@@ -190,6 +191,20 @@ export const fotos = {
     largura: 768,
     altura: 1024,
     larguras: [640, 400],
+  },
+  'mapa-enderecos': {
+    secao: 'contato',
+    // Mapa gerado a partir de blocos do OpenStreetMap (ver docs/fotos.md — não é foto). Pino 1
+    // (Sede/CEI) usa a coordenada exata de um POI já nomeado no OSM ("C.E.I. Analia Franco -
+    // Lar Anália Franco de Londrina"). Pino 2 (Bazar) não tem ponto de numeração de casa
+    // mapeado no OSM para "Rua Rosa Siqueira, 152" — usa o centroide do trecho de rua com o
+    // mesmo CEP da Sede/CEI (86039-560), a precisão real disponível: nível de rua/quadra, não
+    // de fachada exata. Não inventar uma coordenada mais precisa do que isso sem confirmar o
+    // ponto com a administração do bazar.
+    alt: 'Mapa de ruas do Jardim Aeroporto, em Londrina/PR, com dois alfinetes numerados: 1, a Sede/CEI Anália Franco, na Avenida Anália Franco; 2, o Bazar Beneficente, na Rua Rosa Siqueira, a poucas quadras de distância',
+    largura: 1600,
+    altura: 1000,
+    larguras: [960, 640, 400],
   },
 } as const satisfies Record<string, Foto>
 
