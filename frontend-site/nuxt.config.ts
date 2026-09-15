@@ -32,6 +32,16 @@ export default defineNuxtConfig({
     },
   },
 
+  // Fotos em public/fotos/ (ver docs/fotos.md e app/components/AppFoto.vue) não têm hash de
+  // conteúdo no nome — trocar o arquivo mantendo o mesmo nome não muda a URL. Por isso
+  // Cache-Control de 30 dias, sem `immutable` (immutable diz ao navegador "nunca revalide
+  // isto", o que impediria ver uma foto trocada antes de 30 dias mesmo com refresh).
+  routeRules: {
+    '/fotos/**': {
+      headers: { 'cache-control': 'public, max-age=2592000' },
+    },
+  },
+
   nitro: {
     prerender: {
       // O cabeçalho (AppHeader.vue) lê a navegação de app/config/navigation.ts (ver
