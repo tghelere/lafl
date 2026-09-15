@@ -5,8 +5,10 @@
 // quando /api/v1/public/settings existir (ver docs/estrutura-site.md §3.1).
 //
 // Links vêm de app/config/navigation.ts — mesma fonte do header e da gaveta (ver
-// docs/design/navegacao.md §3). Uma coluna por item de topo: o próprio item primeiro, filhos
-// em seguida. Nenhum link solto aqui além destes.
+// docs/design/navegacao.md §3). Uma coluna por item de topo: o título da coluna é o próprio
+// link para a seção (não repete como primeiro item da lista abaixo — duplicava "Quem somos"
+// dentro de "Quem somos"). Item sem filhos (Transparência, Contato) fica só com o título
+// clicável, sem lista. Nenhum link solto aqui além destes.
 import { MapPin, Phone } from '@lucide/vue'
 import { navigation } from '~/config/navigation'
 
@@ -18,9 +20,8 @@ const year = new Date().getFullYear()
     <div class="container">
       <div class="site-footer__grid">
         <div v-for="item in navigation" :key="item.to">
-          <h2>{{ item.label }}</h2>
-          <ul>
-            <li><NuxtLink :to="item.to">{{ item.label }}</NuxtLink></li>
+          <h2><NuxtLink :to="item.to">{{ item.label }}</NuxtLink></h2>
+          <ul v-if="item.children?.length">
             <li v-for="child in item.children" :key="child.to">
               <NuxtLink :to="child.to">{{ child.label }}</NuxtLink>
             </li>

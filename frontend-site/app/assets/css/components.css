@@ -543,6 +543,13 @@
   margin: 0 0 var(--space-3);
 }
 
+/* O título da coluna agora é o link da seção (ver AppFooter.vue) — sem isto, .site-footer a
+   abaixo impõe --text-sm ao link e o título destoa dos outros (cor, peso, versalete e
+   tracking já são herdados do h2 sem precisar repetir, .site-footer a não os declara). */
+.site-footer h2 a {
+  font-size: inherit;
+}
+
 .site-footer ul {
   list-style: none;
   margin: 0;
