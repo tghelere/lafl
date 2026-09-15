@@ -51,9 +51,13 @@ const pillars = [
         Esta página reúne as três frentes e a prestação de contas que sustenta cada uma delas.
       </p>
       <div class="home__hero-ctas">
-        <NuxtLink to="/como-ajudar/doar" class="btn btn--primary">Doar</NuxtLink>
+        <NuxtLink to="/doar" class="btn btn--primary">Doar</NuxtLink>
         <NuxtLink to="/transparencia" class="btn btn--secondary">Ver prestação de contas</NuxtLink>
       </div>
+    </section>
+
+    <section class="home__figure" aria-label="Fachada da sede">
+      <AppFoto slug="fachada-sede" contexto="cheia" prioridade />
     </section>
 
     <section class="home__pillars" aria-label="Os três pilares da instituição">
@@ -127,6 +131,12 @@ const pillars = [
   flex-wrap: wrap;
   gap: var(--space-4);
   margin-top: var(--space-5);
+}
+
+.home__figure {
+  margin-bottom: var(--space-8);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 /* Peso visual igual: mesma largura mínima para os três cartões, cresce por igual. */

@@ -4,8 +4,17 @@
 // app/config/navigation.ts (o mesmo texto do painel "O que fazemos" do header), para não
 // manter a mesma frase em dois lugares.
 import { navigation } from '~/config/navigation'
+import type { FotoSlug } from '~/data/fotos'
 
 const pillars = navigation.find((item) => item.to === '/o-que-fazemos')?.children ?? []
+
+// Uma foto por pilar, como cartão dos três — reaproveita fotos já usadas em outra página
+// (não há foto própria do contraturno no conjunto, o cartão dele fica sem imagem de
+// propósito, não é substituída por outra).
+const fotoPorPilar: Partial<Record<string, FotoSlug>> = {
+  '/educacao-infantil': 'horta-kids',
+  '/bazar': 'bazar-entrada',
+}
 
 useSeoMeta({
   title: 'O Que Fazemos — Lar Anália Franco',
@@ -28,7 +37,18 @@ useSeoMeta({
     </p>
 
     <div class="pillars-grid">
-      <NuxtLink v-for="pillar in pillars" :key="pillar.to" :to="pillar.to" class="card pillars-grid__item">
+      <NuxtLink
+        v-for="(pillar, index) in pillars"
+        :key="pillar.to"
+        :to="pillar.to"
+        class="card pillars-grid__item"
+      >
+        <AppFoto
+          v-if="fotoPorPilar[pillar.to]"
+          :slug="fotoPorPilar[pillar.to]!"
+          contexto="terco"
+          :prioridade="index === 0"
+        />
         <h2>{{ pillar.label }}</h2>
         <p v-if="pillar.hint">{{ pillar.hint }}</p>
       </NuxtLink>
@@ -48,6 +68,12 @@ useSeoMeta({
   display: block;
   color: inherit;
   text-decoration: none;
+}
+
+.pillars-grid__item picture {
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
 .pillars-grid__item h2 {
