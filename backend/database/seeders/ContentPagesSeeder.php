@@ -229,7 +229,7 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'educacao-infantil/dia-da-crianca',
                 'title' => 'Dia da Criança',
-                'meta_description' => 'Programação especial de Dia da Criança do CEI Anália Franco — detalhes da edição deste ano ainda em confirmação com a coordenação.',
+                'meta_description' => 'O CEI Anália Franco reserva uma programação especial de Dia da Criança, em outubro, para as crianças atendidas pela creche.',
                 'content' => <<<'HTML'
                     <p>O Centro de Educação Infantil Anália Franco reserva uma programação especial para o Dia
                     da Criança, em outubro, para as crianças atendidas pela creche.</p>
@@ -446,7 +446,7 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'bazar/o-que-aceitamos',
                 'title' => 'O Que Aceitamos',
-                'meta_description' => 'Lista do que o Bazar Beneficente do Lar Anália Franco aceita em doação — em confirmação com a equipe do bazar.',
+                'meta_description' => 'O Bazar Beneficente do Lar Anália Franco recebe doações de itens para revenda na loja física da instituição.',
                 'content' => <<<'HTML'
                     <p>O Bazar Beneficente recebe doações de itens para revenda na loja física da
                     instituição.</p>
