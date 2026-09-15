@@ -23,8 +23,11 @@ class ContentPagesSeeder extends Seeder
      * página publica ano de fundação até essa correção ser validada de forma definitiva — ver
      * docs/contexto.md.
      *
-     * Cada página termina com o comentário HTML `rascunho: validar com a instituição` —
-     * nenhum texto aqui foi aprovado pelo Lar Anália Franco.
+     * Nenhum texto aqui foi aprovado pelo Lar Anália Franco — esse status é de controle
+     * interno (ver docs/roadmap.md), nunca publicado no conteúdo da página. Até esta sessão o
+     * conteúdo levava o comentário HTML `rascunho: validar com a instituição` anexado no fim
+     * de toda página — removido por pôr a palavra "rascunho" no código-fonte das páginas
+     * publicadas.
      */
     public function run(): void
     {
@@ -37,7 +40,7 @@ class ContentPagesSeeder extends Seeder
                 ['slug' => $data['slug']],
                 [
                     'title' => $data['title'],
-                    'content' => $data['content']."\n\n<!-- rascunho: validar com a instituição -->",
+                    'content' => $data['content'],
                     'meta_title' => "{$data['title']} — Lar Anália Franco",
                     'meta_description' => $data['meta_description'],
                     'status' => PageStatus::Published,
