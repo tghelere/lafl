@@ -115,14 +115,20 @@
       estavam, fora do escopo desta sessão. lucide não tem o glifo do WhatsApp — criado
       `AppWhatsappIcon.vue` com o SVG oficial da marca. Card do Bazar em `/contato` ganhou
       botão de WhatsApp (mensagem de contato geral); card da Sede/CEI ficou só com telefone —
-      não há WhatsApp confirmado para a sede, número do bazar não foi reaproveitado. Criado
-      `AppMapaLocal.vue`: ilustração estática própria (sem coordenada real — nenhuma
-      confirmada, inventar arriscaria pino errado) com botão que só então cria o iframe do
-      Google Maps no DOM, mais link "Abrir no aplicativo de mapas" (geo link universal por
-      texto de endereço, sem chave de API); usado nos dois cards de `/contato`. Conferido na
-      aba de rede em navegador real (Chromium via Playwright, disponível nesta sessão): zero
-      requisição a domínio do Google antes do clique, embed geocodifica corretamente o
-      endereço da Sede/CEI depois. Rotas antes quebradas por aninhamento reconferidas em
+      não há WhatsApp confirmado para a sede, número do bazar não foi reaproveitado.
+      **Correção da mesma sessão:** a primeira versão do mapa (ilustração decorativa + iframe
+      do Google sob clique) foi substituída antes do fim da sessão — a ilustração tinha forma
+      de mapa sem informação real, e o endpoint do embed do Google não era documentado nem
+      estável. Versão final: mapa estático único (`public/fotos/contato/mapa-enderecos-
+      {960,640,400}.{webp,jpg}`, servido por `AppFoto`) — mosaico de blocos do OpenStreetMap
+      com dois alfinetes numerados desenhados por script a partir de coordenadas reais (pino 1
+      = POI nomeado no OSM para a Sede/CEI; pino 2 = centroide do trecho de rua do Bazar, sem
+      numeração de casa mapeada — precisão de rua/quadra, registrada em `app/data/fotos.ts`),
+      legenda e crédito "© OpenStreetMap contributors" na página. `AppMapaLocal.vue` ficou só
+      com o link "Abrir no aplicativo de mapas" por cartão (geo link universal por texto de
+      endereço, sem chave de API, sem iframe, sem requisição alguma até o clique do
+      visitante). Conferido na aba de rede: zero requisição a domínio de terceiro em qualquer
+      momento — só o `.webp` estático local. Rotas antes quebradas por aninhamento reconferidas em
       navegador real: `/bazar/agendar-coleta`, `/transparencia/documentos`,
       `/quem-somos/nossa-historia` — todas com título e conteúdo próprios, sem sinal de
       fallback do pai. Dois parágrafos de conteúdo do CMS (`bazar/visite-a-loja`,
