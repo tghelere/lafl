@@ -74,10 +74,11 @@ useSeoMeta({
     </div>
 
     <section class="contact-map">
-      <AppFoto slug="mapa-enderecos" contexto="cheia" />
+      <h2>Onde estamos</h2>
+      <AppMapaEnderecos />
       <p class="contact-map__legend">
         <span><strong>1</strong> Sede / CEI Anália Franco</span>
-        <span><strong>2</strong> Bazar Beneficente</span>
+        <span><strong>2</strong> Bazar Beneficente (localização aproximada)</span>
       </p>
       <p class="contact-map__credit">© OpenStreetMap contributors</p>
     </section>
@@ -167,6 +168,17 @@ useSeoMeta({
 
 .contact-map {
   margin-block: var(--space-6);
+  /* Mesma largura do bloco dos dois cartões acima (não a largura total da página): o bloco
+     ocupa 100% de .container, cujo teto é --container-max (72rem) menos 2x
+     --container-padding no valor máximo (2rem) = 1088px — o valor que AppMapaEnderecos.vue
+     usa como largura de exibição real do arquivo 1x. Travar aqui evita que os dois voltem a
+     divergir se um dos dois mudar sem o outro. */
+  max-width: 1088px;
+}
+
+.contact-map h2 {
+  margin-top: 0;
+  font-size: var(--text-lg);
 }
 
 .contact-map :deep(picture) {
