@@ -78,8 +78,7 @@ class ContentPagesSeeder extends Seeder
                 'content' => <<<'HTML'
                     <p>O Lar Anália Franco de Londrina é uma associação civil beneficente, filantrópica e de
                     natureza espírita. A sede, onde também funciona o CEI Anália Franco, fica na Av. Anália
-                    Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060. A área exata do
-                    terreno está em confirmação com a instituição.</p>
+                    Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060.</p>
                     <p>Hoje a instituição já opera duas frentes — o Centro de Educação Infantil Anália Franco
                     (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina, e o
                     Bazar Beneficente, loja de doações que sustenta boa parte do orçamento da casa — e
@@ -233,9 +232,6 @@ class ContentPagesSeeder extends Seeder
                 'content' => <<<'HTML'
                     <p>O Centro de Educação Infantil Anália Franco reserva uma programação especial para o Dia
                     da Criança, em outubro, para as crianças atendidas pela creche.</p>
-                    <p>Detalhes da edição deste ano — atividades, parcerias e como a comunidade pode
-                    contribuir — ainda serão confirmados com a coordenação do CEI e publicados nesta
-                    página.</p>
                     HTML,
             ],
             [
@@ -248,9 +244,6 @@ class ContentPagesSeeder extends Seeder
                     Londrina.</p>
                     <p>Fazem parte da rotina aulas de inglês, educação física, atividades na horta da
                     instituição e uso da quadra poliesportiva do terreno.</p>
-                    <p>O currículo pedagógico detalhado (eixos de aprendizagem, avaliação, calendário
-                    letivo) ainda não está disponível para publicação e será adicionado após validação da
-                    coordenação pedagógica.</p>
                     HTML,
             ],
             [
@@ -262,8 +255,6 @@ class ContentPagesSeeder extends Seeder
                     nutricionista, para todas as crianças em período integral.</p>
                     <p>Restrições alimentares e alergias informadas pela família na matrícula são
                     registradas e levadas em conta no preparo das refeições da criança.</p>
-                    <p>Informações sobre protocolo de saúde, vacinação exigida na matrícula e acompanhamento
-                    médico ainda serão detalhadas nesta página, após validação da coordenação do CEI.</p>
                     HTML,
             ],
             [
@@ -272,13 +263,10 @@ class ContentPagesSeeder extends Seeder
                 'meta_description' => 'O CEI Anália Franco funciona no terreno do Lar Anália Franco, com horta e quadra poliesportiva entre os espaços mais usados.',
                 'content' => <<<'HTML'
                     <p>O CEI Anália Franco funciona no terreno da instituição, na Av. Anália Franco, 33,
-                    Jd. Aeroporto, Londrina/PR — a área exata do terreno está em confirmação com a
-                    instituição.</p>
+                    Jd. Aeroporto, Londrina/PR.</p>
                     <p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, que
                     também vai ser usada pela Escola de Contraturno e, fora desse uso, é alugada como fonte
                     de receita da instituição.</p>
-                    <p>Uma galeria de fotos da estrutura será publicada aqui assim que o cadastro de mídia
-                    do site estiver pronto.</p>
                     HTML,
             ],
             [
@@ -363,8 +351,7 @@ class ContentPagesSeeder extends Seeder
                     <p>O programa é para crianças e adolescentes de 6 a 15 anos, de famílias com renda de
                     até 3 salários mínimos. A meta é atender 100 crianças e adolescentes.</p>
                     <p>O programa ainda não abriu turmas — início previsto para 2027. Outros critérios de
-                    seleção, além da faixa etária e da renda familiar, ainda estão em definição junto à
-                    coordenação e serão publicados aqui assim que confirmados.</p>
+                    seleção, além da faixa etária e da renda familiar, ainda estão em definição.</p>
                     HTML,
             ],
             [
@@ -379,8 +366,7 @@ class ContentPagesSeeder extends Seeder
                     instituição.</p>
                     <p>Frequência das oficinas, forma de inscrição e se há vínculo com a escola regular da
                     criança ou adolescente são pontos que a instituição ainda está definindo, por se tratar
-                    de um programa que ainda não começou — início previsto para 2027. Esta página será
-                    atualizada assim que esses detalhes forem confirmados.</p>
+                    de um programa que ainda não começou — início previsto para 2027.</p>
                     HTML,
             ],
             [
@@ -392,7 +378,7 @@ class ContentPagesSeeder extends Seeder
                     reaproveitamento de equipamentos, doou os 20 computadores do laboratório de informática
                     da Escola de Contraturno.</p>
                     <p>O SENAI é parceiro do programa. A lista completa de parceiros — para o contraturno e
-                    para os demais pilares — ainda está sendo consolidada e será publicada nesta página.</p>
+                    para os demais pilares — ainda está sendo consolidada.</p>
                     HTML,
             ],
             [
@@ -531,8 +517,7 @@ class ContentPagesSeeder extends Seeder
                     equipamentos de informática pelo Centro de Recondicionamento de Computadores, programa
                     do governo federal, ao convênio com a Secretaria Municipal de Educação de Londrina para
                     o Centro de Educação Infantil Anália Franco.</p>
-                    <p>A lista completa de parceiros e apoiadores da instituição está sendo consolidada e
-                    será publicada nesta página.</p>
+                    <p>A lista completa de parceiros e apoiadores da instituição está sendo consolidada.</p>
                     HTML,
             ],
         ];
