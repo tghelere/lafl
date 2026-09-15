@@ -26,7 +26,9 @@ export const siteNav: SiteNavSection[] = [
       { label: 'Nossa história', to: '/quem-somos/nossa-historia' },
       { label: 'Missão, visão e valores', to: '/quem-somos/missao-visao-valores' },
       { label: 'Governança', to: '/quem-somos/governanca' },
-      { label: 'O Lar hoje', to: '/quem-somos/o-lar-hoje' },
+      // "O Lar hoje" removido daqui: página em status Draft (404 real), bloqueada até
+      // revisão de advogado — ver docs/roadmap.md, "BLOQUEIO DE PUBLICAÇÃO". Devolver o item
+      // quando a página voltar a Published no ContentPagesSeeder.
     ],
   },
   {

@@ -114,8 +114,6 @@ class ContentPagesSeeder extends Seeder
                     diretoria.</li>
                     <li>2026 — inauguração da sala de informática da Escola de Contraturno.</li>
                     </ul>
-                    <p>A página <a href="/quem-somos/o-lar-hoje">O Lar hoje</a> detalha o que mudou nos
-                    últimos anos.</p>
                     HTML,
             ],
             [
@@ -154,9 +152,8 @@ class ContentPagesSeeder extends Seeder
                     espírita, CNPJ 78.614.096/0001-75, administrada por uma diretoria eleita pelos
                     associados.</p>
                     <p>Em 2022, após uma decisão de primeira instância que reconheceu irregularidades no
-                    antigo serviço de acolhimento institucional (ver <a href="/quem-somos/o-lar-hoje">O Lar
-                    hoje</a>), a diretoria anterior foi afastada por decisão judicial e uma nova diretoria
-                    assumiu a gestão da instituição.</p>
+                    antigo serviço de acolhimento institucional, a diretoria anterior foi afastada por
+                    decisão judicial e uma nova diretoria assumiu a gestão da instituição.</p>
                     <h2>Diretoria — gestão 2026–2027</h2>
                     <h3>Diretoria Executiva</h3>
                     <ul>
@@ -546,8 +543,7 @@ class ContentPagesSeeder extends Seeder
                     <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas,
                     editais e relatórios — hoje com cerca de 70 documentos.</p>
                     <p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o
-                    que precisa, incluindo quem busca informação sobre o processo de 2022 (ver
-                    <a href="/quem-somos/o-lar-hoje">O Lar hoje</a>).</p>
+                    que precisa, incluindo quem busca informação sobre o processo de 2022.</p>
                     <p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro
                     de Educação Infantil Anália Franco, também exige prestação de contas periódica. O
                     repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração
