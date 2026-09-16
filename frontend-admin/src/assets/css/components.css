@@ -256,10 +256,14 @@
   color: var(--color-text);
 }
 
-/* Painel de pendências (tela Início) */
+/* Painel de pendências (tela Início) — auto-fit/minmax mantém os cards numa linha só
+   enquanto o conteúdo (--content-max: 72rem) tiver espaço; quebra só quando a tela é estreita
+   demais para a largura mínima de uma coluna. 14rem só cabia 4 colunas dentro de
+   --content-max com as cinco entradas atuais (5×14rem + 4×gap > 72rem) — 11rem cabe as cinco
+   com folga e ainda deixa cada card legível. */
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   gap: var(--space-4);
 }
 

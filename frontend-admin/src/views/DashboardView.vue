@@ -60,9 +60,7 @@ onMounted(async () => {
          lista vazia da API — nunca uma exceção especial no front, ver
          App\Actions\Dashboard\GetPendingFormSubmissionCounts no backend. -->
     <p v-else-if="entries.length === 0">
-      Seu acesso neste painel é a conteúdo (páginas, notícias, mídia) — ainda não implementado
-      nesta fatia. Você não vê formulários recebidos porque seu papel não tem acesso a esse
-      tipo de dado (ver docs/estrutura-site.md §4.4).
+      Não há pendências de formulário para o seu perfil no momento.
     </p>
 
     <div
