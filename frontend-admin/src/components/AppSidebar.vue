@@ -4,28 +4,27 @@ import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 /**
- * A navegação só mostra o que o papel acessa — conveniência de interface, nunca a fonte da
- * verdade da autorização (ver CLAUDE.md e docs/dominio.md, seção "Papéis"). Um usuário sem
- * papel para uma seção não vê o link aqui, mas quem realmente barra é sempre a Policy na API —
- * chamar a rota diretamente sem o papel devolve 403 de qualquer forma.
+ * A navegação só mostra o que authStore.user.access permite — o mesmo mapa de viewAny por
+ * recurso que a API calcula via Policy (ver App\Http\Resources\UserResource::accessMap no
+ * backend), nunca papel fixo decidido aqui. Um usuário sem acesso a nenhum recurso de uma
+ * seção não vê o bloco aqui, mas quem realmente barra é sempre a Policy na API — chamar a
+ * rota diretamente sem acesso devolve 403 de qualquer forma.
  */
 const authStore = useAuthStore()
 
-const roles = computed(() => authStore.user?.roles ?? [])
+const access = computed(() => authStore.user?.access ?? {})
 
-function hasAnyRole(...names: string[]): boolean {
-  return roles.value.some((role) => names.includes(role))
+function hasAccess(...resources: string[]): boolean {
+  return resources.some((resource) => access.value[resource] === true)
 }
 
-// Um bloco por papel de área (ver docs/dominio.md, seção "Papéis") — cada `show*` espelha o
-// allowedRoles() da Policy do recurso ligado a ele; direcao e super_admin sempre aparecem
-// porque têm acesso a tudo (direcao por allowedRoles(), super_admin por Gate::before).
-const showContraturno = computed(() => hasAnyRole('contraturno', 'direcao', 'super_admin'))
-const showAtendimento = computed(() => hasAnyRole('atendimento', 'direcao', 'super_admin'))
-const showBazar = computed(() => hasAnyRole('bazar', 'direcao', 'super_admin'))
-// Mesmos papéis de TransparencyDocumentPolicy::viewAny (backend/app/Policies/
-// TransparencyDocumentPolicy.php).
-const showTransparencia = computed(() => hasAnyRole('financeiro', 'direcao', 'super_admin'))
+// Cada bloco aparece se o usuário tem acesso a pelo menos um dos recursos que ele lista —
+// cobre sozinho tanto um papel só quanto a soma de dois papéis, sem checar papel nenhum
+// diretamente.
+const showContraturno = computed(() => hasAccess('program-applications', 'partnership-inquiries'))
+const showAtendimento = computed(() => hasAccess('volunteer-applications', 'contact-messages'))
+const showBazar = computed(() => hasAccess('pickup-requests'))
+const showTransparencia = computed(() => hasAccess('transparency-documents'))
 
 function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
   return { name: 'submissions.index', params: { resource } }

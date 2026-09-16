@@ -99,7 +99,7 @@ watch(
 </script>
 
 <template>
-  <AppLayout>
+  <AppLayout :resource="config ? resourceSlug : undefined">
     <template v-if="!config">
       <h1>Recurso não encontrado</h1>
       <ErrorState message="Este recurso não existe." />

@@ -230,7 +230,7 @@ async function handleDelete(): Promise<void> {
 </script>
 
 <template>
-  <AppLayout>
+  <AppLayout resource="transparency-documents">
     <nav
       class="breadcrumb"
       aria-label="Trilha de navegação"

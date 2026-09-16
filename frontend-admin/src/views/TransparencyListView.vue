@@ -90,7 +90,7 @@ watch(
 </script>
 
 <template>
-  <AppLayout>
+  <AppLayout resource="transparency-documents">
     <h1>Transparência</h1>
 
     <NoticeBanner
