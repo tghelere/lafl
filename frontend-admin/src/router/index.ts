@@ -39,6 +39,26 @@ const router = createRouter({
       name: 'submissions.show',
       component: () => import('@/views/SubmissionDetailView.vue'),
     },
+    // Transparência não segue o padrão genérico dos cinco formulários (§4.5) — é CRUD
+    // completo, não só leitura + status —, então tem rotas e telas próprias, registradas
+    // antes das genéricas acima só por organização (a especificidade estática de
+    // "/admin/transparencia" já vence "/admin/:resource" na ordenação do vue-router,
+    // independente de posição).
+    {
+      path: '/admin/transparencia',
+      name: 'transparency.index',
+      component: () => import('@/views/TransparencyListView.vue'),
+    },
+    {
+      path: '/admin/transparencia/novo',
+      name: 'transparency.create',
+      component: () => import('@/views/TransparencyFormView.vue'),
+    },
+    {
+      path: '/admin/transparencia/:uuid',
+      name: 'transparency.edit',
+      component: () => import('@/views/TransparencyFormView.vue'),
+    },
   ],
 })
 

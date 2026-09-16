@@ -19,6 +19,9 @@ function hasAnyRole(...names: string[]): boolean {
 
 const showAtendimento = computed(() => hasAnyRole('atendimento', 'direcao', 'super_admin'))
 const showBazar = computed(() => hasAnyRole('bazar', 'direcao', 'super_admin'))
+// Mesmos papéis de TransparencyDocumentPolicy::viewAny (backend/app/Policies/
+// TransparencyDocumentPolicy.php) — só direcao administra, super_admin sempre por bypass.
+const showTransparencia = computed(() => hasAnyRole('direcao', 'super_admin'))
 
 function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
   return { name: 'submissions.index', params: { resource } }
@@ -87,6 +90,18 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           class="app-sidebar__link"
         >
           Pedidos de coleta
+        </RouterLink>
+      </template>
+
+      <template v-if="showTransparencia">
+        <p class="app-sidebar__section-label">
+          Transparência
+        </p>
+        <RouterLink
+          :to="{ name: 'transparency.index' }"
+          class="app-sidebar__link"
+        >
+          Documentos
         </RouterLink>
       </template>
     </nav>
