@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\Public\ProgramApplicationController as PublicPro
 use App\Http\Controllers\Api\V1\Public\TransparencyDocumentController as PublicTransparencyDocumentController;
 use App\Http\Controllers\Api\V1\Public\VolunteerApplicationController as PublicVolunteerApplicationController;
 use App\Http\Controllers\Api\V1\TransparencyDocumentController;
+use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\VolunteerApplicationController;
 use Illuminate\Support\Facades\Route;
 
@@ -72,6 +73,14 @@ Route::middleware($authenticated)->group(function (): void {
     Route::apiResource('pages', PageController::class)->parameters(['pages' => 'page']);
     Route::apiResource('transparency-documents', TransparencyDocumentController::class)
         ->parameters(['transparency-documents' => 'transparencyDocument']);
+
+    // Gestão de usuários — só super_admin (ver App\Policies\UserPolicy). Sem destroy: contas
+    // só desativam, nunca se apagam (ver docs/levantamento-painel.md, item 2).
+    Route::apiResource('users', UserController::class)
+        ->parameters(['users' => 'user'])
+        ->except(['destroy']);
+    Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
+    Route::patch('/users/{user}/reactivate', [UserController::class, 'reactivate'])->name('users.reactivate');
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
 

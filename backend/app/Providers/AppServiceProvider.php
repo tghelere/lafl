@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Enums\Role;
 use App\Models\User;
+use App\Policies\UserPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -41,6 +42,11 @@ class AppServiceProvider extends ServiceProvider
     private function configureAuthorization(): void
     {
         Gate::before(fn (User $user, string $ability): ?bool => $user->hasRole(Role::SuperAdmin->value) ? true : null);
+
+        // Registro explícito, não por convenção de nome — gestão de usuários é a única área
+        // sem nenhum papel de área autorizado (ver App\Policies\UserPolicy), então não dá
+        // para confiar em descoberta automática silenciosa aqui.
+        Gate::policy(User::class, UserPolicy::class);
     }
 
     private function configureRateLimiting(): void
