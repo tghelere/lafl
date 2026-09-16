@@ -63,6 +63,22 @@ class TransparencyDocument extends Model
     }
 
     /**
+     * Filtro por ano/tipo compartilhado entre a listagem pública (só publicados) e a
+     * administrativa (todos) — App\Actions\Transparency\ListPublicTransparencyDocuments e
+     * App\Http\Controllers\Api\V1\TransparencyDocumentController::index. `null` em qualquer
+     * um dos dois não filtra por aquele campo.
+     *
+     * @param  Builder<TransparencyDocument>  $query
+     * @return Builder<TransparencyDocument>
+     */
+    public function scopeFilterByYearAndType(Builder $query, ?int $year, ?TransparencyDocumentType $type): Builder
+    {
+        return $query
+            ->when($year !== null, fn (Builder $q): Builder => $q->where('year', $year))
+            ->when($type !== null, fn (Builder $q): Builder => $q->where('type', $type));
+    }
+
+    /**
      * Nenhum campo pessoal aqui — documento institucional, log com valor é aceitável (ver
      * docs/protecao-de-dados.md, seção Auditoria, que restringe valor descriptografado, não
      * conteúdo público).

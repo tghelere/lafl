@@ -17,6 +17,67 @@ test('não autenticado recebe 401 ao listar documentos', function (): void {
     $this->getJson('/api/v1/transparency-documents')->assertUnauthorized();
 });
 
+test('listagem administrativa filtra por ano', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    TransparencyDocument::factory()->create(['title' => '2023', 'year' => 2023]);
+    TransparencyDocument::factory()->create(['title' => '2024', 'year' => 2024]);
+
+    $response = $this->actingAs($user)->getJson('/api/v1/transparency-documents?year=2024');
+
+    expect($response->json('data'))->toHaveCount(1)
+        ->and($response->json('data.0.title'))->toBe('2024');
+});
+
+test('listagem administrativa filtra por tipo', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    TransparencyDocument::factory()->create(['title' => 'Balanço', 'type' => TransparencyDocumentType::Balance]);
+    TransparencyDocument::factory()->create(['title' => 'Estatuto', 'type' => TransparencyDocumentType::Bylaws]);
+
+    $response = $this->actingAs($user)->getJson('/api/v1/transparency-documents?type=bylaws');
+
+    expect($response->json('data'))->toHaveCount(1)
+        ->and($response->json('data.0.title'))->toBe('Estatuto');
+});
+
+test('listagem administrativa combina filtro por ano e tipo', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    TransparencyDocument::factory()->create(['title' => 'Balanço 2024', 'year' => 2024, 'type' => TransparencyDocumentType::Balance]);
+    TransparencyDocument::factory()->create(['title' => 'Estatuto 2024', 'year' => 2024, 'type' => TransparencyDocumentType::Bylaws]);
+    TransparencyDocument::factory()->create(['title' => 'Balanço 2023', 'year' => 2023, 'type' => TransparencyDocumentType::Balance]);
+
+    $response = $this->actingAs($user)->getJson('/api/v1/transparency-documents?year=2024&type=balance');
+
+    expect($response->json('data'))->toHaveCount(1)
+        ->and($response->json('data.0.title'))->toBe('Balanço 2024');
+});
+
+test('tipo desconhecido no filtro administrativo é ignorado, não gera erro', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    TransparencyDocument::factory()->create();
+
+    $this->actingAs($user)->getJson('/api/v1/transparency-documents?type=nao-existe')
+        ->assertOk();
+});
+
+test('paginação administrativa respeita o filtro aplicado', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    TransparencyDocument::factory()->count(12)->create(['year' => 2020]);
+    TransparencyDocument::factory()->count(3)->create(['year' => 2024]);
+
+    $firstPage = $this->actingAs($user)->getJson('/api/v1/transparency-documents?year=2024&per_page=2');
+
+    $firstPage->assertOk();
+    expect($firstPage->json('data'))->toHaveCount(2)
+        ->and($firstPage->json('meta.total'))->toBe(3)
+        ->and($firstPage->json('meta.last_page'))->toBe(2)
+        ->and(collect($firstPage->json('data'))->pluck('year')->unique()->all())->toBe([2024]);
+
+    $secondPage = $this->actingAs($user)->getJson('/api/v1/transparency-documents?year=2024&per_page=2&page=2');
+
+    expect($secondPage->json('data'))->toHaveCount(1)
+        ->and($secondPage->json('data.0.year'))->toBe(2024);
+});
+
 test('direcao pode criar e publicar documento de transparência', function (): void {
     $user = userWithRole(Role::Direcao->value);
 

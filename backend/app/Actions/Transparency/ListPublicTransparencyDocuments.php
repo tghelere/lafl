@@ -17,8 +17,7 @@ final class ListPublicTransparencyDocuments
     {
         return TransparencyDocument::query()
             ->published()
-            ->when($year !== null, fn ($query) => $query->where('year', $year))
-            ->when($type !== null, fn ($query) => $query->where('type', $type))
+            ->filterByYearAndType($year, $type)
             ->orderByDesc('year')
             ->orderBy('title')
             ->paginate($perPage);

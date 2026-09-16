@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import AppLayout from '@/components/AppLayout.vue'
@@ -16,22 +16,32 @@ import type { TransparencyDocument } from '@/types/transparency'
 const route = useRoute()
 const router = useRouter()
 
-const allDocuments = ref<TransparencyDocument[]>([])
+const documents = ref<TransparencyDocument[]>([])
+const currentPage = ref(1)
+const lastPage = ref(1)
 const isLoading = ref(true)
 const errorMessage = ref<string | null>(null)
 
 const yearFilter = ref('')
 const typeFilter = ref('')
-const currentPage = ref(1)
-const perPage = 15
 
+// Filtro por ano/tipo e paginação são aplicados no servidor (App\Http\Controllers\Api\V1\
+// TransparencyDocumentController::index) — a query string é a fonte de verdade do filtro e
+// da página atual, mesmo padrão de SubmissionListView.vue, para o link ser compartilhável e
+// recarregar a página preservar o estado.
 async function load(): Promise<void> {
   isLoading.value = true
   errorMessage.value = null
 
   try {
-    const response = await fetchTransparencyDocumentList()
-    allDocuments.value = response.data
+    const response = await fetchTransparencyDocumentList({
+      year: yearFilter.value ? Number(yearFilter.value) : undefined,
+      type: typeFilter.value || undefined,
+      page: Number(route.query.page ?? 1),
+    })
+    documents.value = response.data
+    currentPage.value = response.meta.current_page
+    lastPage.value = response.meta.last_page
   } catch (error) {
     errorMessage.value =
       axios.isAxiosError(error) && error.response?.status === 403
@@ -42,30 +52,12 @@ async function load(): Promise<void> {
   }
 }
 
-onMounted(load)
-
-// Filtro por ano/tipo é aplicado aqui, não na API (ver services/transparencyDocuments.ts) —
-// carrega uma vez, filtra e pagina no cliente.
-const filteredDocuments = computed(() =>
-  allDocuments.value.filter((document) => {
-    const matchesYear = yearFilter.value === '' || document.year === Number(yearFilter.value)
-    const matchesType = typeFilter.value === '' || document.type === typeFilter.value
-
-    return matchesYear && matchesType
-  }),
-)
-
-const lastPage = computed(() => Math.max(1, Math.ceil(filteredDocuments.value.length / perPage)))
-
-const pagedDocuments = computed(() =>
-  filteredDocuments.value.slice((currentPage.value - 1) * perPage, currentPage.value * perPage),
-)
-
 const emptyMessage = computed(() =>
-  allDocuments.value.length === 0 ? 'Nenhum documento cadastrado.' : 'Nenhum documento encontrado para esse filtro.',
+  yearFilter.value || typeFilter.value ? 'Nenhum documento encontrado para esse filtro.' : 'Nenhum documento cadastrado.',
 )
 
 function applyFilters(): void {
+  // Sem `page` de propósito — trocar o filtro sempre volta para a primeira página.
   void router.push({
     query: {
       ...(yearFilter.value ? { year: yearFilter.value } : {}),
@@ -79,7 +71,7 @@ function clearFilters(): void {
 }
 
 function goToPage(page: number): void {
-  currentPage.value = page
+  void router.push({ query: { ...route.query, page: String(page) } })
 }
 
 function formatFileSize(bytes: number): string {
@@ -87,11 +79,11 @@ function formatFileSize(bytes: number): string {
 }
 
 watch(
-  () => route.query,
+  () => route.fullPath,
   () => {
     yearFilter.value = String(route.query.year ?? '')
     typeFilter.value = String(route.query.type ?? '')
-    currentPage.value = 1
+    void load()
   },
   { immediate: true },
 )
@@ -175,7 +167,7 @@ watch(
       :message="errorMessage"
     />
     <EmptyState
-      v-else-if="pagedDocuments.length === 0"
+      v-else-if="documents.length === 0"
       :message="emptyMessage"
     />
     <template v-else>
@@ -193,7 +185,7 @@ watch(
           </thead>
           <tbody>
             <tr
-              v-for="document in pagedDocuments"
+              v-for="document in documents"
               :key="document.uuid"
               class="table__row--clickable"
             >

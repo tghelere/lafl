@@ -1,21 +1,22 @@
 import { httpClient } from '@/services/http'
 import type { TransparencyDocument, TransparencyDocumentListResponse } from '@/types/transparency'
 
+export type TransparencyDocumentListParams = {
+  year?: number
+  type?: string
+  page?: number
+}
+
 /**
- * `GET /api/v1/transparency-documents` (App\Http\Controllers\Api\V1\TransparencyDocumentController::index)
- * não aceita filtro por ano/tipo — só pagina o total, ordenado por `updated_at`. Filtrar aqui
- * não é um bug do endpoint (ele nunca prometeu filtro), então não alteramos o backend por
- * isso: buscamos até o teto de `per_page` que o Controller aceita (100 — `min($request->
- * integer('per_page', 15), 100)`) numa chamada só e filtramos/paginamos no cliente. O acervo
- * de exemplo tem 12 documentos hoje; o real está estimado em ~70 (ver docs/roadmap.md,
- * seção de cache de transparência) — ainda cabe. Se o acervo passar de 100 documentos, isto
- * para de trazer a lista inteira e o filtro por ano/tipo no painel passa a operar só sobre a
- * primeira página; nesse ponto o Controller precisa aprender `year`/`type` como o Action
- * público (ListPublicTransparencyDocuments) já faz.
+ * `GET /api/v1/transparency-documents` filtra e pagina no servidor (App\Http\Controllers\
+ * Api\V1\TransparencyDocumentController::index) — mesma semântica do endpoint público
+ * (ano/tipo ausentes não filtram, tipo desconhecido é ignorado).
  */
-export async function fetchTransparencyDocumentList(): Promise<TransparencyDocumentListResponse> {
+export async function fetchTransparencyDocumentList(
+  params: TransparencyDocumentListParams,
+): Promise<TransparencyDocumentListResponse> {
   const { data } = await httpClient.get<TransparencyDocumentListResponse>('/api/v1/transparency-documents', {
-    params: { per_page: 100 },
+    params,
   })
 
   return data
