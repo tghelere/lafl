@@ -25,6 +25,7 @@ const showContraturno = computed(() => hasAccess('program-applications', 'partne
 const showAtendimento = computed(() => hasAccess('volunteer-applications', 'contact-messages'))
 const showBazar = computed(() => hasAccess('pickup-requests'))
 const showTransparencia = computed(() => hasAccess('transparency-documents'))
+const showConfiguracoes = computed(() => hasAccess('users'))
 
 function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
   return { name: 'submissions.index', params: { resource } }
@@ -111,6 +112,18 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           class="app-sidebar__link"
         >
           Documentos
+        </RouterLink>
+      </template>
+
+      <template v-if="showConfiguracoes">
+        <p class="app-sidebar__section-label">
+          Configurações
+        </p>
+        <RouterLink
+          :to="{ name: 'users.index' }"
+          class="app-sidebar__link"
+        >
+          Usuários
         </RouterLink>
       </template>
     </nav>

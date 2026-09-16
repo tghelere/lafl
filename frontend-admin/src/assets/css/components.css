@@ -547,6 +547,57 @@
   width: auto;
 }
 
+.field__legend {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+/* Lista de papéis com descrição (tela de usuário) — cada opção é rótulo + frase curta do que
+   o papel acessa (ver App\Enums\Role::description no backend, via GET /api/v1/roles), não só
+   o nome do papel. */
+.role-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.role-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.role-checkbox:has(input:checked) {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-raised));
+}
+
+.role-checkbox input[type='checkbox'] {
+  width: auto;
+  margin-top: 0.2em;
+}
+
+.role-checkbox__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.role-checkbox__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+
+.role-checkbox__description {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
 /* Grade de detalhe — pares rótulo/valor na tela de detalhe de um formulário */
 .detail-grid {
   display: grid;

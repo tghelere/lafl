@@ -59,6 +59,23 @@ const router = createRouter({
       name: 'transparency.edit',
       component: () => import('@/views/TransparencyFormView.vue'),
     },
+    // Gestão de usuários — mesmo raciocínio de transparência: rotas próprias, registradas
+    // antes das genéricas só por organização.
+    {
+      path: '/admin/usuarios',
+      name: 'users.index',
+      component: () => import('@/views/UserListView.vue'),
+    },
+    {
+      path: '/admin/usuarios/novo',
+      name: 'users.create',
+      component: () => import('@/views/UserFormView.vue'),
+    },
+    {
+      path: '/admin/usuarios/:uuid',
+      name: 'users.edit',
+      component: () => import('@/views/UserFormView.vue'),
+    },
   ],
 })
 
