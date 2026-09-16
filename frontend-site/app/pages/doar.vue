@@ -28,8 +28,8 @@ useSeoMeta({
 
     <article class="prose">
       <h1>{{ page.title }}</h1>
-      <!-- Mesma ressalva de [...slug].vue: conteúdo vem do CMS, escrito por usuário
-           autenticado do painel, sanitização é entregável futuro. -->
+      <!-- Mesma observação de [...slug].vue: conteúdo do CMS, sanitizado no backend ao
+           salvar (ver docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md). -->
       <div class="page-content" v-html="page.content" />
     </article>
   </template>

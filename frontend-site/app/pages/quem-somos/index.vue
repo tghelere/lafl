@@ -32,9 +32,10 @@ useSeoMeta({
     <article class="prose">
       <h1>{{ page.title }}</h1>
       <AppFoto slug="equipe-formacao" contexto="metade" prioridade />
-      <!-- Conteúdo vem do CMS, escrito por usuário autenticado do painel — não há input de
-           visitante aqui. Sanitização no backend é entregável de sessão futura (ver
-           docs/roadmap.md); até lá, quem escreve é sempre interno e confiável. -->
+      <!-- Conteúdo vem do CMS, sanitizado no backend ao salvar contra uma allowlist
+           explícita (App\Support\Html\ContentSanitizer, ver
+           docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md) — é o que torna este
+           v-html seguro, não a confiança em quem escreve pelo painel. -->
       <div class="page-content" v-html="page.content" />
     </article>
   </template>

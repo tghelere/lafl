@@ -49,51 +49,27 @@ export default defineNuxtConfig({
       // docs/roadmap.md). Com o crawler padrão (`crawlLinks: true`), `nuxt generate` seguiria
       // esses links e falharia tentando prerenderizar uma rota sem página ou sem página do
       // CMS correspondente. `crawlLinks: false` faz o generate prerenderizar só o que está
-      // listado abaixo. Toda página do CMS é servida pela rota genérica `[...slug].vue`
-      // (Etapa 1 do roadmap) — generalizar isso é responsabilidade do template, não deste
-      // arquivo; aqui ainda listamos cada slug manualmente porque não existe endpoint público
-      // de listagem de páginas (só `GET /pages/{slug}`, ver docs/estrutura-site.md §3.1) para
-      // descobrir as rotas publicadas em tempo de build.
+      // listado abaixo.
+      //
+      // A lista só tem página cujo conteúdo é FIXO no .vue. Toda rota que lê o conteúdo da
+      // API de `pages` saiu daqui quando o painel passou a editar esse conteúdo: uma rota
+      // prerenderizada vira arquivo estático gravado no build, então o texto salvo pelo
+      // painel só apareceria no site depois de um novo `nuxt generate` — exatamente o que a
+      // edição pelo painel existe para evitar. Essas rotas passam a ser SSR a cada request,
+      // e a alteração aparece já na requisição seguinte (o backend invalida o cache de 10
+      // minutos ao salvar, ver App\Actions\Content\SavePage).
+      //
+      // Isso não muda a exigência de deploy: o servidor Nitro (`nuxt build` + node) já era
+      // necessário para os cinco formulários e para /transparencia/documentos (ver abaixo),
+      // então o site nunca foi hospedagem 100% estática.
       crawlLinks: false,
       routes: [
         '/',
         '/robots.txt',
         '/sitemap.xml',
-        // Slugs atuais conhecidos no momento do build. Renomear um deles exige rodar `nuxt
-        // generate` de novo para o novo slug entrar no output estático; o slug antigo só
-        // resolve com 301 se o site estiver rodando com o servidor Nitro (`nuxt build` +
-        // node), não em hospedagem 100% estática (ver docs/roadmap.md).
+        // Conteúdo fixo no próprio .vue, sem `usePublicPage` — o painel não edita nenhuma
+        // destas, então prerenderizar continua sendo a melhor opção.
         '/o-que-fazemos',
-        '/doar',
-        '/quem-somos',
-        '/quem-somos/nossa-historia',
-        '/quem-somos/missao-visao-valores',
-        '/quem-somos/governanca',
-        // '/quem-somos/o-lar-hoje' fora da lista de propósito: status Draft no seeder (ver
-        // docs/roadmap.md, "BLOQUEIO DE PUBLICAÇÃO") — a API pública devolve 404 para ela
-        // agora, e o prerender falha o build inteiro se uma rota aqui não resolver. Devolver
-        // ao array quando a página for liberada (Published) para publicação.
-        '/educacao-infantil',
-        '/educacao-infantil/dia-da-crianca',
-        '/educacao-infantil/proposta-pedagogica',
-        '/educacao-infantil/alimentacao-e-saude',
-        '/educacao-infantil/estrutura',
-        '/educacao-infantil/depoimentos',
-        '/educacao-infantil/matricula',
-        '/contraturno',
-        '/contraturno/o-projeto',
-        '/contraturno/para-quem-e',
-        '/contraturno/como-funciona',
-        '/contraturno/parceiros',
-        '/contraturno/o-que-vem-por-ai',
-        '/bazar',
-        '/bazar/visite-a-loja',
-        '/bazar/o-que-aceitamos',
-        '/bazar/para-onde-vai',
-        '/bazar/sua-compra-vira-educacao',
-        '/como-ajudar',
-        '/como-ajudar/parceiros',
-        '/transparencia',
         '/politica-de-privacidade',
         // Os cinco formulários (ver docs/estrutura-site.md Parte 2) NÃO entram aqui, de
         // propósito — mesmo raciocínio de /transparencia/documentos: cada página lê
