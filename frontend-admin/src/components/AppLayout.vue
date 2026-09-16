@@ -76,7 +76,10 @@ async function handleLogout(): Promise<void> {
           v-if="authStore.user"
           class="app-topbar__user"
         >
-          {{ authStore.user.name }} · {{ authStore.user.roles.join(', ') }}
+          <RouterLink :to="{ name: 'account' }">
+            {{ authStore.user.name }}
+          </RouterLink>
+          · {{ authStore.user.roles.join(', ') }}
         </span>
         <button
           type="button"

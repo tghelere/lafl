@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+import NoticeBanner from '@/components/NoticeBanner.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const email = ref('')
@@ -12,6 +13,7 @@ const isSubmitting = ref(false)
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 async function handleSubmit(): Promise<void> {
   errorMessage.value = null
@@ -22,10 +24,17 @@ async function handleSubmit(): Promise<void> {
     await router.push({ name: 'dashboard' })
   } catch (error) {
     // A API é a única fonte de verdade para mensagens de erro (ver CLAUDE.md) — o front só
-    // exibe o que ela devolveu, nunca decide o texto.
-    errorMessage.value = axios.isAxiosError(error)
-      ? (error.response?.data?.message ?? 'Não foi possível entrar. Tente novamente.')
-      : 'Não foi possível entrar. Tente novamente.'
+    // exibe o que ela devolveu, nunca decide o texto. Login com credencial inválida ou conta
+    // desativada responde 422 com a mensagem específica dentro de errors.email, não em
+    // data.message (que é só o texto genérico "the given data was invalid") — por isso o
+    // campo é conferido primeiro.
+    if (axios.isAxiosError(error) && error.response?.status === 422) {
+      const body = error.response.data as { message?: string; errors?: Record<string, string[]> }
+      errorMessage.value =
+        body.errors?.email?.[0] ?? body.message ?? 'Não foi possível entrar. Tente novamente.'
+    } else {
+      errorMessage.value = 'Não foi possível entrar. Tente novamente.'
+    }
   } finally {
     isSubmitting.value = false
   }
@@ -42,6 +51,13 @@ async function handleSubmit(): Promise<void> {
         Painel administrativo
       </p>
       <h1>Lar Anália Franco</h1>
+
+      <NoticeBanner
+        v-if="route.query['senha-definida']"
+        variant="info"
+      >
+        Senha definida. Entre com a nova senha.
+      </NoticeBanner>
 
       <div class="field">
         <label for="email">E-mail</label>

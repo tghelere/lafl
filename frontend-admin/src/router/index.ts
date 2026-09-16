@@ -20,6 +20,15 @@ const router = createRouter({
       component: () => import('@/views/LoginView.vue'),
       meta: { public: true },
     },
+    // Alcançável por quem recebe o link de definição de senha fora do sistema (ver
+    // App\Actions\Users\GeneratePasswordLink) — fora de /admin de propósito, junto de /login
+    // (§4.1 de docs/estrutura-site.md: "fora do menu").
+    {
+      path: '/definir-senha',
+      name: 'set-password',
+      component: () => import('@/views/SetPasswordView.vue'),
+      meta: { public: true },
+    },
     {
       path: '/',
       redirect: { name: 'dashboard' },
@@ -28,6 +37,13 @@ const router = createRouter({
       path: '/admin',
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
+    },
+    // Autosserviço sobre a própria conta — fora de /admin porque não é um recurso do mapa de
+    // acesso (todo usuário autenticado, qualquer papel, pode trocar a própria senha).
+    {
+      path: '/conta',
+      name: 'account',
+      component: () => import('@/views/AccountView.vue'),
     },
     {
       path: '/admin/:resource',

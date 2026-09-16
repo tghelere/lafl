@@ -34,9 +34,48 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.data
   }
 
+  /**
+   * Definição da senha pela primeira vez, via link de uso único — rota pública, mas o
+   * endpoint continua exigindo o cookie de CSRF (o domínio é stateful independente de sessão
+   * autenticada), daí o mesmo ensureCsrfCookie() do login.
+   */
+  async function setPassword(payload: {
+    token: string
+    email: string
+    password: string
+    password_confirmation: string
+  }): Promise<void> {
+    await ensureCsrfCookie()
+
+    await httpClient.post('/api/v1/auth/set-password', payload)
+  }
+
+  /**
+   * Troca da própria senha já autenticado (ver /conta). AuthenticateSession compara o hash de
+   * senha guardado na sessão com o hash atual a cada requisição — sem o fix em
+   * App\Actions\Auth\ChangeUserPassword, a própria sessão que troca a senha caía junto das
+   * demais; aqui o front só chama o endpoint e mantém a sessão como está, sem logout.
+   */
+  async function changePassword(payload: {
+    current_password: string
+    password: string
+    password_confirmation: string
+  }): Promise<void> {
+    await httpClient.put('/api/v1/auth/password', payload)
+  }
+
   function clearSession(): void {
     user.value = null
   }
 
-  return { user, isAuthenticated, login, logout, fetchCurrentUser, clearSession }
+  return {
+    user,
+    isAuthenticated,
+    login,
+    logout,
+    fetchCurrentUser,
+    setPassword,
+    changePassword,
+    clearSession,
+  }
 })
