@@ -37,9 +37,10 @@ final class UserController extends Controller
 
         if ($search !== '') {
             // whereLike() em vez de where(..., 'like', ...): no PostgreSQL o LIKE é sensível
-            // a maiúscula, então "maria" não acharia "Maria". A suíte roda em SQLite, onde
-            // LIKE já ignora caixa — por isso o teste de busca passava mesmo com a busca
-            // quebrada no banco de verdade.
+            // a maiúscula, então "maria" não acharia "Maria". Bug descoberto quando a suíte
+            // ainda rodava em SQLite (que ignora caixa por padrão) — o teste de busca passava
+            // com a busca quebrada no banco de verdade. A suíte roda só contra Postgres desde
+            // então (ver backend/.env.testing e CLAUDE.md, "Armadilhas conhecidas").
             $query->where(function ($subQuery) use ($search): void {
                 $subQuery->whereLike('name', "%{$search}%")
                     ->orWhereLike('email', "%{$search}%");

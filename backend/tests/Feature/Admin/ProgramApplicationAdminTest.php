@@ -41,6 +41,29 @@ test('listagem filtra por status', function (): void {
     expect($response->json('data'))->toHaveCount(1);
 });
 
+/**
+ * whereDate('created_at', ...) é abstração do Laravel — a Grammar de cada driver já traduz
+ * para a expressão certa (CAST no Postgres, date() no SQLite), mas o padrão se repete em
+ * cinco controllers e nenhum tinha teste algum contra banco de verdade até a varredura de
+ * dialeto desta sessão (ver docs/roadmap.md). Cobre aqui como representante do padrão —
+ * ProgramApplication, PickupRequest, VolunteerApplication, PartnershipInquiry e
+ * ContactMessage repetem o mesmo código, não a mesma consulta testada cinco vezes.
+ */
+test('listagem filtra por período (from/to) sobre created_at', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    $foraDoPeriodo = ProgramApplication::factory()->create(['created_at' => now()->subDays(10)]);
+    $dentroDoPeriodo = ProgramApplication::factory()->create(['created_at' => now()->subDays(3)]);
+    $tambemForaDoPeriodo = ProgramApplication::factory()->create(['created_at' => now()]);
+
+    $from = now()->subDays(5)->toDateString();
+    $to = now()->subDays(1)->toDateString();
+
+    $response = $this->actingAs($user)->getJson("/api/v1/program-applications?from={$from}&to={$to}");
+
+    $response->assertOk();
+    expect($response->json('data.*.uuid'))->toBe([$dentroDoPeriodo->uuid]);
+});
+
 test('detalhe devolve dado completo e audita o acesso', function (): void {
     $user = userWithRole(Role::Direcao->value);
     $application = ProgramApplication::factory()->create(['guardian_name' => 'João Pereira']);

@@ -41,9 +41,11 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // CHECK constraint só existe no Postgres — SQLite (usado em teste local, ver
-        // phpunit.xml) não suporta ALTER TABLE ... ADD CONSTRAINT da mesma forma, e o teste
-        // local não precisa da trava redundante que o enum PHP já garante na aplicação.
+        // CHECK constraint só existe no Postgres — dev/teste/produção rodam só nele (ver
+        // CLAUDE.md, "Armadilhas conhecidas"). A guarda continua por causa da opção sem
+        // Docker documentada no README (SQLite): lá `ALTER TABLE ... ADD CONSTRAINT` não é
+        // suportado do mesmo jeito, e a trava redundante não faz falta — o enum PHP já
+        // garante o valor na aplicação.
         if (DB::getDriverName() === 'pgsql') {
             $values = implode(',', array_map(
                 fn (TransparencyDocumentType $type): string => "'{$type->value}'",

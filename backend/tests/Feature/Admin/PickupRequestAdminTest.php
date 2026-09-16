@@ -85,3 +85,30 @@ test('bazar pode atualizar status', function (): void {
     expect($fresh->handled_by)->toBe($user->id)
         ->and($fresh->status)->toBe(FormSubmissionStatus::Done);
 });
+
+/**
+ * orderByRaw('scheduled_for IS NULL') — expressão portável (IS NULL nunca é NULL, sempre
+ * true/false, e ASC ordena false antes de true tanto no Postgres quanto no SQLite), mas sem
+ * teste nenhum até agora. Conferido explicitamente contra Postgres real (ver
+ * docs/roadmap.md, varredura de dialeto): quem tem data agendada vem primeiro, mais cedo
+ * primeiro; quem não tem vai por último, mais recente primeiro.
+ */
+test('listagem ordena por data agendada, com os sem data por último', function (): void {
+    $user = userWithRole(Role::Bazar->value);
+
+    $semData1 = PickupRequest::factory()->create(['scheduled_for' => null, 'created_at' => now()->subDay()]);
+    $semData2 = PickupRequest::factory()->create(['scheduled_for' => null, 'created_at' => now()]);
+    $maisTarde = PickupRequest::factory()->create(['scheduled_for' => now()->addDays(5)]);
+    $maisCedo = PickupRequest::factory()->create(['scheduled_for' => now()->addDay()]);
+
+    $response = $this->actingAs($user)->getJson('/api/v1/pickup-requests');
+
+    $response->assertOk();
+
+    expect($response->json('data.*.uuid'))->toBe([
+        $maisCedo->uuid,
+        $maisTarde->uuid,
+        $semData2->uuid,
+        $semData1->uuid,
+    ]);
+});
