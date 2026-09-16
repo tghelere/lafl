@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 class RoleSeeder extends Seeder
 {
     /**
-     * Cria os papéis descritos em docs/dominio.md, seção "Papéis e permissões".
+     * Cria os papéis descritos em docs/dominio.md, seção "Papéis".
      */
     public function run(): void
     {
