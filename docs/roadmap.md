@@ -302,6 +302,30 @@ levantar.
       antigo (`nuxt build` + `node .output/server/index.mjs`), não só `.output/public`
       hospedado como arquivos estáticos.
 
+#### Deploy — cache de HTML das páginas editáveis pelo painel
+
+Desde que o painel passou a editar `pages.content`, **toda rota cujo conteúdo vem do CMS saiu
+de `nitro.prerender.routes`** e passou a ser SSR a cada request. Prerenderizar essas rotas
+gravaria o texto no build, e a edição pelo painel só apareceria depois de um novo
+`nuxt generate` — exatamente o que a tela existe para evitar. Continuam prerenderizadas
+apenas as páginas de conteúdo fixo no `.vue` (`/`, `/o-que-fazemos`,
+`/politica-de-privacidade`, `/obrigado/:tipo`) mais `robots.txt` e `sitemap.xml`.
+
+Medido nesta sessão: salvar invalida o cache de 10 minutos do backend
+(`App\Actions\Content\SavePage` → `Cache::forget`) e a alteração aparece na **requisição
+seguinte** ao site, sem rebuild. A cadeia inteira só se mantém verdadeira se nada acrescentar
+uma camada de cache de HTML por cima.
+
+- [ ] **Se o Cloudflare (ou qualquer CDN na frente do Nitro) cachear HTML**, as rotas
+      editáveis precisam de `Cache-Control` de TTL curto **ou** de purge no salvamento —
+      senão o CDN serve o HTML antigo por horas e a edição "não aparece", com o backend e o
+      Nitro certos. Por padrão o Cloudflare não cacheia HTML (só assets por extensão), então
+      isso só morde se alguém criar uma Page Rule / Cache Rule de "cache everything". Duas
+      saídas, na ordem de preferência: (1) não cachear HTML dessas rotas; (2) TTL curto
+      (1–5 min) somado a purge por URL no salvar, o que exigiria o backend chamar a API do
+      Cloudflare — dependência e credencial novas, a avaliar só se o tráfego justificar.
+      Decidir junto com a escolha de hospedagem, que ainda não está fechada.
+
 ### Painel administrativo (Vue)
 
 - [ ] Gestão de conteúdo (`pages`, `posts`, mídia) ainda não tem tela — a API de `pages` já
