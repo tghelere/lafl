@@ -103,6 +103,52 @@ test('atualizar documento troca metadado sem exigir novo arquivo', function (): 
     expect($document->fresh()->file_path)->toBe($document->file_path);
 });
 
+test('atualizar metadado de documento publicado não despublica por efeito colateral', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    $document = TransparencyDocument::factory()->published()->create(['title' => 'Antigo']);
+    $publishedAt = $document->published_at;
+
+    $response = $this->actingAs($user)->put("/api/v1/transparency-documents/{$document->uuid}", [
+        'title' => 'Novo título',
+        'year' => $document->year,
+        'type' => $document->type->value,
+    ])->assertOk();
+
+    expect($response->json('data.published_at'))->not->toBeNull();
+    expect($document->fresh()->published_at)->not->toBeNull()
+        ->and($document->fresh()->published_at->equalTo($publishedAt))->toBeTrue();
+});
+
+test('despublicar via atualização exige published explícito como false', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    $document = TransparencyDocument::factory()->published()->create();
+
+    $response = $this->actingAs($user)->put("/api/v1/transparency-documents/{$document->uuid}", [
+        'title' => $document->title,
+        'year' => $document->year,
+        'type' => $document->type->value,
+        'published' => false,
+    ])->assertOk();
+
+    expect($response->json('data.published_at'))->toBeNull();
+    expect($document->fresh()->published_at)->toBeNull();
+});
+
+test('publicar via atualização com published true', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    $document = TransparencyDocument::factory()->create();
+
+    $response = $this->actingAs($user)->put("/api/v1/transparency-documents/{$document->uuid}", [
+        'title' => $document->title,
+        'year' => $document->year,
+        'type' => $document->type->value,
+        'published' => true,
+    ])->assertOk();
+
+    expect($response->json('data.published_at'))->not->toBeNull();
+    expect($document->fresh()->published_at)->not->toBeNull();
+});
+
 test('excluir documento é auditado e some das listagens', function (): void {
     $user = userWithRole(Role::Direcao->value);
     $document = TransparencyDocument::factory()->create();

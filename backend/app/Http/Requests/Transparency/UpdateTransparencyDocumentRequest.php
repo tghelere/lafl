@@ -52,7 +52,10 @@ final class UpdateTransparencyDocumentRequest extends FormRequest
             year: $this->integer('year'),
             type: TransparencyDocumentType::from($this->string('type')->value()),
             file: $this->file('file'),
-            publish: $this->boolean('published'),
+            // null quando o campo não veio na requisição: distingue "não mexer no estado de
+            // publicação" (edição só de metadado) de "despublicar explicitamente" — ver bug
+            // corrigido em SaveTransparencyDocument.
+            publish: $this->has('published') ? $this->boolean('published') : null,
         );
     }
 }

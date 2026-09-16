@@ -14,6 +14,6 @@ final readonly class TransparencyDocumentData
         public int $year,
         public TransparencyDocumentType $type,
         public ?UploadedFile $file,
-        public bool $publish,
+        public ?bool $publish,
     ) {}
 }

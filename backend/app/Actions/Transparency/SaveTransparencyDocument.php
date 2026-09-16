@@ -44,9 +44,12 @@ final class SaveTransparencyDocument
             $document->year = $data->year;
             $document->type = $data->type;
 
-            if ($data->publish) {
+            // null (só possível numa atualização, ver UpdateTransparencyDocumentRequest::toDto)
+            // significa "não mexer no estado de publicação" — editar título/ano/tipo não pode
+            // despublicar um documento por efeito colateral.
+            if ($data->publish === true) {
                 $document->published_at ??= now();
-            } else {
+            } elseif ($data->publish === false) {
                 $document->published_at = null;
             }
 
