@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Users\CreateUser;
 use App\Actions\Users\DeactivateUser;
+use App\Actions\Users\GeneratePasswordLink;
 use App\Actions\Users\ReactivateUser;
 use App\Actions\Users\UpdateUser;
 use App\Http\Controllers\Controller;
@@ -13,6 +14,7 @@ use App\Http\Requests\Users\StoreUserRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\UserAccountResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
@@ -98,5 +100,17 @@ final class UserController extends Controller
         Gate::authorize('reactivate', $user);
 
         return new UserAccountResource($action->handle($user));
+    }
+
+    /**
+     * A URL só aparece nesta resposta — nunca é reenviada, logada ou recuperável depois (ver
+     * App\Actions\Users\GeneratePasswordLink). Se o super_admin perder o link antes de
+     * repassar, a única saída é gerar um novo.
+     */
+    public function generatePasswordLink(User $user, GeneratePasswordLink $action): JsonResponse
+    {
+        Gate::authorize('generatePasswordLink', $user);
+
+        return response()->json(['data' => ['url' => $action->handle($user)]]);
     }
 }

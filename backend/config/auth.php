@@ -101,6 +101,24 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        // Broker dedicado ao link de definição de senha que o super_admin gera e copia para
+        // enviar por fora (WhatsApp — sem e-mail configurado no lançamento, ver
+        // App\Actions\Users\GeneratePasswordLink). Reaproveita a mesma tabela do broker
+        // 'users' (token com hash, nunca em texto puro — ver Illuminate\Auth\Passwords\
+        // DatabaseTokenRepository), mas com validade própria: 24h em vez dos 60 minutos
+        // padrão de um "esqueci minha senha" por e-mail, porque o link não chega
+        // instantaneamente. Deixado como broker separado (não só um `expire` diferente no
+        // 'users') para quando o "esqueci minha senha" por e-mail existir (ver
+        // docs/roadmap.md) não competir pela mesma janela de validade nem pelo mesmo botão de
+        // "gerar novo invalida o anterior" — são fluxos com dona e prazo diferentes, mesmo
+        // reaproveitando a tabela.
+        'user_setup' => [
+            'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 1440,
+            'throttle' => 60,
+        ],
     ],
 
     /*

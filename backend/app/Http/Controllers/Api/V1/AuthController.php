@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Api\V1;
 use App\Actions\Auth\ChangeUserPassword;
 use App\Actions\Auth\LoginUser;
 use App\Actions\Auth\LogoutUser;
+use App\Actions\Auth\SetUserPassword;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\SetPasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -47,6 +49,17 @@ final class AuthController extends Controller
         $action->handle(
             $user,
             $request->string('current_password')->value(),
+            $request->string('password')->value(),
+        );
+
+        return response()->noContent();
+    }
+
+    public function setPassword(SetPasswordRequest $request, SetUserPassword $action): Response
+    {
+        $action->handle(
+            $request->string('token')->value(),
+            $request->string('email')->value(),
             $request->string('password')->value(),
         );
 

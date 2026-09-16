@@ -32,6 +32,13 @@ Route::prefix('auth')->name('auth.')->group(function () use ($authenticated): vo
         ->middleware('throttle:login')
         ->name('login');
 
+    // Pública, de propósito — quem chega até aqui já tem o token do link (ver
+    // App\Actions\Users\GeneratePasswordLink). Nenhum dado pessoal na URL, o e-mail vem só
+    // no corpo (ver App\Actions\Auth\SetUserPassword).
+    Route::post('/set-password', [AuthController::class, 'setPassword'])
+        ->middleware('throttle:set-password')
+        ->name('set-password');
+
     Route::middleware($authenticated)->group(function (): void {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/user', [AuthController::class, 'user'])->name('user');
@@ -81,6 +88,7 @@ Route::middleware($authenticated)->group(function (): void {
         ->except(['destroy']);
     Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
     Route::patch('/users/{user}/reactivate', [UserController::class, 'reactivate'])->name('users.reactivate');
+    Route::post('/users/{user}/password-link', [UserController::class, 'generatePasswordLink'])->name('users.password-link');
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
 
