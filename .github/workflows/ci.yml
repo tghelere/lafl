@@ -11,9 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Banco real (Postgres), não SQLite — paridade com produção. Chaves abaixo são
-      # só para teste, já documentadas como tal em backend/phpunit.xml; nunca usadas fora
-      # de CI/testing.
+      # Banco real (Postgres), não SQLite — nunca mais SQLite em teste nenhum, local ou CI
+      # (ver CLAUDE.md, "Armadilhas conhecidas": um bug de LIKE sensível a maiúsculas passou
+      # pela suíte inteira sem ser notado enquanto ela rodava em SQLite). Mesmos valores de
+      # backend/.env.testing (commitado — ver ali para o resto da configuração de teste, ex.
+      # SANCTUM_STATEFUL_DOMAINS) de propósito: phpunit.xml só define APP_ENV=testing, e um
+      # <env> de lá nunca sobrescreve uma variável já presente no processo (PHPUnit só seta
+      # se a variável ainda não existir) — então os valores abaixo, sendo variável de
+      # ambiente do job, já vencem SEMPRE, quer .env.testing exista ou não. Redundante com
+      # .env.testing de propósito (mesma config, duas fontes) para as etapas que rodam fora
+      # do fluxo de teste (Larastan, Pint) também terem um banco válido para se conectar,
+      # sem precisar de --env=testing em cada passo.
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
@@ -27,6 +35,9 @@ jobs:
       BLIND_INDEX_KEY: base64:98GJMoj/GdVN6Z9BlvM7Xyjz5RyAQlZhTDIxMtLSVg8=
 
     services:
+      # Versão principal (16) igual à do serviço "postgres" em docker-compose.yml, de
+      # propósito — divergir aqui reabriria o mesmo risco que motivou parar de usar SQLite:
+      # "verde no CI" deixando de significar "verde contra o banco real".
       postgres:
         image: postgres:16-alpine
         env:
@@ -72,7 +83,10 @@ jobs:
         run: ./vendor/bin/phpstan analyse --memory-limit=512M
 
       - name: Rodar migrations
-        run: php artisan migrate --force
+        # --env=testing: mesmo mecanismo usado localmente (ver README) para apontar
+        # explicitamente para backend/.env.testing, em vez de depender só da variável de
+        # ambiente do job para acertar o banco.
+        run: php artisan migrate --env=testing --force
 
       - name: Pest
         run: php artisan test
