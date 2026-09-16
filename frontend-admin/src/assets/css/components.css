@@ -621,3 +621,121 @@
   color: var(--color-text);
   overflow-wrap: break-word;
 }
+
+/* Editor de conteúdo (Tiptap) — ver src/components/RichTextEditor.vue */
+.rich-text {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+
+.rich-text__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.rich-text__button {
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.rich-text__button:hover {
+  background: var(--color-surface-raised);
+  border-color: var(--color-border);
+}
+
+.rich-text__button--active {
+  background: var(--color-surface-raised);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.rich-text__separator {
+  width: 1px;
+  align-self: stretch;
+  margin: 0 var(--space-2);
+  background: var(--color-border);
+}
+
+.rich-text__surface {
+  min-height: 22rem;
+  padding: var(--space-4) var(--space-5);
+  outline: none;
+  overflow-wrap: break-word;
+}
+
+/* O conteúdo editado é o mesmo HTML que o site publica — o editor mostra a hierarquia de
+   título, lista e link, não a identidade visual do site (fonte e cor são do painel). */
+.rich-text__surface > * + * {
+  margin-top: var(--space-4);
+}
+
+.rich-text__surface h2 {
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
+}
+
+.rich-text__surface h3 {
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
+}
+
+.rich-text__surface ul,
+.rich-text__surface ol {
+  padding-left: var(--space-6);
+}
+
+.rich-text__surface li + li {
+  margin-top: var(--space-2);
+}
+
+.rich-text__surface a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+/* O conteúdo do site usa class="btn btn--primary" em link de chamada para ação, e o painel
+   tem uma classe .btn própria — dentro do editor as duas colidiam e o rótulo do link ficava
+   invisível (texto da cor do fundo laranja). Aqui o link volta a ser um link: o editor mostra
+   a hierarquia do texto, não a identidade visual do site. */
+.rich-text__surface .btn,
+.rich-text__surface .btn--primary,
+.rich-text__surface .btn--secondary {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  text-decoration: underline;
+}
+
+.rich-text__surface p:empty::before {
+  content: '';
+  display: inline-block;
+}
+
+/* Contador de caracteres dos campos de SEO */
+.char-counter {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.char-counter--over {
+  color: var(--color-error);
+  font-weight: var(--weight-semibold);
+}

@@ -25,6 +25,7 @@ const showContraturno = computed(() => hasAccess('program-applications', 'partne
 const showAtendimento = computed(() => hasAccess('volunteer-applications', 'contact-messages'))
 const showBazar = computed(() => hasAccess('pickup-requests'))
 const showTransparencia = computed(() => hasAccess('transparency-documents'))
+const showConteudo = computed(() => hasAccess('pages'))
 const showConfiguracoes = computed(() => hasAccess('users'))
 
 function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
@@ -100,6 +101,18 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           class="app-sidebar__link"
         >
           Pedidos de coleta
+        </RouterLink>
+      </template>
+
+      <template v-if="showConteudo">
+        <p class="app-sidebar__section-label">
+          Conteúdo
+        </p>
+        <RouterLink
+          :to="{ name: 'pages.index' }"
+          class="app-sidebar__link"
+        >
+          Páginas
         </RouterLink>
       </template>
 

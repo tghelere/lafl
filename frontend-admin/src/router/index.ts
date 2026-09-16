@@ -75,6 +75,20 @@ const router = createRouter({
       name: 'transparency.edit',
       component: () => import('@/views/TransparencyFormView.vue'),
     },
+    // Conteúdo das páginas do site — mesmo raciocínio de transparência: rotas próprias,
+    // registradas antes das genéricas só por organização. Sem rota de criar: esta fatia
+    // edita o conteúdo das páginas existentes, não cria nem exclui página (ver
+    // docs/levantamento-painel.md, itens 3 e 5).
+    {
+      path: '/admin/paginas',
+      name: 'pages.index',
+      component: () => import('@/views/ContentPageListView.vue'),
+    },
+    {
+      path: '/admin/paginas/:uuid',
+      name: 'pages.edit',
+      component: () => import('@/views/ContentPageFormView.vue'),
+    },
     // Gestão de usuários — mesmo raciocínio de transparência: rotas próprias, registradas
     // antes das genéricas só por organização.
     {
