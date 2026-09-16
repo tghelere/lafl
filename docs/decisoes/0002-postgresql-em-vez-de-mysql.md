@@ -27,12 +27,16 @@ PostgreSQL.
 - **MySQL/MariaDB.** Sem array nativo — o blind index por token exigiria tabela de junção
   (`name_index_tokens`) só para reproduzir o que o GIN faz de forma nativa. JSON existe mas
   com suporte a índice mais limitado. Nenhuma vantagem compensa essa perda para este domínio.
-- **SQLite em produção.** Adequado para teste local e CI rápido (usado em dev), mas sem os
-  recursos de índice acima e sem o isolamento de acesso concorrente que produção exige.
+- **SQLite em produção.** Sem os recursos de índice acima e sem o isolamento de acesso
+  concorrente que produção exige.
 
 ## Consequências
 
-- CI roda os testes contra Postgres real, não SQLite, para ter paridade com produção (ver
-  `README.md`) — SQLite continua servindo para execução local rápida.
 - Toda migration que use recurso específico do Postgres (array, GIN, `CHECK`) fica
   implicitamente presa a este banco; não há meta de portabilidade multi-SGBD.
+- **Atualização:** este documento chegou a listar SQLite como opção válida para teste local
+  rápido. Deixou de ser — um bug real (`LIKE` sensível a maiúsculas, que o Postgres respeita e
+  o SQLite ignora) passou pela suíte inteira sem ser notado enquanto ela rodava em SQLite. A
+  suíte roda exclusivamente contra Postgres, local e CI, desde então (ver `CLAUDE.md`,
+  "Armadilhas conhecidas", e `README.md`, seção "Testes e qualidade"). SQLite segue existindo
+  só como conveniência opcional para rodar a *aplicação* sem Docker — nunca para teste.
