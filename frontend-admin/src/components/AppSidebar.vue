@@ -5,8 +5,8 @@ import { useAuthStore } from '@/stores/auth'
 
 /**
  * A navegação só mostra o que o papel acessa — conveniência de interface, nunca a fonte da
- * verdade da autorização (ver CLAUDE.md e docs/estrutura-site.md §4.4). Um usuário sem papel
- * para uma seção não vê o link aqui, mas quem realmente barra é sempre a Policy na API —
+ * verdade da autorização (ver CLAUDE.md e docs/dominio.md, seção "Papéis"). Um usuário sem
+ * papel para uma seção não vê o link aqui, mas quem realmente barra é sempre a Policy na API —
  * chamar a rota diretamente sem o papel devolve 403 de qualquer forma.
  */
 const authStore = useAuthStore()
@@ -17,11 +17,15 @@ function hasAnyRole(...names: string[]): boolean {
   return roles.value.some((role) => names.includes(role))
 }
 
+// Um bloco por papel de área (ver docs/dominio.md, seção "Papéis") — cada `show*` espelha o
+// allowedRoles() da Policy do recurso ligado a ele; direcao e super_admin sempre aparecem
+// porque têm acesso a tudo (direcao por allowedRoles(), super_admin por Gate::before).
+const showContraturno = computed(() => hasAnyRole('contraturno', 'direcao', 'super_admin'))
 const showAtendimento = computed(() => hasAnyRole('atendimento', 'direcao', 'super_admin'))
 const showBazar = computed(() => hasAnyRole('bazar', 'direcao', 'super_admin'))
 // Mesmos papéis de TransparencyDocumentPolicy::viewAny (backend/app/Policies/
-// TransparencyDocumentPolicy.php) — só direcao administra, super_admin sempre por bypass.
-const showTransparencia = computed(() => hasAnyRole('direcao', 'super_admin'))
+// TransparencyDocumentPolicy.php).
+const showTransparencia = computed(() => hasAnyRole('financeiro', 'direcao', 'super_admin'))
 
 function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
   return { name: 'submissions.index', params: { resource } }
@@ -51,9 +55,9 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
         Pendências
       </RouterLink>
 
-      <template v-if="showAtendimento">
+      <template v-if="showContraturno">
         <p class="app-sidebar__section-label">
-          Atendimento
+          Contraturno
         </p>
         <RouterLink
           :to="resourceRoute('program-applications')"
@@ -67,6 +71,12 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
         >
           Propostas de apoio
         </RouterLink>
+      </template>
+
+      <template v-if="showAtendimento">
+        <p class="app-sidebar__section-label">
+          Atendimento
+        </p>
         <RouterLink
           :to="resourceRoute('volunteer-applications')"
           class="app-sidebar__link"
