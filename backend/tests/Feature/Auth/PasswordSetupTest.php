@@ -219,3 +219,30 @@ test('usuário desativado depois de gerar o link não consegue mais usá-lo', fu
         'password_confirmation' => 'senha-nova-forte-123',
     ])->assertStatus(422)->assertJsonFragment(['token' => ['Link inválido ou expirado.']]);
 });
+
+/**
+ * Diferente do teste acima: aqui a desativação passa pelo endpoint de verdade
+ * (App\Actions\Users\DeactivateUser), que apaga a linha do token — não só marca a conta como
+ * desativada. Reativar depois não faz o link antigo voltar a funcionar, porque a linha já
+ * não existe mais (ao contrário do teste acima, cuja falha vem só da checagem de
+ * `deactivated_at` dentro do callback do broker.reset()).
+ */
+test('gerar link, desativar, reativar: o link antigo continua falhando porque o token foi apagado na desativação', function (): void {
+    $admin = userWithRole(Role::SuperAdmin->value);
+    $target = User::factory()->create();
+
+    $url = $this->actingAs($admin)->postJson("/api/v1/users/{$target->uuid}/password-link")->json('data.url');
+    $token = extractSetupToken($url);
+
+    $this->actingAs($admin)->patchJson("/api/v1/users/{$target->uuid}/deactivate")->assertOk();
+    $this->actingAs($admin)->patchJson("/api/v1/users/{$target->uuid}/reactivate")->assertOk();
+
+    expect($target->fresh()->deactivated_at)->toBeNull();
+
+    $this->postJson('/api/v1/auth/set-password', [
+        'token' => $token,
+        'email' => $target->email,
+        'password' => 'senha-nova-forte-123',
+        'password_confirmation' => 'senha-nova-forte-123',
+    ])->assertStatus(422)->assertJsonFragment(['token' => ['Link inválido ou expirado.']]);
+});

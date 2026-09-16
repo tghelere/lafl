@@ -6,6 +6,7 @@ namespace App\Actions\Users;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -29,6 +30,13 @@ final class DeactivateUser
             $this->assertLastActiveSuperAdminSurvives->handle($target);
 
             $target->forceFill(['deactivated_at' => now()])->save();
+
+            // Link de definição de senha pendente (ou um futuro "esqueci minha senha" por
+            // e-mail, broker 'users') não pode continuar utilizável para uma conta desativada
+            // — GeneratePasswordLink já barra gerar um novo, mas um link gerado antes da
+            // desativação continuaria válido até expirar sozinho sem isto.
+            Password::broker('user_setup')->deleteToken($target);
+            Password::broker('users')->deleteToken($target);
 
             return $target;
         });
