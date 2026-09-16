@@ -135,6 +135,40 @@
       `bazar/o-que-aceitamos`, no `ContentPagesSeeder`) ainda citam o WhatsApp do bazar como
       texto solto, não como botão — fora do escopo desta sessão (frontend), não convertido.
 
+- [x] **Gestão de usuários — backend completo (sessão de definição de senha por link).**
+      Rodou depois da sessão de redesenho de papéis (papéis por área, `docs/dominio.md`).
+      `users.deactivated_at` (nullable, null = ativo). Login recusa conta desativada só
+      depois de confirmar a senha certa (senha errada nunca diferencia ativo de desativado);
+      sessão aberta perde acesso na requisição seguinte à desativação
+      (`App\Http\Middleware\EnsureUserIsActive`, aplicado com `auth:sanctum` em toda rota
+      autenticada). CRUD sob `/api/v1/users` (busca por nome/e-mail, filtro ativo/inativo,
+      paginação, criar, editar nome/e-mail/papéis, desativar, reativar — sem exclusão, conta
+      só desativa), autorizado só a `super_admin` via `App\Policies\UserPolicy` (nem
+      `direcao`). Usuário nasce com hash de valor aleatório no lugar de senha, inútil até
+      definir a própria. Proteções testadas: ninguém desativa a si mesmo nem remove o
+      próprio papel `super_admin`; não é possível desativar nem remover `super_admin` do
+      último `super_admin` ativo (`App\Actions\Users\AssertLastActiveSuperAdminSurvives`,
+      `lockForUpdate()` dentro de `DB::transaction()` contra duas requisições concorrentes).
+      Link de definição de senha de uso único
+      (`POST /api/v1/users/{uuid}/password-link`, `super_admin`): reaproveita o password
+      broker nativo do Laravel (`Illuminate\Auth\Passwords\DatabaseTokenRepository`, token
+      com hash, nunca texto puro) com broker próprio `user_setup` em `config/auth.php` (24h
+      de validade, separado do broker `users` padrão reservado para o futuro "esqueci minha
+      senha" por e-mail); gerar de novo invalida o anterior de graça, por já ser como o
+      repositório do broker funciona. `POST /api/v1/auth/set-password` (público, throttle
+      próprio) usa `broker->reset()` inteiro — token inválido, expirado, e-mail que não
+      confere ou usuário desativado dão todos a mesma mensagem genérica. Sessões antigas
+      invalidadas na troca de senha sem código próprio:
+      `Laravel\Sanctum\Http\Middleware\AuthenticateSession` já faz isso em modo SPA, só
+      precisou ser ligado. Auditoria (`activity('users')`): criação, alteração de papéis,
+      desativação, reativação e geração de link — nunca token, URL ou senha (varrido por
+      teste dedicado). `GET /api/v1/roles` (mesma ability de `users`) lista os papéis com
+      nome e descrição definidos só em `App\Enums\Role`. `GET /api/v1/auth/user` ganhou
+      `data.access`, mapa de `viewAny` por recurso calculado via `$user->can()` — **o
+      frontend ainda não consome isto**. `docs/estrutura-site.md` §4.4 realinhado com a
+      matriz de `docs/dominio.md`. Só backend nesta sessão — tela vem depois (ver pendência
+      abaixo). 269 testes Pest, Pint e Larastan verdes.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista

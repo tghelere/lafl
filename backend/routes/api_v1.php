@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\Public\PickupRequestController as PublicPickupRe
 use App\Http\Controllers\Api\V1\Public\ProgramApplicationController as PublicProgramApplicationController;
 use App\Http\Controllers\Api\V1\Public\TransparencyDocumentController as PublicTransparencyDocumentController;
 use App\Http\Controllers\Api\V1\Public\VolunteerApplicationController as PublicVolunteerApplicationController;
+use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\TransparencyDocumentController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\VolunteerApplicationController;
@@ -89,6 +90,7 @@ Route::middleware($authenticated)->group(function (): void {
     Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
     Route::patch('/users/{user}/reactivate', [UserController::class, 'reactivate'])->name('users.reactivate');
     Route::post('/users/{user}/password-link', [UserController::class, 'generatePasswordLink'])->name('users.password-link');
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
 

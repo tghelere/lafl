@@ -238,49 +238,71 @@ A tela de Início é a mesma para todos, mas mostra só os blocos que o papel en
 
 ## 4.4 Papéis — decidido
 
-O enum atual (`social_work`, `psychology`, `pedagogy`) veio do desenho de acolhimento e não
-se aplica mais. Substituir por:
+Implementado em `App\Enums\Role` (backend/app/Enums/Role.php); esta seção espelha
+`docs/dominio.md`, seção "Papéis" — em caso de divergência entre os dois, o código e
+`docs/dominio.md` têm precedência, esta seção é só a versão "painel/menu" da mesma matriz.
 
 ```php
 enum Role: string
 {
     case SuperAdmin = 'super_admin';
     case Direcao = 'direcao';
-    case Atendimento = 'atendimento';
+    case Financeiro = 'financeiro';
+    case Contraturno = 'contraturno';
     case Bazar = 'bazar';
+    case Atendimento = 'atendimento';
     case Comunicacao = 'comunicacao';
 }
 ```
 
-**Princípio:** os papéis são modelados pelo **tipo de dado que tocam**, não por cargo.
-Organograma muda; a classificação do dado não.
+**Princípio:** os papéis são modelados pela **área de atuação**, não por cargo. Organograma
+muda; a área dona de um formulário ou conteúdo não. Um usuário pode acumular mais de um
+papel — cada papel soma seus acessos aos dos outros que o mesmo usuário tiver, não existe
+papel "combinado" à parte.
 
-Três níveis de dado no sistema:
+### Matriz de acesso por recurso
 
-1. **Conteúdo público** — páginas, notícias, mídia, documentos. Nenhum dado de pessoa.
-2. **Formulários recebidos** — dado de adulto: responsáveis, doadores, voluntários, empresas.
-3. **Cadastro de assistidos** — dado de menor. Ainda não implementado.
+A fonte da verdade é sempre a Policy do recurso (`backend/app/Policies/*`), nunca esta
+tabela.
 
-| Papel | Conteúdo | Formulários | Assistidos | Usuários |
-|---|---|---|---|---|
-| `super_admin` | total | total | total | total |
-| `direcao` | total | total | total | — |
-| `atendimento` | leitura | total | — | — |
-| `bazar` | só vitrine | só coletas | — | — |
-| `comunicacao` | total | **nenhum** | **nenhum** | — |
+| Recurso | Papéis com acesso (leitura e escrita) |
+|---|---|
+| `pages` | `direcao`, `comunicacao` |
+| `transparency-documents` | `direcao`, `financeiro` |
+| `program-applications` | `direcao`, `contraturno` |
+| `partnership-inquiries` | `direcao`, `contraturno` |
+| `pickup-requests` | `direcao`, `bazar` |
+| `volunteer-applications` | `direcao`, `atendimento` |
+| `contact-messages` | `direcao`, `atendimento` |
+| gestão de usuários (`/api/v1/users`, `/api/v1/roles`) | **só `super_admin`** — nem `direcao` |
+
+`super_admin` acessa tudo, sempre — bypass via `Gate::before` em `AppServiceProvider`, não
+aparece na tabela. `direcao` acessa todos os recursos operacionais, leitura e escrita, exceto
+gestão de usuários. `comunicacao` não tem acesso a nenhum formulário recebido nem a
+`transparency-documents` — só `pages`, nunca dado de pessoa.
 
 **Notas de desenho:**
 
-- `super_admin` é a única conta que gerencia usuários e papéis. `direcao` enxerga tudo
-  operacional mas não cria acesso — conceder acesso deve ser sempre ato deliberado.
-- `bazar` é separado porque pedido de coleta contém **endereço residencial** do doador, e
-  porque a equipe do bazar tende a ser própria e rotativa.
+- Gestão de usuários (criar, editar papel, desativar, reativar, gerar link de senha) é a
+  única área sem nenhum papel de área autorizado — nem `direcao`, que administra todo o
+  resto. Conceder acesso ao próprio painel é sempre ato deliberado de `super_admin`, nunca
+  delegável. Ver `docs/dominio.md`, seção "Contas", para o desenho completo (estado
+  ativo/inativo, link de senha de uso único, proteções contra remover o último
+  `super_admin`).
+- `bazar` é separado porque pedido de coleta (`pickup_requests`) contém **endereço
+  residencial** do doador, e porque a equipe do bazar tende a ser própria e rotativa.
+- `partnership-inquiries` está sob `contraturno`, não `atendimento`: o único formulário de
+  proposta de parceria do site (`/contraturno/apoiar`, "Apoiar o Projeto") é específico do
+  Contraturno — não existe formulário de parceria institucional geral.
 - `comunicacao` é o papel mais provável de ser terceirizado. **Não enxerga nenhum formulário
-  recebido.** Exige teste Pest afirmando isso explicitamente.
-- Não há papel `financeiro`: publicar documento de transparência é ato de direção, e o
-  contador externo não precisa de login.
-- `secretaria_cei` entra quando o cadastro de assistidos existir, para separar quem vê dado
-  de criança de quem vê formulário de adulto.
+  recebido nem documento de transparência.** Exige teste Pest afirmando isso explicitamente
+  (ver `tests/Feature/Authorization/RoleMatrixTest.php`).
+- Não há papel para a creche (CEI): a Educação Infantil não tem formulário recebido próprio
+  (matrícula aponta para a Central de Vagas da Prefeitura) nem conteúdo administrado fora de
+  `pages`, que já é `comunicacao`/`direcao`.
+- `secretaria_cei` (ou equivalente) só entra quando o cadastro de assistidos (Fase 2)
+  existir, para separar quem vê dado de criança de quem vê formulário de adulto — Fase 2
+  está bloqueada até `docs/lgpd/inventario-de-dados.md` ser preenchido.
 - Dividir papel depois é simples; juntar é que dá trabalho. Se `atendimento` se revelar
   amplo demais, divide-se em `secretaria` e `contato`.
 

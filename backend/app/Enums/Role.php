@@ -37,4 +37,22 @@ enum Role: string
             self::Comunicacao => 'Comunicação',
         };
     }
+
+    /**
+     * Frase curta para quem está escolhendo papel na tela de usuários (ver
+     * GET /api/v1/roles) — não é a fonte da verdade de acesso, só uma explicação em
+     * português do que a matriz em docs/dominio.md já decide via Policy.
+     */
+    public function description(): string
+    {
+        return match ($this) {
+            self::SuperAdmin => 'Acesso total ao sistema, sem restrição — inclusive gestão de usuários.',
+            self::Direcao => 'Acessa todos os formulários recebidos, documentos de transparência e conteúdo do site.',
+            self::Financeiro => 'Acessa os documentos de transparência (balanços, prestações de contas).',
+            self::Contraturno => 'Acessa avisos de interesse e propostas de apoio ao Contraturno.',
+            self::Bazar => 'Acessa os pedidos de coleta de doação do Bazar.',
+            self::Atendimento => 'Acessa candidaturas de voluntariado e mensagens de contato.',
+            self::Comunicacao => 'Administra o conteúdo do site (páginas).',
+        };
+    }
 }
