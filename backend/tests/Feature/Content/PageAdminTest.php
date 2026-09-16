@@ -166,3 +166,97 @@ test('excluir página é auditado e some das listagens', function (): void {
         ->and($page->fresh()->deleted_at)->not->toBeNull()
         ->and(Activity::where('event', 'deleted')->where('subject_id', $page->id)->where('subject_type', Page::class)->exists())->toBeTrue();
 });
+
+test('conteúdo salvo pela API é sanitizado antes de ir para o banco', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+
+    $this->actingAs($user)->postJson('/api/v1/pages', [
+        'slug' => 'quem-somos',
+        'title' => 'Quem Somos',
+        'content' => '<p>Texto legítimo.</p><script>alert(1)</script><p><a href="javascript:alert(1)">x</a></p>',
+        'status' => PageStatus::Published->value,
+    ])->assertCreated();
+
+    $content = Page::where('slug', 'quem-somos')->value('content');
+
+    expect($content)->toBe('<p>Texto legítimo.</p><p><a>x</a></p>');
+});
+
+test('conteúdo atualizado pela API também é sanitizado', function (): void {
+    $user = userWithRole(Role::Comunicacao->value);
+    $page = Page::factory()->published()->create(['slug' => 'quem-somos']);
+
+    $this->actingAs($user)->putJson("/api/v1/pages/{$page->uuid}", [
+        'slug' => $page->slug,
+        'title' => $page->title,
+        'content' => '<p onclick="alert(1)">Texto</p><iframe src="https://exemplo.invalid"></iframe>',
+        'status' => PageStatus::Published->value,
+    ])->assertOk();
+
+    expect($page->fresh()->content)->toBe('<p>Texto</p>');
+});
+
+/**
+ * Recorte desta fatia: a tela do painel não expõe slug nem status, mas a API continua
+ * aceitando os dois campos. Para quem não tem `direcao`, o que vier neles é ignorado — ver
+ * UpdatePageRequest::prepareForValidation() e PagePolicy::managePublication().
+ */
+test('comunicacao não muda slug nem status pela API: os valores atuais são mantidos', function (): void {
+    $user = userWithRole(Role::Comunicacao->value);
+    $page = Page::factory()->create([
+        'slug' => 'quem-somos',
+        'status' => PageStatus::Draft,
+        'published_at' => null,
+    ]);
+
+    $this->actingAs($user)->putJson("/api/v1/pages/{$page->uuid}", [
+        'slug' => 'endereco-sequestrado',
+        'title' => 'Título novo',
+        'content' => '<p>Conteúdo novo.</p>',
+        'status' => PageStatus::Published->value,
+    ])->assertOk()
+        ->assertJsonPath('data.slug', 'quem-somos')
+        ->assertJsonPath('data.status', 'draft');
+
+    $page->refresh();
+
+    // O que a fatia permite mudar mudou de verdade; o que ela não permite ficou parado.
+    expect($page->title)->toBe('Título novo')
+        ->and($page->content)->toBe('<p>Conteúdo novo.</p>')
+        ->and($page->slug)->toBe('quem-somos')
+        ->and($page->status)->toBe(PageStatus::Draft)
+        ->and($page->published_at)->toBeNull()
+        ->and(PageSlugHistory::where('page_id', $page->id)->exists())->toBeFalse();
+});
+
+test('direcao continua podendo mudar slug e status', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    $page = Page::factory()->create([
+        'slug' => 'antigo',
+        'status' => PageStatus::Draft,
+        'published_at' => null,
+    ]);
+
+    $this->actingAs($user)->putJson("/api/v1/pages/{$page->uuid}", [
+        'slug' => 'novo',
+        'title' => $page->title,
+        'content' => '<p>x</p>',
+        'status' => PageStatus::Published->value,
+    ])->assertOk()
+        ->assertJsonPath('data.slug', 'novo')
+        ->assertJsonPath('data.status', 'published');
+});
+
+test('super_admin continua podendo mudar slug e status', function (): void {
+    $user = userWithRole(Role::SuperAdmin->value);
+    $page = Page::factory()->create(['slug' => 'antigo', 'status' => PageStatus::Draft]);
+
+    $this->actingAs($user)->putJson("/api/v1/pages/{$page->uuid}", [
+        'slug' => 'novo',
+        'title' => $page->title,
+        'content' => '<p>x</p>',
+        'status' => PageStatus::Published->value,
+    ])->assertOk()
+        ->assertJsonPath('data.slug', 'novo')
+        ->assertJsonPath('data.status', 'published');
+});

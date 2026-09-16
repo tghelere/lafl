@@ -47,4 +47,16 @@ final class PagePolicy
     {
         return $this->viewAny($user);
     }
+
+    /**
+     * Endereço público (slug) e situação de publicação da página. Separado de `update`
+     * porque mexer no texto e mexer na estrutura do site têm peso diferente: trocar o slug
+     * quebra link já divulgado e muda o que o Nuxt prerenderiza; publicar/despublicar tira
+     * uma página do ar. `comunicacao` escreve o conteúdo do dia a dia mas não decide isso —
+     * só `direcao` (e `super_admin`, pelo Gate::before em AppServiceProvider).
+     */
+    public function managePublication(User $user, Page $page): bool
+    {
+        return $user->hasRole(Role::Direcao->value);
+    }
 }

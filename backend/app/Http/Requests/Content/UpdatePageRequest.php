@@ -6,6 +6,7 @@ namespace App\Http\Requests\Content;
 
 use App\Actions\Content\Data\PageData;
 use App\Enums\PageStatus;
+use App\Models\Page;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,6 +15,36 @@ final class UpdatePageRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()?->can('update', $this->route('page')) ?? false;
+    }
+
+    /**
+     * Quem não pode mexer em publicação (ver PagePolicy::managePublication) tem `slug` e
+     * `status` substituídos pelos valores já gravados, antes da validação — o que vier no
+     * corpo para esses dois campos é simplesmente ignorado.
+     *
+     * Ignorar em vez de responder 422 é a forma mais simples que garante o invariante: as
+     * regras, o DTO e o Action continuam exatamente como estão (os dois campos seguem
+     * `required` e validados), e o resultado é o mesmo independente do que o cliente mande —
+     * inclusive um cliente antigo ou um `curl` direto na API. Um 422 exigiria regra
+     * condicional e só puniria quem mandou o valor atual junto, que é o caso normal de um
+     * formulário que devolve o registro inteiro.
+     */
+    protected function prepareForValidation(): void
+    {
+        $page = $this->route('page');
+
+        if (! $page instanceof Page) {
+            return;
+        }
+
+        if ($this->user()?->can('managePublication', $page) === true) {
+            return;
+        }
+
+        $this->merge([
+            'slug' => $page->slug,
+            'status' => $page->status->value,
+        ]);
     }
 
     /**

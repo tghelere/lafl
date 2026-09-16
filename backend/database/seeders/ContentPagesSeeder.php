@@ -297,7 +297,7 @@ class ContentPagesSeeder extends Seeder
                     <p>A matrícula no CEI Anália Franco é feita exclusivamente pela Central de Vagas da
                     Secretaria Municipal de Educação de Londrina — o Lar Anália Franco não recebe pedido de
                     vaga diretamente, nem pelo site nem por telefone.</p>
-                    <p><strong>Central de Vagas</strong><br>
+                    <p><strong>Central de Vagas</strong><br />
                     Rua Benjamin Constant, 800 — Centro, Londrina/PR</p>
                     <p>Para telefone, horário de atendimento e outros canais de contato, consulte o site
                     oficial da Prefeitura de Londrina.</p>
@@ -432,7 +432,7 @@ class ContentPagesSeeder extends Seeder
                 'content' => <<<'HTML'
                     <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália
                     Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou
-                    <a href="https://wa.me/5543999500183?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
+                    <a href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
                     HTML,
             ],
             [
@@ -445,7 +445,7 @@ class ContentPagesSeeder extends Seeder
                     <p>A lista detalhada do que é aceito — e do que não é — está em confirmação com a
                     equipe do bazar. Para
                     <a href="/bazar/agendar-coleta">agendar uma coleta</a>, o jeito mais rápido é pelo
-                    <a href="https://wa.me/5543999500183?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
+                    <a href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
                     HTML,
             ],
             [

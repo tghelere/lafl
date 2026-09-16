@@ -9,12 +9,15 @@ use App\Enums\PageStatus;
 use App\Models\Page;
 use App\Models\PageSlugHistory;
 use App\Support\Cache\PublicPageCache;
+use App\Support\Html\ContentSanitizer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class SavePage
 {
+    public function __construct(private readonly ContentSanitizer $sanitizer) {}
+
     /**
      * Cria ou atualiza uma página. Slug muda → histórico gravado, cache público invalidado.
      */
@@ -29,7 +32,10 @@ final class SavePage
 
             $page->slug = $data->slug;
             $page->title = $data->title;
-            $page->content = $data->content;
+            // Sanitiza aqui, e não no FormRequest, para que todo caminho de escrita passe
+            // pelo mesmo filtro — inclusive seeder, comando de console ou qualquer chamada
+            // futura que não venha de uma requisição HTTP.
+            $page->content = $this->sanitizer->sanitize($data->content);
             $page->meta_title = $data->metaTitle;
             $page->meta_description = $data->metaDescription;
             $page->status = $data->status;
