@@ -34,9 +34,10 @@ final class UserResource extends JsonResource
 
     /**
      * viewAny de cada recurso administrativo, calculado pelas Policies via `$user->can()` —
-     * nunca reimplementado aqui, só agregado. O front ainda não consome isto (ver
-     * docs/roadmap.md, tela de usuários); existe para a navegação decidir o que mostrar sem
-     * hardcodar papel por papel do lado do cliente.
+     * nunca reimplementado aqui, só agregado. É o que o painel usa para decidir menu e
+     * guarda de tela (ver frontend-admin/src/components/AppSidebar.vue e AppLayout.vue), sem
+     * hardcodar papel por papel do lado do cliente. Quem barra de fato continua sendo a
+     * Policy: acrescentar recurso aqui sem Policy correspondente não concede nada.
      *
      * @return array<string, bool>
      */

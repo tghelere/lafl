@@ -260,3 +260,27 @@ test('super_admin continua podendo mudar slug e status', function (): void {
         ->assertJsonPath('data.slug', 'novo')
         ->assertJsonPath('data.status', 'published');
 });
+
+/**
+ * A busca precisa ignorar caixa. Atenção ao ler este teste: a suíte roda em SQLite (ver
+ * phpunit.xml), onde LIKE já ignora caixa por conta própria — é o PostgreSQL de
+ * desenvolvimento e produção que diferencia, e foi lá que a busca apareceu quebrada. Este
+ * teste documenta a intenção, mas quem garante o comportamento no banco real é o
+ * whereLike() do Controller, não o resultado verde aqui.
+ */
+test('listagem de páginas filtra por título, ignorando maiúscula e minúscula', function (string $busca): void {
+    $user = userWithRole(Role::Direcao->value);
+    Page::factory()->create(['slug' => 'quem-somos', 'title' => 'Quem Somos']);
+    Page::factory()->create(['slug' => 'bazar', 'title' => 'Bazar Beneficente']);
+
+    $response = $this->actingAs($user)->getJson('/api/v1/pages?search='.$busca);
+
+    $response->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.title', 'Bazar Beneficente');
+})->with(['bazar', 'Bazar', 'BAZAR', 'beneficente']);
+
+test('listagem sem busca devolve todas as páginas', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    Page::factory()->count(3)->create();
+
+    $this->actingAs($user)->getJson('/api/v1/pages')->assertOk()->assertJsonCount(3, 'data');
+});

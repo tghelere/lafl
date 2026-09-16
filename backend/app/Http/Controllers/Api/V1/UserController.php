@@ -36,9 +36,13 @@ final class UserController extends Controller
         $query = User::query()->with('roles')->orderBy('name');
 
         if ($search !== '') {
+            // whereLike() em vez de where(..., 'like', ...): no PostgreSQL o LIKE é sensível
+            // a maiúscula, então "maria" não acharia "Maria". A suíte roda em SQLite, onde
+            // LIKE já ignora caixa — por isso o teste de busca passava mesmo com a busca
+            // quebrada no banco de verdade.
             $query->where(function ($subQuery) use ($search): void {
-                $subQuery->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                $subQuery->whereLike('name', "%{$search}%")
+                    ->orWhereLike('email', "%{$search}%");
             });
         }
 
