@@ -163,19 +163,49 @@ basta por ora.
 
 ## Papéis
 
-Definidos em `@docs/estrutura-site.md` §4.4:
-`super_admin`, `direcao`, `atendimento`, `bazar`, `comunicacao`.
+`App\Enums\Role`: `super_admin`, `direcao`, `financeiro`, `contraturno`, `bazar`,
+`atendimento`, `comunicacao`.
 
-Modelados pelo **tipo de dado que tocam**, não por cargo. `secretaria_cei` entra na Fase 2.
+Por **área de atuação**, não por cargo — organograma muda, a área dona de um formulário ou
+conteúdo não. Um usuário pode acumular mais de um papel (ex.: quem cuida do financeiro também
+cobre o contraturno); cada papel soma seus acessos aos dos outros que o mesmo usuário tiver —
+não há papel "combinado" à parte. Sem papel para a creche (CEI): Educação Infantil não tem
+formulário recebido próprio (matrícula aponta para a Central de Vagas da Prefeitura, ver
+`docs/roadmap.md`) nem conteúdo administrado fora de `pages`, que já é
+`comunicacao`/`direcao`. `secretaria_cei` (ou equivalente) só entra quando a Fase 2 (cadastro
+de assistidos) for desbloqueada — fora do escopo atual.
 
-O enum atual do código (`social_work`, `psychology`, `pedagogy`, `coordination`,
-`administrative`, `content_editor`) veio do desenho de acolhimento e **precisa ser
-substituído**.
+### Matriz de acesso por recurso
+
+A fonte da verdade é sempre a Policy do recurso (`App\Policies\*`), nunca esta tabela — ela
+existe para consulta rápida, não para ser lida em vez do código.
+
+| Recurso | Papéis com acesso (leitura e escrita) |
+|---|---|
+| `pages` | `direcao`, `comunicacao` |
+| `transparency-documents` | `direcao`, `financeiro` |
+| `program-applications` | `direcao`, `contraturno` |
+| `partnership-inquiries` | `direcao`, `contraturno` |
+| `pickup-requests` | `direcao`, `bazar` |
+| `volunteer-applications` | `direcao`, `atendimento` |
+| `contact-messages` | `direcao`, `atendimento` |
+| gestão de usuários | não implementada (ver `docs/roadmap.md`) |
+
+`super_admin` acessa tudo, sempre — bypass via `Gate::before` em `AppServiceProvider`, não
+aparece na tabela. `direcao` acessa todos os recursos acima, leitura e escrita, exceto gestão
+de usuários (quando existir). `comunicacao` não tem acesso a nenhum formulário recebido nem a
+`transparency-documents` — só `pages`, nunca dado de pessoa.
+
+`partnership-inquiries` está sob `contraturno`, não `atendimento`: o único formulário de
+proposta de parceria do site (`/contraturno/apoiar`, página "Apoiar o Projeto") é específico
+do Contraturno — não existe formulário de parceria institucional geral (`/como-ajudar/
+parceiros` é conteúdo sobre parceiros já existentes, sem formulário).
 
 **Princípios:**
 
 - Toda autorização por **Policy**, nunca por checagem inline de papel no controller
-- `comunicacao` não enxerga nenhum formulário recebido — exige teste Pest explícito
+- `comunicacao` não enxerga nenhum formulário recebido nem dado de pessoa — exige teste Pest
+  explícito
 - Acesso a dado de assistido gera auditoria, inclusive leitura
 
 ## Pendências

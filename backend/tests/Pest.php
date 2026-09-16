@@ -17,8 +17,10 @@ pest()->extend(TestCase::class)
 
 /**
  * Cria (e semeia os papéis, se preciso) um usuário sintético com o papel dado — usado nos
- * testes de Policy por papel (ver docs/estrutura-site.md §4.4). Não chama actingAs: cada
- * teste decide explicitamente quando autenticar.
+ * testes de Policy por papel (ver docs/dominio.md, seção "Papéis"). Não chama actingAs: cada
+ * teste decide explicitamente quando autenticar. Um usuário pode acumular mais de um papel
+ * chamando `$user->assignRole(...)` de novo no teste (ver
+ * tests/Feature/Authorization/RoleMatrixTest.php).
  */
 function userWithRole(string $role): User
 {
