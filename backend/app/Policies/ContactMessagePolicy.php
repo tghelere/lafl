@@ -4,4 +4,12 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-final class ContactMessagePolicy extends FormSubmissionPolicy {}
+use App\Enums\Role;
+
+final class ContactMessagePolicy extends FormSubmissionPolicy
+{
+    protected function allowedRoles(): array
+    {
+        return [...parent::allowedRoles(), Role::Atendimento->value];
+    }
+}

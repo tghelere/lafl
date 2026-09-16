@@ -9,10 +9,10 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Base compartilhada pelas seis Policies de formulário recebido (ver docs/estrutura-site.md
- * §4.4: "formulários recebidos" — `direcao` e `atendimento` têm acesso total, `comunicacao`
- * nenhum). `bazar` é a única exceção, tratada em `PickupRequestPolicy`, que sobrescreve
- * `allowedRoles()`.
+ * Base compartilhada pelas seis Policies de formulário recebido (ver docs/dominio.md, seção
+ * "Papéis") — `direcao` acessa todos, cada subclasse soma o papel da área dona daquele
+ * formulário por cima do que a base já dá (`comunicacao` nunca aparece em nenhuma: não tem
+ * acesso a formulário recebido nem a dado de pessoa).
  *
  * super_admin não aparece aqui — bypass via Gate::before em AppServiceProvider.
  *
@@ -27,7 +27,7 @@ abstract class FormSubmissionPolicy
      */
     protected function allowedRoles(): array
     {
-        return [Role::Direcao->value, Role::Atendimento->value];
+        return [Role::Direcao->value];
     }
 
     public function viewAny(User $user): bool

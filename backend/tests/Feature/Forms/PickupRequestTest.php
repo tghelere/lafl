@@ -69,10 +69,10 @@ test('job de expurgo apaga endereço de coleta concluída, mas preserva o resto 
         ->and($pending->fresh()->address)->not->toBeNull();
 });
 
-test('direcao, atendimento e bazar podem ver o formulário, comunicacao não', function (): void {
+test('direcao e bazar podem ver o formulário, atendimento e comunicacao não', function (): void {
     expect(userWithRole(Role::Direcao->value)->can('viewAny', PickupRequest::class))->toBeTrue()
-        ->and(userWithRole(Role::Atendimento->value)->can('viewAny', PickupRequest::class))->toBeTrue()
         ->and(userWithRole(Role::Bazar->value)->can('viewAny', PickupRequest::class))->toBeTrue()
+        ->and(userWithRole(Role::Atendimento->value)->can('viewAny', PickupRequest::class))->toBeFalse()
         ->and(userWithRole(Role::Comunicacao->value)->can('viewAny', PickupRequest::class))->toBeFalse();
 });
 

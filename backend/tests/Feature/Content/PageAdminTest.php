@@ -43,19 +43,18 @@ test('comunicacao pode criar e publicar página', function (): void {
     expect($response->json('data.published_at'))->not->toBeNull();
 });
 
-test('atendimento não pode criar página, mas pode listar e ver', function (): void {
+test('atendimento não acessa pages em nenhuma operação', function (): void {
     $user = userWithRole(Role::Atendimento->value);
     $page = Page::factory()->create();
 
+    $this->actingAs($user)->getJson('/api/v1/pages')->assertForbidden();
+    $this->actingAs($user)->getJson("/api/v1/pages/{$page->uuid}")->assertForbidden();
     $this->actingAs($user)->postJson('/api/v1/pages', [
         'slug' => 'x',
         'title' => 'X',
         'content' => 'x',
         'status' => PageStatus::Draft->value,
     ])->assertForbidden();
-
-    $this->actingAs($user)->getJson('/api/v1/pages')->assertOk();
-    $this->actingAs($user)->getJson("/api/v1/pages/{$page->uuid}")->assertOk();
 });
 
 test('bazar não acessa pages em nenhuma operação', function (): void {

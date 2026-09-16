@@ -10,18 +10,17 @@ use App\Models\User;
 
 /**
  * super_admin não aparece aqui — bypass via Gate::before em AppServiceProvider (ver
- * docs/estrutura-site.md §4.4).
+ * docs/dominio.md, seção "Papéis").
  *
- * Diferente de PagePolicy: só `direcao` administra documentos de transparência, nem
- * `comunicacao` nem `atendimento` — publicar prestação de contas é ato de direção, não de
- * conteúdo geral (ver docs/estrutura-site.md §4.2 e docs/dominio.md, "Não há papel
- * financeiro").
+ * `direcao` e `financeiro` administram documentos de transparência; nem `comunicacao` nem
+ * `atendimento` — publicar prestação de contas é ato de direção/financeiro, não de conteúdo
+ * geral.
  */
 final class TransparencyDocumentPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(Role::Direcao->value);
+        return $user->hasAnyRole([Role::Direcao->value, Role::Financeiro->value]);
     }
 
     public function view(User $user, TransparencyDocument $document): bool

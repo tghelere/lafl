@@ -71,9 +71,10 @@ test('honeypot preenchido devolve sucesso mas não grava nada', function (): voi
     expect(ProgramApplication::count())->toBe(0);
 });
 
-test('direcao e atendimento podem ver o formulário, comunicacao e bazar não', function (): void {
+test('direcao e contraturno podem ver o formulário, atendimento comunicacao e bazar não', function (): void {
     expect(userWithRole(Role::Direcao->value)->can('viewAny', ProgramApplication::class))->toBeTrue()
-        ->and(userWithRole(Role::Atendimento->value)->can('viewAny', ProgramApplication::class))->toBeTrue()
+        ->and(userWithRole(Role::Contraturno->value)->can('viewAny', ProgramApplication::class))->toBeTrue()
+        ->and(userWithRole(Role::Atendimento->value)->can('viewAny', ProgramApplication::class))->toBeFalse()
         ->and(userWithRole(Role::Comunicacao->value)->can('viewAny', ProgramApplication::class))->toBeFalse()
         ->and(userWithRole(Role::Bazar->value)->can('viewAny', ProgramApplication::class))->toBeFalse();
 });
