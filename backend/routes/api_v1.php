@@ -20,12 +20,18 @@ use App\Http\Controllers\Api\V1\TransparencyDocumentController;
 use App\Http\Controllers\Api\V1\VolunteerApplicationController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('auth')->name('auth.')->group(function (): void {
+// Aplicado a toda rota autenticada deste arquivo (ver bootstrap/app.php para o que cada uma
+// faz) — 'auth:sanctum' resolve o usuário, 'active' barra quem foi desativado depois do
+// login, 'auth.session' barra sessão cuja senha mudou em outro lugar (troca autenticada ou
+// definição por link).
+$authenticated = ['auth:sanctum', 'active', 'auth.session'];
+
+Route::prefix('auth')->name('auth.')->group(function () use ($authenticated): void {
     Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:login')
         ->name('login');
 
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware($authenticated)->group(function (): void {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/user', [AuthController::class, 'user'])->name('user');
         Route::put('/password', [AuthController::class, 'updatePassword'])->name('password.update');
@@ -62,7 +68,7 @@ Route::prefix('public')->name('public.')->group(function (): void {
     });
 });
 
-Route::middleware('auth:sanctum')->group(function (): void {
+Route::middleware($authenticated)->group(function (): void {
     Route::apiResource('pages', PageController::class)->parameters(['pages' => 'page']);
     Route::apiResource('transparency-documents', TransparencyDocumentController::class)
         ->parameters(['transparency-documents' => 'transparencyDocument']);

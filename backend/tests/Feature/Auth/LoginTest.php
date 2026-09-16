@@ -44,6 +44,35 @@ test('login registra evento de auditoria', function (): void {
     expect(Activity::where('event', 'login')->where('causer_id', $this->user->id)->exists())->toBeTrue();
 });
 
+test('login de usuário desativado com senha correta recusa com mensagem específica', function (): void {
+    $this->user->forceFill(['deactivated_at' => now()])->save();
+
+    $response = $this->postJson('/api/v1/auth/login', [
+        'email' => $this->user->email,
+        'password' => 'senha-correta',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors('email')
+        ->assertJsonFragment(['email' => ['Esta conta foi desativada. Fale com a direção.']]);
+
+    $this->assertGuest('web');
+});
+
+test('login de usuário desativado com senha errada recusa com a mensagem genérica, não a de desativado', function (): void {
+    $this->user->forceFill(['deactivated_at' => now()])->save();
+
+    $response = $this->postJson('/api/v1/auth/login', [
+        'email' => $this->user->email,
+        'password' => 'senha-errada',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonFragment(['email' => ['Credenciais inválidas.']]);
+
+    $this->assertGuest('web');
+});
+
 test('login é limitado por rate limit', function (): void {
     RateLimiter::clear('login');
 
