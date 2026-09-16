@@ -45,6 +45,12 @@ function roleMatrixResources(): array
             'endpoint' => '/api/v1/pages',
             'allowed' => [Role::Direcao, Role::Comunicacao],
         ],
+        // Único recurso sem nenhum papel de área — nem direcao (ver App\Policies\
+        // UserPolicy). `allowed` vazio: toda linha deste recurso nega, exceto super_admin.
+        'users' => [
+            'endpoint' => '/api/v1/users',
+            'allowed' => [],
+        ],
     ];
 }
 

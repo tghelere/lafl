@@ -270,21 +270,41 @@ levantar.
 
 ### Painel administrativo (Vue)
 
-- [ ] Gestão de conteúdo (`pages`, `posts`, mídia) e de documentos de transparência ainda não
-      têm tela — a API de `pages`/`transparency-documents` já existe e está testada desde
-      sessões anteriores, só falta a interface. As telas de leitura dos seis formulários
-      recebidos (Início/Atendimento/Bazar) foram construídas na sessão 6; conteúdo,
-      transparência e usuários seguem fora de escopo.
+- [ ] Gestão de conteúdo (`pages`, `posts`, mídia) ainda não tem tela — a API de `pages` já
+      existe e está testada, só falta a interface. Documentos de transparência já têm tela
+      (`TransparencyListView.vue`/`TransparencyFormView.vue`, ver sessão de filtro/paginação
+      server-side).
+- [ ] **Tela de gestão de usuários — próxima sessão.** O backend inteiro já existe e está
+      testado (ver `docs/dominio.md`, seção "Contas"): CRUD sob `/api/v1/users` (busca,
+      filtro ativo/inativo, paginação, criar, editar nome/e-mail/papéis, desativar, reativar
+      — sem exclusão, conta só desativa), `GET /api/v1/roles` para popular o seletor de
+      papéis, e o mapa de acesso por recurso em `GET /api/v1/auth/user` (`data.access`) para
+      a navegação decidir o que mostrar. Falta só a interface: lista com busca/filtro,
+      formulário de criar/editar, ação de (des/re)ativar com confirmação, e o botão "gerar
+      link de definição de senha" que mostra a URL uma única vez (copiável, nunca
+      recuperável depois — avisar isso na tela) para o admin enviar por fora (WhatsApp).
 - [ ] Editor de texto rico com sanitização no backend (Tiptap, a justificar como nova
       dependência quando a tela existir)
 - [ ] Preview de SERP nos campos de SEO
-- [ ] Tela de upload de documento de transparência (a API já existe e está testada — só falta
-      a interface)
 - [ ] `frontend-admin` não tem nenhuma ferramenta de teste (Vitest, Testing Library ou
       equivalente) — a sessão 6 construiu a primeira fatia de UI real do painel sem nenhum
       teste automatizado do lado do front, só Pest no backend e verificação manual via
       `php artisan tinker` (sem navegador disponível na sessão). Vale considerar antes da
       próxima leva de telas, quando a superfície ficar grande demais para revisão visual pura.
+
+### Autenticação — pendências pós-lançamento
+
+- [ ] **"Esqueci minha senha" por e-mail** — depende de SMTP configurado em produção (ver
+      `MAIL_MAILER` em `.env.example`, hoje só Mailpit em dev). O broker `users` em
+      `config/auth.php` já existe pronto para isso (60 min de validade, padrão), separado do
+      broker `user_setup` que o link administrativo usa (24h) — implementar como
+      `POST /api/v1/auth/forgot-password` + `POST /api/v1/auth/reset-password` reaproveitando
+      `Password::broker('users')->sendResetLink()`/`->reset()`, mesmo padrão de
+      `App\Actions\Auth\SetUserPassword`.
+- [ ] **2FA** — schema já existe em `users` (`two_factor_secret`, `two_factor_recovery_codes`,
+      `two_factor_confirmed_at`, todos cifrados), mas sem fluxo de setup, desafio no login ou
+      recuperação. `docs/protecao-de-dados.md`/`docs/dominio.md` registram 2FA como
+      obrigatório para conta de sistema — pendência de implementação, não de desenho.
 
 ### Formulários públicos — decisões e pendências desta sessão
 
