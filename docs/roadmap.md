@@ -328,22 +328,25 @@ uma camada de cache de HTML por cima.
 
 ### Painel administrativo (Vue)
 
-- [ ] Gestão de conteúdo (`pages`, `posts`, mídia) ainda não tem tela — a API de `pages` já
-      existe e está testada, só falta a interface. Documentos de transparência já têm tela
-      (`TransparencyListView.vue`/`TransparencyFormView.vue`, ver sessão de filtro/paginação
-      server-side).
-- [ ] **Tela de gestão de usuários — próxima sessão.** O backend inteiro já existe e está
-      testado (ver `docs/dominio.md`, seção "Contas"): CRUD sob `/api/v1/users` (busca,
-      filtro ativo/inativo, paginação, criar, editar nome/e-mail/papéis, desativar, reativar
-      — sem exclusão, conta só desativa), `GET /api/v1/roles` para popular o seletor de
-      papéis, e o mapa de acesso por recurso em `GET /api/v1/auth/user` (`data.access`) para
-      a navegação decidir o que mostrar. Falta só a interface: lista com busca/filtro,
-      formulário de criar/editar, ação de (des/re)ativar com confirmação, e o botão "gerar
-      link de definição de senha" que mostra a URL uma única vez (copiável, nunca
-      recuperável depois — avisar isso na tela) para o admin enviar por fora (WhatsApp).
-- [ ] Editor de texto rico com sanitização no backend (Tiptap, a justificar como nova
-      dependência quando a tela existir)
-- [ ] Preview de SERP nos campos de SEO
+- [x] Edição do conteúdo das páginas existentes — feito
+      (`ContentPageListView.vue`/`ContentPageFormView.vue`): título, conteúdo e campos de SEO,
+      com sanitização no backend (ver
+      `docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md`).
+- [ ] Gestão de conteúdo além dessa fatia: **criar** e **excluir** página, **renomear slug** e
+      **publicar/despublicar** continuam sem tela — a API aceita as quatro operações, mas o
+      painel não as expõe. Para quem não tem `direcao`, `slug` e `status` são ignorados no
+      update (`UpdatePageRequest::prepareForValidation` + `PagePolicy::managePublication`), de
+      modo que o recorte vale mesmo para chamada direta à API. Renomear slug é a mais delicada
+      das quatro: quebra link já divulgado e mexe na lista de prerender do Nuxt.
+- [ ] `posts` e mídia seguem sem entidade e sem tela (ver "Backend — entidades da Fase 1
+      restantes").
+- [x] Tela de gestão de usuários — feita (`UserListView.vue`/`UserFormView.vue`), junto das
+      telas de conta (`/definir-senha`, `/conta`).
+- [x] Editor de texto rico com sanitização no backend — Tiptap no painel, allowlist em
+      `App\Support\Html\ContentSanitizer`, dependências justificadas no ADR 0010.
+- [ ] Preview de SERP nos campos de SEO — hoje há só contador de caracteres na descrição,
+      avisando a partir de 160 (onde o Google costuma cortar), sem a simulação visual do
+      resultado de busca.
 - [ ] `frontend-admin` não tem nenhuma ferramenta de teste (Vitest, Testing Library ou
       equivalente) — a sessão 6 construiu a primeira fatia de UI real do painel sem nenhum
       teste automatizado do lado do front, só Pest no backend e verificação manual via
