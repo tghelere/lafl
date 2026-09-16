@@ -3,6 +3,10 @@
 .env.*
 !.env.example
 !*/.env.example
+# Exceção: backend/.env.testing só tem valor fictício (nunca dado ou chave real) e precisa
+# estar versionado para a suíte rodar igual em qualquer máquina e no CI — ver README, seção
+# "Testes e qualidade".
+!backend/.env.testing
 
 # Backend (Laravel)
 backend/vendor/

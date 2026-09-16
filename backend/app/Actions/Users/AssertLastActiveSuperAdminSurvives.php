@@ -27,13 +27,19 @@ final class AssertLastActiveSuperAdminSurvives
             return;
         }
 
-        $activeSuperAdminCount = User::query()
+        // ->count() depois de lockForUpdate() vira `SELECT count(*) ... FOR UPDATE` — o
+        // PostgreSQL recusa travar linha em cima de função de agregação (SQLite deixava
+        // passar, porque lockForUpdate() é um no-op lá; nunca trava nada de verdade). Selecionar
+        // as linhas e contar com count() nativo do PHP (Collection implementa Countable) trava
+        // cada linha que qualifica, sem agregação na mesma consulta — ->count() do Collection
+        // faria sentido pedir de volta ao banco, mas aqui as linhas já estão na mão.
+        $activeSuperAdmins = User::query()
             ->role(Role::SuperAdmin->value)
             ->active()
             ->lockForUpdate()
-            ->count();
+            ->get(['id']);
 
-        if ($activeSuperAdminCount <= 1) {
+        if (count($activeSuperAdmins) <= 1) {
             throw ValidationException::withMessages([
                 'roles' => ['Não é possível remover ou desativar o último super administrador ativo.'],
             ]);

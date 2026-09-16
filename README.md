@@ -90,7 +90,12 @@ cd ../frontend-site  && npm install && npm run dev   # http://localhost:3000
 ```
 
 Em produção/staging, `DB_CONNECTION=pgsql` e Redis são obrigatórios (ver `.env.example`) —
-SQLite/file aqui são só para rodar esta fatia sem Docker, nunca para dado real.
+SQLite/file aqui são só para rodar a aplicação sem Docker, nunca para dado real.
+
+**A suíte de testes não segue esse SQLite** — `backend/.env.testing` aponta sempre para
+Postgres (ver seção "Testes e qualidade"), então rodar `php artisan test` sem Docker exige
+pelo menos o serviço `postgres` do compose no ar (`docker compose up -d postgres`) ou um
+Postgres local equivalente.
 
 ## Login de desenvolvimento
 
@@ -128,8 +133,20 @@ cd backend && php artisan tinker --execute="dump(\Spatie\Activitylog\Models\Acti
 
 ## Testes e qualidade
 
+**A suíte Pest roda exclusivamente contra PostgreSQL — nunca SQLite** (ver `CLAUDE.md`,
+"Armadilhas conhecidas"). Um bug real de busca (`LIKE` sensível a maiúsculas, que o Postgres
+respeita e o SQLite ignora) passou pela suíte inteira sem ser notado enquanto ela rodava em
+`:memory:`; rodar contra o mesmo banco de produção é o que garante que "verde localmente"
+signifique "verde de verdade".
+
+O banco de teste (`lar_analia_franco_test`) é **separado do banco de desenvolvimento**
+(`lar_analia_franco`), no mesmo Postgres do `docker-compose.yml` — `php artisan test` nunca
+apaga dado de desenvolvimento, mesmo rodando `migrate:fresh` internamente
+(`Illuminate\Foundation\Testing\RefreshDatabase`).
+
 ```bash
-# backend/
+# backend/ — precisa do Postgres do compose no ar (docker compose up -d postgres), mesmo que
+# o resto do stack rode sem Docker (ver "Setup local — sem Docker")
 php artisan test
 ./vendor/bin/pint
 ./vendor/bin/phpstan analyse --memory-limit=512M   # 128M (padrão do PHP) estoura com o volume atual de código
@@ -143,8 +160,25 @@ npm run build      # SSR
 npm run generate   # SSG
 ```
 
-CI (`.github/workflows/ci.yml`) roda os mesmos comandos a cada push/PR, com o backend contra
-Postgres real (não SQLite) para paridade com produção.
+A configuração de teste vive em `backend/.env.testing` (commitado — só valores fictícios,
+nunca dado real), carregado automaticamente por `APP_ENV=testing`
+(`backend/phpunit.xml`) em vez de `backend/.env`. Para preparar o banco pela primeira vez, ou
+depois de uma migration nova:
+
+```bash
+cd backend && php artisan migrate:fresh --env=testing --force
+```
+
+`docker/postgres/init-test-db.sql` cria `lar_analia_franco_test` automaticamente no primeiro
+boot do container `postgres` (volume de dados vazio). Num volume já existente de antes desta
+mudança, criar o banco manualmente uma vez:
+
+```bash
+docker compose exec postgres psql -U lar -d postgres -c "CREATE DATABASE lar_analia_franco_test;"
+```
+
+CI (`.github/workflows/ci.yml`) roda os mesmos comandos a cada push/PR, com um container de
+serviço Postgres na mesma versão principal do `docker-compose.yml` (16).
 
 ## Convenções
 

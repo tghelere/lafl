@@ -18,22 +18,15 @@
         </include>
     </source>
     <php>
+        <!-- Único valor aqui de propósito: só isto já basta para
+             Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables carregar
+             backend/.env.testing (não backend/.env) — é lá que mora toda a configuração de
+             teste, banco Postgres dedicado incluído (ver .env.testing e CLAUDE.md,
+             "Armadilhas conhecidas": a suíte não roda mais em SQLite). Duplicar as mesmas
+             chaves aqui seria pior que redundante — um <env> definido aqui é setado no
+             processo ANTES do Dotenv carregar o arquivo, e Dotenv não sobrescreve variável já
+             definida, então bastaria uma linha esquecida aqui para o .env.testing parar de
+             fazer efeito silenciosamente. -->
         <env name="APP_ENV" value="testing"/>
-        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
-        <env name="DB_URL" value=""/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <!-- Chaves só para teste, geradas nesta sessão. Nunca usar em ambiente real. -->
-        <env name="FIELD_ENCRYPTION_KEY" value="base64:2CXDHL3fMP8mbXCe5JRiUEImexTHkhQ3hzgPvQif5V0="/>
-        <env name="BLIND_INDEX_KEY" value="base64:98GJMoj/GdVN6Z9BlvM7Xyjz5RyAQlZhTDIxMtLSVg8="/>
-        <env name="PULSE_ENABLED" value="false"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="NIGHTWATCH_ENABLED" value="false"/>
     </php>
 </phpunit>

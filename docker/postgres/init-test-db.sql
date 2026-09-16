@@ -1,0 +1,11 @@
+-- Banco de teste dedicado, separado do banco de desenvolvimento (lar_analia_franco) — a
+-- suíte Pest roda exclusivamente contra Postgres (ver CLAUDE.md, "Armadilhas conhecidas": um
+-- bug de LIKE sensível a maiúsculas passou pelos testes sem ser notado enquanto a suíte
+-- rodava em SQLite, que ignora caixa por padrão). Ter um banco à parte evita que
+-- `migrate:fresh` de um `php artisan test` apague dado de desenvolvimento por engano.
+--
+-- Scripts em /docker-entrypoint-initdb.d só rodam no primeiro boot do container, com o
+-- volume de dados vazio — não têm efeito num volume já inicializado antes deste arquivo
+-- existir. Para criar o banco num volume já existente, ver README, seção "Testes e
+-- qualidade".
+CREATE DATABASE lar_analia_franco_test;

@@ -30,6 +30,11 @@ services:
       - "${DB_FORWARD_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      # Banco de teste dedicado (lar_analia_franco_test), separado do banco de
+      # desenvolvimento — ver docker/postgres/init-test-db.sql e backend/.env.testing. Só
+      # roda no primeiro boot do container (volume vazio); num volume já existente, criar o
+      # banco manualmente (ver README).
+      - ./docker/postgres/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-lar}"]
       interval: 5s
