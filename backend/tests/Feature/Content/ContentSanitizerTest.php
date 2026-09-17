@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Support\Content\InitialPages;
 use App\Support\Html\ContentSanitizer;
-use Database\Seeders\ContentPagesSeeder;
 
 beforeEach(function (): void {
     $this->sanitizer = new ContentSanitizer;
@@ -126,16 +126,14 @@ test('sanitizar duas vezes dá o mesmo resultado que sanitizar uma vez', functio
 
 /**
  * A garantia que importa para o conteúdo já publicado: passar pelo sanitizador não altera
- * nem um byte do que o seeder institucional traz hoje. Se alguém acrescentar uma estrutura
- * nova ao conteúdo sem estendê-la na allowlist, este teste acusa antes de a página ir ao ar
- * mutilada.
+ * nem um byte do que o conteúdo institucional inicial traz hoje (App\Support\Content\InitialPages,
+ * a fonte do seeder de desenvolvimento e do comando `conteudo:importar-inicial`). Se alguém
+ * acrescentar uma estrutura nova ao conteúdo sem estendê-la na allowlist, este teste acusa
+ * antes de a página ir ao ar mutilada.
  */
-test('conteúdo de todas as páginas do seeder atravessa o sanitizador sem nenhuma alteração', function (): void {
-    $method = new ReflectionMethod(ContentPagesSeeder::class, 'pages');
-    $method->setAccessible(true);
-
+test('conteúdo de todas as páginas do conteúdo inicial atravessa o sanitizador sem nenhuma alteração', function (): void {
     /** @var list<array{slug: string, content: string}> $pages */
-    $pages = $method->invoke(new ContentPagesSeeder);
+    $pages = InitialPages::all();
 
     expect($pages)->not->toBeEmpty();
 
