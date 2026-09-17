@@ -14,9 +14,9 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Notificação ao setor responsável a cada formulário recebido (ver docs/estrutura-site.md
- * §2.3). Nunca carrega dado pessoal — só tipo, data e um link para o painel administrativo
- * (a tela em si ainda não existe, ver docs/roadmap.md). E-mail não é canal seguro: o
- * destinatário pode encaminhar sem pensar, então o conteúdo não pode depender de sigilo.
+ * §2.3). Nunca carrega dado pessoal — só tipo, data e um link para o painel administrativo.
+ * E-mail não é canal seguro: o destinatário pode encaminhar sem pensar, então o conteúdo não
+ * pode depender de sigilo.
  */
 final class FormSubmissionReceived extends Mailable implements ShouldQueue
 {

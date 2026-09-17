@@ -11,10 +11,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * Lista os papéis do enum para popular o seletor da tela de usuários (ainda não existe, ver
- * docs/roadmap.md) — nome e descrição vêm só de App\Enums\Role, único lugar que os define.
- * Autorizado pela mesma ability de listar usuários (App\Policies\UserPolicy::viewAny): quem
- * pode ver a lista de usuários é quem precisa saber quais papéis existem para atribuir.
+ * Lista os papéis do enum para popular o seletor da tela de usuários (UserFormView.vue, ver
+ * frontend-admin/src/router/index.ts) — nome e descrição vêm só de App\Enums\Role, único lugar
+ * que os define. Autorizado pela mesma ability de listar usuários
+ * (App\Policies\UserPolicy::viewAny): quem pode ver a lista de usuários é quem precisa saber
+ * quais papéis existem para atribuir.
  */
 final class RoleController extends Controller
 {

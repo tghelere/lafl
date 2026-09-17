@@ -51,9 +51,9 @@ enum FormSubmissionType: string
     }
 
     /**
-     * Nome do recurso no painel administrativo (`docs/estrutura-site.md` §4.5) — usado só para
-     * montar o link do e-mail de notificação; a tela em si ainda não existe (ver
-     * docs/roadmap.md).
+     * Nome do recurso no painel administrativo (`docs/estrutura-site.md` §4.5) — usado para
+     * montar o link do e-mail de notificação e é o mesmo slug da rota `/admin/:resource` do
+     * painel (SubmissionListView.vue / SubmissionDetailView.vue).
      */
     public function adminResourceSlug(): string
     {
