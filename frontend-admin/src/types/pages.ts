@@ -20,3 +20,15 @@ export interface ContentPageListResponse {
     total: number
   }
 }
+
+/**
+ * Marcador que o conteúdo de uma página pode usar para publicar um número calculado (ver
+ * App\Enums\ContentMarker no backend). `marker` é o que se escreve no texto; `value` é o que
+ * o site publica hoje, e vem da API — o painel nunca calcula nada disso.
+ */
+export interface ContentMarker {
+  name: string
+  marker: string
+  label: string
+  value: string
+}

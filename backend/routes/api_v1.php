@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ContactMessageController;
+use App\Http\Controllers\Api\V1\ContentMarkerController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\PartnershipInquiryController;
@@ -86,6 +87,12 @@ Route::prefix('public')->name('public.')->group(function (): void {
 
 Route::middleware($authenticated)->group(function (): void {
     Route::apiResource('pages', PageController::class)->parameters(['pages' => 'page']);
+
+    // Marcadores que o editor de páginas oferece, com o valor de agora (ver
+    // App\Enums\ContentMarker). Sem paginação: é um enum de cinco casos, mesmo caso de
+    // /roles.
+    Route::get('/content-markers', [ContentMarkerController::class, 'index'])
+        ->name('content-markers.index');
     Route::apiResource('transparency-documents', TransparencyDocumentController::class)
         ->parameters(['transparency-documents' => 'transparencyDocument']);
 

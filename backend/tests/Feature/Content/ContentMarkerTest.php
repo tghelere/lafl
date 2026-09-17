@@ -209,3 +209,31 @@ test('todo marcador declarado resolve para algo diferente de si mesmo', function
         expect($resolvido)->not->toContain($placeholder);
     }
 });
+
+test('o painel lista os marcadores disponíveis com o valor de agora', function (): void {
+    $this->travelTo(CarbonImmutable::parse('2026-09-17 12:00:00', 'America/Sao_Paulo'));
+    TransparencyDocument::factory()->published()->create();
+
+    $response = $this->actingAs(userWithRole(Role::Comunicacao->value))
+        ->getJson('/api/v1/content-markers')
+        ->assertOk();
+
+    expect($response->json('data'))->toHaveCount(count(ContentMarker::cases()));
+
+    $porNome = collect($response->json('data'))->keyBy('name');
+
+    expect($porNome['documentos_transparencia'])->toBe([
+        'name' => 'documentos_transparencia',
+        'marker' => '{{documentos_transparencia}}',
+        'label' => 'Documentos publicados em Transparência',
+        'value' => '1 documento',
+    ])->and($porNome['idade_bazar']['value'])->toBe('58 anos');
+});
+
+test('quem não administra conteúdo não vê a lista de marcadores', function (): void {
+    $this->getJson('/api/v1/content-markers')->assertUnauthorized();
+
+    $this->actingAs(userWithRole(Role::Atendimento->value))
+        ->getJson('/api/v1/content-markers')
+        ->assertForbidden();
+});

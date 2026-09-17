@@ -8,8 +8,9 @@ import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import RichTextEditor from '@/components/RichTextEditor.vue'
+import { fetchContentMarkers } from '@/services/contentMarkers'
 import { fetchContentPage, updateContentPage } from '@/services/pages'
-import type { ContentPage } from '@/types/pages'
+import type { ContentMarker, ContentPage } from '@/types/pages'
 
 /**
  * Comprimento em que o Google costuma truncar a meta description no resultado de busca. Não
@@ -25,6 +26,7 @@ const uuid = computed(() => (typeof route.params.uuid === 'string' ? route.param
 const record = ref<ContentPage | null>(null)
 const isLoading = ref(false)
 const loadErrorMessage = ref<string | null>(null)
+const markers = ref<ContentMarker[]>([])
 
 const title = ref('')
 const content = ref('')
@@ -106,6 +108,21 @@ async function load(): Promise<void> {
   }
 }
 
+/**
+ * Os valores envelhecem (a contagem muda a cada documento publicado), então a lista é buscada
+ * a cada abertura, não uma vez na vida do painel.
+ *
+ * Falhar aqui não pode atrapalhar quem veio escrever: a lista é um auxílio, e sem ela o
+ * editor continua inteiro. Por isso o erro não vai para `loadErrorMessage`.
+ */
+async function loadMarkers(): Promise<void> {
+  try {
+    markers.value = await fetchContentMarkers()
+  } catch {
+    markers.value = []
+  }
+}
+
 watch(
   () => route.fullPath,
   () => {
@@ -113,6 +130,7 @@ watch(
     savedAt.value = null
     clearFieldErrors()
     void load()
+    void loadMarkers()
   },
   { immediate: true },
 )
@@ -274,6 +292,37 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
             v-if="fieldErrors.content"
             class="field__error"
           >{{ fieldErrors.content[0] }}</span>
+
+          <!-- Os valores vêm prontos da API (App\Actions\Content\ListContentMarkers) — o
+               painel não calcula idade nem conta documento. -->
+          <section
+            v-if="markers.length"
+            class="markers"
+            aria-labelledby="page-markers-title"
+          >
+            <h2
+              id="page-markers-title"
+              class="markers__title"
+            >
+              Números que se calculam sozinhos
+            </h2>
+            <p class="markers__hint">
+              Escreva o marcador no meio do texto e o site publica o número do dia, com o
+              plural certo. Não digite o número: escrito à mão, ele envelhece sem ninguém
+              perceber.
+            </p>
+            <ul class="markers__list">
+              <li
+                v-for="marker in markers"
+                :key="marker.name"
+                class="markers__item"
+              >
+                <code class="markers__code">{{ marker.marker }}</code>
+                <span class="markers__label">{{ marker.label }}</span>
+                <span class="markers__value">hoje: {{ marker.value }}</span>
+              </li>
+            </ul>
+          </section>
         </div>
 
         <h2 class="page-form__section">
@@ -348,6 +397,56 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
 
 .page-form__open {
   margin-left: var(--space-3);
+}
+
+.markers {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  /* Um degrau abaixo do branco do .card em volta, para o bloco se ler como nota de apoio. */
+  background: var(--color-surface);
+}
+
+.markers__title {
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-2);
+}
+
+.markers__hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3);
+}
+
+.markers__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.markers__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.markers__code {
+  font-weight: 600;
+}
+
+.markers__label {
+  color: var(--color-text-muted);
+}
+
+.markers__value {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .page-form__section {
