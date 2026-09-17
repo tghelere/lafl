@@ -20,9 +20,13 @@ use RuntimeException;
  * ("1 ano"/"73 anos", "1 documento"/"71 documentos", milhar com ponto). É o que impede que
  * um texto do site diga "71 documento" ou "1 documentos": quem consome nunca monta a frase.
  *
- * Instância única por requisição (singleton em App\Providers\AppServiceProvider) e cada
- * valor calculado uma vez só — a contagem é uma consulta ao banco, e uma página com dois
- * marcadores não precisa de duas.
+ * Cada valor é calculado uma vez por instância — a contagem é uma consulta ao banco, e uma
+ * página com dois marcadores não precisa de duas. A memória para aí, de propósito: NÃO
+ * registrar esta classe como singleton no container. A instância que o container injeta em
+ * App\Actions\Content\ResolveContentMarkers já vive exatamente uma requisição, que é o
+ * tempo em que os valores são estáveis; um singleton sobreviveria à requisição (em teste, e
+ * sob Octane também em produção) e serviria a contagem de antes de o documento ser
+ * publicado.
  */
 final class InstitutionalFacts
 {

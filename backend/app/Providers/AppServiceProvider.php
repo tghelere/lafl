@@ -7,7 +7,6 @@ namespace App\Providers;
 use App\Enums\Role;
 use App\Models\User;
 use App\Policies\UserPolicy;
-use App\Services\InstitutionalFacts;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -22,10 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Instância única por requisição: os valores de InstitutionalFacts são os mesmos
-        // dentro de uma requisição, e a contagem de documentos é uma consulta ao banco — uma
-        // página com dois marcadores não precisa consultar duas vezes.
-        $this->app->singleton(InstitutionalFacts::class);
+        //
     }
 
     /**

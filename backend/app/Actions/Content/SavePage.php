@@ -16,7 +16,10 @@ use Illuminate\Validation\ValidationException;
 
 final class SavePage
 {
-    public function __construct(private readonly ContentSanitizer $sanitizer) {}
+    public function __construct(
+        private readonly ContentSanitizer $sanitizer,
+        private readonly AssertContentMarkersAreKnown $assertKnownMarkers,
+    ) {}
 
     /**
      * Cria ou atualiza uma página. Slug muda → histórico gravado, cache público invalidado.
@@ -25,17 +28,24 @@ final class SavePage
     {
         $this->assertValidSlugDepth($data->slug);
 
-        return DB::transaction(function () use ($data, $page): Page {
+        // Sanitiza aqui, e não no FormRequest, para que todo caminho de escrita passe pelo
+        // mesmo filtro — inclusive seeder, comando de console ou qualquer chamada futura que
+        // não venha de uma requisição HTTP.
+        $content = $this->sanitizer->sanitize($data->content);
+
+        // Sobre o conteúdo já sanitizado, que é exatamente o que vai para o banco: marcador
+        // desconhecido é recusado antes de gravar, nunca depois (ver
+        // App\Actions\Content\AssertContentMarkersAreKnown).
+        $this->assertKnownMarkers->handle($content);
+
+        return DB::transaction(function () use ($data, $page, $content): Page {
             $page ??= new Page;
             $previousSlug = $page->exists ? $page->slug : null;
             $wasPublished = $page->exists && $page->status === PageStatus::Published;
 
             $page->slug = $data->slug;
             $page->title = $data->title;
-            // Sanitiza aqui, e não no FormRequest, para que todo caminho de escrita passe
-            // pelo mesmo filtro — inclusive seeder, comando de console ou qualquer chamada
-            // futura que não venha de uma requisição HTTP.
-            $page->content = $this->sanitizer->sanitize($data->content);
+            $page->content = $content;
             $page->meta_title = $data->metaTitle;
             $page->meta_description = $data->metaDescription;
             $page->status = $data->status;

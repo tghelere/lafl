@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Public;
 
+use App\Actions\Content\ResolveContentMarkers;
 use App\Actions\Content\ResolvePublicPageBySlug;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Public\PageResource;
@@ -12,8 +13,11 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 final class PageController extends Controller
 {
-    public function show(string $slug, ResolvePublicPageBySlug $resolver): HttpResponse
-    {
+    public function show(
+        string $slug,
+        ResolvePublicPageBySlug $resolver,
+        ResolveContentMarkers $markers,
+    ): HttpResponse {
         $result = $resolver->handle($slug);
 
         if ($result === null) {
@@ -30,11 +34,24 @@ final class PageController extends Controller
             return response()->json(['redirect_to' => $result['redirect_to']]);
         }
 
+        $hasMarkers = str_contains($result['content'], '{{');
+
+        // Depois do cache de ResolvePublicPageBySlug, de propósito: o cache guarda o conteúdo
+        // cru por dez minutos, e um número calculado preso a essa janela é o bug que os
+        // marcadores existem para não ter (ver App\Actions\Content\ResolveContentMarkers).
+        $result['content'] = $markers->handle($result['content']);
+
         /** @var Response $response */
         $response = (new PageResource((object) $result))->response();
 
         return $response
-            ->setCache(['public' => true, 'max_age' => 300])
-            ->setEtag(md5($result['updated_at'].'|'.$result['slug']));
+            // Página com marcador muda sem a página ter sido editada — publicar um documento
+            // altera a contagem. Guardar essa resposta por tempo devolveria o número velho a
+            // quem pedisse de novo, então cada requisição revalida; o ETag, que inclui o
+            // conteúdo já resolvido, é quem responde 304 enquanto o número não mudar.
+            ->setCache($hasMarkers
+                ? ['public' => true, 'max_age' => 0, 'must_revalidate' => true]
+                : ['public' => true, 'max_age' => 300])
+            ->setEtag(md5($result['updated_at'].'|'.$result['slug'].'|'.$result['content']));
     }
 }

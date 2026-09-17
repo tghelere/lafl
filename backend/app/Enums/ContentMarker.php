@@ -18,6 +18,14 @@ namespace App\Enums;
  */
 enum ContentMarker: string
 {
+    /**
+     * Casa QUALQUER `{{...}}` escrito no conteúdo, conhecido ou não, com o nome no grupo 1 —
+     * é o que permite recusar marcador inventado ao salvar (App\Actions\Content\
+     * AssertContentMarkersAreKnown) em vez de deixá-lo vazar cru para o site. Espaço em volta
+     * do nome é tolerado: quem escreve `{{ idade_bazar }}` quis o mesmo marcador.
+     */
+    public const PATTERN = '/\{\{\s*([^{}]*?)\s*\}\}/';
+
     case AssociationAge = 'idade_associacao';
     case HeadquartersAge = 'idade_sede';
     case BazaarAge = 'idade_bazar';
