@@ -345,13 +345,15 @@
   transform: rotate(180deg);
 }
 
-/* Painel — §6. Ancorado ao item: borda esquerda alinhada com a do rótulo, compensando o
-   padding de 12px do gatilho. Sem gap vertical (top: 100% exato) — um vão de 1px fecha o
-   menu no meio do movimento diagonal do mouse até o painel. */
+/* Painel — §6. Alinha o TEXTO do link ao texto do rótulo, não a caixa do painel à caixa do
+   gatilho: a caixa do painel soma borda (1px) + padding do <ul> (8px) + padding do link
+   (12px) = 21px de recuo próprio antes do texto, contra 12px do padding do gatilho — por
+   isso o deslocamento é `12 - 21`, não `12`. Sem gap vertical (top: 100% exato) — um vão de
+   1px fecha o menu no meio do movimento diagonal do mouse até o painel. */
 .site-header__panel {
   position: absolute;
   top: 100%;
-  left: 12px;
+  left: -9px;
   z-index: 40;
   min-width: 220px;
   margin: 0;
@@ -367,11 +369,19 @@
   min-width: 290px;
 }
 
+/* Espaçamento entre itens do painel: dependia do `li + li` global de base.css, escopado
+   para .prose/.page-content na sessão 13 (8f60c00) sem devolver este aqui — ficou colado. */
+.site-header__panel li + li {
+  margin-top: var(--space-2);
+}
+
 /* Clamp de borda — §6: se a borda direita passaria de viewport - 16px, ancora pela direita
-   do item em vez da esquerda. Alternância calculada em JS (AppHeader.vue, measureClamp). */
+   do item em vez da esquerda. Alternância calculada em JS (AppHeader.vue, measureClamp).
+   Mesmo recuo de 21px do lado direito (borda + padding do <ul> + padding do link), por isso
+   o espelho do -9px acima é `-9`, não `0`. */
 .site-header__panel--right {
   left: auto;
-  right: 0;
+  right: -9px;
 }
 
 .site-header__panel-link {
@@ -471,8 +481,12 @@
   gap: var(--space-2);
 }
 
-/* Escala de navegação, não de título — os sete itens cabem numa tela sem rolar. */
-.mobile-nav a {
+/* Escala de navegação, não de título — os sete itens cabem numa tela sem rolar. Escopado a
+   `.mobile-nav ul a` (não `.mobile-nav a`): o CTA Doar é um `<a class="btn btn--primary">`
+   irmão do `<ul>`, fora dele — um seletor tão genérico quanto `.mobile-nav a` bate o `.btn`
+   por especificidade (0,1,1 > 0,1,0) e tira o padding lateral do botão, acrescenta a borda
+   inferior de item de lista e desalinha o texto. */
+.mobile-nav ul a {
   display: block;
   padding: var(--space-3) 0;
   font-family: var(--font-body);
@@ -484,8 +498,8 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.mobile-nav a:hover,
-.mobile-nav a.router-link-active {
+.mobile-nav ul a:hover,
+.mobile-nav ul a.router-link-active {
   color: var(--color-focus);
 }
 
