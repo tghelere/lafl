@@ -21,7 +21,6 @@ export const navigation: NavItem[] = [
     to: '/quem-somos',
     children: [
       { label: 'Nossa história', to: '/quem-somos/nossa-historia' },
-      { label: 'Missão e valores', to: '/quem-somos/missao-visao-valores' },
       { label: 'Governança', to: '/quem-somos/governanca' },
     ],
   },
@@ -52,7 +51,7 @@ export const navigation: NavItem[] = [
     children: [
       { label: 'Doar', to: '/doar' },
       { label: 'Doar itens ao bazar', to: '/bazar/agendar-coleta' },
-      { label: 'Seja parceiro', to: '/como-ajudar/parceiros' },
+      { label: 'Parceiros', to: '/como-ajudar/parceiros' },
     ],
   },
   {

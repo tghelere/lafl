@@ -5,6 +5,7 @@ const { hasError, fieldFailed } = useFormErrorState()
 useSeoMeta({
   title: 'Voluntariado — Como Ajudar — Lar Anália Franco',
   description: 'Seja voluntário no Lar Anália Franco — bazar, contraturno, eventos ou apoio administrativo.',
+  robots: 'noindex, nofollow',
 })
 </script>
 

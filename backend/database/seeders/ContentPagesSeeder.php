@@ -123,8 +123,12 @@ class ContentPagesSeeder extends Seeder
                 'slug' => 'quem-somos/missao-visao-valores',
                 'title' => 'Missão, Visão e Valores',
                 'meta_description' => 'Rascunho de trabalho da missão, visão e valores do Lar Anália Franco, ainda pendente de validação pela direção da instituição.',
+                // Fora do escopo de lançamento — página sai do ar (Draft) e da navegação até o
+                // texto ser validado pela direção. O status é o controle; o texto público não
+                // repete "isto é rascunho" (ver Etapa 3 de docs/tarefas/01-....md).
+                'status' => PageStatus::Draft,
                 'content' => <<<'HTML'
-                    <p><strong>Este texto é um rascunho de trabalho</strong>, escrito a partir da operação atual da instituição. A missão anterior descrevia o antigo serviço de acolhimento, hoje encerrado, e por isso não é mais usada — a redação final ainda depende de validação da direção.</p><h2>Missão</h2><p>Sustentar, em Londrina, uma educação infantil de qualidade e oportunidades de formação para adolescentes em situação de vulnerabilidade social, financiadas em parte pelo próprio trabalho da instituição.</p><h2>Visão</h2><p>Ser reconhecida em Londrina como uma instituição que presta contas do que arrecada e do que faz.</p><h2>Valores</h2><ul><li><p>Transparência: os documentos de prestação de contas são públicos, não apenas entregues ao órgão fiscalizador.</p></li><li><p>Continuidade: a creche funciona sem interrupção desde 2002.</p></li><li><p>Autossustentação: o Bazar Beneficente existe desde 1968 para custear o que o convênio público não cobre.</p></li></ul>
+                    <p>A missão anterior descrevia o antigo serviço de acolhimento, hoje encerrado, e por isso não é mais usada.</p><h2>Missão</h2><p>Sustentar, em Londrina, uma educação infantil de qualidade e oportunidades de formação para adolescentes em situação de vulnerabilidade social, financiadas em parte pelo próprio trabalho da instituição.</p><h2>Visão</h2><p>Ser reconhecida em Londrina como uma instituição que presta contas do que arrecada e do que faz.</p><h2>Valores</h2><ul><li><p>Transparência: os documentos de prestação de contas são públicos, não apenas entregues ao órgão fiscalizador.</p></li><li><p>Continuidade: a creche funciona sem interrupção desde 2002.</p></li><li><p>Autossustentação: o Bazar Beneficente existe desde 1968 para custear o que o convênio público não cobre.</p></li></ul>
                     HTML,
             ],
             [
@@ -156,6 +160,9 @@ class ContentPagesSeeder extends Seeder
                 'slug' => 'educacao-infantil/dia-da-crianca',
                 'title' => 'Dia da Criança',
                 'meta_description' => 'O CEI Anália Franco reserva uma programação especial de Dia da Criança, em outubro, para as crianças atendidas pela creche.',
+                // Fora do escopo de lançamento — conteúdo de uma frase, não sai do ar até
+                // ganhar corpo (ver docs/roadmap.md, pendências do site público).
+                'status' => PageStatus::Draft,
                 'content' => <<<'HTML'
                     <p>O Centro de Educação Infantil Anália Franco reserva uma programação especial para o Dia da Criança, em outubro, para as crianças atendidas pela creche.</p>
                     HTML,
@@ -188,6 +195,10 @@ class ContentPagesSeeder extends Seeder
                 'slug' => 'educacao-infantil/depoimentos',
                 'title' => 'Depoimentos',
                 'meta_description' => 'O CEI Anália Franco tem avaliação pública de 4,5 estrelas no Google. Depoimentos individuais só entram aqui com autorização de quem os deu.',
+                // Fora do escopo de lançamento — página sem depoimento nenhum ainda, não sai
+                // do ar até a instituição colher as autorizações (ver docs/contexto.md, "Regras
+                // de conteúdo").
+                'status' => PageStatus::Draft,
                 'content' => <<<'HTML'
                     <p>O CEI Anália Franco tem avaliação pública de 4,5 estrelas, com mais de duas centenas de avaliações, no perfil do Google da instituição.</p><p>Depoimentos de pais e responsáveis só entram nesta página com autorização expressa de quem os deu — nenhuma avaliação pública é reproduzida aqui sem esse consentimento. Esta seção será preenchida à medida que a instituição colher essas autorizações.</p>
                     HTML,
@@ -318,9 +329,9 @@ class ContentPagesSeeder extends Seeder
             [
                 'slug' => 'como-ajudar',
                 'title' => 'Como Ajudar',
-                'meta_description' => 'Formas de apoiar o Lar Anália Franco: PIX, transferência bancária, doação de itens, voluntariado e parceria empresarial.',
+                'meta_description' => 'Formas de apoiar o Lar Anália Franco: PIX, transferência bancária e doação de itens.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco não opera gateway de pagamento no site — as formas de contribuir hoje passam por canais já existentes, explicados nas páginas desta seção.</p><p>É possível apoiar a instituição via PIX ou transferência bancária, doando itens para o Bazar Beneficente, ou se tornando voluntário. Empresas também podem apoiar diretamente os programas da instituição.</p>
+                    <p>O Lar Anália Franco não opera gateway de pagamento no site — as formas de contribuir hoje passam por canais já existentes, explicados nas páginas desta seção.</p><p>É possível apoiar a instituição via PIX ou transferência bancária, ou doando itens para o Bazar Beneficente.</p>
                     HTML,
             ],
             [

@@ -6,6 +6,7 @@ const { hasError, fieldFailed } = useFormErrorState()
 useSeoMeta({
   title: 'Apoiar o Projeto — Contraturno — Lar Anália Franco',
   description: 'Empresas interessadas em apoiar a Escola de Contraturno do Lar Anália Franco.',
+  robots: 'noindex, nofollow',
 })
 </script>
 
