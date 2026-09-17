@@ -206,12 +206,21 @@ useSeoMeta({
 .doc-filter__field select {
   font: inherit;
   font-size: var(--text-sm);
-  padding: var(--space-2) var(--space-3);
+  height: var(--control-height-sm);
+  padding-inline: var(--space-3);
+  line-height: normal;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
   color: var(--color-text);
   min-width: 10rem;
+}
+
+/* Mesma altura pequena do input/select acima — na barra de filtro, "Filtrar" usa .btn
+   (control-height-md por padrão) e ficava mais alto que os campos ao lado. Ver
+   docs/tarefas/03-alinhamento-visual.md. */
+.doc-filter .btn {
+  height: var(--control-height-sm);
 }
 
 .doc-filter__clear {

@@ -99,10 +99,6 @@ ol {
   padding-left: var(--space-6);
 }
 
-li + li {
-  margin-top: var(--space-2);
-}
-
 /* --color-accent (laranja-500) não atinge 4,5:1 como texto sobre --color-surface (~2,8:1) —
    por isso o link usa --color-focus (laranja-700, o degrau mais escuro da mesma família),
    o único tom da marca que passa em contraste de texto. Ver nota de decisão em

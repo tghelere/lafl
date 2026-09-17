@@ -21,11 +21,12 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
+  height: var(--control-height-md);
+  padding-inline: var(--space-5);
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  line-height: 1;
+  line-height: normal;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
@@ -201,6 +202,17 @@
 
 .prose strong {
   font-weight: var(--weight-semibold);
+}
+
+/* Ritmo vertical de lista restrito ao conteúdo de texto — antes era uma regra global
+   (`li + li` em base.css) e quebrava a centralização vertical de toda lista em linha com
+   `align-items: center` (menu do header, breadcrumb, navegação de seção): a partir do
+   segundo item, a margem no topo empurrava o item para baixo dentro da própria linha. Cada
+   lista fora de conteúdo declara seu próprio espaçamento (ver .mobile-nav ul/.mobile-nav__children
+   abaixo e .site-footer ul, que já tinha o seu). Ver docs/tarefas/03-alinhamento-visual.md. */
+.prose li + li,
+.page-content li + li {
+  margin-top: var(--space-2);
 }
 
 /* O editor Tiptap do painel serializa item de lista como <li><p>texto</p></li>, nunca
@@ -454,6 +466,9 @@
   padding: 0;
   display: flex;
   flex-direction: column;
+  /* Substitui o `li + li` global (removido — ver nota em .prose acima): coluna, então gap
+     não corre risco de quebrar centralização nenhuma, só espaçamento mesmo. */
+  gap: var(--space-2);
 }
 
 /* Escala de navegação, não de título — os sete itens cabem numa tela sem rolar. */
@@ -478,6 +493,10 @@
   list-style: none;
   margin: 0;
   padding-left: var(--space-4);
+}
+
+.mobile-nav__children li + li {
+  margin-top: var(--space-2);
 }
 
 .mobile-nav__children a {
@@ -701,7 +720,18 @@
 }
 
 .form__field input,
-.form__field select,
+.form__field select {
+  font: inherit;
+  font-size: var(--text-base);
+  height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  line-height: normal;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
 .form__field textarea {
   font: inherit;
   font-size: var(--text-base);
@@ -710,9 +740,6 @@
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
   color: var(--color-text);
-}
-
-.form__field textarea {
   resize: vertical;
   min-height: 6rem;
 }

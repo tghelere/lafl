@@ -30,6 +30,13 @@
   --shadow-sm: 0 1px 2px rgb(34 31 27 / 8%);
   --shadow-md: 0 4px 16px rgb(34 31 27 / 12%);
 
+  /* Altura de controle — aplicada igualmente a botão, input e select para que fiquem com a
+     mesma altura numa mesma linha (barra de filtro de /transparencia/documentos, formulário).
+     Antes cada um chegava à própria altura por padding + line-height (herdado, variando por
+     elemento) e nunca batiam. Ver docs/tarefas/03-alinhamento-visual.md. */
+  --control-height-sm: 2.5rem;
+  --control-height-md: 3rem;
+
   /* Layout */
   --container-max: 72rem;
   --container-padding: clamp(1rem, 4vw, 2rem);
