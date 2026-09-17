@@ -56,3 +56,4 @@ docker/**/data/
 
 # Saída de verificação manual em navegador (Playwright MCP)
 .playwright-mcp/
+.pacotes/
