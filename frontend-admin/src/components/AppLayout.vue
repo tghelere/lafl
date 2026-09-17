@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 
 import AccessDeniedState from '@/components/AccessDeniedState.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
+import NotFoundState from '@/components/NotFoundState.vue'
 import { useIdleTimeout } from '@/composables/useIdleTimeout'
 import { useAuthStore } from '@/stores/auth'
 
@@ -29,10 +30,12 @@ useIdleTimeout(idleTimeoutMinutes, () => {
   void handleLogout()
 })
 
-// 'unmapped': a chave de `resource` não existe no mapa devolvido por /auth/user — bug de
-// integração (nome usado na tela não bate com o nome que o backend calcula), não falta de
-// permissão do usuário. Reportado à parte de "denied" de propósito (ver CLAUDE.md: "exceto
-// se algo não couber no mapa, reportar").
+// 'unmapped': a chave de `resource` não existe no mapa devolvido por /auth/user — tanto bug de
+// integração (nome usado na tela não bate com o nome que o backend calcula) quanto recurso
+// inexistente vindo direto da URL (ex.: /admin/recurso-que-nao-existe). Para quem usa o
+// painel isto não é "sem permissão", é "isto não existe" — por isso mostra a mesma tela da
+// rota coringa (NotFoundState), não a de acesso negado. O console.error abaixo continua
+// existindo para quem desenvolve identificar o primeiro caso.
 const accessState = computed<'allowed' | 'denied' | 'unmapped' | null>(() => {
   if (!props.resource) {
     return null
@@ -97,9 +100,8 @@ async function handleLogout(): Promise<void> {
         <AccessDeniedState
           v-if="accessState === 'denied'"
         />
-        <AccessDeniedState
+        <NotFoundState
           v-else-if="accessState === 'unmapped'"
-          unmapped
         />
         <slot v-else />
       </main>

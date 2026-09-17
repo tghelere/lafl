@@ -63,11 +63,12 @@ watch(() => route.fullPath, load, { immediate: true })
 </script>
 
 <template>
-  <AppLayout :resource="config ? resourceSlug : undefined">
-    <template v-if="!config">
-      <h1>Recurso não encontrado</h1>
-      <ErrorState message="Este recurso não existe." />
-    </template>
+  <AppLayout :resource="resourceSlug">
+    <!-- Nunca renderiza: quando `config` é falso, `resourceSlug` não existe no mapa de acesso
+         devolvido por /auth/user, então AppLayout já mostra a tela de não encontrada antes
+         de chegar a desenhar este slot. O ramo só está aqui para o vue-tsc estreitar o tipo
+         de `config` no ramo abaixo. -->
+    <template v-if="!config" />
 
     <template v-else>
       <nav

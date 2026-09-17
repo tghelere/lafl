@@ -106,6 +106,14 @@ const router = createRouter({
       name: 'users.edit',
       component: () => import('@/views/UserFormView.vue'),
     },
+    // Coringa — precisa ser a última entrada: qualquer URL que não bata com nenhuma rota
+    // acima cai aqui em vez de deixar o vue-router não renderizar nada (ver
+    // frontend-admin/src/views/NotFoundView.vue).
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue'),
+    },
   ],
 })
 
