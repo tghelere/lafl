@@ -246,6 +246,24 @@
       que pegam o defeito (regra global e altura de controle reintroduzidas, ficou vermelho,
       revertido antes do commit — mesmo método da sessão 10). Ver `docs/relatorio-sessao-13.md`.
 
+- [x] **Logo institucional, crédito da Softhing e três correções do header (sessão 14,
+      `docs/tarefas/04-marca-e-credito-softhing.md`).** `shared/brand/` criado como fonte
+      única dos arquivos de marca (Lar Anália Franco e Softhing); site e painel importam a
+      logo direto de lá (mesmo padrão de `shared/design-tokens/tokens.css`), favicon e a logo
+      do e-mail são cópia documentada (consumidos fora do grafo de módulos JS). Logo no
+      header/rodapé do site, no login e na sidebar do painel; favicons substituídos nos dois
+      frontends; crédito "Desenvolvido por Softhing" no rodapé do site e na sidebar/login do
+      painel, com evento Umami no clique (só no site — o painel não tem Umami) e
+      `utm_campaign` distinto por app. `--color-yellow-500`/`--color-orange-500` corrigidos
+      para o hex oficial do `.ai` de identidade (`docs/decisoes/0013-...md`, fecha a pendência
+      de ADR aberta desde `6b55ccb`). Antes das etapas da tarefa: três correções pedidas no
+      header do site — texto do painel suspenso não alinhava com o texto do gatilho (a caixa
+      do painel soma 21px de recuo próprio contra 12px do gatilho), espaçamento entre itens do
+      painel suspenso perdido na sessão 13, e `.mobile-nav a` vencendo `.btn` do CTA Doar na
+      gaveta mobile por especificidade. Oito testes novos em `e2e/tests/layout/` (três de
+      alinhamento, cinco de marca/crédito) e um teste Pest para a logo do e-mail. Ver
+      `docs/relatorio-sessao-14.md`.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
