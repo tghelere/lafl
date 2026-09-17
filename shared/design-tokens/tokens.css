@@ -4,8 +4,8 @@
    frontend-site/nuxt.config.ts e frontend-admin/src/main.ts).
 
    Paleta extraída da logo do Lar Anália Franco (amarelo da casa + laranja da tipografia).
-   Substitui a paleta verde/ocre de docs/decisoes/0009-direcao-visual.md — decisão desta
-   sessão, ADR de substituição pendente de registro.
+   Substitui a paleta verde/ocre de docs/decisoes/0009-direcao-visual.md — ver
+   docs/decisoes/0013-paleta-derivada-da-logo-substitui-0009.md.
 
    Tokens de espaçamento, raio, sombra e layout continuam locais a cada frontend (não são
    tokens de marca e não fazem parte do escopo desta sessão) — ver o tokens.css de cada
@@ -21,7 +21,7 @@
   --color-yellow-200: #fcdfa1;
   --color-yellow-300: #fbd179;
   --color-yellow-400: #fac452;
-  --color-yellow-500: #f9b62a; /* valor de marca — não alterar */
+  --color-yellow-500: #fabb29; /* valor de marca — não alterar (conferido no .ai de identidade, ver docs/decisoes/0013) */
   --color-yellow-600: #e89f07;
   --color-yellow-700: #b57c05;
   --color-yellow-800: #825904;
@@ -33,7 +33,7 @@
   --color-orange-200: #f9bfa3;
   --color-orange-300: #f7a57c;
   --color-orange-400: #f48a55;
-  --color-orange-500: #f26f2e; /* valor de marca — não alterar */
+  --color-orange-500: #f26e34; /* valor de marca — não alterar (conferido no .ai de identidade, ver docs/decisoes/0013) */
   --color-orange-600: #df530e;
   --color-orange-700: #ae410b;
   --color-orange-800: #7d2f08;
@@ -55,19 +55,20 @@
   /* ---- Tokens semânticos — componentes consomem estes, nunca a escala direta ----
 
      Restrição não negociável: amarelo e laranja nunca são --color-text nem
-     --color-text-muted (branco/#F9B62A ≈ 1,79:1; branco/#F26F2E ≈ 2,96:1 — ambos abaixo do
+     --color-text-muted (branco/#FABB29 ≈ 1,72:1; branco/#F26E34 ≈ 2,98:1 — ambos abaixo do
      mínimo AA mesmo para texto grande). Os dois só entram como --color-accent* (fundo),
      nunca como cor de texto sobre claro.
 
-     Pares verificados (calculados, não estimados):
+     Pares verificados (calculados, não estimados) — recalculados em docs/decisoes/0013 após
+     a correção dos dois valores de âncora para o hex oficial do .ai de identidade:
        --color-text            on --color-surface        11,01:1
        --color-text            on --color-surface-raised  11,6:1
        --color-text-muted      on --color-surface          5,71:1
        --color-text-muted      on --color-surface-raised   6,01:1
        --color-heading         on --color-surface         15,58:1
        --color-heading         on --color-surface-raised  16,41:1
-       --color-heading         on --color-accent            5,54:1  (rótulo de botão)
-       --color-heading         on --color-accent-hover      4,85:1  (rótulo de botão, hover)
+       --color-heading         on --color-accent            5,51:1  (rótulo de botão)
+       --color-heading         on --color-accent-hover      4,80:1  (rótulo de botão, hover)
        --color-focus           on --color-surface            5,6:1  (visibilidade do anel)
      Todos ≥ 4,5:1 (texto normal). --color-border é divisor não-textual (ver nota abaixo) e
      não está sujeito a esse mínimo. */
@@ -86,18 +87,18 @@
 
   /* Ação primária — no valor exato de marca (500), vibrante. */
   --color-accent: var(--color-orange-500);
-  --color-accent-hover: #f05b11; /* laranja ~6% mais escuro que 500; calibrado (não é um degrau redondo da escala) para manter --color-on-accent em cima em >=4,5:1 no hover */
+  --color-accent-hover: #f05917; /* laranja mais escuro que 500 (mesmo delta de L em HSL do valor anterior, recalculado em docs/decisoes/0013); calibrado, não é um degrau redondo da escala — mantém --color-on-accent em cima em >=4,5:1 no hover */
   --color-focus: var(--color-orange-700); /* mais escuro que --color-accent: em --color-accent (500) o anel de foco ficaria em só ~2,81:1 sobre --color-surface, abaixo do mínimo de 3:1 para elemento de interface */
 
   /* Conteúdo (texto, ícone) sobre uma superfície de --color-accent ou --color-accent-hover —
-     nunca branco (branco sobre --color-accent dá só ~2,96:1) e nunca var(--color-text)
-     (~3,92:1 sobre --color-accent, abaixo do mínimo). Fixo — não muda entre normal, hover,
+     nunca branco (branco sobre --color-accent dá só ~2,98:1) e nunca var(--color-text)
+     (~3,90:1 sobre --color-accent, abaixo do mínimo). Fixo — não muda entre normal, hover,
      foco e ativo, então um componente não pode herdar a cor de link genérica (`a:hover`/
      `a:active`, que tem especificidade 0-1-1 e vence um `color` declarado só no estado base
      de uma classe, 0-1-0) nesses estados. Todo componente com fundo --color-accent* deve
      declarar --color-on-accent explicitamente em CADA estado (normal/hover/foco/ativo), não
      só no estado base — ver .btn--primary em components.css dos dois frontends.
-     --color-on-accent sobre --color-accent: 5,54:1. Sobre --color-accent-hover: 4,85:1. */
+     --color-on-accent sobre --color-accent: 5,51:1. Sobre --color-accent-hover: 4,80:1. */
   --color-on-accent: var(--color-heading);
 
   /* Estado de erro — inalterado nesta sessão (não faz parte da paleta de marca substituída;

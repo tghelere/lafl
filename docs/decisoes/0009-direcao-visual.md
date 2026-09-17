@@ -1,5 +1,11 @@
 # 0009 — Direção visual do site público
 
+> **Substituída por [0013](0013-paleta-derivada-da-logo-substitui-0009.md).** A paleta
+> verde/ocre e a tipografia Bitter/IBM Plex Sans abaixo foram trocadas pela paleta
+> amarelo/laranja extraída da logo e por Poppins/Lora no commit `6b55ccb` — sem ADR na hora.
+> Este documento fica como registro histórico da decisão original; não editado além desta
+> nota.
+
 ## Contexto
 
 O Lar Anália Franco existe desde 1963 e foi condenado em primeira instância em 2022 por
