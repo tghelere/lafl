@@ -12,14 +12,18 @@
 - [x] Autenticação: login, logout, usuário atual, troca de senha autenticada
 - [x] Scaffold do painel admin (Vue 3 + Vite + Pinia + Router) e do site público (Nuxt 4)
 - [x] CI (Pint, Larastan, Pest, `composer audit`, `npm audit`, build dos dois frontends)
-- [x] ADRs 0001–0011 em `docs/decisoes/`
+- [x] ADRs 0001–0012 em `docs/decisoes/`
 - [x] Entidade `pages` ponta a ponta: migration, model, Action, FormRequest, Policy,
       Resources público/admin, endpoints de leitura pública e CRUD administrativo, testes Pest
 - [x] Sistema de design do site público: tokens (cor, tipografia, espaçamento), fontes
       auto-hospedadas, componentes base (`AppHeader`, `AppFooter`, `LedgerLine`) — ver
       `docs/decisoes/0009-direcao-visual.md`
-- [x] Site público prerenderiza a home (`/`) — `nitro.prerender.routes` incluía as subpáginas
-      mas não a raiz; `.output/public` agora sai com `index.html`
+- [x] ~~Site público prerenderiza a home (`/`)~~ — **revertido na sessão 12**: a home passou a
+      ler idade e ano de `/api/v1/public/institution-facts` e saiu de `nitro.prerender.routes`.
+      Prerenderizada, congelaria a idade no dia do build (ver
+      `docs/decisoes/0012-numeros-institucionais-calculados.md`). O site já não era hospedagem
+      estática de qualquer forma — o servidor Nitro é exigido pelos cinco formulários e por
+      `/transparencia/documentos`.
 - [x] Rota genérica de conteúdo (`app/pages/[...slug].vue`) substitui a rota específica de
       "Quem somos": serve qualquer página do CMS pelo slug, com 404 real, redirect 301 via
       histórico de slug e breadcrumb derivado do slug (com título real da página-mãe). Toda
@@ -208,6 +212,24 @@
       contra o dev server real via MCP do Playwright, que neste ambiente roda em Chromium, não
       Firefox — a cobertura de Firefox de fato veio só da bateria de ponta a ponta (que abre
       `contraturno`, `bazar/visite-a-loja` e `quem-somos/nossa-historia` no editor real).
+
+- [x] **Números calculados em vez de texto fixo (sessão 12, `docs/tarefas/02-...md`).** Toda
+      contagem e toda idade que o site publica passa a ser calculada; ano de acontecimento
+      ("o bazar existe desde 1968") e valor de documento (repasse de R$ 2.819.892,84, 15 turmas
+      do plano 2026) continuam literais, porque não são cálculo. `config/institution.php` é a
+      fonte das datas, e o formato do valor declara a precisão: `'1953-07-12'` respeita o
+      aniversário, `'1968'` cai na diferença de ano. `App\Services\InstitutionalFacts` calcula
+      no fuso `America/Sao_Paulo` e devolve tudo já formatado em português, com o plural certo.
+      Dois caminhos até o texto: marcadores `{{...}}` (`App\Enums\ContentMarker`) dentro do
+      conteúdo do CMS, resolvidos só na leitura pública e só depois do cache de dez minutos de
+      `ResolvePublicPageBySlug`; e `GET /api/v1/public/institution-facts` para a home, que saiu
+      do prerender por causa disso. Marcador desconhecido é recusado ao salvar (422 listando os
+      válidos); o endpoint administrativo devolve o marcador cru, senão o primeiro salvamento
+      gravaria o número do dia e o cálculo morreria em silêncio. O editor de páginas do painel
+      lista os cinco marcadores com o valor de hoje ao lado, tudo vindo da API. `transparencia`
+      trocou "cerca de 70 documentos" por `{{documentos_transparencia}}`. Ver
+      `docs/decisoes/0012-numeros-institucionais-calculados.md` e
+      `docs/relatorio-sessao-12.md`.
 
 ## Em andamento
 
@@ -403,6 +425,11 @@ uma camada de cache de HTML por cima.
       ser uma inscrição e virou um aviso de "me avise quando abrir" (ver ADR 0007,
       atualização de 13/09/2026); `school`, `email`, `teen_age` e `message` foram removidos,
       só resta nome e telefone do responsável
+- [ ] `[LACUNA]` **Dia** do início do Bazar Beneficente (1968) e da criação do CEI Anália
+      Franco (2002) — só o ano está documentado. Enquanto for só o ano, a idade calculada sai
+      por diferença de ano e fica adiantada de 1º de janeiro até o aniversário real (ver
+      `docs/decisoes/0012-numeros-institucionais-calculados.md`). Confirmando o dia, o conserto
+      é trocar `'1968'` por `'1968-MM-DD'` em `config/institution.php` — nada mais muda
 - [ ] `[VALIDAR]` Vitrine do bazar (`bazaar_showcase_items`) terá preço? Há quem alimente
       semanalmente? (schema já esboçado com `price` nullable — ver `docs/dominio.md`)
 - [ ] `[VALIDAR]` Prazos de retenção exatos de cada formulário

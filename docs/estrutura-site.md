@@ -182,12 +182,19 @@ administrativos: nunca expõem autor, rascunho ou campo de controle.
 | GET | `/api/v1/public/testimonials` | Depoimentos autorizados |
 | GET | `/api/v1/public/partners` | Parceiros e apoiadores |
 | GET | `/api/v1/public/bazaar/showcase` | Vitrine "novidades da semana" |
-| GET | `/api/v1/public/stats` | Números da home |
+| GET | `/api/v1/public/institution-facts` | Idades calculadas e contagem do acervo (implementado) |
+| GET | `/api/v1/public/stats` | Números da home que a instituição informa e atualiza à mão |
 | GET | `/api/v1/public/settings` | Endereços, horários, PIX, redes sociais |
 | GET | `/api/v1/public/search?q=` | Busca interna |
 
 `settings` é um único endpoint com os dados institucionais que aparecem no rodapé e em
 várias páginas — evita seis chamadas para montar o layout.
+
+`institution-facts` e `stats` não são a mesma coisa e vão conviver: `institution-facts`
+devolve o que é DERIVADO (idade a partir de uma data, contagem do acervo publicado) e por isso
+não pode ser digitado em lugar nenhum; `stats` guardaria o que a instituição INFORMA (crianças
+atendidas, turmas) e atualiza à mão. Ver
+`docs/decisoes/0012-numeros-institucionais-calculados.md`.
 
 ## 3.2 Escrita
 
