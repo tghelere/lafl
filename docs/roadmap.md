@@ -263,6 +263,17 @@
       gaveta mobile por especificidade. Oito testes novos em `e2e/tests/layout/` (três de
       alinhamento, cinco de marca/crédito) e um teste Pest para a logo do e-mail. Ver
       `docs/relatorio-sessao-14.md`.
+- [x] **Quatro correções de código apontadas em revisão (sessão 15,
+      `docs/tarefas/05-correcoes-de-codigo.md`).** Link do e-mail de notificação apontava para
+      `{ADMIN_BASE_URL}/{recurso}/{uuid}`, sem o prefixo `/admin` que a rota do painel exige —
+      corrigido em `NotifyFormSubmissionReceived`. Requisição não autenticada à API sem
+      `Accept: application/json` (curl, robô, navegador abrindo a URL direto) virava 500
+      ("Route [login] not defined") em vez de 401, porque o middleware `auth` tentava
+      redirecionar para uma rota de login que não existe numa API REST pura sem view —
+      corrigido com `redirectGuestsTo(null)` em `bootstrap/app.php`. Painel ganhou tela de
+      "página não encontrada" (ver entrada acima, em "Painel administrativo"). Varredura de
+      comentários que ainda diziam que o painel administrativo não existia (quatro no backend,
+      mais um em "Limitações conhecidas de `pages`" abaixo). Ver `docs/relatorio-sessao-15.md`.
 
 ## Em andamento
 
@@ -400,6 +411,18 @@ uma camada de cache de HTML por cima.
       restantes").
 - [x] Tela de gestão de usuários — feita (`UserListView.vue`/`UserFormView.vue`), junto das
       telas de conta (`/definir-senha`, `/conta`).
+- [x] Telas de listagem e detalhe dos cinco formulários recebidos — feitas
+      (`SubmissionListView.vue`/`SubmissionDetailView.vue`, genéricas por `:resource`, ver
+      `src/config/submissionResources.ts`), com mudança de status e nota interna. Esta entrada
+      não tinha chegado ao roadmap antes da sessão 15, que também corrigiu o link do e-mail de
+      notificação para apontar para elas (faltava o prefixo `/admin`, ver
+      `docs/tarefas/05-correcoes-de-codigo.md`) e vários comentários no backend que ainda
+      diziam que a tela não existia.
+- [x] Tela de "página não encontrada" (sessão 15) — rota coringa no vue-router e `:resource`
+      fora do mapa de acesso levam à mesma tela (`NotFoundState.vue`), dentro do layout
+      autenticado. Antes, URL desconhecida renderizava em branco e recurso inválido caía num
+      estado `unmapped` com mensagem própria; unificados porque, para quem usa o painel, os
+      dois são a mesma coisa ("isto não existe").
 - [x] Editor de texto rico com sanitização no backend — Tiptap no painel, allowlist em
       `App\Support\Html\ContentSanitizer`, dependências justificadas no ADR 0010.
 - [ ] Preview de SERP nos campos de SEO — hoje há só contador de caracteres na descrição,
@@ -565,9 +588,10 @@ projeto inteiro, não só para este caso de uso.
 Eram "aceitáveis com cinco páginas"; agora são **cinco famílias de páginas-mãe com filhas**
 (`quem-somos`, `educacao-infantil`, `contraturno`, `bazar`, `como-ajudar`, mais
 `transparencia`), 28 páginas ao todo. O risco de uma exclusão ou renomeação acidental deixar
-filha órfã é maior do que quando isso foi escrito. Ainda não há tela de admin para páginas
-(painel administrativo não existe), o que limita a exposição prática por ora — mas vale
-resolver (validar em cascata ou migrar para `parent_id`) antes de a tela existir, não depois.
+filha órfã é maior do que quando isso foi escrito. A tela de admin para páginas
+(`ContentPageListView`/`ContentPageFormView`) já existe e não valida nada disso — vale
+resolver (validar em cascata ou migrar para `parent_id`) antes que alguém use a tela para
+excluir ou renomear uma página-mãe de verdade, não depois.
 
 ## Fase 2 — bloqueada
 
