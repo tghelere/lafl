@@ -19,6 +19,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
 
+        // Sem isto, o middleware 'auth' tenta redirecionar quem não está autenticado para uma
+        // rota nomeada 'login' — que não existe (API REST pura, sem view, ver CLAUDE.md) — e
+        // isso vira 500 ("Route [login] not defined") em vez de 401 sempre que a requisição
+        // não pede JSON explicitamente (sem `Accept: application/json`, ex.: curl, robô,
+        // navegador abrindo a URL direto). `redirectGuestsTo(null)` faz o guard devolver null
+        // em vez de tentar montar essa URL, e o `shouldRenderJsonWhen` abaixo garante que toda
+        // rota `api/*` responde 401 em JSON de qualquer forma.
+        $middleware->redirectGuestsTo(null);
+
         // O site público (Nuxt) faz proxy servidor-a-servidor dos seis formulários (ver
         // frontend-site/server/api/forms/[tipo].post.ts) para que o "Redirect para
         // /obrigado/:tipo" e o reaproveitamento de erro funcionem sem JavaScript — a API em
