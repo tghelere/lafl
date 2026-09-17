@@ -275,6 +275,20 @@
       comentários que ainda diziam que o painel administrativo não existia (quatro no backend,
       mais um em "Limitações conhecidas de `pages`" abaixo). Ver `docs/relatorio-sessao-15.md`.
 
+- [x] **Caminho até a produção, lado da aplicação (sessão 16,
+      `docs/tarefas/07-caminho-ate-a-producao.md`).** Um deploy antes disso subiria sem
+      conteúdo e sem ninguém capaz de entrar. Entregues: `php artisan conteudo:importar-inicial`
+      (cria só as páginas que faltam, nunca sobrescreve; o texto saiu do `ContentPagesSeeder`
+      para `App\Support\Content\InitialPages`, fonte única dos dois caminhos),
+      `php artisan usuarios:criar-super-admin` (interativo, sem senha em argumento nenhum,
+      imprime o link de definição de senha, recusa se já houver super_admin ativo), serviços
+      `queue` e `scheduler` no `docker-compose.yml`, suporte a `staging` de ponta a ponta
+      (site inteiro `noindex` em tempo de execução, `MAIL_ALWAYS_TO`, `.env.example`
+      documentado, guardas de ambiente dos seeders travadas por teste),
+      `scripts/deploy/empacotar.sh` com verificação do que não pode ir junto
+      (`docs/decisoes/0014-pacote-de-deploy-minimo.md`) e `docs/deploy.md`. Simulado o primeiro
+      deploy num banco vazio, a partir do pacote podado. Ver `docs/relatorio-sessao-16.md`.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
@@ -373,12 +387,21 @@
 
 #### Deploy — cache de HTML das páginas editáveis pelo painel
 
+> Esta seção virou a §7 de `docs/deploy.md` na sessão 16, que é onde ela vale para quem está
+> publicando. Fica aqui o registro da medição original.
+
 Desde que o painel passou a editar `pages.content`, **toda rota cujo conteúdo vem do CMS saiu
 de `nitro.prerender.routes`** e passou a ser SSR a cada request. Prerenderizar essas rotas
 gravaria o texto no build, e a edição pelo painel só apareceria depois de um novo
 `nuxt generate` — exatamente o que a tela existe para evitar. Continuam prerenderizadas
 apenas as páginas de conteúdo fixo no `.vue` (`/`, `/o-que-fazemos`,
-`/politica-de-privacidade`, `/obrigado/:tipo`) mais `robots.txt` e `sitemap.xml`.
+`/politica-de-privacidade`, `/obrigado/:tipo`) mais `sitemap.xml`.
+
+`robots.txt` saiu do prerender na sessão 16: gravado no build, o mesmo pacote de deploy diria
+"Allow: /" em homologação e em produção, e só uma das duas pode ser indexada. Consequência
+registrada: **`npm run generate` não emite mais `robots.txt`** — o site já não era hospedável
+como estático de qualquer forma (formulários, `/transparencia/documentos` e redirect de slug
+antigo exigem o Nitro), mas se algum dia voltar a ser, esta rota precisa voltar para a lista.
 
 Medido nesta sessão: salvar invalida o cache de 10 minutos do backend
 (`App\Actions\Content\SavePage` → `Cache::forget`) e a alteração aparece na **requisição
@@ -510,6 +533,14 @@ uma camada de cache de HTML por cima.
 
 ### Decisões técnicas em aberto, registradas mas não bloqueantes
 
+- [ ] **O painel é o único artefato de deploy amarrado ao ambiente em tempo de build.** O Vite
+      grava `VITE_API_URL`, `VITE_SITE_URL` e `VITE_SESSION_IDLE_TIMEOUT_MINUTES` dentro do
+      bundle; o site (Nuxt) lê as `NUXT_PUBLIC_*` em tempo de execução e por isso o mesmo
+      `.output` serve homologação ou produção. Em consequência, "promover para produção o
+      mesmo pacote já validado em homologação" (previsto na tarefa 07b) vale para o backend e
+      para o site, mas **o painel precisa ser rebuildado**. A alternativa — o painel ler a
+      configuração em tempo de execução, de um `config.json` servido ao lado do `index.html` —
+      é decisão da 07b, não da 07. Ver `docs/decisoes/0014-pacote-de-deploy-minimo.md`.
 - [ ] `pages.og_image_id`: entra numa migration futura, junto da entidade `media` — decisão
       de sessão anterior, para não criar coluna sem uso funcional possível antes de `media`
       existir
