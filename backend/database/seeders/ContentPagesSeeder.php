@@ -18,10 +18,18 @@ class ContentPagesSeeder extends Seeder
      * `[CONFIRMAR]` ou `[LACUNA]` entra aqui — onde falta o dado, o texto diz explicitamente
      * que está pendente de confirmação com a instituição, em vez de inventar.
      *
-     * Ano de fundação: o estatuto (art. 1º) registra 12/07/1953, divergindo do que este
-     * repositório publicava antes (1963). O cliente confirmou 1953 em 10/09/2026, mas nenhuma
-     * página publica ano de fundação até essa correção ser validada de forma definitiva — ver
-     * docs/contexto.md.
+     * Datas: o estatuto (art. 1º) registra fundação em 12/07/1953, divergindo do que este
+     * repositório publicava antes (1963, que na verdade é o ano de inauguração da sede, não de
+     * fundação da associação). O cliente confirmou as três datas em 17/09/2026 — fundação
+     * (1953), início da obra da sede (1957) e inauguração da sede (1963) — e elas já aparecem
+     * em quem-somos/nossa-historia — ver docs/contexto.md.
+     *
+     * O site não menciona o processo judicial de 2022 em nenhuma página, nem de forma
+     * indireta — decisão do cliente confirmada em 17/09/2026, ver docs/contexto.md, seção
+     * "Histórico recente". `quem-somos/o-lar-hoje`, a página que tratava do assunto, foi
+     * removida por completo deste seeder (não mantida em Draft) — a remoção explícita no
+     * início de `run()` garante que um banco de desenvolvimento que já tinha essa página não
+     * mantenha o texto depois de reseedar.
      *
      * Nenhum texto aqui foi aprovado pelo Lar Anália Franco — esse status é de controle
      * interno (ver docs/roadmap.md), nunca publicado no conteúdo da página. Até esta sessão o
@@ -46,6 +54,12 @@ class ContentPagesSeeder extends Seeder
         if (! app()->environment(['local', 'testing', 'e2e'])) {
             return;
         }
+
+        // quem-somos/o-lar-hoje saiu do array por completo (ver comentário no topo da
+        // classe) — remoção explícita porque updateOrCreate() só cria/atualiza o que está em
+        // pages(), nunca apaga o que ficou de fora. Sem esta linha, um banco de
+        // desenvolvimento que já tinha essa página (mesmo em Draft) manteria o texto.
+        Page::query()->withTrashed()->where('slug', 'quem-somos/o-lar-hoje')->forceDelete();
 
         foreach ($this->pages() as $data) {
             $status = $data['status'] ?? PageStatus::Published;
@@ -94,7 +108,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Quem Somos',
                 'meta_description' => 'O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza espírita de Londrina, com três frentes: creche, contraturno e bazar beneficente.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco de Londrina é uma associação civil beneficente, filantrópica e de natureza espírita. A sede, onde também funciona o CEI Anália Franco, fica na Av. Anália Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060.</p><p>Hoje a instituição já opera duas frentes — o Centro de Educação Infantil Anália Franco (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina, e o Bazar Beneficente, loja de doações que sustenta boa parte do orçamento da casa — e prepara uma terceira, a Escola de Contraturno, com estrutura pronta e início de turmas previsto para 2027.</p><p>As páginas desta seção contam a história da instituição, sua estrutura de governança e o que ela é hoje — inclusive os pontos em que precisou se reconstruir.</p>
+                    <p>O Lar Anália Franco de Londrina é uma associação civil beneficente, filantrópica e de natureza espírita. A sede, onde também funciona o CEI Anália Franco, fica na Av. Anália Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060.</p><p>Hoje a instituição já opera duas frentes — o Centro de Educação Infantil Anália Franco (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina, e o Bazar Beneficente, loja de doações que sustenta boa parte do orçamento da casa — e prepara uma terceira, a Escola de Contraturno, com estrutura pronta e início de turmas previsto para 2027.</p><p>As páginas desta seção contam a história da instituição, sua estrutura de governança e o que ela é hoje.</p>
                     HTML,
             ],
             [
@@ -102,7 +116,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Nossa História',
                 'meta_description' => 'De orfanato a instituição com creche, contraturno e bazar: a linha do tempo do Lar Anália Franco de Londrina.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco foi criado por um grupo espírita de Londrina, originalmente como orfanato. O atendimento que a instituição presta hoje é laico.</p><p>O nome é uma homenagem a Anália Franco (1853–1919), educadora, jornalista, abolicionista e filantropa que fundou mais de 70 escolas e 23 asilos para crianças órfãs no Brasil.</p><ul><li><p>1968 — início do Bazar Beneficente, em funcionamento ininterrupto desde então.</p></li><li><p>2002 — criação do Centro de Educação Infantil Anália Franco, com convênio junto à Secretaria Municipal de Educação de Londrina.</p></li><li><p>2016 — recebe a Medalha Ouro Verde, maior honraria da Câmara Municipal de Londrina.</p></li><li><p>2022 — encerramento do antigo serviço de acolhimento institucional e troca de diretoria.</p></li><li><p>2026 — inauguração da sala de informática da Escola de Contraturno.</p></li></ul>
+                    <p>O Lar Anália Franco foi criado por um grupo espírita de Londrina, originalmente como orfanato. O atendimento que a instituição presta hoje é laico.</p><p>O nome é uma homenagem a Anália Franco (1853–1919), educadora, jornalista, abolicionista e filantropa que fundou mais de 70 escolas e 23 asilos para crianças órfãs no Brasil.</p><ul><li><p>1953 — fundação da associação, por um grupo espírita, originalmente como orfanato.</p></li><li><p>1957 — início da obra da sede, na Av. Anália Franco.</p></li><li><p>1963 — inauguração da sede.</p></li><li><p>1968 — início do Bazar Beneficente, em funcionamento ininterrupto desde então.</p></li><li><p>2002 — criação do Centro de Educação Infantil Anália Franco, com convênio junto à Secretaria Municipal de Educação de Londrina.</p></li><li><p>2016 — recebe a Medalha Ouro Verde, maior honraria da Câmara Municipal de Londrina.</p></li><li><p>2026 — inauguração da sala de informática da Escola de Contraturno.</p></li></ul>
                     HTML,
             ],
             [
@@ -110,7 +124,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Missão, Visão e Valores',
                 'meta_description' => 'Rascunho de trabalho da missão, visão e valores do Lar Anália Franco, ainda pendente de validação pela direção da instituição.',
                 'content' => <<<'HTML'
-                    <p><strong>Este texto é um rascunho de trabalho</strong>, escrito a partir da operação atual da instituição. A missão anterior descrevia o antigo serviço de acolhimento, encerrado em 2022, e por isso não é mais usada — a redação final ainda depende de validação da direção.</p><h2>Missão</h2><p>Sustentar, em Londrina, uma educação infantil de qualidade e oportunidades de formação para adolescentes em situação de vulnerabilidade social, financiadas em parte pelo próprio trabalho da instituição.</p><h2>Visão</h2><p>Ser reconhecida em Londrina como uma instituição que presta contas do que arrecada e do que faz.</p><h2>Valores</h2><ul><li><p>Transparência: os documentos de prestação de contas são públicos, não apenas entregues ao órgão fiscalizador.</p></li><li><p>Continuidade: a creche funciona desde 2002 sem interrupção, inclusive durante a troca de diretoria e o fim do acolhimento institucional em 2022.</p></li><li><p>Autossustentação: o Bazar Beneficente existe desde 1968 para custear o que o convênio público não cobre.</p></li></ul>
+                    <p><strong>Este texto é um rascunho de trabalho</strong>, escrito a partir da operação atual da instituição. A missão anterior descrevia o antigo serviço de acolhimento, hoje encerrado, e por isso não é mais usada — a redação final ainda depende de validação da direção.</p><h2>Missão</h2><p>Sustentar, em Londrina, uma educação infantil de qualidade e oportunidades de formação para adolescentes em situação de vulnerabilidade social, financiadas em parte pelo próprio trabalho da instituição.</p><h2>Visão</h2><p>Ser reconhecida em Londrina como uma instituição que presta contas do que arrecada e do que faz.</p><h2>Valores</h2><ul><li><p>Transparência: os documentos de prestação de contas são públicos, não apenas entregues ao órgão fiscalizador.</p></li><li><p>Continuidade: a creche funciona sem interrupção desde 2002.</p></li><li><p>Autossustentação: o Bazar Beneficente existe desde 1968 para custear o que o convênio público não cobre.</p></li></ul>
                     HTML,
             ],
             [
@@ -118,21 +132,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Governança',
                 'meta_description' => 'Como o Lar Anália Franco é administrado: associação civil beneficente, filantrópica e de natureza espírita, diretoria eleita e prestação de contas pública.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza espírita, CNPJ 78.614.096/0001-75, administrada por uma diretoria eleita pelos associados.</p><p>Em 2022, após uma decisão de primeira instância que reconheceu irregularidades no antigo serviço de acolhimento institucional, a diretoria anterior foi afastada por decisão judicial e uma nova diretoria assumiu a gestão da instituição.</p><h2>Diretoria — gestão 2026–2027</h2><h3>Diretoria Executiva</h3><ul><li><p>Presidente: Valdomiro Ferreira dos Santos</p></li><li><p>Vice-presidente: Sidnei Pereira do Nascimento</p></li><li><p>Secretário: Marcos Aurélio Batyras</p></li><li><p>Diretor de Patrimônio: Domingos Geraldo Stersa Junior</p></li><li><p>1º Tesoureiro: Marcos Adriano Dornelas Pinheiro</p></li><li><p>2º Tesoureiro: Ângelo Pamplona da Costa</p></li></ul><h3>Conselho Deliberativo</h3><ul><li><p>Presidente: André Luiz Gonçalves Salvador</p></li><li><p>Vice-presidente: Jonatas Beranger</p></li></ul><p>A prestação de contas da instituição — balanços, atas e editais — está reunida na seção <a href="/transparencia">Transparência</a>.</p>
-                    HTML,
-            ],
-            [
-                'slug' => 'quem-somos/o-lar-hoje',
-                'title' => 'O Lar Hoje',
-                'meta_description' => 'O que aconteceu em 2022 no Lar Anália Franco, o que mudou desde então e por que a transparência é a resposta da instituição.',
-                // Bloqueio real de publicação — ver docs/roadmap.md, "BLOQUEIO DE PUBLICAÇÃO".
-                // Volta a Published só depois de revisão de advogado e confirmação do status
-                // processual atual (as duas condições registradas lá). Um comentário dentro de
-                // `content` não bloqueia nada — é só texto; por isso o campo `status` é o único
-                // mecanismo que importa aqui.
-                'status' => PageStatus::Draft,
-                'content' => <<<'HTML'
-                    <p>O Lar Anália Franco passou por uma reconstrução profunda desde 2022. Esta página explica o que aconteceu e o que mudou desde então.</p><h2>O que aconteceu</h2><p>Em janeiro de 2022, uma ação movida pelo Ministério Público do Paraná resultou numa decisão de primeira instância que reconheceu irregularidades no antigo serviço de acolhimento institucional — o abrigo que a instituição mantinha até então. A decisão determinou o afastamento de nove ex-dirigentes e a dissolução do Lar como entidade de acolhimento.</p><p>Decisão de primeira instância não é definitiva. O status processual atual — se houve recurso e qual o resultado — está em confirmação junto à instituição e será atualizado aqui assim que validado.</p><h2>O que mudou</h2><p>Uma nova diretoria assumiu a gestão logo em seguida. O serviço de acolhimento foi encerrado — a instituição não recebe mais crianças e adolescentes em regime de abrigo, e não há mais medida protetiva, guarda ou vínculo com vara da infância.</p><p>A creche seguiu funcionando durante todo o processo e cresceu desde então. Em 2026, a instituição também montou a estrutura da Escola de Contraturno — programa em preparação, que ainda não abriu turmas, com início previsto para 2027.</p><h2>O que a instituição está fazendo diferente</h2><p>Não é possível apagar o que aconteceu. O compromisso da direção atual é manter a prestação de contas pública e verificável, documento por documento — ver <a href="/transparencia">Transparência</a>.</p>
+                    <p>O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza espírita, CNPJ 78.614.096/0001-75, administrada por uma diretoria eleita pelos associados.</p><h2>Diretoria — gestão 2026–2027</h2><h3>Diretoria Executiva</h3><ul><li><p>Presidente: Valdomiro Ferreira dos Santos</p></li><li><p>Vice-presidente: Sidnei Pereira do Nascimento</p></li><li><p>Secretário: Marcos Aurélio Batyras</p></li><li><p>Diretor de Patrimônio: Domingos Geraldo Stersa Junior</p></li><li><p>1º Tesoureiro: Marcos Adriano Dornelas Pinheiro</p></li><li><p>2º Tesoureiro: Ângelo Pamplona da Costa</p></li></ul><h3>Conselho Deliberativo</h3><ul><li><p>Presidente: André Luiz Gonçalves Salvador</p></li><li><p>Vice-presidente: Jonatas Beranger</p></li></ul><p>A prestação de contas da instituição — balanços, atas e editais — está reunida na seção <a href="/transparencia">Transparência</a>.</p>
                     HTML,
             ],
         ];
@@ -353,7 +353,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Transparência',
                 'meta_description' => 'O acervo de prestação de contas do Lar Anália Franco — balanços, atas e editais — organizado e público.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas, editais e relatórios — hoje com cerca de 70 documentos.</p><p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o que precisa, incluindo quem busca informação sobre o processo de 2022.</p><p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro de Educação Infantil Anália Franco, também exige prestação de contas periódica. O repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração 06/2022).</p><p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por ano e por tipo.</p>
+                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas, editais e relatórios — hoje com cerca de 70 documentos.</p><p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o que precisa.</p><p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro de Educação Infantil Anália Franco, também exige prestação de contas periódica. O repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração 06/2022).</p><p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por ano e por tipo.</p>
                     HTML,
             ],
         ];

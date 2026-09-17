@@ -37,7 +37,6 @@ já é o limite do que cabe em desktop sem quebrar.
 | `/quem-somos/nossa-historia` | SSG | CMS | — |
 | `/quem-somos/missao-visao-valores` | SSG | CMS | — |
 | `/quem-somos/governanca` | SSG | CMS | — |
-| `/quem-somos/o-lar-hoje` | SSG | CMS | — |
 | **Educação infantil** | | | |
 | `/educacao-infantil` | SSG | CMS | — |
 | `/educacao-infantil/dia-da-crianca` | SSG | CMS | — |
@@ -101,9 +100,7 @@ instituição avisar (ver `docs/contexto.md`).
 
 Cada subpágina tem URL própria e indexável. O mapa da §1.2 já reflete isso.
 
-Motivo: cada URL disputa uma busca distinta, e `/quem-somos/o-lar-hoje` precisa de endereço
-próprio dado o peso reputacional — é a página que deve aparecer quando alguém busca o nome
-da instituição junto do episódio de 2022.
+Motivo: cada URL disputa uma busca distinta.
 
 Consequência a acompanhar: algumas páginas de "Contraturno" nascem com pouco conteúdo, já
 que o programa é novo. Página magra posiciona mal. Se depois da redação alguma ficar com
