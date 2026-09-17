@@ -115,10 +115,24 @@ rm -rf "${PACOTE}/backend/tests" \
 # entrariam junto pelo `git archive` se não fossem apagados aqui.
 find "$PACOTE" \( -name '.env' -o -name '.env.*' \) -type f -delete
 
-# Log e cache de uma máquina de desenvolvimento não têm o que fazer no servidor; os
-# diretórios em si precisam existir, então só o conteúdo vai embora.
-find "${PACOTE}/backend/storage/logs" -type f ! -name '.gitkeep' -delete 2>/dev/null || true
-find "${PACOTE}/backend/bootstrap/cache" -type f ! -name '.gitkeep' -delete 2>/dev/null || true
+# Log e cache de uma máquina de desenvolvimento não têm o que fazer no servidor.
+find "${PACOTE}/backend/storage/logs" -type f -delete 2>/dev/null || true
+find "${PACOTE}/backend/bootstrap/cache" -type f ! -name '.gitignore' -delete 2>/dev/null || true
+
+# Esqueleto de `storage/`. `git archive` não exporta diretório vazio, e `storage/logs/` não
+# tem nenhum arquivo versionado dentro — o pacote saía SEM ele, e o Laravel só não quebrava
+# porque o Monolog cria o diretório sozinho na primeira escrita. Depender disso é apostar que
+# o usuário do PHP-FPM tem permissão de escrita no pai; criar aqui custa uma linha.
+mkdir -p "${PACOTE}/backend/storage/logs" \
+         "${PACOTE}/backend/storage/framework/cache/data" \
+         "${PACOTE}/backend/storage/framework/sessions" \
+         "${PACOTE}/backend/storage/framework/views" \
+         "${PACOTE}/backend/storage/app/private" \
+         "${PACOTE}/backend/storage/app/public" \
+         "${PACOTE}/backend/bootstrap/cache"
+
+# Só existe para a suíte Pest, que não vai no pacote.
+rm -rf "${PACOTE}/backend/storage/framework/testing"
 
 # Documentação e arquivo de editor, em qualquer nível — inclusive o README de cada pacote do
 # vendor, que é documentação de terceiro que ninguém lê no servidor.
@@ -212,6 +226,9 @@ exigido 'backend/app/Console/Commands/ImportInitialContent.php'
 exigido 'backend/database/migrations'
 exigido 'backend/database/seeders/RoleSeeder.php'
 exigido 'backend/resources/views/vendor/mail'
+exigido 'backend/storage/logs'
+exigido 'backend/storage/framework/views'
+exigido 'backend/bootstrap/cache'
 exigido 'site/server/index.mjs'
 exigido 'site/public/_nuxt'
 exigido 'painel/index.html'
