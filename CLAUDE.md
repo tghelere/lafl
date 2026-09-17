@@ -24,7 +24,7 @@ detalhe de conformidade — é a restrição central que molda schema, autoriza�
 | Docs de API | Scramble (OpenAPI 3 gerado do código, sem annotation manual) |
 | Cache/filas | Redis |
 | Analytics | Umami (cookieless) + Google Search Console. **Sem GA4, sem banner de cookies.** |
-| Testes | Pest |
+| Testes | Pest (backend) + Playwright/Firefox (ponta a ponta, pilha real) |
 
 ## Regras invioláveis
 
@@ -62,6 +62,12 @@ Estas nunca são flexibilizadas. Se uma tarefa parecer exigir violá-las, **pare
 - `Model::preventLazyLoading()` ativo em desenvolvimento.
 - Teste Pest obrigatório para todo endpoint de escrita e todo endpoint que toque dado de
   assistido.
+- **Toda funcionalidade nova do painel administrativo ganha um teste de ponta a ponta do seu
+  fluxo principal** (`e2e/`). O painel não tem nenhuma outra rede de proteção automatizada, e
+  todo defeito encontrado nele até hoje foi de integração — busca contra o banco real,
+  comportamento do editor, colisão de CSS, reuso de instância de componente no vue-router.
+  Nenhum apareceria num teste de componente com a API simulada. Um fluxo por funcionalidade,
+  não cobertura exaustiva: o caminho que a pessoa percorre para fazer a coisa acontecer.
 - Commits em português, formato Conventional Commits.
 
 ## Comandos
@@ -84,6 +90,10 @@ npm run generate
 npm run dev
 npm run build
 npm run lint
+
+# Ponta a ponta (e2e/) — sobe API, painel e site sozinho; exige Postgres e Redis do compose
+npm install
+npm run test:e2e
 ```
 
 ## Estado do projeto
@@ -110,15 +120,39 @@ Consulte quando a tarefa exigir:
 - **PostgreSQL é o único banco suportado — desenvolvimento, teste e produção. Nunca
   reintroduzir SQLite, em lugar nenhum.** Um bug real (`LIKE` sensível a maiúsculas, que o
   Postgres respeita e o SQLite ignora) passou pela suíte inteira sem ser notado enquanto ela
-  rodava em SQLite `:memory:`. Qualquer segundo banco recria esse buraco: "verde localmente"
-  só significa "verde de verdade" quando tudo roda contra o mesmo banco de produção. Por isso
-  não existem mais caminho de desenvolvimento em SQLite, conexão `sqlite` em
-  `config/database.php`, nem guarda `DB::getDriverName()` em migration — o caminho Postgres é
-  o único. Configuração de teste em `backend/.env.testing` (banco dedicado
-  `lar_analia_franco_test`, separado do de desenvolvimento, no mesmo Postgres do
-  `docker-compose.yml`); `backend/phpunit.xml` só define `APP_ENV=testing` para carregar
-  aquele arquivo — nunca duplicar config de banco ali de volta. Ver README, seção "Testes e
-  qualidade".
+  rodava em SQLite `:memory:`. Um segundo *motor* de banco recria esse buraco: "verde
+  localmente" só significa "verde de verdade" quando tudo roda contra o mesmo banco de
+  produção. Por isso não existem mais caminho de desenvolvimento em SQLite, conexão `sqlite`
+  em `config/database.php`, nem guarda `DB::getDriverName()` em migration — o caminho Postgres
+  é o único.
+
+- **Os três bancos.** São três *bases* no mesmo Postgres do `docker-compose.yml`, todas
+  PostgreSQL 16 — o que não se repete é o motor, não o nome da base. Separar existe porque
+  dois dos três rodam `migrate:fresh`, e apagar o banco de desenvolvimento por engano é
+  irreversível.
+
+  | Banco | Arquivo de ambiente | Quem usa |
+  |---|---|---|
+  | `lar_analia_franco` | `backend/.env` | desenvolvimento (`php artisan serve`, `npm run dev`) |
+  | `lar_analia_franco_test` | `backend/.env.testing` | suíte Pest **e** `backend/scripts/concorrencia/` |
+  | `lar_analia_franco_e2e` | `backend/.env.e2e` | bateria de ponta a ponta (`e2e/`, `npm run test:e2e`) |
+
+  `backend/phpunit.xml` só define `APP_ENV=testing` para carregar `.env.testing` — nunca
+  duplicar config de banco ali de volta; o mesmo vale para `APP_ENV=e2e` e `.env.e2e`, que o
+  `webServer` do Playwright injeta. Os dois arquivos são commitados de propósito (só valores
+  fictícios) e têm exceção explícita no `.gitignore`.
+
+  **Pest, os scripts de concorrência e a bateria de e2e não podem rodar ao mesmo tempo onde
+  compartilham banco.** Pest e os scripts de concorrência dividem `lar_analia_franco_test` e os
+  dois recriam as tabelas — rodar em paralelo dá falha sem sentido, nas duas pontas. A bateria
+  de e2e tem banco próprio e pode rodar junto de qualquer um dos dois; o que ela não pode é
+  rodar duas vezes em paralelo consigo mesma.
+
+  Quem recria o banco de e2e é `php artisan e2e:prepare`, e só ele: o comando **recusa rodar**
+  se o ambiente não for `e2e` ou se o banco resolvido não for `lar_analia_franco_e2e` — mesma
+  guarda dupla de `backend/scripts/concorrencia/bootstrap.php`, pelo mesmo motivo (ele roda
+  `migrate:fresh`). Ver README, seção "Testes e qualidade", e `e2e/README.md`.
+
 - **Toda operação nova que possa reduzir o total de `super_admin` ativos (desativar usuário,
   remover papel, e qualquer outra que vier a existir) precisa passar por
   `App\Actions\Users\AssertLastActiveSuperAdminSurvives` — chamado dentro da mesma transação,

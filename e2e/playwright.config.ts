@@ -105,7 +105,7 @@ export default defineConfig({
       reuseExistingServer: false,
       stdout: 'pipe',
       stderr: 'pipe',
-      timeout: 300_000,
+      timeout: process.env.CI ? 600_000 : 300_000,
     },
     {
       command: 'npm run build && node .output/server/index.mjs',
@@ -120,7 +120,7 @@ export default defineConfig({
       reuseExistingServer: false,
       stdout: 'pipe',
       stderr: 'pipe',
-      timeout: 300_000,
+      timeout: process.env.CI ? 600_000 : 300_000,
     },
   ],
 })

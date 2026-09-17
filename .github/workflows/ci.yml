@@ -136,3 +136,102 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm audit
+
+  e2e:
+    name: e2e (Playwright, pilha completa)
+    runs-on: ubuntu-latest
+
+    services:
+      # Terceiro banco, só da bateria (ver CLAUDE.md, "Os três bancos"): ela roda
+      # migrate:fresh a cada execução, então precisa de um banco onde apagar tudo não custe
+      # nada. Mesma versão principal do docker-compose.yml e do job backend, pelo mesmo motivo
+      # de sempre: "verde no CI" só significa alguma coisa contra o banco de verdade.
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: lar_analia_franco_e2e
+          POSTGRES_USER: lar
+          POSTGRES_PASSWORD: lar
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U lar"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+      # A bateria usa Redis para sessão e cache (índices próprios, ver backend/.env.e2e) — é o
+      # mesmo arranjo do ambiente real, e é o que faz o limitador de login se comportar aqui
+      # como se comporta em produção.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          # Mesma versão do job backend e de docker/php/Dockerfile.
+          php-version: '8.5'
+          extensions: pdo_pgsql, pgsql, mbstring, intl, exif, gd, bcmath, zip, redis
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # Nenhuma variável de ambiente de banco no job, de propósito: toda a configuração da
+      # bateria vem de backend/.env.e2e (commitado, só valores fictícios), carregado porque o
+      # playwright.config.ts sobe o Laravel com APP_ENV=e2e. Duplicar aqui reabriria a chance
+      # de as duas fontes divergirem em silêncio.
+      - name: Instalar dependências do backend
+        working-directory: backend
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Instalar dependências do painel
+        working-directory: frontend-admin
+        run: npm ci
+
+      - name: Instalar dependências do site
+        working-directory: frontend-site
+        run: npm ci
+
+      - name: Instalar dependências da bateria
+        working-directory: e2e
+        run: npm ci
+
+      - name: Cache do navegador do Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
+
+      - name: Instalar o Firefox do Playwright
+        working-directory: e2e
+        # --with-deps traz as bibliotecas de sistema que o runner não tem por padrão; o
+        # postinstall do e2e/package.json já baixa o navegador, mas não essas bibliotecas.
+        run: npx playwright install --with-deps firefox
+
+      - name: Bateria de ponta a ponta
+        working-directory: e2e
+        # O webServer do Playwright sobe API, painel e site (build de produção dos dois
+        # frontends) antes dos testes, e o global setup recria o banco — nada disso precisa de
+        # passo próprio aqui.
+        run: npm run test:e2e
+
+      - name: Publicar trace, capturas e vídeo da falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artefatos
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 14
