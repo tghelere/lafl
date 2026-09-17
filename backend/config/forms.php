@@ -63,6 +63,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Site público
+    |--------------------------------------------------------------------------
+    |
+    | Base para URL absoluta de asset do site dentro de e-mail (ver
+    | resources/views/vendor/mail/html/message.blade.php — logo do cabeçalho). Cliente de
+    | e-mail não carrega caminho relativo nem import de módulo JS: precisa ser HTTP(S)
+    | completo.
+    |
+    */
+
+    'site_base_url' => env('SITE_BASE_URL', 'http://localhost:3000'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Versão do termo de consentimento
     |--------------------------------------------------------------------------
     |

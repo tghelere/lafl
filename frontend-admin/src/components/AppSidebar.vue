@@ -3,6 +3,11 @@ import { computed } from 'vue'
 
 import { useAuthStore } from '@/stores/auth'
 
+// Fonte única em shared/brand/ — ver LEIA-ME.md de cada pasta. Import direto (não cópia),
+// habilitado por vite.config.ts (server.fs.allow).
+import logoHorizontal from '../../../shared/brand/lar-analia-franco/lar-analia-franco-horizontal.svg'
+import softhingLogo from '../../../shared/brand/softhing/softhing-fundo-escuro.svg'
+
 /**
  * A navegação só mostra o que authStore.user.access permite — o mesmo mapa de viewAny por
  * recurso que a API calcula via Policy (ver App\Http\Resources\UserResource::accessMap no
@@ -38,8 +43,15 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
     <RouterLink
       to="/admin"
       class="app-sidebar__brand"
+      aria-label="Lar Anália Franco — página inicial do painel"
     >
-      Lar Anália Franco
+      <img
+        :src="logoHorizontal"
+        width="65"
+        height="30"
+        alt=""
+        class="app-sidebar__logo"
+      >
     </RouterLink>
 
     <nav
@@ -143,6 +155,24 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
 
     <p class="app-sidebar__note">
       Todo acesso ao detalhe de um formulário é registrado.
+    </p>
+
+    <p class="app-sidebar__credit">
+      Desenvolvido por
+      <a
+        href="https://softhing.com.br/?utm_source=lar-analia-franco&utm_medium=referral&utm_campaign=credito-painel"
+        target="_blank"
+        rel="noopener"
+        aria-label="Softhing — abre o site da desenvolvedora em nova aba"
+      >
+        <img
+          :src="softhingLogo"
+          width="73"
+          height="20"
+          alt=""
+          class="app-sidebar__credit-logo"
+        >
+      </a>
     </p>
   </aside>
 </template>

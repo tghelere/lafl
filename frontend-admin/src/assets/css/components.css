@@ -25,11 +25,11 @@
 }
 
 .app-sidebar__brand {
-  font-family: var(--font-display);
-  font-weight: var(--weight-bold);
-  font-size: var(--text-lg);
-  color: var(--color-surface-raised);
-  text-decoration: none;
+  display: inline-flex;
+}
+
+.app-sidebar__logo {
+  display: block;
 }
 
 .app-sidebar__nav {
@@ -75,6 +75,23 @@
   font-size: var(--text-xs);
   color: color-mix(in srgb, var(--color-surface-raised) 65%, transparent);
   line-height: var(--leading-normal);
+}
+
+.app-sidebar__credit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: color-mix(in srgb, var(--color-surface-raised) 65%, transparent);
+  margin: 0;
+}
+
+.app-sidebar__credit a {
+  display: inline-flex;
+}
+
+.app-sidebar__credit-logo {
+  display: block;
 }
 
 .app-main {

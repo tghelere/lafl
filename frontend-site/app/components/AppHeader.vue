@@ -3,6 +3,12 @@
 // simples da Etapa 1; a Etapa 3 reescreve o bloco <Transition name="mobile-nav"> abaixo.
 import { ctaItem, navigation, type NavItem } from '~/config/navigation'
 
+// Fonte única da logo — shared/brand/lar-analia-franco/LEIA-ME.md. Import direto (não
+// cópia): mesmo padrão do tokens.css de marca em nuxt.config.ts, evita duplicar o arquivo à
+// mão. Exige `vite.server.fs.allow` em nuxt.config.ts para funcionar em dev (build não passa
+// pelo dev server, então não precisa disso).
+import logoHorizontal from '../../../shared/brand/lar-analia-franco/lar-analia-franco-horizontal.svg'
+
 const route = useRoute()
 
 const openTo = ref<string | null>(null)
@@ -172,7 +178,15 @@ function onMobileKeydown(event: KeyboardEvent) {
 <template>
   <header class="site-header">
     <div class="site-header__container site-header__bar">
-      <NuxtLink to="/" class="site-header__mark">Lar Anália Franco</NuxtLink>
+      <NuxtLink to="/" class="site-header__mark" aria-label="Lar Anália Franco — página inicial">
+        <img
+          :src="logoHorizontal"
+          width="95"
+          height="44"
+          alt=""
+          class="site-header__logo"
+        >
+      </NuxtLink>
 
       <nav class="site-header__nav" aria-label="Navegação principal">
         <ul>

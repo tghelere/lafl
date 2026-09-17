@@ -29,6 +29,23 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'pt-BR' },
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+      ],
+    },
+  },
+
+  // AppHeader.vue e AppFooter.vue importam a logo de shared/brand/ (fora da raiz do
+  // projeto) — mesmo padrão do tokens.css de marca acima, evita duplicar o arquivo à mão.
+  // Sem isto o dev server nega leitura de arquivo fora de frontend-site/ (o build de
+  // produção não usa o dev server, então funciona sem isto — mas dev quebraria).
+  vite: {
+    server: {
+      fs: {
+        allow: ['..'],
+      },
     },
   },
 

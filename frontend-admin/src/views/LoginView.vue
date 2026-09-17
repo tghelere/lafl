@@ -6,6 +6,11 @@ import { useRoute, useRouter } from 'vue-router'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import { useAuthStore } from '@/stores/auth'
 
+// Fonte única em shared/brand/ — ver LEIA-ME.md de cada pasta. Import direto (não cópia),
+// habilitado por vite.config.ts (server.fs.allow).
+import logoVertical from '../../../shared/brand/lar-analia-franco/lar-analia-franco-vertical.svg'
+import softhingLogo from '../../../shared/brand/softhing/softhing-fundo-claro.svg'
+
 const email = ref('')
 const password = ref('')
 const errorMessage = ref<string | null>(null)
@@ -43,71 +48,101 @@ async function handleSubmit(): Promise<void> {
 
 <template>
   <main class="login">
-    <form
-      class="login__form card"
-      @submit.prevent="handleSubmit"
-    >
-      <p class="login__eyebrow">
-        Painel administrativo
-      </p>
-      <h1>Lar Anália Franco</h1>
-
-      <NoticeBanner
-        v-if="route.query['senha-definida']"
-        variant="info"
+    <div class="login__center">
+      <form
+        class="login__form card"
+        @submit.prevent="handleSubmit"
       >
-        Senha definida. Entre com a nova senha.
-      </NoticeBanner>
-
-      <div class="field">
-        <label for="email">E-mail</label>
-        <input
-          id="email"
-          v-model="email"
-          type="email"
-          autocomplete="username"
-          required
+        <img
+          :src="logoVertical"
+          width="96"
+          height="142"
+          alt="Lar Anália Franco"
+          class="login__logo"
         >
-      </div>
+        <h1>Painel administrativo</h1>
 
-      <div class="field">
-        <label for="password">Senha</label>
-        <input
-          id="password"
-          v-model="password"
-          type="password"
-          autocomplete="current-password"
-          required
+        <NoticeBanner
+          v-if="route.query['senha-definida']"
+          variant="info"
         >
-      </div>
+          Senha definida. Entre com a nova senha.
+        </NoticeBanner>
 
-      <p
-        v-if="errorMessage"
-        role="alert"
-        class="login__error"
-      >
-        {{ errorMessage }}
-      </p>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            autocomplete="username"
+            required
+          >
+        </div>
 
-      <button
-        type="submit"
-        class="btn btn--primary login__submit"
-        :disabled="isSubmitting"
+        <div class="field">
+          <label for="password">Senha</label>
+          <input
+            id="password"
+            v-model="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <p
+          v-if="errorMessage"
+          role="alert"
+          class="login__error"
+        >
+          {{ errorMessage }}
+        </p>
+
+        <button
+          type="submit"
+          class="btn btn--primary login__submit"
+          :disabled="isSubmitting"
+        >
+          {{ isSubmitting ? 'Entrando…' : 'Entrar' }}
+        </button>
+      </form>
+    </div>
+
+    <p class="login__credit">
+      Desenvolvido por
+      <a
+        href="https://softhing.com.br/?utm_source=lar-analia-franco&utm_medium=referral&utm_campaign=credito-painel"
+        target="_blank"
+        rel="noopener"
+        aria-label="Softhing — abre o site da desenvolvedora em nova aba"
       >
-        {{ isSubmitting ? 'Entrando…' : 'Entrar' }}
-      </button>
-    </form>
+        <img
+          :src="softhingLogo"
+          width="73"
+          height="20"
+          alt=""
+          class="login__credit-logo"
+        >
+      </a>
+    </p>
   </main>
 </template>
 
 <style scoped>
 .login {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   min-height: 100vh;
   padding: var(--space-4);
   background: var(--color-surface);
+}
+
+.login__center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login__form {
@@ -115,17 +150,14 @@ async function handleSubmit(): Promise<void> {
   max-width: 22rem;
 }
 
-.login__eyebrow {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  margin: 0 0 var(--space-2);
+.login__logo {
+  display: block;
+  margin: 0 auto var(--space-5);
 }
 
 .login__form h1 {
   font-size: var(--text-2xl);
+  text-align: center;
   margin-bottom: var(--space-5);
 }
 
@@ -138,5 +170,23 @@ async function handleSubmit(): Promise<void> {
 .login__submit {
   width: 100%;
   margin-top: var(--space-2);
+}
+
+.login__credit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.login__credit a {
+  display: inline-flex;
+}
+
+.login__credit-logo {
+  display: block;
 }
 </style>

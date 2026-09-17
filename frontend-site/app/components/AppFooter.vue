@@ -12,12 +12,32 @@
 import { MapPin, Phone } from '@lucide/vue'
 import { navigation } from '~/config/navigation'
 
+import logoHorizontal from '../../../shared/brand/lar-analia-franco/lar-analia-franco-horizontal.svg'
+import softhingLogo from '../../../shared/brand/softhing/softhing-fundo-escuro.svg'
+import { useUmamiTrack } from '~/composables/useUmamiTrack'
+
 const year = new Date().getFullYear()
+
+const { track } = useUmamiTrack()
+
+function trackCreditoSofthing(): void {
+  track('credito-softhing:site')
+}
 </script>
 
 <template>
   <footer class="site-footer">
     <div class="container">
+      <NuxtLink to="/" class="site-footer__brand" aria-label="Lar Anália Franco — página inicial">
+        <img
+          :src="logoHorizontal"
+          width="86"
+          height="40"
+          alt=""
+          class="site-footer__logo"
+        >
+      </NuxtLink>
+
       <div class="site-footer__grid">
         <div v-for="item in navigation" :key="item.to">
           <h2><NuxtLink :to="item.to">{{ item.label }}</NuxtLink></h2>
@@ -46,6 +66,25 @@ const year = new Date().getFullYear()
         <p>
           © {{ year }} Lar Anália Franco.
           <NuxtLink to="/politica-de-privacidade">Política de privacidade</NuxtLink>
+        </p>
+
+        <p class="site-footer__credit">
+          Desenvolvido por
+          <a
+            href="https://softhing.com.br/?utm_source=lar-analia-franco&utm_medium=referral&utm_campaign=credito-site"
+            target="_blank"
+            rel="noopener"
+            aria-label="Softhing — abre o site da desenvolvedora em nova aba"
+            @click="trackCreditoSofthing"
+          >
+            <img
+              :src="softhingLogo"
+              width="73"
+              height="20"
+              alt=""
+              class="site-footer__credit-logo"
+            >
+          </a>
         </p>
       </div>
     </div>
