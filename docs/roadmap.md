@@ -231,6 +231,21 @@
       `docs/decisoes/0012-numeros-institucionais-calculados.md` e
       `docs/relatorio-sessao-12.md`.
 
+- [x] **Alinhamento visual — ritmo de lista e altura de controle (sessão 13,
+      `docs/tarefas/03-alinhamento-visual.md`).** `li + li` global de `base.css` (site) dava
+      margem no topo a partir do segundo item de qualquer lista — em lista de bloco isso é
+      ritmo, mas em toda lista em linha com `align-items: center` (menu do header, breadcrumb,
+      navegação de seção) desalinhava o centro vertical do item. Escopado para
+      `.prose`/`.page-content`; `.mobile-nav ul`/`.mobile-nav__children`, que dependiam da
+      regra global, ganharam espaçamento próprio. Em ambos os frontends, `.btn` chegava à
+      própria altura por padding + `line-height: 1` e input/select por padding + line-height
+      herdado — nunca batiam, na barra de filtro das listagens do painel e em
+      `/transparencia/documentos` no site. Tokens `--control-height-sm`/`--control-height-md`
+      (um em cada `tokens.css`) aplicados a `.btn`, input e select nesses contextos. Cinco
+      testes novos em `e2e/tests/layout/alinhamento.spec.ts` (tolerância de 1px), com prova de
+      que pegam o defeito (regra global e altura de controle reintroduzidas, ficou vermelho,
+      revertido antes do commit — mesmo método da sessão 10). Ver `docs/relatorio-sessao-13.md`.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
