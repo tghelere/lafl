@@ -37,7 +37,7 @@ está no dia seguinte. Há teste específico para essa fronteira.
 
 `App\Enums\ContentMarker` declara os cinco marcadores.
 
-**11 testes Pest**: idade antes/no/depois do aniversário com tempo congelado, marco com só o
+**10 testes Pest**: idade antes/no/depois do aniversário com tempo congelado, marco com só o
 ano, fronteira de fuso, plural de 0/1/2 para idade e para contagem, milhar, contagem
 acompanhando publicar/despublicar/excluir, formato inválido no config falhando alto.
 
