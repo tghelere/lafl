@@ -56,9 +56,8 @@ useSeoMeta({
     <section class="registro-epoca" aria-label="Fachada e pátio em registro de época">
       <h2>Fachada e pátio, em registro de época</h2>
       <p class="prose">
-        As fotos abaixo documentam reformas já concluídas — não são o estado atual da sede.
-        A fachada em laranja vivo, por exemplo, corresponde ao dia em que a tinta ficou
-        pronta: com o tempo, a cor desbotou.
+        As fotos abaixo registram reformas já concluídas e não mostram necessariamente o
+        estado atual da sede.
       </p>
 
       <div class="registro-epoca__par">

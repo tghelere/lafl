@@ -45,7 +45,8 @@ const pillars = [
       <h1>Uma creche, uma escola de contraturno e um bazar — sustentados pelo mesmo trabalho.</h1>
       <p class="home__lead">
         O Lar Anália Franco atende crianças na educação infantil e prepara uma escola de
-        contraturno para adolescentes, com início de turmas previsto para 2027. A creche é
+        contraturno para crianças e adolescentes de 6 a 15 anos, com início de turmas previsto
+        para 2027. A creche é
         custeada pelo Termo de Colaboração com a Prefeitura de Londrina — R$ 2.819.892,84
         previstos para 2026 — e é o bazar beneficente que cobre o que esse convênio não cobre.
         Esta página reúne as três frentes e a prestação de contas que sustenta cada uma delas.
@@ -103,7 +104,7 @@ const pillars = [
       </div>
       <div class="card">
         <h2>Quer entender de onde vem cada real?</h2>
-        <p>Balanços, atas e editais — o acervo de prestação de contas está todo publicado.</p>
+        <p>Balanços, atas e editais reunidos numa só página, organizados por ano e tipo.</p>
         <NuxtLink to="/transparencia" class="btn btn--secondary">Ver documentos</NuxtLink>
       </div>
     </section>

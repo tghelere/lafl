@@ -36,7 +36,7 @@ export const navigation: NavItem[] = [
       {
         label: 'Escola de contraturno',
         to: '/contraturno',
-        hint: 'Adolescentes, turmas previstas para 2027',
+        hint: 'Crianças e adolescentes de 6 a 15 anos, turmas previstas para 2027',
       },
       {
         label: 'Bazar beneficente',
