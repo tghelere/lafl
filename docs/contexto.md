@@ -17,6 +17,11 @@ e de natureza espírita (estatuto consolidado em 11/06/2022, art. 1º), Londrina
 originalmente como orfanato — corrigido pelo cliente em 10/09/2026; este documento e o
 repositório traziam **1963** até então. O atendimento hoje é laico.
 
+**Datas confirmadas pelo cliente em 17/09/2026:** associação fundada em 12/07/1953, obra da
+sede iniciada em 18/04/1957, sede inaugurada em 15/11/1963 (placa na parede da sede). O ano
+1963 marca a inauguração da sede, não a fundação da associação — é daí que vinha a confusão
+anterior deste documento (parágrafo acima).
+
 **Dois locais distintos, confirmados pelo cliente em 10/09/2026** — não são a mesma entidade
 de endereço, o que afeta seeder, `/contato` e qualquer marcação schema.org futura (JSON-LD
 `NGO`/`Organization`, ver `docs/roadmap.md`):
@@ -185,55 +190,39 @@ Nenhuma dessas opções está disponível hoje — as páginas `/como-ajudar/not
 `/como-ajudar/empresas-ir` foram removidas do `ContentPagesSeeder`, sem deixar rascunho.
 Voltam ao escopo quando a instituição avisar.
 
-## Histórico recente — informação sensível
+## Histórico recente — decisão do cliente sobre o que aparece no site
 
-Em janeiro de 2022 a instituição foi **condenada em primeira instância** em ação do Ministério
-Público do Paraná por maus-tratos no **serviço de acolhimento institucional** (o antigo
-abrigo). A decisão determinou o afastamento de nove ex-dirigentes e a dissolução do Lar
-enquanto entidade de acolhimento. Uma nova diretoria assumiu na sequência.
+**Decisão confirmada pelo cliente em 17/09/2026: o site não menciona o processo judicial de
+2022 em nenhuma página, nem de forma direta nem indireta** — nem "se reconstruir", nem "troca
+de diretoria por decisão judicial", nem "quem busca informação sobre o processo". Nenhum texto
+do site (home, "Quem somos", história, governança, transparência) cita o caso, a condenação de
+primeira instância, o Ministério Público do Paraná ou o antigo serviço de acolhimento
+institucional em relação a esse episódio.
 
-`[LACUNA]` **Status processual atual.** Decisão de primeira instância não é definitiva, e
-estamos em 2026 — quatro anos depois. Não sabemos se houve recurso, em que instância o
-processo está hoje, nem se a decisão de 2022 transitou em julgado. Nenhum texto do site deve
-tratar a condenação de primeira instância como fato encerrado sem essa confirmação; ver a
-nota de bloqueio em `/quem-somos/o-lar-hoje` no `ContentPagesSeeder`.
+Consequência direta: `/quem-somos/o-lar-hoje`, a página que este documento previa para tratar
+do assunto, foi **removida por completo** do `ContentPagesSeeder` (não apenas mantida em
+`Draft`) — ver `docs/roadmap.md`. Com isso, deixam de ser pendência de conteúdo do site duas
+lacunas que só existiam por causa dessa página:
 
-**A creche seguiu funcionando normalmente durante todo o processo** — documentos de abril de
-2023 registram 213 crianças atendidas (ver "Os três pilares" acima). Não há, por ora, número
-confirmado de matrículas imediatamente antes ou depois de 2022 para sustentar uma alegação de
-crescimento específica.
+- `[LACUNA]` **Status processual atual** (se houve recurso, em que instância o processo está,
+  se houve trânsito em julgado) — não há mais texto no site que dependa dessa confirmação.
+- **Controles adotados após 2022** (que controles internos, protocolos de proteção e
+  supervisão a instituição adotou desde a troca de diretoria) — deixa de orientar texto do
+  site pelo mesmo motivo. Pode voltar a interessar noutro contexto, se a instituição um dia
+  decidir tratar o assunto publicamente, mas não bloqueia nem orienta nada do lançamento.
 
-### Controles adotados após 2022 — lacuna de maior valor do projeto
+Registro interno, para contexto de quem trabalha no projeto — **nunca para publicação**: em
+janeiro de 2022 a instituição foi condenada em primeira instância em ação do Ministério
+Público do Paraná por maus-tratos no antigo serviço de acolhimento institucional, com
+afastamento de nove ex-dirigentes; uma nova diretoria assumiu na sequência e o acolhimento foi
+encerrado. A creche seguiu funcionando normalmente durante todo o processo — documentos de
+abril de 2023 registram 213 crianças atendidas (ver "Os três pilares" acima). Nenhum desses
+fatos é reavaliado pela decisão acima; eles só deixam de aparecer, de qualquer forma, no site
+público.
 
-`[LACUNA]` O que falta para `/quem-somos/o-lar-hoje` dizer algo concreto além de "uma nova
-diretoria assumiu, o acolhimento foi encerrado, a creche cresceu". Quem tranquiliza um
-visitante desconfiado é o controle concreto, não a alegação genérica — e nada disto foi
-levantado ainda em fonte pública. Perguntas a fazer à instituição:
-
-- Que controles internos foram criados desde 2022 (financeiros, de conduta, de atendimento)?
-- Quem fiscaliza a instituição hoje, além da prestação de contas pública — órgão externo,
-  auditoria independente, conselho fiscal?
-- Que protocolos de proteção à criança e ao adolescente foram adotados ou reforçados desde
-  então?
-- Como a equipe que atua com crianças e adolescentes é hoje selecionada, formada e
-  supervisionada?
-- Há acompanhamento por algum órgão do sistema de garantia de direitos (Conselho Tutelar,
-  CMDCA, Ministério Público) desde a mudança de diretoria?
-
-Esta é a lacuna de maior valor pendente do projeto: sem essas respostas, a página mais
-sensível do site só pode descrever o que mudou estruturalmente, nunca o que foi construído
-para evitar repetição — que é exatamente o que tranquilizaria quem chega desconfiado.
-
-### Por que isso importa para este projeto
-
-**Para o site:** o objetivo central do redesign é deslocar a percepção pública de
-"instituição que teve um problema" para "instituição que se reergueu". Transparência real é a
-estratégia, não enfeite. Ainda hoje as matérias sobre o caso dominam a busca pelo nome da
-instituição.
-
-**Para o sistema:** o padrão de rigor com dados de menores não é teórico aqui. Uma
-instituição com esse histórico não pode ter um segundo incidente, de nenhuma natureza. As
-regras de `docs/protecao-de-dados.md` existem por isso.
+**Isto não muda o padrão de rigor com dado de menor que o projeto adota.** Uma instituição com
+esse histórico não pode ter um segundo incidente, de nenhuma natureza — as regras de
+`docs/protecao-de-dados.md` existem por isso, mesmo que o site nunca mencione o motivo.
 
 ## Consequência arquitetural: não há mais acolhimento
 

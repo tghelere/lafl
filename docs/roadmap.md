@@ -71,8 +71,10 @@
       na primeira; removidas três menções não confirmadas de `33.000 m²` (duas no corpo, uma
       em `meta_description`); removidas quatro paráfrases de avaliações do Google atribuídas a
       "famílias" sem autorização; dois ajustes de tom (autocrítica na Visão, eufemismo nos
-      Valores). Ver `docs/contexto.md` para as duas lacunas novas (status processual do caso
-      de 2022, controles adotados desde então) e a seção "BLOQUEIO DE PUBLICAÇÃO" abaixo.
+      Valores). Ver `docs/contexto.md`, seção "Histórico recente" — revisada em 17/09/2026: o
+      cliente decidiu que o site não menciona o caso de 2022 em nenhuma página, e
+      `quem-somos/o-lar-hoje` foi removida por completo do seeder (ver sessão de 17/09/2026
+      abaixo).
 - [x] Leitura administrativa dos seis formulários recebidos, ponta a ponta: endpoints
       (listagem paginada com filtro por status/período, detalhe, mudança de status com
       anotação interna, um endpoint agregado de painel com contagem de pendentes por papel) e
@@ -188,43 +190,6 @@
       abaixo
 
 ## Pendente
-
-### BLOQUEIO DE PUBLICAÇÃO — `/quem-somos/o-lar-hoje`
-
-**⚠ Verificado em sessão de correção: o bloqueio não existe de fato. A página está
-`status = published`, `published_at` preenchido, e responde HTTP 200 em
-`/api/v1/public/pages/quem-somos/o-lar-hoje` agora.** O comentário HTML
-`<!-- BLOQUEADO PARA PUBLICAÇÃO -->` no início do conteúdo é só texto — `ContentPagesSeeder::run()`
-seta `'status' => PageStatus::Published` incondicionalmente para todas as páginas do array,
-sem nenhum caso especial para esta. Um comentário dentro de uma string HTML nunca é lido por
-nenhuma lógica da aplicação; ele não é um mecanismo de controle de acesso, é uma nota para
-quem olha o código-fonte do seeder. `scopePublished()` em `App\Models\Page` é o gate real:
-`where('status', PageStatus::Published)->whereNotNull('published_at')` — é esse campo
-`status` que precisa ser `PageStatus::Draft` para a página sair do ar, não o comentário.
-
-**Esta é a única página do site com essa restrição.** `/quem-somos/o-lar-hoje` não pode ir ao
-ar sem:
-
-1. **Revisão de advogado** do texto sobre o caso de 2022 — decisão de primeira instância não é
-   decisão definitiva, e o texto precisa refletir isso com precisão jurídica, não só
-   institucional.
-2. **Confirmação do status processual atual** — se houve recurso, em que instância o processo
-   está hoje, se houve trânsito em julgado. Ver `[LACUNA]` em `docs/contexto.md`, seção
-   "Histórico recente".
-
-O bloco de conteúdo da página, no `ContentPagesSeeder`, já carrega o comentário
-`<!-- BLOQUEADO PARA PUBLICAÇÃO: exige revisão jurídica antes de ir ao ar -->` logo no início
-do HTML — mantém valor como nota de contexto para quem lê o código, mas **não faz o bloqueio
-sozinho**. **Não remover esse comentário** até as duas condições acima estarem satisfeitas, e
-ver a entrega pendente acima: até lá, a página segue publicada e acessível — o bloqueio real
-(mudar o `status` desta página para `Draft` no seeder, ou excluí-la do array até liberar)
-ainda não foi implementado.
-
-Ver também `docs/contexto.md`, "Controles adotados após 2022": a lacuna de maior valor
-pendente do projeto. Sem saber quais controles internos, protocolos de proteção e supervisão
-foram adotados desde 2022, a página não pode dizer nada concreto além de "uma nova diretoria
-assumiu" — o que tranquilizaria de fato um visitante desconfiado é exatamente o que falta
-levantar.
 
 ### Backend — entidades da Fase 1 restantes
 
