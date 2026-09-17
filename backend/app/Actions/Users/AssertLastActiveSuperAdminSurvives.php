@@ -31,6 +31,10 @@ use Illuminate\Validation\ValidationException;
  * segundo comando enxerga tudo o que a transação anterior commitou — inclusive a remoção de
  * papel que o snapshot antigo escondia. Daí a contagem poder ser um `count()` comum, sem
  * `FOR UPDATE`: quem garante a exclusão mútua é o mutex, não a trava das linhas contadas.
+ *
+ * Toda mudança aqui (ou em quem chama esta Action) precisa ser reconferida com dois processos
+ * de verdade — a suíte Pest não alcança concorrência — ver backend/scripts/concorrencia/
+ * (README.md ali tem os dois cenários prontos: remoção cruzada de papel e caso misto).
  */
 final class AssertLastActiveSuperAdminSurvives
 {

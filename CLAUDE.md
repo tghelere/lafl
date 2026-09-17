@@ -119,6 +119,16 @@ Consulte quando a tarefa exigir:
   `docker-compose.yml`); `backend/phpunit.xml` só define `APP_ENV=testing` para carregar
   aquele arquivo — nunca duplicar config de banco ali de volta. Ver README, seção "Testes e
   qualidade".
+- **Toda operação nova que possa reduzir o total de `super_admin` ativos (desativar usuário,
+  remover papel, e qualquer outra que vier a existir) precisa passar por
+  `App\Actions\Users\AssertLastActiveSuperAdminSurvives` — chamado dentro da mesma transação,
+  antes da escrita.** A proteção depende de travar a linha certa (o papel `super_admin` em
+  `roles`, como mutex) antes de contar; travar outra coisa (ex.: as linhas de `users`) não
+  serializa nada — foi exatamente esse o bug corrigido na sessão 9 (ver
+  `docs/relatorio-sessao-9.md`). A suíte Pest não alcança concorrência de verdade (uma conexão
+  só, síncrona): qualquer mudança nessa Action ou nas Actions que a chamam precisa ser
+  conferida com os scripts em `backend/scripts/concorrencia/` (dois processos reais contra o
+  Postgres), não só com testes verdes.
 
 ## Como trabalhar neste projeto
 
