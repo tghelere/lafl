@@ -20,6 +20,55 @@ services:
     networks:
       - lar
 
+  # Fila e agendador rodam em processo PRÓPRIO, como em qualquer servidor — o `app` acima
+  # atende requisição e mais nada. Sem estes dois containers, nada disparado por fila ou por
+  # agendamento acontece no ambiente local: notificação por e-mail dos formulários
+  # (Mail::queue em App\Actions\Forms\NotifyFormSubmissionReceived), expurgo por `expires_at`
+  # e expurgo de endereço de coleta concluída (App\Jobs\..., agendados em
+  # backend/routes/console.php) simplesmente ficam parados, e o defeito só apareceria em
+  # produção. Os dois reaproveitam a mesma imagem e o mesmo volume do `app`: divergir a
+  # imagem do worker da imagem da aplicação é como um job passa a falhar só em produção.
+  queue:
+    build:
+      context: ./docker/php
+    command: php artisan queue:work --tries=3 --max-time=3600
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - MAIL_HOST=mailpit
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - lar
+
+  # `schedule:work` é o equivalente local do cron de minuto em minuto que o servidor usa: ele
+  # fica no ar e chama `schedule:run` a cada minuto. Os jobs agendados são despachados para a
+  # fila, então este container sozinho não basta — quem executa é o `queue` acima.
+  scheduler:
+    build:
+      context: ./docker/php
+    command: php artisan schedule:work
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+      - MAIL_HOST=mailpit
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - lar
+
   postgres:
     image: postgres:16-alpine
     environment:

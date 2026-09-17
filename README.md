@@ -27,7 +27,7 @@ projeto** (Docker Desktop → Settings → Resources → WSL Integration → hab
 Apply & Restart). Sem esse toggle específico, o Postgres/Redis/Mailpit sobem normalmente,
 mas o container `app` falha ao montar `./backend` (erro de "distro mount service").
 
-**Validado de ponta a ponta nesta sessão**, com o toggle ativado: os quatro serviços sobem,
+**Validado de ponta a ponta nesta sessão**, com o toggle ativado: os serviços sobem,
 `composer install` + `migrate:fresh --seed` rodam dentro do container `app`, e o fluxo
 completo do Sanctum SPA mode funciona contra Postgres/Redis reais (csrf-cookie → login →
 rota protegida → logout → 401), com a suíte Pest inteira (30/30) passando dentro do
@@ -58,6 +58,25 @@ Ainda faltam gerar `FIELD_ENCRYPTION_KEY` e `BLIND_INDEX_KEY` em `backend/.env` 
 
 Mailpit (e-mails capturados em dev): http://localhost:8025
 Documentação OpenAPI (Scramble): http://localhost:8000/docs/api
+
+### Fila e agendador
+
+O compose sobe dois containers além da API: `queue` (`php artisan queue:work`) e `scheduler`
+(`php artisan schedule:work`), na mesma imagem do `app` — é a mesma separação de processos
+que o servidor usa (ver `docs/deploy.md`). Sem eles, nada disparado por fila ou agendamento
+acontece: a notificação por e-mail dos formulários fica na fila do Redis sem nunca ser
+enviada, e os dois expurgos por retenção (`App\Jobs\PurgeExpiredFormSubmissions`,
+`App\Jobs\PurgeCompletedPickupRequestAddresses`, agendados em `backend/routes/console.php`)
+nunca rodam.
+
+```bash
+docker compose logs -f queue scheduler                 # acompanhar
+docker compose exec app php artisan schedule:list      # o que está agendado e quando roda
+docker compose exec app php artisan schedule:test      # dispara um agendado agora, sem esperar
+```
+
+Fora do Docker, os mesmos dois processos precisam estar no ar em terminais próprios
+(`php artisan queue:work` e `php artisan schedule:work`, a partir de `backend/`).
 
 ## Setup local — sem Docker (parcial)
 
