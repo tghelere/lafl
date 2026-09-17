@@ -82,16 +82,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Quem Somos',
                 'meta_description' => 'O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza espírita de Londrina, com três frentes: creche, contraturno e bazar beneficente.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco de Londrina é uma associação civil beneficente, filantrópica e de
-                    natureza espírita. A sede, onde também funciona o CEI Anália Franco, fica na Av. Anália
-                    Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060.</p>
-                    <p>Hoje a instituição já opera duas frentes — o Centro de Educação Infantil Anália Franco
-                    (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina, e o
-                    Bazar Beneficente, loja de doações que sustenta boa parte do orçamento da casa — e
-                    prepara uma terceira, a Escola de Contraturno, com estrutura pronta e início de turmas
-                    previsto para 2027.</p>
-                    <p>As páginas desta seção contam a história da instituição, sua estrutura de governança e
-                    o que ela é hoje — inclusive os pontos em que precisou se reconstruir.</p>
+                    <p>O Lar Anália Franco de Londrina é uma associação civil beneficente, filantrópica e de natureza espírita. A sede, onde também funciona o CEI Anália Franco, fica na Av. Anália Franco, 33, Jd. Aeroporto, Londrina/PR — telefone (43) 3325-8060.</p><p>Hoje a instituição já opera duas frentes — o Centro de Educação Infantil Anália Franco (CEI Anália Franco), creche e pré-escola conveniada com a Prefeitura de Londrina, e o Bazar Beneficente, loja de doações que sustenta boa parte do orçamento da casa — e prepara uma terceira, a Escola de Contraturno, com estrutura pronta e início de turmas previsto para 2027.</p><p>As páginas desta seção contam a história da instituição, sua estrutura de governança e o que ela é hoje — inclusive os pontos em que precisou se reconstruir.</p>
                     HTML,
             ],
             [
@@ -99,21 +90,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Nossa História',
                 'meta_description' => 'De orfanato a instituição com creche, contraturno e bazar: a linha do tempo do Lar Anália Franco de Londrina.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco foi criado por um grupo espírita de Londrina, originalmente como
-                    orfanato. O atendimento que a instituição presta hoje é laico.</p>
-                    <p>O nome é uma homenagem a Anália Franco (1853–1919), educadora, jornalista,
-                    abolicionista e filantropa que fundou mais de 70 escolas e 23 asilos para crianças
-                    órfãs no Brasil.</p>
-                    <ul>
-                    <li>1968 — início do Bazar Beneficente, em funcionamento ininterrupto desde então.</li>
-                    <li>2002 — criação do Centro de Educação Infantil Anália Franco, com convênio junto à
-                    Secretaria Municipal de Educação de Londrina.</li>
-                    <li>2016 — recebe a Medalha Ouro Verde, maior honraria da Câmara Municipal de
-                    Londrina.</li>
-                    <li>2022 — encerramento do antigo serviço de acolhimento institucional e troca de
-                    diretoria.</li>
-                    <li>2026 — inauguração da sala de informática da Escola de Contraturno.</li>
-                    </ul>
+                    <p>O Lar Anália Franco foi criado por um grupo espírita de Londrina, originalmente como orfanato. O atendimento que a instituição presta hoje é laico.</p><p>O nome é uma homenagem a Anália Franco (1853–1919), educadora, jornalista, abolicionista e filantropa que fundou mais de 70 escolas e 23 asilos para crianças órfãs no Brasil.</p><ul><li><p>1968 — início do Bazar Beneficente, em funcionamento ininterrupto desde então.</p></li><li><p>2002 — criação do Centro de Educação Infantil Anália Franco, com convênio junto à Secretaria Municipal de Educação de Londrina.</p></li><li><p>2016 — recebe a Medalha Ouro Verde, maior honraria da Câmara Municipal de Londrina.</p></li><li><p>2022 — encerramento do antigo serviço de acolhimento institucional e troca de diretoria.</p></li><li><p>2026 — inauguração da sala de informática da Escola de Contraturno.</p></li></ul>
                     HTML,
             ],
             [
@@ -121,26 +98,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Missão, Visão e Valores',
                 'meta_description' => 'Rascunho de trabalho da missão, visão e valores do Lar Anália Franco, ainda pendente de validação pela direção da instituição.',
                 'content' => <<<'HTML'
-                    <p><strong>Este texto é um rascunho de trabalho</strong>, escrito a partir da operação
-                    atual da instituição. A missão anterior descrevia o antigo serviço de acolhimento,
-                    encerrado em 2022, e por isso não é mais usada — a redação final ainda depende de
-                    validação da direção.</p>
-                    <h2>Missão</h2>
-                    <p>Sustentar, em Londrina, uma educação infantil de qualidade e oportunidades de
-                    formação para adolescentes em situação de vulnerabilidade social, financiadas em parte
-                    pelo próprio trabalho da instituição.</p>
-                    <h2>Visão</h2>
-                    <p>Ser reconhecida em Londrina como uma instituição que presta contas do que arrecada e
-                    do que faz.</p>
-                    <h2>Valores</h2>
-                    <ul>
-                    <li>Transparência: os documentos de prestação de contas são públicos, não apenas
-                    entregues ao órgão fiscalizador.</li>
-                    <li>Continuidade: a creche funciona desde 2002 sem interrupção, inclusive durante a
-                    troca de diretoria e o fim do acolhimento institucional em 2022.</li>
-                    <li>Autossustentação: o Bazar Beneficente existe desde 1968 para custear o que o
-                    convênio público não cobre.</li>
-                    </ul>
+                    <p><strong>Este texto é um rascunho de trabalho</strong>, escrito a partir da operação atual da instituição. A missão anterior descrevia o antigo serviço de acolhimento, encerrado em 2022, e por isso não é mais usada — a redação final ainda depende de validação da direção.</p><h2>Missão</h2><p>Sustentar, em Londrina, uma educação infantil de qualidade e oportunidades de formação para adolescentes em situação de vulnerabilidade social, financiadas em parte pelo próprio trabalho da instituição.</p><h2>Visão</h2><p>Ser reconhecida em Londrina como uma instituição que presta contas do que arrecada e do que faz.</p><h2>Valores</h2><ul><li><p>Transparência: os documentos de prestação de contas são públicos, não apenas entregues ao órgão fiscalizador.</p></li><li><p>Continuidade: a creche funciona desde 2002 sem interrupção, inclusive durante a troca de diretoria e o fim do acolhimento institucional em 2022.</p></li><li><p>Autossustentação: o Bazar Beneficente existe desde 1968 para custear o que o convênio público não cobre.</p></li></ul>
                     HTML,
             ],
             [
@@ -148,29 +106,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Governança',
                 'meta_description' => 'Como o Lar Anália Franco é administrado: associação civil beneficente, filantrópica e de natureza espírita, diretoria eleita e prestação de contas pública.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza
-                    espírita, CNPJ 78.614.096/0001-75, administrada por uma diretoria eleita pelos
-                    associados.</p>
-                    <p>Em 2022, após uma decisão de primeira instância que reconheceu irregularidades no
-                    antigo serviço de acolhimento institucional, a diretoria anterior foi afastada por
-                    decisão judicial e uma nova diretoria assumiu a gestão da instituição.</p>
-                    <h2>Diretoria — gestão 2026–2027</h2>
-                    <h3>Diretoria Executiva</h3>
-                    <ul>
-                    <li>Presidente: Valdomiro Ferreira dos Santos</li>
-                    <li>Vice-presidente: Sidnei Pereira do Nascimento</li>
-                    <li>Secretário: Marcos Aurélio Batyras</li>
-                    <li>Diretor de Patrimônio: Domingos Geraldo Stersa Junior</li>
-                    <li>1º Tesoureiro: Marcos Adriano Dornelas Pinheiro</li>
-                    <li>2º Tesoureiro: Ângelo Pamplona da Costa</li>
-                    </ul>
-                    <h3>Conselho Deliberativo</h3>
-                    <ul>
-                    <li>Presidente: André Luiz Gonçalves Salvador</li>
-                    <li>Vice-presidente: Jonatas Beranger</li>
-                    </ul>
-                    <p>A prestação de contas da instituição — balanços, atas e editais — está reunida na
-                    seção <a href="/transparencia">Transparência</a>.</p>
+                    <p>O Lar Anália Franco é uma associação civil beneficente, filantrópica e de natureza espírita, CNPJ 78.614.096/0001-75, administrada por uma diretoria eleita pelos associados.</p><p>Em 2022, após uma decisão de primeira instância que reconheceu irregularidades no antigo serviço de acolhimento institucional, a diretoria anterior foi afastada por decisão judicial e uma nova diretoria assumiu a gestão da instituição.</p><h2>Diretoria — gestão 2026–2027</h2><h3>Diretoria Executiva</h3><ul><li><p>Presidente: Valdomiro Ferreira dos Santos</p></li><li><p>Vice-presidente: Sidnei Pereira do Nascimento</p></li><li><p>Secretário: Marcos Aurélio Batyras</p></li><li><p>Diretor de Patrimônio: Domingos Geraldo Stersa Junior</p></li><li><p>1º Tesoureiro: Marcos Adriano Dornelas Pinheiro</p></li><li><p>2º Tesoureiro: Ângelo Pamplona da Costa</p></li></ul><h3>Conselho Deliberativo</h3><ul><li><p>Presidente: André Luiz Gonçalves Salvador</p></li><li><p>Vice-presidente: Jonatas Beranger</p></li></ul><p>A prestação de contas da instituição — balanços, atas e editais — está reunida na seção <a href="/transparencia">Transparência</a>.</p>
                     HTML,
             ],
             [
@@ -184,28 +120,7 @@ class ContentPagesSeeder extends Seeder
                 // mecanismo que importa aqui.
                 'status' => PageStatus::Draft,
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco passou por uma reconstrução profunda desde 2022. Esta página
-                    explica o que aconteceu e o que mudou desde então.</p>
-                    <h2>O que aconteceu</h2>
-                    <p>Em janeiro de 2022, uma ação movida pelo Ministério Público do Paraná resultou numa
-                    decisão de primeira instância que reconheceu irregularidades no antigo serviço de
-                    acolhimento institucional — o abrigo que a instituição mantinha até então. A decisão
-                    determinou o afastamento de nove ex-dirigentes e a dissolução do Lar como entidade de
-                    acolhimento.</p>
-                    <p>Decisão de primeira instância não é definitiva. O status processual atual — se houve
-                    recurso e qual o resultado — está em confirmação junto à instituição e será atualizado
-                    aqui assim que validado.</p>
-                    <h2>O que mudou</h2>
-                    <p>Uma nova diretoria assumiu a gestão logo em seguida. O serviço de acolhimento foi
-                    encerrado — a instituição não recebe mais crianças e adolescentes em regime de abrigo, e
-                    não há mais medida protetiva, guarda ou vínculo com vara da infância.</p>
-                    <p>A creche seguiu funcionando durante todo o processo e cresceu desde então. Em 2026, a
-                    instituição também montou a estrutura da Escola de Contraturno — programa em preparação,
-                    que ainda não abriu turmas, com início previsto para 2027.</p>
-                    <h2>O que a instituição está fazendo diferente</h2>
-                    <p>Não é possível apagar o que aconteceu. O compromisso da direção atual é manter a
-                    prestação de contas pública e verificável, documento por documento — ver
-                    <a href="/transparencia">Transparência</a>.</p>
+                    <p>O Lar Anália Franco passou por uma reconstrução profunda desde 2022. Esta página explica o que aconteceu e o que mudou desde então.</p><h2>O que aconteceu</h2><p>Em janeiro de 2022, uma ação movida pelo Ministério Público do Paraná resultou numa decisão de primeira instância que reconheceu irregularidades no antigo serviço de acolhimento institucional — o abrigo que a instituição mantinha até então. A decisão determinou o afastamento de nove ex-dirigentes e a dissolução do Lar como entidade de acolhimento.</p><p>Decisão de primeira instância não é definitiva. O status processual atual — se houve recurso e qual o resultado — está em confirmação junto à instituição e será atualizado aqui assim que validado.</p><h2>O que mudou</h2><p>Uma nova diretoria assumiu a gestão logo em seguida. O serviço de acolhimento foi encerrado — a instituição não recebe mais crianças e adolescentes em regime de abrigo, e não há mais medida protetiva, guarda ou vínculo com vara da infância.</p><p>A creche seguiu funcionando durante todo o processo e cresceu desde então. Em 2026, a instituição também montou a estrutura da Escola de Contraturno — programa em preparação, que ainda não abriu turmas, com início previsto para 2027.</p><h2>O que a instituição está fazendo diferente</h2><p>Não é possível apagar o que aconteceu. O compromisso da direção atual é manter a prestação de contas pública e verificável, documento por documento — ver <a href="/transparencia">Transparência</a>.</p>
                     HTML,
             ],
         ];
@@ -222,15 +137,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Educação Infantil',
                 'meta_description' => 'CEI Anália Franco: creche e pré-escola do Lar Anália Franco para crianças de 1 a 5 anos, 15 turmas, período integral, conveniada com a Prefeitura de Londrina.',
                 'content' => <<<'HTML'
-                    <p>O Centro de Educação Infantil Anália Franco é a creche e pré-escola do Lar Anália
-                    Franco, para crianças de 1 a 5 anos, em 15 turmas (C1 a P5, plano de trabalho do Termo
-                    de Colaboração 06/2022, exercício 2026). Funciona em período integral, das 7h30 às
-                    17h30, com convênio junto à Secretaria Municipal de Educação de Londrina.</p>
-                    <p>O CEI Anália Franco foi criado em 2002 e tem autorização de funcionamento renovada até
-                    janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra
-                    poliesportiva do terreno.</p>
-                    <p>As páginas desta seção detalham a proposta pedagógica, a alimentação e a estrutura
-                    física do CEI, além de como fazer a <a href="/educacao-infantil/matricula">matrícula</a>.</p>
+                    <p>O Centro de Educação Infantil Anália Franco é a creche e pré-escola do Lar Anália Franco, para crianças de 1 a 5 anos, em 15 turmas (C1 a P5, plano de trabalho do Termo de Colaboração 06/2022, exercício 2026). Funciona em período integral, das 7h30 às 17h30, com convênio junto à Secretaria Municipal de Educação de Londrina.</p><p>O CEI Anália Franco foi criado em 2002 e tem autorização de funcionamento renovada até janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra poliesportiva do terreno.</p><p>As páginas desta seção detalham a proposta pedagógica, a alimentação e a estrutura física do CEI, além de como fazer a <a href="/educacao-infantil/matricula">matrícula</a>.</p>
                     HTML,
             ],
             [
@@ -238,8 +145,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Dia da Criança',
                 'meta_description' => 'O CEI Anália Franco reserva uma programação especial de Dia da Criança, em outubro, para as crianças atendidas pela creche.',
                 'content' => <<<'HTML'
-                    <p>O Centro de Educação Infantil Anália Franco reserva uma programação especial para o Dia
-                    da Criança, em outubro, para as crianças atendidas pela creche.</p>
+                    <p>O Centro de Educação Infantil Anália Franco reserva uma programação especial para o Dia da Criança, em outubro, para as crianças atendidas pela creche.</p>
                     HTML,
             ],
             [
@@ -247,11 +153,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Proposta Pedagógica',
                 'meta_description' => 'Rotina do CEI Anália Franco: aulas de inglês, educação física, horta e quadra poliesportiva, em período integral para crianças de 1 a 5 anos.',
                 'content' => <<<'HTML'
-                    <p>O CEI Anália Franco atende crianças de 1 a 5 anos (turmas de C1 a P5) em período
-                    integral, das 7h30 às 17h30, sob convênio com a Secretaria Municipal de Educação de
-                    Londrina.</p>
-                    <p>Fazem parte da rotina aulas de inglês, educação física, atividades na horta da
-                    instituição e uso da quadra poliesportiva do terreno.</p>
+                    <p>O CEI Anália Franco atende crianças de 1 a 5 anos (turmas de C1 a P5) em período integral, das 7h30 às 17h30, sob convênio com a Secretaria Municipal de Educação de Londrina.</p><p>Fazem parte da rotina aulas de inglês, educação física, atividades na horta da instituição e uso da quadra poliesportiva do terreno.</p>
                     HTML,
             ],
             [
@@ -259,10 +161,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Alimentação e Saúde',
                 'meta_description' => 'O CEI Anália Franco serve cinco refeições diárias com cardápio de nutricionista e registra alergias e restrições alimentares informadas na matrícula.',
                 'content' => <<<'HTML'
-                    <p>O CEI Anália Franco serve cinco refeições diárias, com cardápio elaborado por
-                    nutricionista, para todas as crianças em período integral.</p>
-                    <p>Restrições alimentares e alergias informadas pela família na matrícula são
-                    registradas e levadas em conta no preparo das refeições da criança.</p>
+                    <p>O CEI Anália Franco serve cinco refeições diárias, com cardápio elaborado por nutricionista, para todas as crianças em período integral.</p><p>Restrições alimentares e alergias informadas pela família na matrícula são registradas e levadas em conta no preparo das refeições da criança.</p>
                     HTML,
             ],
             [
@@ -270,11 +169,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Estrutura',
                 'meta_description' => 'O CEI Anália Franco funciona no terreno do Lar Anália Franco, com horta e quadra poliesportiva entre os espaços mais usados.',
                 'content' => <<<'HTML'
-                    <p>O CEI Anália Franco funciona no terreno da instituição, na Av. Anália Franco, 33,
-                    Jd. Aeroporto, Londrina/PR.</p>
-                    <p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, que
-                    também vai ser usada pela Escola de Contraturno e, fora desse uso, é alugada como fonte
-                    de receita da instituição.</p>
+                    <p>O CEI Anália Franco funciona no terreno da instituição, na Av. Anália Franco, 33, Jd. Aeroporto, Londrina/PR.</p><p>O terreno tem horta, usada nas atividades pedagógicas, e quadra poliesportiva, que também vai ser usada pela Escola de Contraturno e, fora desse uso, é alugada como fonte de receita da instituição.</p>
                     HTML,
             ],
             [
@@ -282,11 +177,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Depoimentos',
                 'meta_description' => 'O CEI Anália Franco tem avaliação pública de 4,5 estrelas no Google. Depoimentos individuais só entram aqui com autorização de quem os deu.',
                 'content' => <<<'HTML'
-                    <p>O CEI Anália Franco tem avaliação pública de 4,5 estrelas, com mais de duas centenas de
-                    avaliações, no perfil do Google da instituição.</p>
-                    <p>Depoimentos de pais e responsáveis só entram nesta página com autorização expressa de
-                    quem os deu — nenhuma avaliação pública é reproduzida aqui sem esse consentimento. Esta
-                    seção será preenchida à medida que a instituição colher essas autorizações.</p>
+                    <p>O CEI Anália Franco tem avaliação pública de 4,5 estrelas, com mais de duas centenas de avaliações, no perfil do Google da instituição.</p><p>Depoimentos de pais e responsáveis só entram nesta página com autorização expressa de quem os deu — nenhuma avaliação pública é reproduzida aqui sem esse consentimento. Esta seção será preenchida à medida que a instituição colher essas autorizações.</p>
                     HTML,
             ],
             [
@@ -294,15 +185,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Matrícula',
                 'meta_description' => 'A matrícula no CEI Anália Franco é feita pela Central de Vagas da Prefeitura de Londrina, na Rua Benjamin Constant, 800, Centro.',
                 'content' => <<<'HTML'
-                    <p>A matrícula no CEI Anália Franco é feita exclusivamente pela Central de Vagas da
-                    Secretaria Municipal de Educação de Londrina — o Lar Anália Franco não recebe pedido de
-                    vaga diretamente, nem pelo site nem por telefone.</p>
-                    <p><strong>Central de Vagas</strong><br />
-                    Rua Benjamin Constant, 800 — Centro, Londrina/PR</p>
-                    <p>Para telefone, horário de atendimento e outros canais de contato, consulte o site
-                    oficial da Prefeitura de Londrina.</p>
-                    <p>Depois que a Prefeitura encaminha a vaga ao CEI Anália Franco, a secretaria da
-                    instituição entra em contato para os próximos passos da matrícula efetiva.</p>
+                    <p>A matrícula no CEI Anália Franco é feita exclusivamente pela Central de Vagas da Secretaria Municipal de Educação de Londrina — o Lar Anália Franco não recebe pedido de vaga diretamente, nem pelo site nem por telefone.</p><p><strong>Central de Vagas</strong><br />Rua Benjamin Constant, 800 — Centro, Londrina/PR</p><p>Para telefone, horário de atendimento e outros canais de contato, consulte o site oficial da Prefeitura de Londrina.</p><p>Depois que a Prefeitura encaminha a vaga ao CEI Anália Franco, a secretaria da instituição entra em contato para os próximos passos da matrícula efetiva.</p>
                     HTML,
             ],
         ];
@@ -319,20 +202,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Escola de Contraturno',
                 'meta_description' => 'Programa em preparação do Lar Anália Franco para crianças e adolescentes de 6 a 15 anos, com meta de 100 atendidos. Início previsto para 2027.',
                 'content' => <<<'HTML'
-                    <p>A Escola de Contraturno é um programa em preparação do Lar Anália Franco, para
-                    crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos.
-                    A meta é atender 100 crianças e adolescentes.</p>
-                    <p>A estrutura já existe: laboratório de informática com 20 computadores doados pelo
-                    Centro de Recondicionamento de Computadores, parceria com o SENAI, ginásio de esportes
-                    e auditório, no terreno da instituição.</p>
-                    <p>O programa vai oferecer oficinas de produção audiovisual, produção de podcast,
-                    grafite, patrimônio histórico-cultural, capoeira, música, dança, literatura, tecnologias
-                    criativas, informática básica e um time de futebol.</p>
-                    <p>Início das turmas previsto para 2027. Nenhuma turma funciona ainda, e não há aluno
-                    matriculado — avise-se para saber assim que as inscrições abrirem.</p>
-                    <p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p>
-                    <p>As páginas desta seção detalham para quem é o programa, a estrutura já existente, as
-                    oficinas previstas e o que vem a seguir.</p>
+                    <p>A Escola de Contraturno é um programa em preparação do Lar Anália Franco, para crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos. A meta é atender 100 crianças e adolescentes.</p><p>A estrutura já existe: laboratório de informática com 20 computadores doados pelo Centro de Recondicionamento de Computadores, parceria com o SENAI, ginásio de esportes e auditório, no terreno da instituição.</p><p>O programa vai oferecer oficinas de produção audiovisual, produção de podcast, grafite, patrimônio histórico-cultural, capoeira, música, dança, literatura, tecnologias criativas, informática básica e um time de futebol.</p><p>Início das turmas previsto para 2027. Nenhuma turma funciona ainda, e não há aluno matriculado — avise-se para saber assim que as inscrições abrirem.</p><p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p><p>As páginas desta seção detalham para quem é o programa, a estrutura já existente, as oficinas previstas e o que vem a seguir.</p>
                     HTML,
             ],
             [
@@ -340,15 +210,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'O Projeto',
                 'meta_description' => 'A Escola de Contraturno nasceu da receita do Bazar Beneficente, de equipamentos doados e de uma parceria com o SENAI — início previsto para 2027.',
                 'content' => <<<'HTML'
-                    <p>O projeto nasceu da combinação de coisas que o Lar Anália Franco já tinha: espaço
-                    disponível no terreno da instituição e a receita do Bazar Beneficente, que viabilizou o
-                    investimento inicial.</p>
-                    <p>Os computadores do laboratório de informática — 20 ao todo — foram doados pelo Centro
-                    de Recondicionamento de Computadores, programa federal de reaproveitamento de
-                    equipamentos. A instituição também firmou parceria com o SENAI, e o programa vai usar o
-                    ginásio de esportes e o auditório já existentes no terreno.</p>
-                    <p>O programa ainda não abriu turmas — início previsto para 2027. A meta é atender 100
-                    crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos.</p>
+                    <p>O projeto nasceu da combinação de coisas que o Lar Anália Franco já tinha: espaço disponível no terreno da instituição e a receita do Bazar Beneficente, que viabilizou o investimento inicial.</p><p>Os computadores do laboratório de informática — 20 ao todo — foram doados pelo Centro de Recondicionamento de Computadores, programa federal de reaproveitamento de equipamentos. A instituição também firmou parceria com o SENAI, e o programa vai usar o ginásio de esportes e o auditório já existentes no terreno.</p><p>O programa ainda não abriu turmas — início previsto para 2027. A meta é atender 100 crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos.</p>
                     HTML,
             ],
             [
@@ -356,10 +218,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Para Quem É',
                 'meta_description' => 'A Escola de Contraturno é para crianças e adolescentes de 6 a 15 anos de famílias com renda de até 3 salários mínimos, com meta de 100 atendidos.',
                 'content' => <<<'HTML'
-                    <p>O programa é para crianças e adolescentes de 6 a 15 anos, de famílias com renda de
-                    até 3 salários mínimos. A meta é atender 100 crianças e adolescentes.</p>
-                    <p>O programa ainda não abriu turmas — início previsto para 2027. Outros critérios de
-                    seleção, além da faixa etária e da renda familiar, ainda estão em definição.</p>
+                    <p>O programa é para crianças e adolescentes de 6 a 15 anos, de famílias com renda de até 3 salários mínimos. A meta é atender 100 crianças e adolescentes.</p><p>O programa ainda não abriu turmas — início previsto para 2027. Outros critérios de seleção, além da faixa etária e da renda familiar, ainda estão em definição.</p>
                     HTML,
             ],
             [
@@ -367,14 +226,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Como Funciona',
                 'meta_description' => 'A Escola de Contraturno vai oferecer oficinas de produção audiovisual, podcast, grafite, capoeira, música, dança, literatura e informática básica.',
                 'content' => <<<'HTML'
-                    <p>O programa vai oferecer oficinas de produção audiovisual, produção de podcast,
-                    grafite, patrimônio histórico-cultural, capoeira, música, dança, literatura, tecnologias
-                    criativas, informática básica e um time de futebol — usando o laboratório de
-                    informática, o ginásio de esportes e o auditório já existentes no terreno da
-                    instituição.</p>
-                    <p>Frequência das oficinas, forma de inscrição e se há vínculo com a escola regular da
-                    criança ou adolescente são pontos que a instituição ainda está definindo, por se tratar
-                    de um programa que ainda não começou — início previsto para 2027.</p>
+                    <p>O programa vai oferecer oficinas de produção audiovisual, produção de podcast, grafite, patrimônio histórico-cultural, capoeira, música, dança, literatura, tecnologias criativas, informática básica e um time de futebol — usando o laboratório de informática, o ginásio de esportes e o auditório já existentes no terreno da instituição.</p><p>Frequência das oficinas, forma de inscrição e se há vínculo com a escola regular da criança ou adolescente são pontos que a instituição ainda está definindo, por se tratar de um programa que ainda não começou — início previsto para 2027.</p>
                     HTML,
             ],
             [
@@ -382,11 +234,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Parceiros',
                 'meta_description' => 'O Centro de Recondicionamento de Computadores doou os equipamentos do laboratório de informática, e o SENAI é parceiro da Escola de Contraturno.',
                 'content' => <<<'HTML'
-                    <p>O Centro de Recondicionamento de Computadores, programa do governo federal de
-                    reaproveitamento de equipamentos, doou os 20 computadores do laboratório de informática
-                    da Escola de Contraturno.</p>
-                    <p>O SENAI é parceiro do programa. A lista completa de parceiros — para o contraturno e
-                    para os demais pilares — ainda está sendo consolidada.</p>
+                    <p>O Centro de Recondicionamento de Computadores, programa do governo federal de reaproveitamento de equipamentos, doou os 20 computadores do laboratório de informática da Escola de Contraturno.</p><p>O SENAI é parceiro do programa. A lista completa de parceiros — para o contraturno e para os demais pilares — ainda está sendo consolidada.</p>
                     HTML,
             ],
             [
@@ -394,12 +242,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'O Que Vem por Aí',
                 'meta_description' => 'Início das turmas da Escola de Contraturno previsto para 2027. A direção já declarou intenção de estender cursos de acessibilidade digital a idosos no futuro.',
                 'content' => <<<'HTML'
-                    <p>Início das turmas previsto para 2027. A abertura das inscrições será anunciada aqui e
-                    em contato direto com quem se cadastrar para ser avisado.</p>
-                    <p>A direção do Lar Anália Franco já declarou a intenção de, no futuro, estender cursos
-                    de acessibilidade digital a pessoas acima de 60 anos, além das crianças e adolescentes
-                    que o programa vai atender. Essa expansão ainda não tem data nem formato definidos.</p>
-                    <p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p>
+                    <p>Início das turmas previsto para 2027. A abertura das inscrições será anunciada aqui e em contato direto com quem se cadastrar para ser avisado.</p><p>A direção do Lar Anália Franco já declarou a intenção de, no futuro, estender cursos de acessibilidade digital a pessoas acima de 60 anos, além das crianças e adolescentes que o programa vai atender. Essa expansão ainda não tem data nem formato definidos.</p><p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p>
                     HTML,
             ],
         ];
@@ -416,13 +259,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Bazar Beneficente',
                 'meta_description' => 'O Bazar Beneficente do Lar Anália Franco existe desde 1968 e financia parte relevante do orçamento da instituição.',
                 'content' => <<<'HTML'
-                    <p>O Bazar Beneficente existe desde 1968, sem interrupção. É uma loja física que recebe
-                    doações de itens e revende ao público, e financia parte relevante do orçamento do Lar
-                    Anália Franco — o que o convênio da creche com a Prefeitura de Londrina não cobre.</p>
-                    <p>É a receita do bazar que está viabilizando a Escola de Contraturno, programa em
-                    preparação com início de turmas previsto para 2027.</p>
-                    <p>As páginas desta seção explicam onde fica a loja, o que a instituição aceita em
-                    doação e para onde vai o resultado das vendas.</p>
+                    <p>O Bazar Beneficente existe desde 1968, sem interrupção. É uma loja física que recebe doações de itens e revende ao público, e financia parte relevante do orçamento do Lar Anália Franco — o que o convênio da creche com a Prefeitura de Londrina não cobre.</p><p>É a receita do bazar que está viabilizando a Escola de Contraturno, programa em preparação com início de turmas previsto para 2027.</p><p>As páginas desta seção explicam onde fica a loja, o que a instituição aceita em doação e para onde vai o resultado das vendas.</p>
                     HTML,
             ],
             [
@@ -430,9 +267,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Visite a Loja',
                 'meta_description' => 'O Bazar Beneficente funciona em endereço próprio, na Rua Rosa Siqueira, 152, Jd. Aeroporto, em Londrina/PR — separado da sede do Lar Anália Franco.',
                 'content' => <<<'HTML'
-                    <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália
-                    Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou
-                    <a href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
+                    <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou <a target="_blank" href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
                     HTML,
             ],
             [
@@ -440,12 +275,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'O Que Aceitamos',
                 'meta_description' => 'O Bazar Beneficente do Lar Anália Franco recebe doações de itens para revenda na loja física da instituição.',
                 'content' => <<<'HTML'
-                    <p>O Bazar Beneficente recebe doações de itens para revenda na loja física da
-                    instituição.</p>
-                    <p>A lista detalhada do que é aceito — e do que não é — está em confirmação com a
-                    equipe do bazar. Para
-                    <a href="/bazar/agendar-coleta">agendar uma coleta</a>, o jeito mais rápido é pelo
-                    <a href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." target="_blank" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
+                    <p>O Bazar Beneficente recebe doações de itens para revenda na loja física da instituição.</p><p>A lista detalhada do que é aceito — e do que não é — está em confirmação com a equipe do bazar. Para <a href="/bazar/agendar-coleta">agendar uma coleta</a>, o jeito mais rápido é pelo <a target="_blank" href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
                     HTML,
             ],
             [
@@ -453,14 +283,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Para Onde Vai',
                 'meta_description' => 'A receita do Bazar Beneficente sustenta o que o convênio com a Prefeitura de Londrina não cobre, incluindo a nova Escola de Contraturno.',
                 'content' => <<<'HTML'
-                    <p>A receita do Bazar Beneficente sustenta parte relevante do orçamento do Lar Anália
-                    Franco — o convênio com a Prefeitura de Londrina cobre a creche, e é o bazar que banca o
-                    restante da operação da instituição.</p>
-                    <p>É a receita do bazar, por exemplo, que está viabilizando a Escola de Contraturno,
-                    programa em preparação com equipamentos já doados pelo Centro de Recondicionamento de
-                    Computadores e início de turmas previsto para 2027.</p>
-                    <p>Os números exatos de arrecadação e destinação estão nos documentos reunidos na seção
-                    <a href="/transparencia">Transparência</a>.</p>
+                    <p>A receita do Bazar Beneficente sustenta parte relevante do orçamento do Lar Anália Franco — o convênio com a Prefeitura de Londrina cobre a creche, e é o bazar que banca o restante da operação da instituição.</p><p>É a receita do bazar, por exemplo, que está viabilizando a Escola de Contraturno, programa em preparação com equipamentos já doados pelo Centro de Recondicionamento de Computadores e início de turmas previsto para 2027.</p><p>Os números exatos de arrecadação e destinação estão nos documentos reunidos na seção <a href="/transparencia">Transparência</a>.</p>
                     HTML,
             ],
             [
@@ -468,12 +291,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Sua Compra Vira Educação',
                 'meta_description' => 'Cada peça comprada no Bazar Beneficente ajuda a sustentar o CEI Anália Franco e a Escola de Contraturno do Lar Anália Franco.',
                 'content' => <<<'HTML'
-                    <p>Cada peça comprada no Bazar Beneficente ajuda a sustentar o Centro de Educação
-                    Infantil Anália Franco e a Escola de Contraturno — as duas frentes educacionais do Lar
-                    Anália Franco, uma já em funcionamento e outra em preparação.</p>
-                    <p>O convênio da instituição com a Prefeitura de Londrina cobre a creche, mas não cobre
-                    tudo. É a receita do bazar que completa o que falta, e que está viabilizando a Escola de
-                    Contraturno, com início de turmas previsto para 2027.</p>
+                    <p>Cada peça comprada no Bazar Beneficente ajuda a sustentar o Centro de Educação Infantil Anália Franco e a Escola de Contraturno — as duas frentes educacionais do Lar Anália Franco, uma já em funcionamento e outra em preparação.</p><p>O convênio da instituição com a Prefeitura de Londrina cobre a creche, mas não cobre tudo. É a receita do bazar que completa o que falta, e que está viabilizando a Escola de Contraturno, com início de turmas previsto para 2027.</p>
                     HTML,
             ],
         ];
@@ -490,11 +308,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Como Ajudar',
                 'meta_description' => 'Formas de apoiar o Lar Anália Franco: PIX, transferência bancária, doação de itens, voluntariado e parceria empresarial.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco não opera gateway de pagamento no site — as formas de contribuir
-                    hoje passam por canais já existentes, explicados nas páginas desta seção.</p>
-                    <p>É possível apoiar a instituição via PIX ou transferência bancária, doando itens para
-                    o Bazar Beneficente, ou se tornando voluntário. Empresas também podem apoiar diretamente
-                    os programas da instituição.</p>
+                    <p>O Lar Anália Franco não opera gateway de pagamento no site — as formas de contribuir hoje passam por canais já existentes, explicados nas páginas desta seção.</p><p>É possível apoiar a instituição via PIX ou transferência bancária, doando itens para o Bazar Beneficente, ou se tornando voluntário. Empresas também podem apoiar diretamente os programas da instituição.</p>
                     HTML,
             ],
             [
@@ -502,16 +316,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Doar',
                 'meta_description' => 'Doe para o Lar Anália Franco via PIX ou transferência bancária.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco ainda não processa doações em dinheiro diretamente pelo site.
-                    Doe por PIX ou transferência bancária:</p>
-                    <ul>
-                    <li><strong>PIX</strong> (chave CNPJ): 78.614.096/0001-75 — nome exibido: LAR ANALIA
-                    FRANCO DE LONDRINA</li>
-                    <li><strong>Transferência:</strong> Banco do Brasil (001), agência 2755-3, conta
-                    corrente 4963-8</li>
-                    </ul>
-                    <p>Doações de itens para o Bazar Beneficente também sustentam diretamente a
-                    instituição.</p>
+                    <p>O Lar Anália Franco ainda não processa doações em dinheiro diretamente pelo site. Doe por PIX ou transferência bancária:</p><ul><li><p><strong>PIX</strong> (chave CNPJ): 78.614.096/0001-75 — nome exibido: LAR ANALIA FRANCO DE LONDRINA</p></li><li><p><strong>Transferência:</strong> Banco do Brasil (001), agência 2755-3, conta corrente 4963-8</p></li></ul><p>Doações de itens para o Bazar Beneficente também sustentam diretamente a instituição.</p>
                     HTML,
             ],
             [
@@ -519,11 +324,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Parceiros',
                 'meta_description' => 'Parcerias que sustentam os três pilares do Lar Anália Franco, da doação de equipamentos ao convênio com a Secretaria de Educação.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco mantém parcerias que sustentam seus três pilares — da doação de
-                    equipamentos de informática pelo Centro de Recondicionamento de Computadores, programa
-                    do governo federal, ao convênio com a Secretaria Municipal de Educação de Londrina para
-                    o Centro de Educação Infantil Anália Franco.</p>
-                    <p>A lista completa de parceiros e apoiadores da instituição está sendo consolidada.</p>
+                    <p>O Lar Anália Franco mantém parcerias que sustentam seus três pilares — da doação de equipamentos de informática pelo Centro de Recondicionamento de Computadores, programa do governo federal, ao convênio com a Secretaria Municipal de Educação de Londrina para o Centro de Educação Infantil Anália Franco.</p><p>A lista completa de parceiros e apoiadores da instituição está sendo consolidada.</p>
                     HTML,
             ],
         ];
@@ -540,16 +341,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Transparência',
                 'meta_description' => 'O acervo de prestação de contas do Lar Anália Franco — balanços, atas e editais — organizado e público.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas,
-                    editais e relatórios — hoje com cerca de 70 documentos.</p>
-                    <p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o
-                    que precisa, incluindo quem busca informação sobre o processo de 2022.</p>
-                    <p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro
-                    de Educação Infantil Anália Franco, também exige prestação de contas periódica. O
-                    repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração
-                    06/2022).</p>
-                    <p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por
-                    ano e por tipo.</p>
+                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas, editais e relatórios — hoje com cerca de 70 documentos.</p><p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o que precisa, incluindo quem busca informação sobre o processo de 2022.</p><p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro de Educação Infantil Anália Franco, também exige prestação de contas periódica. O repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração 06/2022).</p><p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por ano e por tipo.</p>
                     HTML,
             ],
         ];
