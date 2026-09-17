@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Enums\PageStatus;
 use App\Enums\Role;
+use App\Models\Page;
 
 /**
  * Matriz de papéis × recurso administrativo (ver docs/dominio.md, seção "Papéis") — um
@@ -89,6 +91,58 @@ test('matriz de acesso por papel e recurso', function (string $resourceKey, Role
         $response->assertForbidden();
     }
 })->with('role matrix');
+
+/**
+ * A matriz acima cobre só `viewAny` (GET de listagem) por recurso — não distingue quem lê de
+ * quem escreve. `pages` é o único recurso hoje em que isso importa: `comunicacao` lê e edita
+ * página existente igual a `direcao`, mas não cria nem exclui (ver App\Policies\PagePolicy).
+ * Testado à parte, por ability, com um papel de cada situação: acesso total (direcao), acesso
+ * parcial (comunicacao) e nenhum acesso (bazar).
+ *
+ * @return array<string, mixed>
+ */
+function pagesPayload(): array
+{
+    return [
+        'slug' => 'quem-somos',
+        'title' => 'Quem Somos',
+        'content' => '<p>Conteúdo institucional de teste.</p>',
+        'status' => PageStatus::Draft->value,
+    ];
+}
+
+dataset('pages create/update/delete por papel', [
+    'direcao · create · permite' => [Role::Direcao, 'create', true],
+    'direcao · update · permite' => [Role::Direcao, 'update', true],
+    'direcao · delete · permite' => [Role::Direcao, 'delete', true],
+    'comunicacao · create · nega' => [Role::Comunicacao, 'create', false],
+    'comunicacao · update · permite' => [Role::Comunicacao, 'update', true],
+    'comunicacao · delete · nega' => [Role::Comunicacao, 'delete', false],
+    'bazar · create · nega' => [Role::Bazar, 'create', false],
+    'bazar · update · nega' => [Role::Bazar, 'update', false],
+    'bazar · delete · nega' => [Role::Bazar, 'delete', false],
+]);
+
+test('pages: create/update/delete por papel', function (Role $role, string $ability, bool $shouldAllow): void {
+    $user = userWithRole($role->value);
+
+    $response = match ($ability) {
+        'create' => $this->actingAs($user)->postJson('/api/v1/pages', pagesPayload()),
+        'update' => $this->actingAs($user)->putJson(
+            '/api/v1/pages/'.Page::factory()->create()->uuid,
+            pagesPayload(),
+        ),
+        'delete' => $this->actingAs($user)->deleteJson(
+            '/api/v1/pages/'.Page::factory()->create()->uuid,
+        ),
+    };
+
+    if ($shouldAllow) {
+        $response->assertSuccessful();
+    } else {
+        $response->assertForbidden();
+    }
+})->with('pages create/update/delete por papel');
 
 test('usuário com dois papéis soma os acessos de cada um', function (): void {
     $user = userWithRole(Role::Financeiro->value);

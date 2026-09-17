@@ -10,8 +10,12 @@ use App\Models\User;
 
 /**
  * super_admin não aparece aqui — bypass via Gate::before em AppServiceProvider (ver
- * docs/dominio.md, seção "Papéis"). `direcao` e `comunicacao` têm leitura e escrita iguais —
- * `atendimento` não administra conteúdo (formulário recebido é a área dela, não página).
+ * docs/dominio.md, seção "Papéis"). `direcao` e `comunicacao` leem e editam página existente
+ * igual — mas só `direcao` cria e exclui página. `comunicacao` é o papel de quem escreve o
+ * conteúdo do dia a dia (título, texto, SEO); criar uma página nova ou apagar uma existente
+ * mexe na estrutura do site (o que o Nuxt prerenderiza, o que sai do ar) — mesmo peso de
+ * decisão que `managePublication` já reserva a `direcao`. `atendimento` não administra
+ * conteúdo (formulário recebido é a área dela, não página).
  */
 final class PagePolicy
 {
@@ -35,7 +39,7 @@ final class PagePolicy
 
     public function create(User $user): bool
     {
-        return $this->viewAny($user);
+        return $user->hasRole(Role::Direcao->value);
     }
 
     public function update(User $user, Page $page): bool
@@ -45,7 +49,7 @@ final class PagePolicy
 
     public function delete(User $user, Page $page): bool
     {
-        return $this->viewAny($user);
+        return $user->hasRole(Role::Direcao->value);
     }
 
     /**

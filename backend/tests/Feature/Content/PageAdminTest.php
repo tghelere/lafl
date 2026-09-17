@@ -29,18 +29,43 @@ test('direcao pode criar página', function (): void {
     expect(Page::where('slug', 'quem-somos')->exists())->toBeTrue();
 });
 
-test('comunicacao pode criar e publicar página', function (): void {
+/**
+ * comunicacao edita página existente (título, conteúdo, SEO), mas não cria nem exclui —
+ * mexer na estrutura do site (o que passa a existir, o que sai do ar) é decisão de direcao,
+ * mesmo peso que managePublication já reserva para slug/status (ver App\Policies\PagePolicy).
+ */
+test('comunicacao não pode criar página', function (): void {
     $user = userWithRole(Role::Comunicacao->value);
 
-    $response = $this->actingAs($user)->postJson('/api/v1/pages', [
+    $this->actingAs($user)->postJson('/api/v1/pages', [
         'slug' => 'quem-somos',
         'title' => 'Quem Somos',
         'content' => 'Conteúdo institucional de teste.',
         'status' => PageStatus::Published->value,
-    ]);
+    ])->assertForbidden();
 
-    $response->assertCreated()->assertJsonPath('data.status', 'published');
-    expect($response->json('data.published_at'))->not->toBeNull();
+    expect(Page::where('slug', 'quem-somos')->exists())->toBeFalse();
+});
+
+test('comunicacao não pode excluir página', function (): void {
+    $user = userWithRole(Role::Comunicacao->value);
+    $page = Page::factory()->create();
+
+    $this->actingAs($user)->deleteJson("/api/v1/pages/{$page->uuid}")->assertForbidden();
+
+    expect(Page::find($page->id))->not->toBeNull();
+});
+
+test('comunicacao continua podendo editar página existente', function (): void {
+    $user = userWithRole(Role::Comunicacao->value);
+    $page = Page::factory()->create(['title' => 'Título antigo']);
+
+    $this->actingAs($user)->putJson("/api/v1/pages/{$page->uuid}", [
+        'slug' => $page->slug,
+        'title' => 'Título novo',
+        'content' => '<p>Conteúdo novo.</p>',
+        'status' => $page->status->value,
+    ])->assertOk()->assertJsonPath('data.title', 'Título novo');
 });
 
 test('atendimento não acessa pages em nenhuma operação', function (): void {

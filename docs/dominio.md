@@ -182,7 +182,7 @@ existe para consulta rápida, não para ser lida em vez do código.
 
 | Recurso | Papéis com acesso (leitura e escrita) |
 |---|---|
-| `pages` | `direcao`, `comunicacao` |
+| `pages` | `direcao`, `comunicacao` (ver nota abaixo) |
 | `transparency-documents` | `direcao`, `financeiro` |
 | `program-applications` | `direcao`, `contraturno` |
 | `partnership-inquiries` | `direcao`, `contraturno` |
@@ -195,6 +195,14 @@ existe para consulta rápida, não para ser lida em vez do código.
 aparece na tabela. `direcao` acessa todos os recursos acima, leitura e escrita, exceto gestão
 de usuários (quando existir). `comunicacao` não tem acesso a nenhum formulário recebido nem a
 `transparency-documents` — só `pages`, nunca dado de pessoa.
+
+**Nota sobre `pages`:** `comunicacao` lê e edita página existente (título, conteúdo, campos
+de SEO) igual a `direcao`, mas não **cria** nem **exclui** página — as duas abilities exigem
+`direcao`. Criar ou apagar mexe na estrutura do site (o que passa a existir, o que sai do ar e
+do que o Nuxt prerenderiza), mesmo peso de decisão que `managePublication` já reserva a
+`direcao` para trocar slug ou status de uma página existente (ver `App\Policies\PagePolicy`).
+`comunicacao` é o papel de quem escreve o conteúdo do dia a dia, não de quem decide a
+estrutura.
 
 `partnership-inquiries` está sob `contraturno`, não `atendimento`: o único formulário de
 proposta de parceria do site (`/contraturno/apoiar`, página "Apoiar o Projeto") é específico
