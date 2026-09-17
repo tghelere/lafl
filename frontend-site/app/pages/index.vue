@@ -72,7 +72,7 @@ const pillars = [
     <section class="home__ledger" aria-labelledby="home-ledger-heading">
       <h2 id="home-ledger-heading">A instituição em números</h2>
       <p class="home__ledger-note">
-        Números com fonte documental — veja o acervo completo em
+        Números com fonte documental — veja o acervo em
         <NuxtLink to="/transparencia">Transparência</NuxtLink>.
       </p>
       <div class="ledger">
