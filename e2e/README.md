@@ -87,21 +87,19 @@ com o sintoma aparecendo bem longe da causa.
 
 ### Forma canônica do editor
 
-Duas páginas do `E2eSeeder` (`e2e-pagina-com-botao` e `e2e-pagina-com-link-externo`) guardam o
-conteúdo na forma exata que o editor do painel produz. O teste de ida e volta abre cada uma,
-salva sem alterar nada e exige que o `content` gravado não mude — é o que impede uma reescrita
-silenciosa de páginas publicadas quando alguém abre e salva por reflexo.
+O teste de ida e volta (`tests/paginas/editor.spec.ts`) abre três páginas reais do
+`ContentPagesSeeder` — `contraturno` (botão), `bazar/visite-a-loja` (link externo),
+`quem-somos/nossa-historia` (lista) —, salva cada uma sem alterar nada e exige que o `content`
+gravado não mude. É o que impede uma reescrita silenciosa de páginas publicadas quando alguém
+abre e salva por reflexo.
 
-Se o editor ou a allowlist do backend mudarem, esse teste fica vermelho de propósito. Para
-regerar as constantes:
-
-```bash
-npm run test:e2e -- tests/paginas/editor.spec.ts   # vai falhar, mostrando o diff
-cd ../backend && APP_ENV=e2e php artisan tinker --execute='foreach (App\Models\Page::whereIn("slug", ["e2e-pagina-com-botao","e2e-pagina-com-link-externo"])->get() as $p) { echo $p->slug."\n".$p->content."\n\n"; }'
-```
-
-Copie a saída para `CANONICAL_*` em `E2eSeeder.php` — e, antes de copiar, confira se a
-diferença é normalização inofensiva ou perda de verdade (`class="btn"`, `target`, `rel`).
+Isso só funciona porque o `content` do `ContentPagesSeeder` já vive em forma canônica do editor
+— literalmente `sanitize(editor.getHTML(html))`, o ponto fixo estável do Tiptap do painel mais
+o `ContentSanitizer` (ver o comentário no topo de `ContentPagesSeeder.php`). Se o editor ou a
+allowlist do backend mudarem, tanto esse teste quanto
+`ContentSanitizerTest::conteúdo de todas as páginas do seeder atravessa o sanitizador sem
+nenhuma alteração` (no backend) ficam vermelhos de propósito — é a forma de descobrir que o
+conteúdo já publicado seria reescrito na próxima vez que alguém salvasse pelo painel.
 
 ## Estrutura
 

@@ -28,6 +28,18 @@ class ContentPagesSeeder extends Seeder
      * conteúdo levava o comentário HTML `rascunho: validar com a instituição` anexado no fim
      * de toda página — removido por pôr a palavra "rascunho" no código-fonte das páginas
      * publicadas.
+     *
+     * O `content` de cada página está em FORMA CANÔNICA DO EDITOR: é literalmente
+     * sanitize(editor.getHTML(html)) — o ponto fixo estável do editor Tiptap do painel mais o
+     * ContentSanitizer, o par que qualquer salvamento pelo painel de fato executa. Não é HTML
+     * "bonito" escrito à mão; entre outras coisas, todo item de lista vem como
+     * `<li><p>texto</p></li>`, nunca `<li>texto</li>` (é assim que o schema de lista do editor
+     * sempre serializa — ver o CSS de `.page-content li > p:first-child:last-child` no site e
+     * o equivalente em `.rich-text__surface` no painel). Escrever conteúdo novo fora dessa
+     * forma não quebra nada sozinho, mas o primeiro salvamento pelo painel reescreve para a
+     * forma canônica de qualquer jeito — manter os dois já alinhados evita esse ruído no diff.
+     * O teste "conteúdo de todas as páginas do seeder atravessa o sanitizador sem nenhuma
+     * alteração" (ContentSanitizerTest) é o que garante essa propriedade.
      */
     public function run(): void
     {

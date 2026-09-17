@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Actions\Content\Data\PageData;
-use App\Actions\Content\SavePage;
-use App\Enums\PageStatus;
 use App\Enums\Role;
 use App\Enums\TransparencyDocumentType;
-use App\Models\Page;
 use App\Models\TransparencyDocument;
 use App\Models\User;
 use Database\Seeders\Support\PlaceholderPdf;
@@ -36,9 +32,11 @@ use Illuminate\Support\Str;
  *   senha), porque esses testes mexem no estado da conta e não podem compartilhar o
  *   storageState dos usuários de papel;
  * - o conteúdo institucional inteiro (ContentPagesSeeder) e o acervo de transparência
- *   (TransparencyDocumentsSeeder), para os testes rodarem contra volume realista;
- * - duas páginas em forma canônica do editor, para o teste de ida e volta (ver
- *   CANONICAL_* abaixo);
+ *   (TransparencyDocumentsSeeder), para os testes rodarem contra volume realista — inclusive
+ *   páginas com botão (contraturno), link externo (bazar/visite-a-loja) e lista
+ *   (quem-somos/nossa-historia), que o teste de ida e volta do editor usa direto: desde que
+ *   ContentPagesSeeder guarda o content em forma canônica do editor (ver o comentário no
+ *   topo daquele arquivo), não há mais motivo para manter cópia sintética só para isso;
  * - um documento de transparência propositalmente fora da primeira página da listagem
  *   administrativa.
  */
@@ -59,36 +57,6 @@ class E2eSeeder extends Seeder
     public const MARKER_DOCUMENT_YEAR = 2019;
 
     public const MARKER_DOCUMENT_TITLE = 'Prestação de contas do convênio — CEI Anália Franco 2019';
-
-    /**
-     * Slugs das duas páginas do teste de ida e volta do editor ("abrir e salvar sem alterar
-     * não pode mudar o content").
-     */
-    public const ROUND_TRIP_BUTTON_SLUG = 'e2e-pagina-com-botao';
-
-    public const ROUND_TRIP_EXTERNAL_LINK_SLUG = 'e2e-pagina-com-link-externo';
-
-    /**
-     * Conteúdo em FORMA CANÔNICA DO EDITOR: exatamente o HTML que o Tiptap do painel
-     * reserializa e o ContentSanitizer devolve ao salvar. Não é o HTML "bonito" que uma pessoa
-     * escreveria — é o ponto fixo da ida e volta, e é essa a propriedade que o teste verifica.
-     *
-     * Por que não reaproveitar direto uma página do ContentPagesSeeder: aquele conteúdo é
-     * escrito à mão, com quebra de linha e indentação entre as tags, e nunca passou pelo
-     * editor. A primeira gravação pelo painel normaliza tudo isso de uma vez — diferença real,
-     * porém trivial, que afogaria o que o teste existe para pegar: `class="btn"` sumindo do
-     * link, ou `target`/`rel` do link externo se perdendo na ida e volta (o botão e o link
-     * externo abaixo são cópias fiéis dos de `contraturno` e `bazar/visite-a-loja`).
-     *
-     * Se o editor ou a allowlist mudarem, este teste fica vermelho de propósito: é a forma de
-     * descobrir que o conteúdo já publicado vai ser reescrito na próxima vez que alguém salvar.
-     * Para regerar, ver e2e/README.md, seção "Forma canônica do editor".
-     */
-    private const CANONICAL_BUTTON_CONTENT = '<p>Início das turmas previsto para 2027. Nenhuma turma funciona ainda, e não há aluno matriculado — avise-se para saber assim que as inscrições abrirem.</p><p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p>';
-
-    private const CANONICAL_EXTERNAL_LINK_CONTENT = '<p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou <a target="_blank" href="https://wa.me/5543999500183" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>';
-
-    public function __construct(private readonly SavePage $savePage) {}
 
     public function run(): void
     {
@@ -174,48 +142,10 @@ class E2eSeeder extends Seeder
     private function seedPages(): void
     {
         // Conteúdo institucional inteiro: dá volume realista à listagem (mais de uma página de
-        // paginação) e é o que o teste de busca por título usa.
+        // paginação), é o que o teste de busca por título usa, e fornece as páginas reais que
+        // o teste de ida e volta do editor abre e salva sem alterar (contraturno, com botão;
+        // bazar/visite-a-loja, com link externo; quem-somos/nossa-historia, com lista).
         $this->call(ContentPagesSeeder::class);
-
-        foreach ($this->roundTripPages() as $data) {
-            $existing = Page::query()->where('slug', $data['slug'])->first();
-
-            // Pelo SavePage, e não por Model::create, para o conteúdo gravado passar pelo
-            // mesmo ContentSanitizer de qualquer outra escrita — é justamente a ida e volta
-            // completa que o teste verifica.
-            $this->savePage->handle(
-                new PageData(
-                    slug: $data['slug'],
-                    title: $data['title'],
-                    content: $data['content'],
-                    metaTitle: null,
-                    metaDescription: $data['meta_description'],
-                    status: PageStatus::Published,
-                ),
-                $existing,
-            );
-        }
-    }
-
-    /**
-     * @return list<array{slug: string, title: string, content: string, meta_description: string}>
-     */
-    private function roundTripPages(): array
-    {
-        return [
-            [
-                'slug' => self::ROUND_TRIP_BUTTON_SLUG,
-                'title' => 'Página de teste com botão',
-                'content' => self::CANONICAL_BUTTON_CONTENT,
-                'meta_description' => 'Página sintética da bateria de ponta a ponta: conteúdo com link em formato de botão (class="btn").',
-            ],
-            [
-                'slug' => self::ROUND_TRIP_EXTERNAL_LINK_SLUG,
-                'title' => 'Página de teste com link externo',
-                'content' => self::CANONICAL_EXTERNAL_LINK_CONTENT,
-                'meta_description' => 'Página sintética da bateria de ponta a ponta: conteúdo com link para fora do site.',
-            ],
-        ];
     }
 
     private function seedTransparencyDocuments(): void

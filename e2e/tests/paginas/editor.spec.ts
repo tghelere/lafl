@@ -13,8 +13,13 @@ test.describe('comunicacao', () => {
   /**
    * A regressão mais cara de todas: abrir uma página e salvar sem mexer em nada não pode
    * mudar o conteúdo publicado. Quem escreve no painel salva por reflexo, e uma ida e volta
-   * que perde `class="btn"` ou o `target`/`rel` de um link externo reescreveria silenciosamente
-   * páginas que ninguém pediu para mudar.
+   * que perde `class="btn"`, o `target`/`rel` de um link externo, ou achata `<li><p>` de volta
+   * a `<li>` puro reescreveria silenciosamente páginas que ninguém pediu para mudar.
+   *
+   * As três páginas são reais do ContentPagesSeeder, não sintéticas: desde que o `content` do
+   * seeder passou a viver em forma canônica do editor (ver o comentário no topo daquele
+   * arquivo), abrir e salvar uma página institucional sem alterar nada é exatamente o cenário
+   * que este teste verifica — não precisa de cópia dedicada.
    *
    * A comparação é pelo endpoint administrativo, dos dois lados — o que o editor mostra na
    * tela já passou pelo Tiptap, então comparar pela interface compararia a normalização do
@@ -23,15 +28,24 @@ test.describe('comunicacao', () => {
   const PAGINAS_DE_IDA_E_VOLTA = [
     {
       descricao: 'com botão (class="btn")',
-      titulo: 'Página de teste com botão',
+      titulo: 'Escola de Contraturno',
       // O que não pode se perder na ida e volta. Sem isto a comparação "antes === depois"
       // passaria igual se o editor tivesse apagado os dois lados.
       precisaConter: ['class="btn btn--primary"', 'href="/contraturno/inscricao"'],
     },
     {
       descricao: 'com link externo',
-      titulo: 'Página de teste com link externo',
-      precisaConter: ['href="https://wa.me/5543999500183"', 'target="_blank"', 'rel="noopener noreferrer"'],
+      titulo: 'Visite a Loja',
+      precisaConter: ['href="https://wa.me/5543999500183', 'target="_blank"', 'rel="noopener noreferrer"'],
+    },
+    {
+      descricao: 'com lista',
+      titulo: 'Nossa História',
+      // O schema de lista do Tiptap sempre serializa item como <li><p>texto</p></li> — se a
+      // ida e volta achatar de volta a <li>texto</li>, o espaçamento no site dobra (ver
+      // .page-content li > p:first-child:last-child em frontend-site/app/assets/css/
+      // components.css).
+      precisaConter: ['<li><p>1968 — início do Bazar Beneficente'],
     },
   ] as const
 
