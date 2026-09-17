@@ -239,6 +239,11 @@ otimizar (cache do `composer`/`npm`) se um dia incomodar.
 
 ## Etapa 5 — Registro
 
+`docs/decisoes/0011-e2e-com-playwright-contra-a-pilha-real.md` registra a decisão de
+arquitetura: por que ponta a ponta antes de teste de componente, por que a pilha em modo de
+produção, por que um terceiro banco (e por que isso não reabre a decisão 0002), por que só
+Firefox e por que um worker só — com as alternativas descartadas e o motivo de cada uma.
+
 `CLAUDE.md` passou a registrar:
 
 - os três bancos, com quem usa cada um e qual arquivo de ambiente configura cada um;
@@ -262,6 +267,18 @@ uma falha no CI.
 - banco de desenvolvimento intacto: 1 usuário, 27 páginas, 12 documentos — e zero contas
   `@e2e.local`, ou seja, nada da bateria vazou para lá;
 - CI: os quatro jobs verdes de primeira no run `35192234148` — `e2e` incluído, com 24/24.
+
+## O que precisa de conferência humana
+
+Nada de interface mudou nesta sessão — a entrega é infraestrutura de teste, documentação e um
+job de CI. As duas alterações em código de produção foram temporárias, para a prova da Etapa 3,
+e foram revertidas.
+
+A conferência no navegador foi feita pela própria bateria: 24 testes dirigiram as telas reais
+num Firefox real, três vezes seguidas sem intermitência. O que a bateria **não** verifica, e
+continua dependendo de olho humano: aparência (alinhamento, contraste, tipografia),
+comportamento em tela estreita e acessibilidade além do nome acessível dos elementos que os
+testes localizam.
 
 ## O que ficou de fora
 
