@@ -112,7 +112,15 @@ tests/auth/            login e o que cada papel enxerga
 tests/usuarios/        criação, link de senha, desativação, troca da própria senha
 tests/transparencia/   upload, publicação, filtro
 tests/paginas/         editor, publicação no site, sanitização, busca
+tests/layout/          alinhamento visual, marca, página não encontrada
+tests/homologacao/     bloqueio de indexação do site em staging
 ```
+
+`tests/homologacao/noindex.spec.ts` é o único arquivo que sobe um servidor por conta própria:
+uma SEGUNDA instância do mesmo `.output` do site, na porta 3101, com
+`NUXT_PUBLIC_ENVIRONMENT=staging`. É o que prova que o bloqueio de indexação é decidido em
+tempo de execução e não gravado no pacote — as duas instâncias saem do mesmo build e
+respondem diferente. Ela sobe no `beforeAll` e cai no `afterAll` do arquivo.
 
 ## Falha no CI
 

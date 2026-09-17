@@ -23,6 +23,9 @@ export default defineNuxtConfig({
       siteUrl: '',
       umamiWebsiteId: '',
       umamiUrl: '',
+      // `staging` liga o bloqueio de indexação do site inteiro (ver
+      // server/middleware/staging-noindex.ts). Vazio em desenvolvimento e em produção.
+      environment: '',
     },
   },
 
@@ -88,7 +91,9 @@ export default defineNuxtConfig({
       // então o site nunca foi hospedagem 100% estática.
       crawlLinks: false,
       routes: [
-        '/robots.txt',
+        // '/robots.txt' NÃO entra aqui: precisa ser decidido em tempo de execução, porque o
+        // mesmo pacote de deploy vai para homologação e para produção e só uma das duas pode
+        // ser indexada (ver server/routes/robots.txt.ts).
         '/sitemap.xml',
         // Conteúdo fixo no próprio .vue, sem `usePublicPage` — o painel não edita nenhuma
         // destas, então prerenderizar continua sendo a melhor opção.

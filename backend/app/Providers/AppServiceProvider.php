@@ -11,6 +11,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,6 +34,25 @@ class AppServiceProvider extends ServiceProvider
 
         $this->configureRateLimiting();
         $this->configureAuthorization();
+        $this->configureMailRedirect();
+    }
+
+    /**
+     * `MAIL_ALWAYS_TO` definido reendereça TODO e-mail da aplicação para um único endereço,
+     * descartando cc e bcc — é assim que a homologação testa os formulários sem escrever
+     * para os endereços reais da instituição (ver config/mail.php e docs/deploy.md).
+     *
+     * Vale tanto para envio imediato quanto para o enfileirado: o reendereçamento acontece
+     * no `Mailer::send`, dentro do worker, que sobe a aplicação inteira e passa por aqui.
+     * Em desenvolvimento e em produção a variável fica vazia e nada disto acontece.
+     */
+    private function configureMailRedirect(): void
+    {
+        $address = config('mail.always_to');
+
+        if (is_string($address) && $address !== '') {
+            Mail::alwaysTo($address);
+        }
     }
 
     /**

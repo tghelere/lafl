@@ -20,6 +20,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Destinatário único (homologação)
+    |--------------------------------------------------------------------------
+    |
+    | Definido, TODO e-mail é reendereçado para este endereço, com cc e bcc
+    | descartados (Mail::alwaysTo, aplicado em App\Providers\AppServiceProvider).
+    | É o que impede a homologação de escrever para destinatário real enquanto a
+    | instituição testa com dados de mentira — em `staging` os destinatários dos
+    | formulários são os endereços reais do FORM_RECIPIENT_*, e sem isto um teste
+    | de formulário viraria e-mail na caixa de alguém.
+    |
+    | Vazio em desenvolvimento (o Mailpit já retém tudo) e em produção (onde o
+    | e-mail precisa chegar a quem ele é dirigido).
+    |
+    */
+
+    'always_to' => env('MAIL_ALWAYS_TO'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Mailer Configurations
     |--------------------------------------------------------------------------
     |

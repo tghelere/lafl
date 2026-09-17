@@ -15,6 +15,14 @@ export const API_URL = process.env.E2E_API_URL ?? 'http://localhost:8100'
 export const ADMIN_URL = process.env.E2E_ADMIN_URL ?? 'http://localhost:5175'
 export const SITE_URL = process.env.E2E_SITE_URL ?? 'http://localhost:3100'
 
+/**
+ * Segunda instância do MESMO build do site, subida por tests/homologacao/noindex.spec.ts com
+ * `NUXT_PUBLIC_ENVIRONMENT=staging` — é a única forma de provar que o bloqueio de indexação
+ * é decidido em tempo de execução, e não gravado no pacote. Fora daquele arquivo ninguém a
+ * usa, e ela só fica no ar durante ele.
+ */
+export const STAGING_SITE_URL = process.env.E2E_STAGING_SITE_URL ?? 'http://localhost:3101'
+
 /** Host de escuta dos três servidores. Loopback: nada da bateria fica exposto na rede. */
 export const BIND_HOST = '127.0.0.1'
 
