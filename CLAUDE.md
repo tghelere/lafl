@@ -111,6 +111,7 @@ Consulte quando a tarefa exigir:
 - `@docs/protecao-de-dados.md` — LGPD, ECA, matriz de criptografia, consentimento, retenção
 - `@docs/dominio.md` — entidades, relacionamentos, papéis e permissões
 - `@docs/convencoes.md` — padrões de código detalhados, backend e frontend
+- `@docs/deploy.md` — requisitos do servidor, ambientes, processos, variáveis, primeiro deploy
 
 ## Armadilhas conhecidas
 

@@ -177,8 +177,18 @@ visível quanto o aceite.
 
 ## Ambientes e deploy
 
-- `local` — Docker Compose: PHP, Postgres, Redis, Mailpit
-- `staging` — espelho de produção, **sem dado real de assistido**
-- `production` — VPS ou serviço gerenciado, backup diário automatizado
+**`docs/deploy.md` é o documento completo**: requisitos do servidor, processos permanentes,
+checklist de variáveis, ordem do primeiro deploy, backup e a regra de cache de HTML. O resumo:
 
-CI: Pint, PHPStan, Pest, `composer audit`, `npm audit`, build dos dois frontends.
+- `local` — Docker Compose: PHP, Postgres, Redis, Mailpit, worker e scheduler
+- `staging` — homologação no mesmo VPS de produção, com base, `.env` e processos próprios.
+  **Sem dado real de assistido**, não indexável (`X-Robots-Tag: noindex, nofollow` em toda
+  resposta) e com todo e-mail reendereçado para um endereço de teste (`MAIL_ALWAYS_TO`)
+- `production` — VPS, backup diário automatizado
+
+O servidor **não recebe o repositório**: recebe um pacote com só o que executa, gerado por
+`scripts/deploy/empacotar.sh` — ver `docs/decisoes/0014-pacote-de-deploy-minimo.md`. Nada é
+buildado no servidor.
+
+CI: Pint, PHPStan, Pest, `composer audit`, `npm audit`, build dos dois frontends, bateria de
+ponta a ponta (Playwright).

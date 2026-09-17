@@ -16,7 +16,8 @@ frontend-site/       # Nuxt — site público (SSR/SSG)
 frontend-admin/       # Vue 3 SPA — painel administrativo
 e2e/                  # bateria de ponta a ponta (Playwright) — ver e2e/README.md
 docker/               # imagens de desenvolvimento
-docs/                 # arquitetura, proteção de dados, domínio, convenções
+docs/                 # arquitetura, proteção de dados, domínio, convenções, deploy
+scripts/deploy/       # empacotamento para o servidor (ver docs/decisoes/0014-...)
 .github/workflows/    # CI
 ```
 
@@ -115,6 +116,10 @@ Criado pelo `DevSuperAdminSeeder` (só roda em `local`/`testing`, nunca em produ
 | E-mail | `dev@laranaliafranco.local` |
 | Senha | `password` |
 | Papel | `super_admin` |
+
+Isso existe **só** em `local`/`testing`. Em homologação e em produção a primeira conta é criada
+por `php artisan usuarios:criar-super-admin`, que não aceita senha em lugar nenhum — imprime o
+link de definição de senha. Ver `docs/deploy.md`.
 
 ## Chaves de criptografia
 
