@@ -22,7 +22,7 @@ test('envio de formulário enfileira e-mail de notificação ao setor responsáv
 
     Mail::assertQueued(FormSubmissionReceived::class, function (FormSubmissionReceived $mail) use ($message) {
         return $mail->type === FormSubmissionType::ContactMessage
-            && $mail->adminUrl === "http://localhost:5173/contact-messages/{$message->uuid}"
+            && $mail->adminUrl === "http://localhost:5173/admin/contact-messages/{$message->uuid}"
             && $mail->hasTo(config('forms.notification_recipients.contact_message'));
     });
 });

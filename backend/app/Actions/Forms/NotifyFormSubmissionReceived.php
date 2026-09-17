@@ -17,7 +17,7 @@ final class NotifyFormSubmissionReceived
     public function handle(FormSubmissionType $type, string $uuid): void
     {
         $recipient = config("forms.notification_recipients.{$type->value}");
-        $adminUrl = rtrim((string) config('forms.admin_base_url'), '/')."/{$type->adminResourceSlug()}/{$uuid}";
+        $adminUrl = rtrim((string) config('forms.admin_base_url'), '/')."/admin/{$type->adminResourceSlug()}/{$uuid}";
 
         Mail::to($recipient)->queue(new FormSubmissionReceived($type, now()->format('d/m/Y H:i'), $adminUrl));
     }

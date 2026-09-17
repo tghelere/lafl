@@ -53,9 +53,10 @@ return [
     | Painel administrativo
     |--------------------------------------------------------------------------
     |
-    | Base para o link no e-mail de notificação. A tela em si não existe ainda (ver
-    | docs/roadmap.md) — o link fica quebrado até lá, de propósito: o e-mail já nasce pronto
-    | para quando a tela existir, em vez de precisar editar o texto depois.
+    | Base para o link no e-mail de notificação, montado em
+    | App\Actions\Forms\NotifyFormSubmissionReceived como
+    | "{admin_base_url}/admin/{slug-do-recurso}/{uuid}" — o mesmo formato de rota do painel
+    | (ver frontend-admin/src/router/index.ts, "submissions.show").
     |
     */
 
