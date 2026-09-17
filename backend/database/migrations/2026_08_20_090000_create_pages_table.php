@@ -45,19 +45,15 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // CHECK constraint só existe no Postgres — dev/teste/produção rodam só nele (ver
-        // CLAUDE.md, "Armadilhas conhecidas"). A guarda continua por causa da opção sem
-        // Docker documentada no README (SQLite): lá `ALTER TABLE ... ADD CONSTRAINT` não é
-        // suportado do mesmo jeito, e a trava redundante não faz falta — o enum PHP já
-        // garante o valor na aplicação.
-        if (DB::getDriverName() === 'pgsql') {
-            $values = implode(',', array_map(
-                fn (PageStatus $status): string => "'{$status->value}'",
-                PageStatus::cases(),
-            ));
+        // CHECK espelhando o enum PHP (ver docs/convencoes.md). Sem guarda de driver:
+        // PostgreSQL é o único banco suportado, em desenvolvimento, teste e produção (ver
+        // CLAUDE.md, "Armadilhas conhecidas").
+        $values = implode(',', array_map(
+            fn (PageStatus $status): string => "'{$status->value}'",
+            PageStatus::cases(),
+        ));
 
-            DB::statement("ALTER TABLE pages ADD CONSTRAINT pages_status_check CHECK (status IN ({$values}))");
-        }
+        DB::statement("ALTER TABLE pages ADD CONSTRAINT pages_status_check CHECK (status IN ({$values}))");
     }
 
     /**

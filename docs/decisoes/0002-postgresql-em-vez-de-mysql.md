@@ -35,8 +35,10 @@ PostgreSQL.
 - Toda migration que use recurso específico do Postgres (array, GIN, `CHECK`) fica
   implicitamente presa a este banco; não há meta de portabilidade multi-SGBD.
 - **Atualização:** este documento chegou a listar SQLite como opção válida para teste local
-  rápido. Deixou de ser — um bug real (`LIKE` sensível a maiúsculas, que o Postgres respeita e
-  o SQLite ignora) passou pela suíte inteira sem ser notado enquanto ela rodava em SQLite. A
-  suíte roda exclusivamente contra Postgres, local e CI, desde então (ver `CLAUDE.md`,
-  "Armadilhas conhecidas", e `README.md`, seção "Testes e qualidade"). SQLite segue existindo
-  só como conveniência opcional para rodar a *aplicação* sem Docker — nunca para teste.
+  rápido, e depois como conveniência para rodar a aplicação sem Docker. Nenhuma das duas
+  existe mais. Um bug real (`LIKE` sensível a maiúsculas, que o Postgres respeita e o SQLite
+  ignora) passou pela suíte inteira sem ser notado enquanto ela rodava em SQLite; manter um
+  segundo banco em qualquer ambiente recria esse buraco. PostgreSQL passou a ser o único banco
+  suportado em desenvolvimento, teste e produção — a conexão `sqlite` saiu de
+  `config/database.php` e as guardas `DB::getDriverName()` saíram das migrations (ver
+  `CLAUDE.md`, "Armadilhas conhecidas", e `README.md`).

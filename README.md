@@ -58,30 +58,23 @@ Ainda faltam gerar `FIELD_ENCRYPTION_KEY` e `BLIND_INDEX_KEY` em `backend/.env` 
 Mailpit (e-mails capturados em dev): http://localhost:8025
 Documentação OpenAPI (Scramble): http://localhost:8000/docs/api
 
-## Setup local — sem Docker
+## Setup local — sem Docker (parcial)
 
-Foi o caminho efetivamente usado e testado durante esta sessão (sem Postgres/Redis nativos
-disponíveis). Requer PHP 8.3+, Composer e Node 20+.
+**PostgreSQL é obrigatório**, sem alternativa: é o único banco suportado em desenvolvimento,
+teste e produção (ver `CLAUDE.md`, "Armadilhas conhecidas"). O projeto já usou SQLite como
+atalho para rodar sem serviço externo; essa opção não existe mais, porque produzia um segundo
+comportamento de banco que escondeu bug real (busca com `LIKE` sensível a maiúsculas, que o
+Postgres respeita e o SQLite ignora).
 
-```bash
-cp backend/.env.example backend/.env
-```
-
-Editar `backend/.env` para rodar sem serviços externos:
-
-```dotenv
-DB_CONNECTION=sqlite
-DB_DATABASE=database/database.sqlite   # relativo a backend/
-CACHE_STORE=file
-SESSION_DRIVER=file
-QUEUE_CONNECTION=sync
-```
+Dá para rodar PHP e Node na máquina e deixar só a infraestrutura no Docker:
 
 ```bash
+docker compose up -d postgres redis mailpit      # só os serviços
+
+cp backend/.env.example backend/.env             # já vem apontando para pgsql
 cd backend
 composer install
 php artisan key:generate
-touch database/database.sqlite
 php artisan migrate:fresh --seed
 php artisan serve                                   # http://localhost:8000
 
@@ -89,13 +82,8 @@ cd ../frontend-admin && npm install && npm run dev   # http://localhost:5173
 cd ../frontend-site  && npm install && npm run dev   # http://localhost:3000
 ```
 
-Em produção/staging, `DB_CONNECTION=pgsql` e Redis são obrigatórios (ver `.env.example`) —
-SQLite/file aqui são só para rodar a aplicação sem Docker, nunca para dado real.
-
-**A suíte de testes não segue esse SQLite** — `backend/.env.testing` aponta sempre para
-Postgres (ver seção "Testes e qualidade"), então rodar `php artisan test` sem Docker exige
-pelo menos o serviço `postgres` do compose no ar (`docker compose up -d postgres`) ou um
-Postgres local equivalente.
+Sem Docker nenhum, é preciso um PostgreSQL 16 local ouvindo em `DB_HOST`/`DB_PORT` (e, para
+fila/cache/sessão como configurados, um Redis) — ver `backend/.env.example`.
 
 ## Login de desenvolvimento
 
@@ -133,11 +121,11 @@ cd backend && php artisan tinker --execute="dump(\Spatie\Activitylog\Models\Acti
 
 ## Testes e qualidade
 
-**A suíte Pest roda exclusivamente contra PostgreSQL — nunca SQLite** (ver `CLAUDE.md`,
-"Armadilhas conhecidas"). Um bug real de busca (`LIKE` sensível a maiúsculas, que o Postgres
-respeita e o SQLite ignora) passou pela suíte inteira sem ser notado enquanto ela rodava em
-`:memory:`; rodar contra o mesmo banco de produção é o que garante que "verde localmente"
-signifique "verde de verdade".
+**A suíte Pest roda exclusivamente contra PostgreSQL** (ver `CLAUDE.md`, "Armadilhas
+conhecidas") — como todo o resto do projeto. Um bug real de busca (`LIKE` sensível a
+maiúsculas, que o Postgres respeita e o SQLite ignora) passou pela suíte inteira sem ser
+notado enquanto ela rodava em `:memory:`; rodar contra o mesmo banco de produção é o que
+garante que "verde localmente" signifique "verde de verdade".
 
 O banco de teste (`lar_analia_franco_test`) é **separado do banco de desenvolvimento**
 (`lar_analia_franco`), no mesmo Postgres do `docker-compose.yml` — `php artisan test` nunca

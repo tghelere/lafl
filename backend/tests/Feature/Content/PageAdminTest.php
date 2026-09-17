@@ -262,11 +262,10 @@ test('super_admin continua podendo mudar slug e status', function (): void {
 });
 
 /**
- * A busca precisa ignorar caixa. Atenção ao ler este teste: a suíte roda em SQLite (ver
- * phpunit.xml), onde LIKE já ignora caixa por conta própria — é o PostgreSQL de
- * desenvolvimento e produção que diferencia, e foi lá que a busca apareceu quebrada. Este
- * teste documenta a intenção, mas quem garante o comportamento no banco real é o
- * whereLike() do Controller, não o resultado verde aqui.
+ * A busca precisa ignorar caixa. Este teste só vale porque a suíte roda contra o mesmo
+ * PostgreSQL de desenvolvimento e produção (ver CLAUDE.md, "Armadilhas conhecidas"): foi
+ * exatamente aqui que a busca apareceu quebrada, e enquanto a suíte rodava em SQLite — onde
+ * LIKE já ignora caixa sozinho — ele teria passado verde com o bug em pé.
  */
 test('listagem de páginas filtra por título, ignorando maiúscula e minúscula', function (string $busca): void {
     $user = userWithRole(Role::Direcao->value);

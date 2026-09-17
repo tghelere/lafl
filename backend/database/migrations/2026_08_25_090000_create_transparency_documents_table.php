@@ -41,19 +41,15 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // CHECK constraint só existe no Postgres — dev/teste/produção rodam só nele (ver
-        // CLAUDE.md, "Armadilhas conhecidas"). A guarda continua por causa da opção sem
-        // Docker documentada no README (SQLite): lá `ALTER TABLE ... ADD CONSTRAINT` não é
-        // suportado do mesmo jeito, e a trava redundante não faz falta — o enum PHP já
-        // garante o valor na aplicação.
-        if (DB::getDriverName() === 'pgsql') {
-            $values = implode(',', array_map(
-                fn (TransparencyDocumentType $type): string => "'{$type->value}'",
-                TransparencyDocumentType::cases(),
-            ));
+        // CHECK espelhando o enum PHP (ver docs/convencoes.md). Sem guarda de driver:
+        // PostgreSQL é o único banco suportado, em desenvolvimento, teste e produção (ver
+        // CLAUDE.md, "Armadilhas conhecidas").
+        $values = implode(',', array_map(
+            fn (TransparencyDocumentType $type): string => "'{$type->value}'",
+            TransparencyDocumentType::cases(),
+        ));
 
-            DB::statement("ALTER TABLE transparency_documents ADD CONSTRAINT transparency_documents_type_check CHECK (type IN ({$values}))");
-        }
+        DB::statement("ALTER TABLE transparency_documents ADD CONSTRAINT transparency_documents_type_check CHECK (type IN ({$values}))");
     }
 
     /**

@@ -19,7 +19,12 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    // PostgreSQL é o único banco suportado — desenvolvimento, teste e produção (ver
+    // CLAUDE.md, "Armadilhas conhecidas"). O padrão do esqueleto do Laravel aqui era
+    // 'sqlite': com DB_CONNECTION ausente, a aplicação subia num banco que o projeto não
+    // suporta em vez de falhar, e a divergência só aparecia numa consulta que os dois bancos
+    // tratam diferente.
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,19 +37,10 @@ return [
     |
     */
 
+    // A conexão 'sqlite' do esqueleto do Laravel foi removida de propósito: com ela definida,
+    // um DB_CONNECTION=sqlite esquecido em algum .env funcionaria em silêncio. Sem ela, o
+    // Laravel recusa a conexão na hora, com o nome do driver no erro.
     'connections' => [
-
-        'sqlite' => [
-            'driver' => 'sqlite',
-            'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-            'busy_timeout' => null,
-            'journal_mode' => null,
-            'synchronous' => null,
-            'transaction_mode' => 'DEFERRED',
-        ],
 
         'mysql' => [
             'driver' => 'mysql',

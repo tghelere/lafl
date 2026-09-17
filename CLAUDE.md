@@ -107,14 +107,17 @@ Consulte quando a tarefa exigir:
 - Conteúdo público de página é cacheado por 10 minutos (`ResolvePublicPageBySlug`). Depois
   de reseedar, rode `cache:clear` antes de conferir no navegador — sem isso o site serve o
   conteúdo anterior e a alteração parece não ter surtido efeito.
-- **Testes do backend só valem rodando contra PostgreSQL — nunca reintroduzir SQLite na
-  suíte.** Um bug real (`LIKE` sensível a maiúsculas, que o Postgres respeita e o SQLite
-  ignora) passou pela suíte inteira sem ser notado enquanto ela rodava em SQLite `:memory:`.
-  "Verde localmente" só significa "verde de verdade" quando o teste roda contra o mesmo banco
-  de produção. Configuração de teste em `backend/.env.testing` (banco dedicado
-  `lar_analia_franco_test`, separado do banco de desenvolvimento, no mesmo Postgres do
-  `docker-compose.yml`) — `backend/phpunit.xml` só define `APP_ENV=testing` para carregar
-  aquele arquivo; nunca duplicar config de banco ali de volta. Ver README, seção "Testes e
+- **PostgreSQL é o único banco suportado — desenvolvimento, teste e produção. Nunca
+  reintroduzir SQLite, em lugar nenhum.** Um bug real (`LIKE` sensível a maiúsculas, que o
+  Postgres respeita e o SQLite ignora) passou pela suíte inteira sem ser notado enquanto ela
+  rodava em SQLite `:memory:`. Qualquer segundo banco recria esse buraco: "verde localmente"
+  só significa "verde de verdade" quando tudo roda contra o mesmo banco de produção. Por isso
+  não existem mais caminho de desenvolvimento em SQLite, conexão `sqlite` em
+  `config/database.php`, nem guarda `DB::getDriverName()` em migration — o caminho Postgres é
+  o único. Configuração de teste em `backend/.env.testing` (banco dedicado
+  `lar_analia_franco_test`, separado do de desenvolvimento, no mesmo Postgres do
+  `docker-compose.yml`); `backend/phpunit.xml` só define `APP_ENV=testing` para carregar
+  aquele arquivo — nunca duplicar config de banco ali de volta. Ver README, seção "Testes e
   qualidade".
 
 ## Como trabalhar neste projeto

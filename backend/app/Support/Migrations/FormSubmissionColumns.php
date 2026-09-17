@@ -43,18 +43,13 @@ final class FormSubmissionColumns
         $table->timestamps();
     }
 
+    /**
+     * CHECK espelhando o enum PHP no banco (ver docs/convencoes.md). Sem guarda de driver:
+     * PostgreSQL é o único banco suportado, em desenvolvimento, teste e produção (ver
+     * CLAUDE.md, "Armadilhas conhecidas").
+     */
     public static function addStatusCheckConstraint(string $table): void
     {
-        if (DB::getDriverName() !== 'pgsql') {
-            // Dev/teste/produção rodam só em Postgres (ver CLAUDE.md, "Armadilhas
-            // conhecidas": a suíte não usa mais SQLite nem para teste). Esta guarda continua
-            // existindo só para quem escolher a opção sem Docker documentada no README
-            // (SQLite, sem serviço externo nenhum) — lá `ALTER TABLE ... ADD CONSTRAINT` não
-            // é suportado do mesmo jeito, e a trava redundante não faz falta: o enum PHP já
-            // garante o valor na aplicação.
-            return;
-        }
-
         $values = implode(',', array_map(
             fn (FormSubmissionStatus $status): string => "'{$status->value}'",
             FormSubmissionStatus::cases(),

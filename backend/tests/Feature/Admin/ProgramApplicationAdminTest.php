@@ -42,10 +42,10 @@ test('listagem filtra por status', function (): void {
 });
 
 /**
- * whereDate('created_at', ...) é abstração do Laravel — a Grammar de cada driver já traduz
- * para a expressão certa (CAST no Postgres, date() no SQLite), mas o padrão se repete em
- * cinco controllers e nenhum tinha teste algum contra banco de verdade até a varredura de
- * dialeto desta sessão (ver docs/roadmap.md). Cobre aqui como representante do padrão —
+ * whereDate('created_at', ...) é abstração do Laravel — a Grammar traduz para a expressão
+ * certa do Postgres (CAST) —, mas o padrão se repete em cinco controllers e nenhum tinha
+ * teste algum contra banco de verdade até a varredura de dialeto (ver docs/roadmap.md).
+ * Cobre aqui como representante do padrão —
  * ProgramApplication, PickupRequest, VolunteerApplication, PartnershipInquiry e
  * ContactMessage repetem o mesmo código, não a mesma consulta testada cinco vezes.
  */
