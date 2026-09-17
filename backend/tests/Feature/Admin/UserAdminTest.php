@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Actions\Users\AssertLastActiveSuperAdminSurvives;
 use App\Enums\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Spatie\Activitylog\Models\Activity;
@@ -146,10 +147,11 @@ test('ninguém remove o próprio papel de super_admin', function (): void {
  * super_admin ativo, o próprio ator só pode ser ele mesmo — cai na regra "ninguém desativa a
  * si mesmo" antes de chegar aqui. A proteção contra reduzir a zero super_admins ativos só é
  * alcançável de verdade por duas requisições concorrentes (dois super_admins se
- * desativando/despapelando um ao outro ao mesmo tempo) — o que o lock com transação existe
- * para impedir, mas que o client de teste HTTP síncrono do Pest não reproduz (uma única
- * conexão de banco, sem paralelismo real). Testada aqui direto na Action, isolada da regra
- * de autoproteção.
+ * desativando/despapelando um ao outro ao mesmo tempo) — o que o mutex na linha do papel
+ * existe para impedir, mas que o client de teste HTTP síncrono do Pest não reproduz (uma
+ * única conexão de banco, sem paralelismo real; a corrida foi reproduzida com dois processos
+ * de verdade contra o Postgres local, ver docs/relatorio-sessao-9.md). Testada aqui direto na
+ * Action, isolada da regra de autoproteção.
  */
 test('AssertLastActiveSuperAdminSurvives bloqueia só quando o alvo é o único super_admin ativo', function (): void {
     $action = app(AssertLastActiveSuperAdminSurvives::class);
@@ -173,6 +175,44 @@ test('AssertLastActiveSuperAdminSurvives bloqueia só quando o alvo é o único 
     // Papel diferente de super_admin nunca é protegido por esta regra.
     $regularUser = userWithRole(Role::Direcao->value);
     $action->handle($regularUser);
+});
+
+/**
+ * Guarda de regressão do que a suíte não consegue exercitar: a serialização depende de o
+ * mutex (SELECT ... FOR UPDATE na linha do papel super_admin) ser adquirido ANTES da
+ * contagem. Travar as linhas de `users` em vez disso não serializa — remover papel não altera
+ * a linha de `users`, e em READ COMMITTED a segunda transação conta com o snapshot antigo da
+ * pivot (foi assim que o sistema chegou a zero super_admin ativo, ver
+ * docs/relatorio-sessao-9.md). Sem este teste, trocar o mutex por qualquer coisa "equivalente"
+ * passaria verde.
+ */
+test('a contagem de super_admins só acontece depois de travar a linha do papel', function (): void {
+    $target = userWithRole(Role::SuperAdmin->value);
+    userWithRole(Role::SuperAdmin->value);
+
+    $queries = [];
+    DB::listen(function ($query) use (&$queries): void {
+        $queries[] = strtolower($query->sql);
+    });
+
+    DB::transaction(fn () => app(AssertLastActiveSuperAdminSurvives::class)->handle($target));
+
+    $mutex = null;
+    $count = null;
+
+    foreach ($queries as $index => $sql) {
+        if ($mutex === null && str_contains($sql, 'from "roles"') && str_contains($sql, 'for update')) {
+            $mutex = $index;
+        }
+
+        if ($count === null && str_contains($sql, 'count(*)') && str_contains($sql, 'from "users"')) {
+            $count = $index;
+        }
+    }
+
+    expect($mutex)->not->toBeNull('nenhum SELECT ... FOR UPDATE na tabela de papéis')
+        ->and($count)->not->toBeNull('nenhuma contagem de usuários')
+        ->and($mutex)->toBeLessThan($count, 'a contagem veio antes do mutex — a serialização não vale nada assim');
 });
 
 test('desativar um super_admin que não é o último funciona normalmente', function (): void {
