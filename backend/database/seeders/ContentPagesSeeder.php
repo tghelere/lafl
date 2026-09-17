@@ -31,7 +31,7 @@ class ContentPagesSeeder extends Seeder
      */
     public function run(): void
     {
-        if (! app()->environment(['local', 'testing'])) {
+        if (! app()->environment(['local', 'testing', 'e2e'])) {
             return;
         }
 

@@ -35,6 +35,10 @@ services:
       # roda no primeiro boot do container (volume vazio); num volume já existente, criar o
       # banco manualmente (ver README).
       - ./docker/postgres/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+      # Terceiro banco (lar_analia_franco_e2e), o da bateria de ponta a ponta — ver
+      # docker/postgres/init-e2e-db.sql. Mesma ressalva do anterior: só no primeiro boot;
+      # num volume já existente, `php artisan e2e:prepare` cria o banco sozinho.
+      - ./docker/postgres/init-e2e-db.sql:/docker-entrypoint-initdb.d/init-e2e-db.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-lar}"]
       interval: 5s

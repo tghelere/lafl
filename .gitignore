@@ -7,6 +7,10 @@
 # estar versionado para a suíte rodar igual em qualquer máquina e no CI — ver README, seção
 # "Testes e qualidade".
 !backend/.env.testing
+# Mesma exceção, mesmo motivo, para o ambiente da bateria de ponta a ponta: backend/.env.e2e
+# só tem valor fictício e precisa estar versionado para `npm run test:e2e` rodar igual em
+# qualquer máquina e no CI — ver e2e/README.md.
+!backend/.env.e2e
 
 # Backend (Laravel)
 backend/vendor/

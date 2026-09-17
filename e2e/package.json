@@ -1,0 +1,17 @@
+{
+  "name": "e2e",
+  "private": true,
+  "type": "module",
+  "description": "Bateria de ponta a ponta (Playwright) do painel administrativo e do site público — ver README.md.",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "postinstall": "playwright install firefox"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.13.3",
+    "typescript": "~6.0.2"
+  }
+}

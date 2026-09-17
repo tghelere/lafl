@@ -1,0 +1,13 @@
+-- Terceiro banco: o da bateria de ponta a ponta (Playwright), separado tanto do banco de
+-- desenvolvimento (lar_analia_franco) quanto do da suíte Pest (lar_analia_franco_test). Os
+-- três vivem no mesmo Postgres deste compose; o que muda é quem apaga o quê.
+--
+-- A bateria roda `migrate:fresh` a cada execução, então precisa de um banco onde apagar tudo
+-- não custe nada — e precisa estar separado do banco de teste porque Pest e e2e podem ser
+-- disparados ao mesmo tempo (ver CLAUDE.md, "Armadilhas conhecidas").
+--
+-- Scripts em /docker-entrypoint-initdb.d só rodam no primeiro boot do container, com o volume
+-- de dados vazio. Num volume já existente este arquivo não tem efeito — mas `php artisan
+-- e2e:prepare` cria o banco sozinho quando ele não existe, então nada precisa ser feito à mão
+-- (ver App\Console\Commands\PrepareE2eDatabase e e2e/README.md).
+CREATE DATABASE lar_analia_franco_e2e;

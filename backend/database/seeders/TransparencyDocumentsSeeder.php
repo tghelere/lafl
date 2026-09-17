@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Enums\TransparencyDocumentType;
 use App\Models\TransparencyDocument;
+use Database\Seeders\Support\PlaceholderPdf;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -19,13 +20,13 @@ class TransparencyDocumentsSeeder extends Seeder
      */
     public function run(): void
     {
-        if (! app()->environment(['local', 'testing'])) {
+        if (! app()->environment(['local', 'testing', 'e2e'])) {
             return;
         }
 
         foreach ($this->documents() as $data) {
             $path = 'transparency-documents/'.Str::uuid().'.pdf';
-            $bytes = $this->placeholderPdf();
+            $bytes = PlaceholderPdf::bytes();
 
             Storage::disk('local')->put($path, $bytes);
 
@@ -59,28 +60,5 @@ class TransparencyDocumentsSeeder extends Seeder
             ['title' => 'Relatório anual de atividades 2024', 'year' => 2024, 'type' => TransparencyDocumentType::AnnualReport],
             ['title' => 'Relatório anual de atividades 2023', 'year' => 2023, 'type' => TransparencyDocumentType::AnnualReport],
         ];
-    }
-
-    /**
-     * PDF mínimo, de uma página em branco — só para o arquivo abrir de verdade num leitor de
-     * PDF; o conteúdo em si é irrelevante, é dado sintético (ver docs/protecao-de-dados.md).
-     */
-    private function placeholderPdf(): string
-    {
-        return <<<'PDF'
-            %PDF-1.4
-            1 0 obj
-            << /Type /Catalog /Pages 2 0 R >>
-            endobj
-            2 0 obj
-            << /Type /Pages /Kids [3 0 R] /Count 1 >>
-            endobj
-            3 0 obj
-            << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << >> >>
-            endobj
-            trailer
-            << /Size 4 /Root 1 0 R >>
-            %%EOF
-            PDF;
     }
 }
