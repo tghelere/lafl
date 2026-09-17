@@ -647,8 +647,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Variante "entry" — usada na cronologia do Lar hoje: data à esquerda, descrição no lugar
-   do numeral, sem valor grande em destaque. */
+/* Variante "entry" — data à esquerda, descrição no lugar do numeral, sem valor grande em
+   destaque. Oferecida por LedgerLine.vue (prop `variant`) e hoje sem uso no site: a
+   cronologia que a usava ficava em "O Lar hoje", página retirada do escopo de lançamento. */
 .ledger__item--entry .ledger__figure {
   flex-direction: column;
   align-items: flex-start;
