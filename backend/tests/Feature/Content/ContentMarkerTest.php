@@ -8,6 +8,7 @@ use App\Models\Page;
 use App\Models\TransparencyDocument;
 use App\Support\Html\ContentSanitizer;
 use Carbon\CarbonImmutable;
+use Database\Seeders\ContentPagesSeeder;
 
 test('o sanitizador não encosta num marcador', function (): void {
     // A premissa de tudo: `{` e `}` não são sintaxe de HTML, então o marcador atravessa a
@@ -236,4 +237,39 @@ test('quem não administra conteúdo não vê a lista de marcadores', function (
     $this->actingAs(userWithRole(Role::Atendimento->value))
         ->getJson('/api/v1/content-markers')
         ->assertForbidden();
+});
+
+/**
+ * O seeder institucional grava `content` direto pelo model, sem passar por
+ * App\Actions\Content\SavePage — então a recusa de marcador desconhecido não o alcança. Este
+ * teste é a rede que falta: um `{{coisa}}` escrito no seeder chegaria ao site cru.
+ */
+test('o conteúdo do seeder institucional só usa marcador que existe', function (): void {
+    $method = new ReflectionMethod(ContentPagesSeeder::class, 'pages');
+    $method->setAccessible(true);
+
+    /** @var list<array{slug: string, content: string}> $pages */
+    $pages = $method->invoke(new ContentPagesSeeder);
+
+    expect($pages)->not->toBeEmpty();
+
+    $desconhecidos = [];
+    $usados = [];
+
+    foreach ($pages as $page) {
+        preg_match_all(ContentMarker::PATTERN, $page['content'], $matches);
+
+        foreach ($matches[1] as $name) {
+            $usados[] = $name;
+
+            if (ContentMarker::tryFrom($name) === null) {
+                $desconhecidos[] = "{$page['slug']}: {{{$name}}}";
+            }
+        }
+    }
+
+    expect($desconhecidos)->toBe([])
+        // E a varredura está viva: a página de transparência de fato usa o marcador da
+        // contagem, em vez de um número escrito à mão.
+        ->and($usados)->toContain(ContentMarker::TransparencyDocumentCount->value);
 });

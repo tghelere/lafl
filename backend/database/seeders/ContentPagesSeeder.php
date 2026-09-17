@@ -31,6 +31,13 @@ class ContentPagesSeeder extends Seeder
      * início de `run()` garante que um banco de desenvolvimento que já tinha essa página não
      * mantenha o texto depois de reseedar.
      *
+     * Contagem e idade NUNCA são digitadas aqui: entram como marcador de
+     * App\Enums\ContentMarker (`{{documentos_transparencia}}`, `{{idade_bazar}}` e os
+     * demais), resolvido só na leitura pública. "Cerca de 70 documentos" envelhecia a cada
+     * upload; o marcador não. Ano de acontecimento ("o bazar existe desde 1968") e valor de documento (o repasse de
+     * R$ 2.819.892,84, as 15 turmas do plano de trabalho) continuam literais — não são
+     * cálculo, são o que o documento diz.
+     *
      * Nenhum texto aqui foi aprovado pelo Lar Anália Franco — esse status é de controle
      * interno (ver docs/roadmap.md), nunca publicado no conteúdo da página. Até esta sessão o
      * conteúdo levava o comentário HTML `rascunho: validar com a instituição` anexado no fim
@@ -364,7 +371,7 @@ class ContentPagesSeeder extends Seeder
                 'title' => 'Transparência',
                 'meta_description' => 'O acervo de prestação de contas do Lar Anália Franco — balanços, atas e editais — organizado e público.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas, editais e relatórios — hoje com cerca de 70 documentos.</p><p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o que precisa.</p><p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro de Educação Infantil Anália Franco, também exige prestação de contas periódica. O repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração 06/2022).</p><p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por ano e por tipo.</p>
+                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas, editais e relatórios — hoje com {{documentos_transparencia}}.</p><p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o que precisa.</p><p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro de Educação Infantil Anália Franco, também exige prestação de contas periódica. O repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração 06/2022).</p><p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por ano e por tipo.</p>
                     HTML,
             ],
         ];
