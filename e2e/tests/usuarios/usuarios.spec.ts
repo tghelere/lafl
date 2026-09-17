@@ -93,7 +93,7 @@ test.describe('super_admin', () => {
     await expect(pessoa).toHaveURL(/\/login$/)
     await expect(pessoa.getByRole('button', { name: 'Entrar' })).toBeVisible()
     await expect(pessoa.getByLabel('E-mail')).toBeVisible()
-    await expect(pessoa.getByRole('heading', { name: 'Lar Anália Franco' })).toBeVisible()
+    await expect(pessoa.getByRole('heading', { name: 'Painel administrativo' })).toBeVisible()
 
     await pessoa.context().close()
   })
