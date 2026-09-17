@@ -51,20 +51,26 @@ export default defineNuxtConfig({
       // CMS correspondente. `crawlLinks: false` faz o generate prerenderizar só o que está
       // listado abaixo.
       //
-      // A lista só tem página cujo conteúdo é FIXO no .vue. Toda rota que lê o conteúdo da
-      // API de `pages` saiu daqui quando o painel passou a editar esse conteúdo: uma rota
-      // prerenderizada vira arquivo estático gravado no build, então o texto salvo pelo
-      // painel só apareceria no site depois de um novo `nuxt generate` — exatamente o que a
-      // edição pelo painel existe para evitar. Essas rotas passam a ser SSR a cada request,
-      // e a alteração aparece já na requisição seguinte (o backend invalida o cache de 10
-      // minutos ao salvar, ver App\Actions\Content\SavePage).
+      // A lista só tem página cujo conteúdo é FIXO no .vue E não depende de nenhum número
+      // calculado. Toda rota que lê o conteúdo da API de `pages` saiu daqui quando o painel
+      // passou a editar esse conteúdo: uma rota prerenderizada vira arquivo estático gravado
+      // no build, então o texto salvo pelo painel só apareceria no site depois de um novo
+      // `nuxt generate` — exatamente o que a edição pelo painel existe para evitar. Essas
+      // rotas passam a ser SSR a cada request, e a alteração aparece já na requisição
+      // seguinte (o backend invalida o cache de 10 minutos ao salvar, ver
+      // App\Actions\Content\SavePage).
+      //
+      // A HOME saiu daqui pelo mesmo motivo, por outro caminho: o conteúdo dela é fixo, mas a
+      // linha de registro lê idade e ano de /api/v1/public/institution-facts (ver
+      // app/composables/useInstitutionFacts.ts). Prerenderizada, a home congelaria a idade no
+      // dia do build e só voltaria a acertar no build seguinte — a mesma falha silenciosa que
+      // o número escrito à mão tinha, agora com outra fachada.
       //
       // Isso não muda a exigência de deploy: o servidor Nitro (`nuxt build` + node) já era
       // necessário para os cinco formulários e para /transparencia/documentos (ver abaixo),
       // então o site nunca foi hospedagem 100% estática.
       crawlLinks: false,
       routes: [
-        '/',
         '/robots.txt',
         '/sitemap.xml',
         // Conteúdo fixo no próprio .vue, sem `usePublicPage` — o painel não edita nenhuma

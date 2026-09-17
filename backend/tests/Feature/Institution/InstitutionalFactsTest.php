@@ -107,13 +107,13 @@ test('os marcos publicados trazem ano, data quando conhecida, e idade crua e for
         'year' => 1953,
         'date' => '1953-07-12',
         'age_years' => 73,
-        'age' => '73 anos',
+        'age_formatted' => '73 anos',
     ])->and($marcos['bazaar_opened'])->toBe([
         'year' => 1968,
         // Sem dia confirmado, o endpoint não inventa um — quem consome sabe que só há o ano.
         'date' => null,
         'age_years' => 58,
-        'age' => '58 anos',
+        'age_formatted' => '58 anos',
     ]);
 });
 

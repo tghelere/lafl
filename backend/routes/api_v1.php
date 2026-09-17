@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\PartnershipInquiryController;
 use App\Http\Controllers\Api\V1\PickupRequestController;
 use App\Http\Controllers\Api\V1\ProgramApplicationController;
 use App\Http\Controllers\Api\V1\Public\ContactMessageController as PublicContactMessageController;
+use App\Http\Controllers\Api\V1\Public\InstitutionFactsController as PublicInstitutionFactsController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
 use App\Http\Controllers\Api\V1\Public\PartnershipInquiryController as PublicPartnershipInquiryController;
 use App\Http\Controllers\Api\V1\Public\PickupRequestController as PublicPickupRequestController;
@@ -54,6 +55,12 @@ Route::prefix('public')->name('public.')->group(function (): void {
     Route::get('/pages/{slug}', [PublicPageController::class, 'show'])
         ->where('slug', '.*')
         ->name('pages.show');
+
+    // Os mesmos números que os marcadores do CMS resolvem, para as páginas cujo conteúdo é
+    // fixo no .vue (ver App\Enums\ContentMarker e frontend-site/app/pages/index.vue). Nada
+    // aqui é dado pessoal — são datas do estatuto e a contagem do acervo já público.
+    Route::get('/institution-facts', [PublicInstitutionFactsController::class, 'show'])
+        ->name('institution-facts.show');
 
     Route::get('/transparency-documents', [PublicTransparencyDocumentController::class, 'index'])
         ->name('transparency-documents.index');

@@ -68,7 +68,7 @@ final class InstitutionalFacts
      * formatada — é o que alimenta o endpoint público de fatos, para as páginas fixas em
      * .vue que não passam pelo CMS (ver frontend-site/app/pages/index.vue).
      *
-     * @return array<string, array{year: int, date: string|null, age_years: int, age: string}>
+     * @return array<string, array{year: int, date: string|null, age_years: int, age_formatted: string}>
      */
     public function milestones(): array
     {
@@ -81,11 +81,23 @@ final class InstitutionalFacts
                 'year' => (int) substr($raw, 0, 4),
                 'date' => $this->hasFullDate($raw) ? $raw : null,
                 'age_years' => $age,
-                'age' => $this->formatYears($age),
+                'age_formatted' => $this->formatYears($age),
             ];
         }
 
         return $milestones;
+    }
+
+    /**
+     * O acervo de transparência cru e formatado, no mesmo formato dos marcos.
+     *
+     * @return array{count: int, count_formatted: string}
+     */
+    public function transparencyDocuments(): array
+    {
+        $count = $this->publishedTransparencyDocumentCount();
+
+        return ['count' => $count, 'count_formatted' => $this->formatDocuments($count)];
     }
 
     /**

@@ -11,6 +11,14 @@ useSeoMeta({
     'Associação civil beneficente, filantrópica e de natureza espírita em Londrina. Creche conveniada, escola de contraturno e bazar beneficente, com prestação de contas pública.',
 })
 
+// Fundação e tempo de bazar vêm calculados da API, nunca digitados aqui (ver
+// App\Services\InstitutionalFacts) — é por isso que a home não está em
+// nitro.prerender.routes. Falhando a chamada, as duas linhas simplesmente não aparecem: um
+// número errado na prestação de contas é pior que um número a menos.
+const { data: institutionFacts } = await useInstitutionFacts()
+
+const marcos = computed(() => institutionFacts.value?.data.milestones ?? null)
+
 // Peso visual igual entre os três pilares — quem chegou pelo bazar não precisa entender o
 // que é um CEI primeiro (ver docs/estrutura-site.md §1.1).
 const pillars = [
@@ -86,8 +94,18 @@ const pillars = [
           label="Repasse do Termo de Colaboração com o Município"
           date="2026"
         />
-        <LedgerLine value="1968" label="Bazar beneficente em funcionamento desde" date="58 anos" />
-        <LedgerLine value="1953" label="Fundação da associação" />
+        <template v-if="marcos">
+          <LedgerLine
+            :value="String(marcos.bazaar_opened.year)"
+            label="Bazar beneficente em funcionamento desde"
+            :date="marcos.bazaar_opened.age_formatted"
+          />
+          <LedgerLine
+            :value="String(marcos.association_founded.year)"
+            label="Fundação da associação"
+            :date="marcos.association_founded.age_formatted"
+          />
+        </template>
       </div>
     </section>
 
