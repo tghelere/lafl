@@ -6,52 +6,26 @@ require __DIR__.'/bootstrap.php';
 
 use App\Enums\Role;
 use App\Models\User;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 /**
- * A proteção conta super_admins ATIVOS no sistema inteiro, não só os dois usuários de teste.
- * Rodando contra um banco de desenvolvimento de verdade — que já tem pelo menos o
- * dev@laranaliafranco.local — sobrar um terceiro super_admin ativo mascararia a demonstração:
- * as duas remoções concorrentes seriam permitidas sem problema nenhum, porque o terceiro
- * continuaria de pé (a regra só barra reduzir a ZERO, não a um).
- *
- * Por isso este setup DESATIVA TEMPORARIAMENTE qualquer super_admin ativo que não seja um dos
- * dois usuários de teste, e grava quem foi desativado em .signals/desativados-temporariamente.
- * json para cleanup.php reverter no final — mesmo se o script quebrar no meio, "php
- * cleanup.php" sozinho restaura pelo arquivo. Nada além de deactivated_at é tocado (papel,
- * senha, e-mail continuam intactos).
+ * migrate:fresh antes de tudo: o banco de teste dedicado começa vazio a cada execução, então
+ * não há super_admin nenhum além dos dois que este script cria — sem isso, qualquer usuário
+ * deixado por uma execução anterior, ou pela própria suíte Pest, poderia mascarar a
+ * demonstração (um terceiro super_admin ativo sobraria de pé, e a regra só barra reduzir a
+ * ZERO, não a um). bootstrap.php já garantiu que a conexão resolvida é o banco de teste, não o
+ * de desenvolvimento — apagar tudo aqui é seguro.
  */
-clearSignals();
+Artisan::call('migrate:fresh', ['--force' => true]);
 
-$stateFile = SIGNAL_DIR.'/desativados-temporariamente.json';
-
-if (file_exists($stateFile)) {
-    fwrite(STDERR, "Já existe um estado de desativação temporária pendente ({$stateFile}).\n");
-    fwrite(STDERR, "Rode primeiro: php cleanup.php\n");
-    exit(1);
-}
-
-$otherActiveSuperAdmins = User::query()
-    ->role(Role::SuperAdmin->value)
-    ->active()
-    ->where('email', 'not like', '%'.CORRIDA_EMAIL_DOMAIN)
-    ->get(['id', 'uuid', 'email']);
-
-@mkdir(SIGNAL_DIR, 0777, true);
-file_put_contents($stateFile, json_encode(
-    $otherActiveSuperAdmins->pluck('uuid')->all(),
-    JSON_PRETTY_PRINT,
-));
-
-foreach ($otherActiveSuperAdmins as $admin) {
-    $admin->forceFill(['deactivated_at' => now()])->save();
-    say('setup', "desativado temporariamente: {$admin->email} (restaurado por cleanup.php)");
-}
+// migrate:fresh só recria as tabelas — o papel super_admin precisa existir na tabela roles
+// antes de assignRole() poder atribuí-lo.
+(new RoleSeeder)->run();
 
 foreach (['a', 'b'] as $letter) {
     $email = "super-{$letter}".CORRIDA_EMAIL_DOMAIN;
-
-    User::where('email', $email)->delete();
 
     $user = User::factory()->create([
         'name' => 'Super '.strtoupper($letter).' (corrida)',
@@ -60,6 +34,8 @@ foreach (['a', 'b'] as $letter) {
     ]);
     $user->assignRole(Role::SuperAdmin->value);
 }
+
+clearSignals();
 
 say('setup', 'banco: '.DB::connection()->getDatabaseName());
 say('setup', 'super-a e super-b criados, ambos super_admin ativos');

@@ -4,31 +4,37 @@ Scripts usados para reproduzir, com dois processos PHP de verdade contra o Postg
 corrida que `App\Actions\Users\AssertLastActiveSuperAdminSurvives` existe para impedir: dois
 super_admins removendo o papel (ou desativando) um ao outro ao mesmo tempo, de um jeito que
 zeraria o total de super_admins ativos do sistema. Histórico completo, com a saída "antes" (o
-bug) e "depois" (a correção), em `docs/relatorio-sessao-9.md`.
+bug) e "depois" (a correção) da sessão original, em `docs/relatorio-sessao-9.md`.
 
 Não é teste automatizado — a suíte Pest usa uma conexão só, síncrona, e não reproduz
 concorrência de verdade. Isto aqui é para conferir manualmente, depois de qualquer mudança em
 `AssertLastActiveSuperAdminSurvives` ou nas Actions que a chamam, que a serialização continua
-funcionando.
+funcionando — a seção "Prova de que o script detecta o bug" abaixo mostra a saída real dos
+dois casos, com a proteção quebrada de propósito e depois restaurada.
 
 ## ⚠️ Antes de rodar
 
-- **Só roda com `APP_ENV=local`.** Os scripts recusam rodar em qualquer outro ambiente
-  (`bootstrap.php` confere `app()->environment('local')`) — nunca rodar isto contra staging
-  ou produção.
-- **Cria dois usuários reais** (`super-a@corrida.local`, `super-b@corrida.local`) no banco de
-  desenvolvimento configurado no seu `backend/.env`, com papel `super_admin`.
-- **Desativa temporariamente** qualquer outro super_admin ativo que já exista no banco
-  (inclusive o `dev@laranaliafranco.local` do `DevSuperAdminSeeder`) — sem isso, um terceiro
-  super_admin sempre sobraria de pé e a corrida nunca chegaria a zero, mascarando o que se
-  quer demonstrar. Só `deactivated_at` é tocado; papel, senha e e-mail continuam intactos, e a
-  reativação é automática ao final (`run.sh` chama `cleanup.php` mesmo se a corrida falhar no
-  meio ou for interrompida com Ctrl+C).
-- **Tudo é revertido ao final**: os dois usuários de teste são apagados (junto com o registro
-  de auditoria que geraram) e quem foi desativado temporariamente volta a ficar ativo.
-- Se o processo for morto de um jeito que o `trap` do bash não capture (`kill -9`, queda de
-  energia), rode a limpeza manualmente: `php cleanup.php`. É idempotente — pode rodar de novo
-  sem risco, inclusive sem nada pendente.
+- **Roda exclusivamente contra o banco de teste dedicado**
+  (`lar_analia_franco_test`, ver `backend/.env.testing`) — **nunca** o banco de
+  desenvolvimento. `bootstrap.php` força `APP_ENV=testing` sozinho, antes de qualquer
+  bootstrap do Laravel, então não depende de quem roda lembrar de exportar nada; e confere o
+  **nome do banco resolvido**, não só o ambiente — se por algum motivo a conexão não for
+  exatamente `lar_analia_franco_test` (ex.: alguém sobrescreve `DB_DATABASE` por fora, ou
+  `backend/.env.testing` é editado para apontar para outro lugar), o script recusa rodar e
+  imprime o banco que encontrou.
+- **`migrate:fresh` antes de cada execução** (dentro de `setup.php`) — o banco de teste é
+  apagado e recriado do zero toda vez. É seguro porque é sempre o banco de teste (ver acima),
+  nunca o de desenvolvimento.
+- **Nunca rode isto enquanto a suíte Pest estiver rodando.** Os dois usam o mesmo banco de
+  teste; o `migrate:fresh` deste script apaga as tabelas debaixo de qualquer teste com
+  transação aberta no meio, e o inverso também vale — rodar a suíte no meio da corrida
+  bagunça os dois. Rode um de cada vez.
+- **Cria dois usuários de teste** (`super-a@corrida.local`, `super-b@corrida.local`), com
+  papel `super_admin`, só no banco de teste.
+- **Tudo é apagado ao final** — `run.sh` chama `cleanup.php` mesmo se a corrida falhar no meio
+  ou for interrompida (`trap ... EXIT`). Como o próximo `setup.php` recria o banco do zero de
+  qualquer forma, não há muito risco em não limpar, mas o script limpa mesmo assim, para quem
+  quiser inspecionar o banco de teste logo depois de uma corrida.
 
 ## Como rodar
 
@@ -56,19 +62,131 @@ super_admins ATIVOS no sistema inteiro: 1
 >>> Invariante preservado: ainda existe super_admin ativo.
 ```
 
-`super_admins ATIVOS no sistema inteiro` conta o banco todo, não só os dois usuários de
-teste — por isso ele bate com o total real do banco (`1`) só porque `setup.php` já isolou o
-cenário desativando qualquer outro super_admin ativo.
+`super_admins ATIVOS no sistema inteiro` conta o banco de teste inteiro — como
+`setup.php` acabou de rodar `migrate:fresh`, os únicos super_admins que existem são os dois
+que ele mesmo criou, então o total bate certinho com a demonstração.
 
-**Se a proteção for quebrada de novo** (ex.: alguém reverte o mutex para travar as linhas de
-`users` em vez da linha do papel), a saída muda para:
+## Prova de que o script detecta o bug
+
+Rodado com a versão **anterior à correção** de `AssertLastActiveSuperAdminSurvives`
+(`git show 638d4cb^:backend/app/Actions/Users/AssertLastActiveSuperAdminSurvives.php`,
+trocada temporariamente no arquivo local, sem commitar — restaurada com `git checkout --`
+logo em seguida), depois com a correção de volta. Saída real dos dois cenários, copiada
+direto do terminal — não reconstruída.
+
+### Antes da correção (bug presente)
+
+`./run.sh papel`:
 
 ```
-[P2] RESULTADO: operação PERMITIDA (sem exceção)
+==================== SETUP (cenário: papel) ====================
+[06:07:57 setup] banco: lar_analia_franco_test
+[06:07:57 setup] super-a e super-b criados, ambos super_admin ativos
+[06:07:57 setup] super_admins ativos agora (deve ser exatamente 2): 2
 
-super_admins ATIVOS no sistema inteiro: 0
->>> INVARIANTE VIOLADO: o sistema ficou sem nenhum super_admin ativo.
+==================== CORRIDA ====================
+  [06:07:57 P1] abrindo transação externa
+  [06:07:57 P1] removendo super_admin de B (caminho real: UpdateUser::handle)
+  [06:07:57 P1] operação feita, ainda SEM commit — travas retidas
+  [06:07:57 P1] esperando P2 encostar na trava...
+  [06:07:57 P1] P2 está bloqueado numa trava de linha (pg_stat_activity)
+  [06:07:57 P1] commitando
+  [06:07:57 P1] commit feito. super_admins ativos agora: 1
+  [06:07:57 P2] P1 está com a trava; vou tentar remover super_admin de A (caminho real: UpdateUser)
+  [06:07:57 P2] RESULTADO: operação PERMITIDA (sem exceção)
+
+==================== ESTADO FINAL (antes da limpeza) ====================
+[06:07:57 final] super_admins ATIVOS no sistema inteiro: 0
+[06:07:57 final]   super-a@corrida.local        papéis=[] ativo=sim
+[06:07:57 final]   super-b@corrida.local        papéis=[] ativo=sim
+[06:07:57 final] >>> INVARIANTE VIOLADO: o sistema ficou sem nenhum super_admin ativo.
 ```
+
+`./run.sh misto`:
+
+```
+==================== SETUP (cenário: misto) ====================
+[06:08:03 setup] banco: lar_analia_franco_test
+[06:08:03 setup] super-a e super-b criados, ambos super_admin ativos
+[06:08:03 setup] super_admins ativos agora (deve ser exatamente 2): 2
+
+==================== CORRIDA ====================
+  [06:08:03 P1] abrindo transação externa
+  [06:08:03 P1] removendo super_admin de B (caminho real: UpdateUser::handle)
+  [06:08:03 P1] operação feita, ainda SEM commit — travas retidas
+  [06:08:03 P1] esperando P2 encostar na trava...
+  [06:08:03 P1] P2 está bloqueado numa trava de linha (pg_stat_activity)
+  [06:08:03 P1] commitando
+  [06:08:03 P1] commit feito. super_admins ativos agora: 1
+  [06:08:03 P2] P1 está com a trava; vou tentar DESATIVAR A (caminho real: DeactivateUser)
+  [06:08:03 P2] RESULTADO: desativação PERMITIDA (sem exceção)
+
+==================== ESTADO FINAL (antes da limpeza) ====================
+[06:08:03 final] super_admins ATIVOS no sistema inteiro: 0
+[06:08:03 final]   super-a@corrida.local        papéis=[super_admin] ativo=não
+[06:08:03 final]   super-b@corrida.local        papéis=[] ativo=sim
+[06:08:03 final] >>> INVARIANTE VIOLADO: o sistema ficou sem nenhum super_admin ativo.
+```
+
+### Depois de restaurar a correção
+
+`./run.sh papel`:
+
+```
+==================== SETUP (cenário: papel) ====================
+[06:08:14 setup] banco: lar_analia_franco_test
+[06:08:14 setup] super-a e super-b criados, ambos super_admin ativos
+[06:08:14 setup] super_admins ativos agora (deve ser exatamente 2): 2
+
+==================== CORRIDA ====================
+  [06:08:15 P1] abrindo transação externa
+  [06:08:15 P1] removendo super_admin de B (caminho real: UpdateUser::handle)
+  [06:08:15 P1] operação feita, ainda SEM commit — travas retidas
+  [06:08:15 P1] esperando P2 encostar na trava...
+  [06:08:15 P1] P2 está bloqueado numa trava de linha (pg_stat_activity)
+  [06:08:15 P1] commitando
+  [06:08:15 P1] commit feito. super_admins ativos agora: 1
+  [06:08:15 P2] P1 está com a trava; vou tentar remover super_admin de A (caminho real: UpdateUser)
+  [06:08:15 P2] RESULTADO: operação RECUSADA — Não é possível remover ou desativar o último
+       super administrador ativo.
+
+==================== ESTADO FINAL (antes da limpeza) ====================
+[06:08:15 final] super_admins ATIVOS no sistema inteiro: 1
+[06:08:15 final]   super-a@corrida.local        papéis=[super_admin] ativo=sim
+[06:08:15 final]   super-b@corrida.local        papéis=[] ativo=sim
+[06:08:15 final] >>> Invariante preservado: ainda existe super_admin ativo.
+```
+
+`./run.sh misto`:
+
+```
+==================== SETUP (cenário: misto) ====================
+[06:08:20 setup] banco: lar_analia_franco_test
+[06:08:20 setup] super-a e super-b criados, ambos super_admin ativos
+[06:08:20 setup] super_admins ativos agora (deve ser exatamente 2): 2
+
+==================== CORRIDA ====================
+  [06:08:20 P1] abrindo transação externa
+  [06:08:20 P1] removendo super_admin de B (caminho real: UpdateUser::handle)
+  [06:08:20 P1] operação feita, ainda SEM commit — travas retidas
+  [06:08:20 P1] esperando P2 encostar na trava...
+  [06:08:20 P1] P2 está bloqueado numa trava de linha (pg_stat_activity)
+  [06:08:20 P1] commitando
+  [06:08:20 P1] commit feito. super_admins ativos agora: 1
+  [06:08:20 P2] P1 está com a trava; vou tentar DESATIVAR A (caminho real: DeactivateUser)
+  [06:08:20 P2] RESULTADO: desativação RECUSADA — Não é possível remover ou desativar o último
+       super administrador ativo.
+
+==================== ESTADO FINAL (antes da limpeza) ====================
+[06:08:20 final] super_admins ATIVOS no sistema inteiro: 1
+[06:08:20 final]   super-a@corrida.local        papéis=[super_admin] ativo=sim
+[06:08:20 final]   super-b@corrida.local        papéis=[] ativo=sim
+[06:08:20 final] >>> Invariante preservado: ainda existe super_admin ativo.
+```
+
+Confirmado depois, via `git status`, que nenhuma alteração ficou pendente em
+`AssertLastActiveSuperAdminSurvives.php` — a troca para a versão antiga foi só no arquivo em
+disco, nunca commitada.
 
 ## Como funciona a sincronização
 
@@ -88,11 +206,11 @@ trava antes de commitar — não é um `sleep` arbitrário torcendo para o timin
 
 | Arquivo | Papel |
 |---|---|
-| `bootstrap.php` | Sobe a aplicação real, confere `APP_ENV=local`, funções auxiliares |
-| `setup.php` | Desativa temporariamente outros super_admins ativos, cria super-a e super-b |
+| `bootstrap.php` | Força `APP_ENV=testing`, sobe a aplicação real, confere o banco resolvido, funções auxiliares |
+| `setup.php` | `migrate:fresh` + `RoleSeeder`, cria super-a e super-b |
 | `p1.php` | Processo 1 — sempre remove o papel de super_admin de B |
 | `p2-remove-papel.php` | Processo 2, cenário "papel" — remove o papel de A |
 | `p2-desativa.php` | Processo 2, cenário "misto" — desativa A |
 | `final.php` | Imprime o estado depois da corrida, antes da limpeza |
-| `cleanup.php` | Reativa quem foi desativado, apaga super-a e super-b — idempotente |
+| `cleanup.php` | Apaga super-a e super-b — idempotente |
 | `run.sh` | Orquestra os processos e garante a limpeza (`trap ... EXIT`) |

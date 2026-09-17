@@ -18,8 +18,8 @@ case "$CENARIO" in
     ;;
 esac
 
-# Reativa quem foi desativado temporariamente e apaga os usuários de teste, não importa como
-# o script termina — inclusive se a corrida falhar no meio ou for interrompida (Ctrl+C).
+# Apaga os usuários de teste, não importa como o script termina — inclusive se a corrida
+# falhar no meio ou for interrompida (Ctrl+C).
 cleanup() {
   echo
   echo "==================== LIMPEZA ===================="
