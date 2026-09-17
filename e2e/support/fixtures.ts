@@ -2,6 +2,18 @@ import type { APIResponse } from '@playwright/test'
 
 import { AdminApi } from './api'
 
+/**
+ * PDF mínimo de uma página em branco, o mesmo formato que os seeders usam — nenhum arquivo
+ * real da instituição entra no repositório (CLAUDE.md, regra 10). Precisa ser um PDF de
+ * verdade porque a validação da API é por mimetype, não por extensão.
+ */
+export const placeholderPdf = Buffer.from(
+  '%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n' +
+    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n' +
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << >> >>\nendobj\n' +
+    'trailer\n<< /Size 4 /Root 1 0 R >>\n%%EOF\n',
+)
+
 export type CreatedUser = { id: string; name: string; email: string; roles: string[] }
 
 export type CreatedPage = { id: string; slug: string; title: string; content: string }

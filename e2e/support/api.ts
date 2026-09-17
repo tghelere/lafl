@@ -98,3 +98,28 @@ export async function fetchPageContent(api: AdminApi, uuid: string): Promise<str
 
   return body.data.content
 }
+
+/**
+ * O valor que um marcador de conteúdo tem AGORA, pela mesma fonte que o painel mostra a quem
+ * escreve (ver App\Actions\Content\ListContentMarkers).
+ *
+ * É o que impede a asserção tautológica: o teste não recalcula a idade nem conta documento em
+ * TypeScript — regra de negócio nenhuma vive aqui —, pergunta à API e depois cobra que o site
+ * publique exatamente esse texto.
+ */
+export async function markerValue(api: AdminApi, name: string): Promise<string> {
+  const response = await api.get('/api/v1/content-markers')
+
+  if (!response.ok()) {
+    throw new Error(`GET /api/v1/content-markers respondeu ${response.status()}`)
+  }
+
+  const body = (await response.json()) as { data: Array<{ name: string; value: string }> }
+  const marker = body.data.find((candidate) => candidate.name === name)
+
+  if (!marker) {
+    throw new Error(`a API não conhece o marcador "${name}"`)
+  }
+
+  return marker.value
+}

@@ -1,20 +1,9 @@
 import { expect, test } from '@playwright/test'
 
 import { acceptNextDialog, unique } from '../../support/admin'
+import { placeholderPdf } from '../../support/fixtures'
 import { gotoSite } from '../../support/site'
 import { storageStatePath } from '../../support/users'
-
-/**
- * PDF mínimo de uma página em branco, o mesmo formato que os seeders usam — nenhum arquivo
- * real da instituição entra no repositório (CLAUDE.md, regra 10). O upload precisa ser um PDF
- * de verdade porque a validação da API é por mimetype, não por extensão.
- */
-const PDF_DE_MENTIRA = Buffer.from(
-  '%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n' +
-    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n' +
-    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << >> >>\nendobj\n' +
-    'trailer\n<< /Size 4 /Root 1 0 R >>\n%%EOF\n',
-)
 
 test.describe('financeiro', () => {
   test.use({ storageState: storageStatePath('financeiro') })
@@ -29,7 +18,7 @@ test.describe('financeiro', () => {
     await page.getByLabel('Arquivo (PDF, até 20 MB)').setInputFiles({
       name: 'balanco-e2e.pdf',
       mimeType: 'application/pdf',
-      buffer: PDF_DE_MENTIRA,
+      buffer: placeholderPdf,
     })
     await page.getByRole('button', { name: 'Salvar' }).click()
 
@@ -87,7 +76,7 @@ test.describe('financeiro', () => {
     await page.getByLabel('Arquivo (PDF, até 20 MB)').setInputFiles({
       name: 'edital-e2e.pdf',
       mimeType: 'application/pdf',
-      buffer: PDF_DE_MENTIRA,
+      buffer: placeholderPdf,
     })
     await page.getByRole('button', { name: 'Salvar' }).click()
     await expect(page.getByText('Documento cadastrado.')).toBeVisible()
