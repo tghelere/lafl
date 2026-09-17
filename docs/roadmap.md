@@ -184,6 +184,31 @@
       `SavePage` e middleware `EnsureUserIsActive` removidos um a um deixam testes vermelhos
       — ver `docs/relatorio-sessao-10.md`.
 
+- [x] **Conteúdo e escopo de lançamento (sessão 11, `docs/tarefas/01-...md`).** Decisões do
+      cliente de 17/09/2026 aplicadas ao `ContentPagesSeeder` e à navegação:
+      `quem-somos/o-lar-hoje` removida por completo (não mais Draft), com remoção explícita no
+      seeder para não sobreviver num banco de desenvolvimento já seedado; toda menção direta ou
+      indireta ao processo judicial de 2022 removida do conteúdo institucional (ver
+      `docs/contexto.md`, "Histórico recente" revisada, e a antiga seção "BLOQUEIO DE
+      PUBLICAÇÃO" removida deste arquivo). `nossa-historia` ganhou os marcos de fundação/obra/
+      inauguração da sede (1953/1957/1963), agora confirmados. Escopo de lançamento fechado:
+      `missao-visao-valores`, `educacao-infantil/dia-da-crianca` e
+      `educacao-infantil/depoimentos` passam a Draft e saem da navegação;
+      `/como-ajudar/voluntariado` e `/contraturno/apoiar` continuam publicadas, mas `noindex,
+      nofollow`; menu "Seja parceiro" virou "Parceiros"; `como-ajudar` perdeu voluntariado e
+      apoio empresarial do texto; `siteNav.ts` aponta `Doar` direto para `/doar`. Faixa etária
+      do contraturno corrigida para "crianças e adolescentes de 6 a 15 anos" (home e o hint de
+      `navigation.ts`, repetido em `/o-que-fazemos`); duas afirmações de completude do acervo
+      de transparência removidas da home (a contagem real fica para a próxima sessão, números
+      calculados); parágrafo da fachada em `nossa-historia.vue` reescrito em tom neutro.
+      Verificação completa: Pint, Larastan, Pest (336 testes), build/generate do site, lint/
+      build do painel e as 25 da bateria de ponta a ponta (Firefox, via `npm run test:e2e`),
+      todos verdes sem precisar ajustar nenhum teste. `migrate:fresh --seed` + `cache:clear`
+      rodados no banco de desenvolvimento; conferência visual das páginas alteradas feita
+      contra o dev server real via MCP do Playwright, que neste ambiente roda em Chromium, não
+      Firefox — a cobertura de Firefox de fato veio só da bateria de ponta a ponta (que abre
+      `contraturno`, `bazar/visite-a-loja` e `quem-somos/nossa-historia` no editor real).
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
