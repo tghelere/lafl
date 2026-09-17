@@ -703,6 +703,15 @@
   margin-top: var(--space-2);
 }
 
+/* Mesmo ajuste do site (ver .page-content em frontend-site/app/assets/css/components.css):
+   o schema de lista do Tiptap sempre envolve o texto do item num <p>, e o <p> global de
+   base.css dobraria o espaçamento por cima do li + li acima. Restrito ao item com um
+   parágrafo só, para não apagar a separação quando o item tiver mais de um parágrafo ou uma
+   lista aninhada. */
+.rich-text__surface li > p:first-child:last-child {
+  margin: 0;
+}
+
 .rich-text__surface a {
   color: var(--color-accent);
   text-decoration: underline;

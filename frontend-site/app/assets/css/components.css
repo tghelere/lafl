@@ -203,6 +203,17 @@
   font-weight: var(--weight-semibold);
 }
 
+/* O editor Tiptap do painel serializa item de lista como <li><p>texto</p></li>, nunca
+   <li>texto</li> puro — é assim que o schema dele representa lista, não uma escolha de quem
+   escreve o conteúdo. Sem isto, o <p> herdava a margem de base.css e dobrava o espaçamento
+   entre itens por cima do que li + li já dá. `:first-child:last-child` restringe o reset ao
+   caso comum — um parágrafo só, nada mais no item — para não apagar o espaçamento quando o
+   item tiver mais de um parágrafo ou uma lista aninhada; aí o <p> extra volta a valer a
+   margem normal de base.css e cria a separação entre os blocos dentro do mesmo <li>. */
+.page-content li > p:first-child:last-child {
+  margin: 0;
+}
+
 /* Cabeçalho do site */
 /* Header — docs/design/navegacao.md §4-8. Medidas em px literais (não na escala de
    --space ou --text): são valores exatos do spec, testados contra o checklist de aceitação
