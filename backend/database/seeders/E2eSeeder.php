@@ -86,7 +86,7 @@ class E2eSeeder extends Seeder
      */
     private const CANONICAL_BUTTON_CONTENT = '<p>Início das turmas previsto para 2027. Nenhuma turma funciona ainda, e não há aluno matriculado — avise-se para saber assim que as inscrições abrirem.</p><p><a class="btn btn--primary" href="/contraturno/inscricao">Avise-me quando abrir</a></p>';
 
-    private const CANONICAL_EXTERNAL_LINK_CONTENT = '<p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou <a target="_blank" rel="noopener noreferrer" href="https://wa.me/5543999500183">WhatsApp (43) 99950-0183</a>.</p>';
+    private const CANONICAL_EXTERNAL_LINK_CONTENT = '<p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou <a target="_blank" href="https://wa.me/5543999500183" rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>';
 
     public function __construct(private readonly SavePage $savePage) {}
 

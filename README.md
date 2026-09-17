@@ -14,6 +14,7 @@ começar.
 backend/            # Laravel — API REST, /api/v1
 frontend-site/       # Nuxt — site público (SSR/SSG)
 frontend-admin/       # Vue 3 SPA — painel administrativo
+e2e/                  # bateria de ponta a ponta (Playwright) — ver e2e/README.md
 docker/               # imagens de desenvolvimento
 docs/                 # arquitetura, proteção de dados, domínio, convenções
 .github/workflows/    # CI
@@ -148,6 +149,25 @@ npm run build      # SSR
 npm run generate   # SSG
 ```
 
+### Ponta a ponta (Playwright)
+
+O painel administrativo é coberto por uma bateria de ponta a ponta contra a pilha real — API,
+painel e site público em modo de produção, num Firefox de verdade:
+
+```bash
+cd e2e && npm install && npm run test:e2e
+```
+
+Ela sobe os três serviços sozinha (portas 8100/5175/3100, distintas das de desenvolvimento) e
+usa um **terceiro banco**, `lar_analia_franco_e2e`, recriado a cada execução. Só exige o
+Postgres e o Redis do compose no ar. Detalhes, regras de escrita dos testes e o que fazer
+quando o CI falha: `e2e/README.md`.
+
+**Pest, os scripts de concorrência e a bateria de e2e não devem rodar ao mesmo tempo onde
+compartilham banco** — Pest e os scripts de concorrência dividem `lar_analia_franco_test`, e os
+dois rodam `migrate:fresh`. A bateria de e2e tem banco próprio e pode rodar em paralelo com
+qualquer um dos dois.
+
 A configuração de teste vive em `backend/.env.testing` (commitado — só valores fictícios,
 nunca dado real), carregado automaticamente por `APP_ENV=testing`
 (`backend/phpunit.xml`) em vez de `backend/.env`. Para preparar o banco pela primeira vez, ou
@@ -164,6 +184,10 @@ mudança, criar o banco manualmente uma vez:
 ```bash
 docker compose exec postgres psql -U lar -d postgres -c "CREATE DATABASE lar_analia_franco_test;"
 ```
+
+O banco de e2e (`lar_analia_franco_e2e`) tem o mesmo arranjo — `docker/postgres/init-e2e-db.sql`
+no primeiro boot —, mas não precisa de nenhum passo manual num volume já existente:
+`php artisan e2e:prepare` cria o banco sozinho quando ele não existe.
 
 CI (`.github/workflows/ci.yml`) roda os mesmos comandos a cada push/PR, com um container de
 serviço Postgres na mesma versão principal do `docker-compose.yml` (16).
