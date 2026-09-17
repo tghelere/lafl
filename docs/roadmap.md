@@ -169,6 +169,19 @@
       matriz de `docs/dominio.md`. Só backend nesta sessão — tela vem depois (ver pendência
       abaixo). 269 testes Pest, Pint e Larastan verdes.
 
+- [x] Bateria de ponta a ponta do painel administrativo (`e2e/`, Playwright + Firefox):
+      24 testes contra a pilha real em modo de produção (API Laravel, build do painel servido
+      por `vite preview`, site Nuxt em SSR), cobrindo login e acesso por papel, gestão de
+      usuários (link de definição de senha, desativação com sessão aberta, troca da própria
+      senha), transparência (upload, publicação, filtro) e páginas (ida e volta do editor,
+      publicação no site, sanitização, busca). Terceiro banco dedicado
+      (`lar_analia_franco_e2e`) com ambiente próprio em `backend/.env.e2e` e guarda dupla em
+      `php artisan e2e:prepare`, que recusa rodar fora dele. Job `e2e` no CI com Postgres e
+      Redis, publicando trace/captura/vídeo em caso de falha e marcando teste instável em
+      separado. Provado que a bateria pega defeito: filtragem do menu, sanitização do
+      `SavePage` e middleware `EnsureUserIsActive` removidos um a um deixam testes vermelhos
+      — ver `docs/relatorio-sessao-10.md`.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
