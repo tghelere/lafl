@@ -13,7 +13,7 @@
 // pessoa aceitou. Mudou o texto de forma relevante, muda a data nos dois lugares.
 const VERSAO = '2026-09-18'
 
-useSeoMeta({
+usePageSeo({
   title: 'Política de Privacidade — Lar Anália Franco',
   description:
     'O que o Lar Anália Franco coleta pelos formulários deste site, por quanto tempo guarda, '

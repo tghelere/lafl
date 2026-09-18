@@ -362,11 +362,13 @@
       mínima de slug e `updated_at`) e todos os documentos publicados, pela URL legível da
       etapa 3. Saiu de `nitro.prerender.routes` pelo mesmo motivo das páginas do CMS. Falta
       `posts`, que ainda não existe — acrescentar a busca aqui quando existir.
-- [ ] JSON-LD `NGO`/`Organization` — modelar Sede/CEI e Bazar como dois locais distintos
-      (`location`/`department` separados), não um endereço só; ver os dois endereços
-      confirmados em `docs/contexto.md`. Quando chegar a vez de `/contraturno`: descrição
-      institucional apenas, nunca marcada como serviço em operação nem como oferta ativa — o
-      programa ainda não abriu (ver `docs/contexto.md`)
+- [x] JSON-LD `NGO` na home — feito na sessão 21 (tarefa 06, etapa 2), em
+      `app/composables/useOrganizationJsonLd.ts`: CNPJ como `identifier`, logo PNG, telefone,
+      `foundingDate` vindo da API (nunca digitada na página) e os dois locais distintos em
+      `location` (Sede/CEI e Bazar). O contraturno aparece só na descrição, como programa em
+      preparação — sem `makesOffer`, `hasOfferCatalog` ou `Service`, e há teste de ponta a
+      ponta que falha se alguém acrescentar um deles. Falta marcação por página (`WebPage`,
+      `BreadcrumbList`), que depende de nada — só não foi pedida ainda
 - [ ] Eventos Umami nos CTAs
 - [ ] `/educacao-infantil/estrutura` menciona uma galeria de fotos que ainda não existe —
       depende da entidade `media`

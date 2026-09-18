@@ -13,7 +13,7 @@ const WHATSAPP_NUMBER = '5543999500183'
 const WHATSAPP_MESSAGE = 'Olá! Gostaria de agendar uma coleta de doação para o Bazar Beneficente.'
 const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
 
-useSeoMeta({
+usePageSeo({
   title: 'Agendar Coleta — Bazar — Lar Anália Franco',
   description: 'Agende a coleta de itens para doação ao Bazar Beneficente do Lar Anália Franco pelo WhatsApp (43) 99950-0183.',
 })

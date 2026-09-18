@@ -5,7 +5,7 @@
 // adolescente (ver ADR 0007).
 const { hasError, fieldFailed } = useFormErrorState()
 
-useSeoMeta({
+usePageSeo({
   title: 'Avise-me — Contraturno — Lar Anália Franco',
   description: 'Deixe seu contato para ser avisado quando as inscrições da Escola de Contraturno abrirem.',
 })

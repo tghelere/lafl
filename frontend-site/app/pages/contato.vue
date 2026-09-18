@@ -11,7 +11,7 @@ const WHATSAPP_NUMBER = '5543999500183'
 const WHATSAPP_MESSAGE = 'Olá! Gostaria de falar com o Lar Anália Franco.'
 const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
 
-useSeoMeta({
+usePageSeo({
   title: 'Contato — Lar Anália Franco',
   description: 'Fale com o Lar Anália Franco.',
 })

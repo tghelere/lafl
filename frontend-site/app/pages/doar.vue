@@ -11,7 +11,7 @@ if (error.value) {
 
 const page = computed(() => (data.value && 'data' in data.value ? data.value.data : null))
 
-useSeoMeta({
+usePageSeo({
   title: () => page.value?.meta_title || page.value?.title || 'Doar — Lar Anália Franco',
   description: () => page.value?.meta_description || undefined,
 })

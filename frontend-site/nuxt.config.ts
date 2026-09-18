@@ -100,10 +100,16 @@ export default defineNuxtConfig({
         // da API. Prerenderizado, congelaria o acervo no dia do build — publicar um balanço
         // pelo painel exigiria novo deploy para o Google saber que ele existe.
         //
-        // Conteúdo fixo no próprio .vue, sem `usePublicPage` — o painel não edita nenhuma
-        // destas, então prerenderizar continua sendo a melhor opção.
-        '/o-que-fazemos',
-        '/politica-de-privacidade',
+        // '/o-que-fazemos' e '/politica-de-privacidade' saíram na sessão 21, mesmo raciocínio
+        // por um terceiro caminho: o conteúdo delas é fixo, mas o `<link rel="canonical">`, o
+        // `og:url` e o `og:image` que toda página passou a emitir (app/composables/usePageSeo.ts)
+        // são ABSOLUTOS e saem de NUXT_PUBLIC_SITE_URL. Prerenderizadas, essas três tags são
+        // gravadas com o valor do momento do build — e o pacote de deploy é UM só para
+        // homologação e produção (ver .github/workflows/deploy.yml, "Gerar o pacote": nenhuma
+        // NUXT_PUBLIC_* no ambiente do build, de propósito). O resultado seria og:image
+        // relativo, que nenhum rastreador de link resolve, e o risco de um canônico apontando
+        // para o domínio errado. Em SSR as três saem certas nos dois ambientes.
+        //
         // Os cinco formulários (ver docs/estrutura-site.md Parte 2) NÃO entram aqui, de
         // propósito — mesmo raciocínio de /transparencia/documentos: cada página lê
         // route.query (erro=1&campos=...) para reexibir erro de validação sem JavaScript
@@ -117,6 +123,9 @@ export default defineNuxtConfig({
         //
         // Confirmação pós-formulário, noindex — as cinco variações são enumeráveis, então
         // prerenderizamos todas por completude (ver App\Enums\FormSubmissionType no backend).
+        // Continuam aqui, ao contrário das duas acima, porque página `noindex` não emite
+        // canônico nem Open Graph (ver app/composables/usePageSeo.ts): não sobra nenhuma tag
+        // dependente do ambiente para o build congelar.
         '/obrigado/inscricao',
         '/obrigado/coleta',
         '/obrigado/voluntariado',

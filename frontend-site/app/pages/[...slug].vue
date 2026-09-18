@@ -48,11 +48,9 @@ const breadcrumbItems = computed(() => {
   return items
 })
 
-useSeoMeta({
+usePageSeo({
   title: () => page.value?.meta_title || page.value?.title || 'Lar Anália Franco',
   description: () => page.value?.meta_description || undefined,
-  ogTitle: () => page.value?.meta_title || page.value?.title || 'Lar Anália Franco',
-  ogDescription: () => page.value?.meta_description || undefined,
 })
 </script>
 

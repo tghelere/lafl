@@ -3,10 +3,10 @@
 // criança nesta ponta (ver docs/dominio.md).
 const { hasError, fieldFailed } = useFormErrorState()
 
-useSeoMeta({
+usePageSeo({
   title: 'Apoiar o Projeto — Contraturno — Lar Anália Franco',
   description: 'Empresas interessadas em apoiar a Escola de Contraturno do Lar Anália Franco.',
-  robots: 'noindex, nofollow',
+  noindex: true,
 })
 </script>
 

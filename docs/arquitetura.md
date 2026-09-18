@@ -152,10 +152,13 @@ Resistir ao impulso de indexar tudo: cada índice encarece escrita.
 ## SEO (site público)
 
 - SSR/SSG por padrão; nada de conteúdo institucional dependente de JS
-- Meta tags e Open Graph por página, alimentadas pela API
+- Meta tags e Open Graph por página, alimentadas pela API — um composable só
+  (`app/composables/usePageSeo.ts`), nunca repetidos página a página; canônico, `og:url` e
+  `og:image` são absolutos e resolvidos em tempo de execução, o que impede prerenderizar
+  qualquer página indexável (o pacote de deploy é um só para homologação e produção)
 - `sitemap.xml` gerado a partir de `updated_at` dos conteúdos
 - `robots.txt` liberando o site e bloqueando o admin
-- JSON-LD com schema `NGO` / `Organization`
+- JSON-LD com schema `NGO` na home, com os dois locais distintos (Sede/CEI e Bazar)
 - URLs semânticas por slug único, com redirect 301 ao mudar slug
 - `alt` obrigatório em toda imagem — validado na API, não só na interface
 - Campos de meta title e meta description editáveis no painel

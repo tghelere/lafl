@@ -39,9 +39,9 @@ if (!isThankYouType(tipo)) {
 
 const content = MESSAGES[tipo]
 
-useSeoMeta({
+usePageSeo({
   title: `${content.title} — Lar Anália Franco`,
-  robots: 'noindex, nofollow',
+  noindex: true,
 })
 
 const { track } = useUmamiTrack()

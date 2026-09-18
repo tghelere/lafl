@@ -6,11 +6,18 @@ nenhum arquivo de logo é editado dentro de `frontend-site/` ou `frontend-admin/
 O logo usado dentro de componente Vue (header, rodapé, login, sidebar) é `import`ado direto
 daqui — sem cópia, mesmo padrão de `shared/design-tokens/tokens.css` (ver `nuxt.config.ts` e
 `frontend-admin/vite.config.ts`, ambos com `vite.server.fs.allow` liberando acesso a este
-diretório). Favicon e a logo do e-mail são cópia manual e documentada, não import: são
-consumidos fora do grafo de módulos JS (requisição direta de `/favicon.ico`, `<img>` de
-e-mail que precisa de URL absoluta) e por isso vivem em `frontend-site/public/` e
-`frontend-admin/public/`. Se o arquivo de origem mudar, recopiar manualmente — não há script
-de sincronização.
+diretório). Favicon, a logo do e-mail e a imagem Open Graph são cópia manual e documentada,
+não import: são consumidos fora do grafo de módulos JS (requisição direta de `/favicon.ico`,
+`<img>` de e-mail que precisa de URL absoluta, e o rastreador do Facebook/WhatsApp buscando
+`https://dominio/og/og-padrao.png` a partir da meta tag) e por isso vivem em
+`frontend-site/public/` e `frontend-admin/public/`. Se o arquivo de origem mudar, recopiar
+manualmente — não há script de sincronização.
+
+| Cópia manual | Origem |
+|---|---|
+| `frontend-site/public/og/og-padrao.png` | `og/og-padrao.png` |
+| `frontend-site/public/brand/lar-analia-franco-horizontal-600.png` | `lar-analia-franco-horizontal-600.png` |
+| `frontend-site/public/favicon.*`, `apple-touch-icon.png`, `icon-*.png` | `favicon/` |
 
 | Arquivo | Uso |
 |---|---|

@@ -2,12 +2,9 @@
 // Única página com layout próprio (ver docs/decisoes/0009-direcao-visual.md): sem hero de
 // banco de imagem, três pilares com peso visual igual, linha de registro em modo `example`
 // até validação institucional, sem carrossel nem animação decorativa.
-useSeoMeta({
+usePageSeo({
   title: 'Lar Anália Franco — creche, contraturno e bazar em Londrina',
   description:
-    'Associação civil beneficente, filantrópica e de natureza espírita em Londrina. Creche conveniada, escola de contraturno e bazar beneficente, com prestação de contas pública.',
-  ogTitle: 'Lar Anália Franco',
-  ogDescription:
     'Associação civil beneficente, filantrópica e de natureza espírita em Londrina. Creche conveniada, escola de contraturno e bazar beneficente, com prestação de contas pública.',
 })
 
@@ -18,6 +15,11 @@ useSeoMeta({
 const { data: institutionFacts } = await useInstitutionFacts()
 
 const marcos = computed(() => institutionFacts.value?.data.milestones ?? null)
+
+// Dado estruturado da instituição (schema.org NGO), só na home — é a página que representa a
+// organização inteira. A data de fundação vem do mesmo cálculo da linha de registro abaixo,
+// nunca digitada aqui.
+useOrganizationJsonLd(() => marcos.value?.association_founded.date ?? undefined)
 
 // Peso visual igual entre os três pilares — quem chegou pelo bazar não precisa entender o
 // que é um CEI primeiro (ver docs/estrutura-site.md §1.1).

@@ -16,7 +16,7 @@ const fotoPorPilar: Partial<Record<string, FotoSlug>> = {
   '/bazar': 'bazar-entrada',
 }
 
-useSeoMeta({
+usePageSeo({
   title: 'O Que Fazemos — Lar Anália Franco',
   description: 'As três frentes do Lar Anália Franco: educação infantil, escola de contraturno e bazar beneficente.',
 })
