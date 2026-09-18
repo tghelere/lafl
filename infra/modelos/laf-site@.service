@@ -1,0 +1,41 @@
+# Site público (Nitro do Nuxt) — uma instância por ambiente: laf-site@staging,
+# laf-site@production. Ver docs/deploy.md §3 e infra/criar-ambiente.sh.
+
+[Unit]
+Description=Lar Anália Franco — site público (%i)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deploy
+Group=www-data
+
+# WorkingDirectory no link `current`, não na release: a troca atômica do link mais o
+# `systemctl restart` desta unidade é o que faz a publicação valer para o site.
+WorkingDirectory=/var/www/laf/%i/current
+EnvironmentFile=/var/www/laf/%i/shared/site.env
+ExecStart=/usr/bin/node site/server/index.mjs
+
+Restart=always
+RestartSec=3
+# Sem StartLimit: um site que não sobe precisa continuar tentando. Quem decide que o deploy
+# falhou é a checagem de saúde de infra/publicar.sh, que reverte — não o systemd desistindo.
+StartLimitIntervalSec=0
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=laf-site-%i
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+# ProtectHome=true torna /home inacessível, e é de propósito: o serviço não tem o que
+# procurar lá. Em troca, HOME precisa apontar para um lugar gravável, senão qualquer
+# biblioteca que tente escrever cache no diretório do usuário falha por permissão.
+Environment=HOME=/var/www/laf/%i/shared
+
+[Install]
+WantedBy=multi-user.target

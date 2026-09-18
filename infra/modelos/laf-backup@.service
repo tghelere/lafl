@@ -1,0 +1,9 @@
+# Backup do banco — disparado pelo laf-backup@%i.timer. Ver infra/backup-banco.sh.
+
+[Unit]
+Description=Lar Anália Franco — backup do banco (%i)
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/laf-backup-banco %i

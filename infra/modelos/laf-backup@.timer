@@ -1,0 +1,14 @@
+# Backup diário. `Persistent=true` para o backup rodar no próximo boot se a máquina estiver
+# desligada na hora — servidor reiniciado de madrugada não pode custar um dia de backup.
+
+[Unit]
+Description=Lar Anália Franco — backup diário do banco (%i)
+
+[Timer]
+OnCalendar=*-*-* 03:20:00
+RandomizedDelaySec=10m
+Persistent=true
+Unit=laf-backup@%i.service
+
+[Install]
+WantedBy=timers.target

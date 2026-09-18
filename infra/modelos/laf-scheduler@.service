@@ -1,0 +1,43 @@
+# Agendador — uma instância por ambiente. `schedule:work` fica no ar e chama `schedule:run`
+# de minuto em minuto; é o equivalente do container `scheduler` do docker-compose.yml, de
+# propósito (mesma separação em dev e em servidor).
+#
+# Sem ele, o expurgo por retenção e o expurgo de endereço de coleta concluída nunca rodam
+# (ver backend/routes/console.php e docs/protecao-de-dados.md) — e nada quebra de imediato,
+# que é o que torna a falta difícil de perceber.
+#
+# Quem EXECUTA os jobs agendados é o worker (laf-queue@%i): esta unidade só os despacha.
+
+[Unit]
+Description=Lar Anália Franco — agendador (%i)
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+Type=simple
+User=deploy
+Group=www-data
+
+WorkingDirectory=/var/www/laf/%i/current/backend
+ExecStart=/usr/bin/php8.5 artisan schedule:work
+
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=0
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=laf-scheduler-%i
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+# ProtectHome=true torna /home inacessível, e é de propósito: o serviço não tem o que
+# procurar lá. Em troca, HOME precisa apontar para um lugar gravável, senão qualquer
+# biblioteca que tente escrever cache no diretório do usuário falha por permissão.
+Environment=HOME=/var/www/laf/%i/shared
+
+[Install]
+WantedBy=multi-user.target

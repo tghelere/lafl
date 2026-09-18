@@ -1,0 +1,39 @@
+# Worker da fila — uma instância por ambiente. Sem ele, o e-mail de notificação de
+# formulário fica parado no Redis para sempre (ver docs/deploy.md §3).
+
+[Unit]
+Description=Lar Anália Franco — worker da fila (%i)
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+Type=simple
+User=deploy
+Group=www-data
+
+WorkingDirectory=/var/www/laf/%i/current/backend
+# --max-time=3600: o worker sai sozinho de hora em hora e o systemd o levanta de novo. É o
+# que impede vazamento de memória de processo longo e o que faz o worker pegar código novo
+# mesmo sem `queue:restart`.
+ExecStart=/usr/bin/php8.5 artisan queue:work --tries=3 --max-time=3600 --sleep=3
+
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=0
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=laf-queue-%i
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+# ProtectHome=true torna /home inacessível, e é de propósito: o serviço não tem o que
+# procurar lá. Em troca, HOME precisa apontar para um lugar gravável, senão qualquer
+# biblioteca que tente escrever cache no diretório do usuário falha por permissão.
+Environment=HOME=/var/www/laf/%i/shared
+
+[Install]
+WantedBy=multi-user.target

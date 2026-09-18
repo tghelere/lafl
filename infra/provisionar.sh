@@ -129,7 +129,7 @@ passo 'Pacotes base'
 apt-get update -qq
 apt-get install -y -qq \
   ca-certificates curl gnupg lsb-release software-properties-common \
-  ufw fail2ban unattended-upgrades rsync git jq acl
+  ufw fail2ban unattended-upgrades rsync git jq acl apache2-utils
 ok 'utilitários'
 
 # ---------------------------------------------------------------------------
@@ -260,6 +260,31 @@ client_max_body_size 20M;
 add_header X-Content-Type-Options   "nosniff"          always;
 add_header X-Frame-Options          "SAMEORIGIN"       always;
 add_header Referrer-Policy          "strict-origin-when-cross-origin" always;
+CONF
+
+# TLS num snippet NOSSO, e não nos arquivos que o plugin nginx do certbot instala em
+# /etc/letsencrypt: aqueles só aparecem depois de uma execução com `--nginx`, e aqui o
+# certbot roda com `--webroot` justamente para não tocar nos arquivos de site.
+cat > /etc/nginx/snippets/laf-tls.conf <<'CONF'
+# Lar Anália Franco — ver infra/provisionar.sh
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers off;
+ssl_session_cache shared:LAF_TLS:10m;
+ssl_session_timeout 1d;
+ssl_session_tickets off;
+
+# Sem ssl_dhparam de propósito: as suítes em uso são todas ECDHE, e o parâmetro só vale
+# para DHE. Gerar um arquivo de 4096 bits para nada custa minutos no provisionamento.
+
+# HSTS no snippet de TLS, e não em cada server{}: um host que ficasse de fora passaria a
+# aceitar downgrade para HTTP sem ninguém notar. `always` para valer também em resposta de
+# erro — é justamente no 5xx que o navegador não pode esquecer o HTTPS.
+#
+# SEM `includeSubDomains`: em produção este cabeçalho sai do domínio raiz, e a diretiva
+# valeria para TODO subdomínio dele — inclusive os que a instituição venha a usar para
+# outra coisa e que não estejam em HTTPS. O navegador guarda isso por um ano e não há como
+# desfazer do lado dele. Cada host do sistema recebe o cabeçalho por si.
+add_header Strict-Transport-Security "max-age=31536000" always;
 CONF
 
 # Webroot único do ACME, compartilhado pelos seis hosts. `certbot --webroot` em vez de
