@@ -20,7 +20,7 @@ inverter as duas era a única forma de cada commit fechar uma etapa inteira, com
 | 3 — PDFs indexáveis | `1f1f7d1` |
 | 1 — sitemap real | `cb7985b` |
 | 2 — metadados e JSON-LD | `21ddc20` |
-| 4 — página de documentos | `0000000` |
+| 4 — página de documentos | `c1b172f` |
 
 ## Etapa 3 — o PDF ganhou endereço (commit `1f1f7d1`)
 
@@ -145,7 +145,7 @@ nunca aparecia na bateria.
 | Pint e PHPStan | limpos (PHPStan com `--memory-limit=1G`, ver roadmap) |
 | `npm run build` do site | ok |
 | `npm run lint` e `npm run build` do painel | ok |
-| Ponta a ponta | 91 testes, 21 novos; verdes |
+| Ponta a ponta | 91 testes, 21 novos; verdes (`c763b5a` corrigiu um teste de outra área que falhou) |
 | `curl -I` do PDF | `200`, `application/pdf`, `inline; filename=balanco-patrimonial-2024.pdf`, `max-age=3600` |
 | Sitemap | XML válido por parser, 42 `<loc>`, sem repetição, todas respondendo 200 |
 | JSON-LD | validado contra o vocabulário schema.org oficial |
@@ -202,6 +202,11 @@ reproduzida**, não como resolvida. Nada da sessão toca autenticação, sessão
    cópias manuais entrou no `LEIA-ME.md` da marca.
 8. **Página `noindex` não emite canônico nem Open Graph** (a tarefa pedia "todas as páginas";
    a leitura restritiva é não mandar sinal contraditório).
+
+Fechamento: `ac72df4` (documentação e as duas ADRs). Conferência visual feita no navegador
+(Playwright MCP, Firefox): a página de documentos filtrada renderiza com o título certo, e a
+URL do PDF **abre no leitor do próprio navegador**, com `balanco-patrimonial-2024.pdf` no topo
+— que é o comportamento que o `curl -I` sozinho não mostra.
 
 ## O que ficou de fora, e por quê
 
