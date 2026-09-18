@@ -10,7 +10,7 @@ hora de usar — o repositório nunca é clonado lá.
 
 | Arquivo | Onde roda | Para quê |
 |---|---|---|
-| `provisionar.sh` | servidor, como root | base comum: Nginx, PHP-FPM, Node, PostgreSQL, Redis, Certbot, firewall, `fail2ban`, usuário `deploy` |
+| `provisionar.sh` | servidor, como root | base comum: Nginx, PHP-FPM, Node, PostgreSQL, Redis, Certbot, firewall, `fail2ban`, usuários `deploy` e `sysadmin` |
 | `criar-ambiente.sh` | servidor, como root | um ambiente (`staging` ou `production`): banco, `.env`, hosts do Nginx, TLS, serviços, backup |
 | `publicar.sh` | servidor, como `deploy` | recebe um pacote, cria a release, troca o link, confere a saúde e **reverte sozinho** se falhar |
 | `reverter.sh` | servidor, como `deploy` | volta para a release anterior à mão |
@@ -23,22 +23,27 @@ hora de usar — o repositório nunca é clonado lá.
 # Na sua máquina — envie infra/ para o servidor (o repositório NÃO vai junto).
 rsync -av --delete infra/ root@IP:/root/laf-infra/
 
-# 1. Base do servidor. Cria o usuário `deploy` com a sua chave.
-ssh root@IP '/root/laf-infra/provisionar.sh --chave-publica "'"$(cat ~/.ssh/id_ed25519.pub)"'"'
+# 1. Base do servidor. Cria `deploy` (chave do GitHub Actions) e `sysadmin` (sua chave).
+ssh root@IP '/root/laf-infra/provisionar.sh \
+  --chave-publica       "'"$(cat ~/.ssh/laf-deploy.pub)"'" \
+  --chave-publica-admin "'"$(cat ~/.ssh/id_ed25519.pub)"'"'
 
-# 2. CONFIRME o acesso do usuário novo antes de trancar a porta.
-ssh deploy@IP 'echo entrou'
+# 2. CONFIRME os dois acessos novos antes de trancar a porta.
+ssh deploy@IP   'echo entrou'
+ssh sysadmin@IP 'sudo -n whoami'      # precisa imprimir "root"
 
-# 3. Só agora: desativa login de root e senha por SSH.
+# 3. Ambiente de homologação. (--hosts-na-raiz quando a homologação mora em domínio próprio.)
+ssh root@IP '/root/laf-infra/criar-ambiente.sh --ambiente staging --dominio SEUDOMINIO \
+  --hosts-na-raiz --email-tls voce@exemplo.org --email-de-teste teste@exemplo.org'
+
+# 4. POR ÚLTIMO: desativa login de root e senha por SSH.
 ssh root@IP '/root/laf-infra/provisionar.sh --trancar-ssh --eu-confirmo'
-
-# 4. Ambiente de homologação.
-ssh root@IP '/root/laf-infra/criar-ambiente.sh --ambiente staging --dominio SEUDOMINIO --email-tls voce@exemplo.org'
 ```
 
-O passo 3 é separado do 1 de propósito: desativar senha e root antes de confirmar que a
-chave do usuário novo funciona é trancar a porta com a chave do lado de dentro, e recuperar
-isso numa VPS depende do console da hospedagem.
+Trancar vem depois do passo 2 porque desativar senha e root antes de confirmar que a chave
+do usuário novo funciona é trancar a porta com a chave do lado de dentro, e recuperar isso
+numa VPS depende do console da hospedagem. E vem depois do passo 3 porque o passo 3 roda
+como root — daí em diante, `criar-ambiente.sh` se roda por `ssh sysadmin@IP` + `sudo`.
 
 ## O que fica onde, no servidor
 

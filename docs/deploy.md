@@ -14,6 +14,24 @@ pacote atende os dois ambientes) e `docs/protecao-de-dados.md` (chaves e retenç
 
 ---
 
+## 0. O que está no ar hoje
+
+| | |
+|---|---|
+| VPS | Hostinger, `2.25.223.146`, Ubuntu 24.04 LTS |
+| Homologação | site `homologacao-laf.softhing.com.br`, API `api.homologacao-laf…`, painel `painel.homologacao-laf…` |
+| Produção | **não existe** — só é criada quando o lançamento for decidido (ver §10) |
+| Publicação automática | ligada para `staging`, desligada para `production` |
+
+Onde estão os segredos deste ambiente: as três chaves e a senha do banco só existem em
+`/var/www/laf/staging/shared/.env`, no servidor; a senha da autenticação básica do site
+existe só como hash em `/etc/nginx/laf-staging.htpasswd`. Nenhum dos dois é recuperável a
+partir do repositório — a cópia de trabalho vive no cofre de senhas.
+
+Pendência conhecida deste ambiente: **SMTP não configurado**. O `.env` está com
+`MAIL_MAILER=log`, então nenhum e-mail sai da máquina — o conteúdo renderizado vai para
+`storage/logs/laravel.log`, com o destinatário já reescrito por `MAIL_ALWAYS_TO`. Ver §4.
+
 ## 1. O que o servidor precisa ter
 
 Instalado por `infra/provisionar.sh`. As versões são as mesmas do `docker-compose.yml` e do
@@ -33,12 +51,33 @@ SQLite: "verde no CI" só quer dizer alguma coisa quando o CI roda contra o que 
 Nada é buildado no servidor: `composer install`, `nuxt build` e `vite build` acontecem no CI,
 dentro de `scripts/deploy/empacotar.sh`. O servidor recebe o pacote pronto.
 
-Segurança básica, também do `provisionar.sh`: usuário `deploy` sem senha e só com chave, login
+Segurança básica, também do `provisionar.sh`: dois usuários sem senha e só com chave, login
 de root e senha por SSH desativados, `ufw` com 22/80/443, `fail2ban` no `sshd`, atualizações
 automáticas só do repositório de segurança e sem reinício automático.
 
-O `sudo` do `deploy` é uma **lista fechada** de recarregamentos (`/etc/sudoers.d/laf-deploy`) —
-a chave que o GitHub Actions usa não pode virar root na máquina se um dia vazar.
+### Os dois usuários
+
+| Usuário | Chave | `sudo` | Para quê |
+|---|---|---|---|
+| `deploy` | a que vive no segredo `DEPLOY_SSH_KEY` do GitHub | **lista fechada** de recarregamentos (`/etc/sudoers.d/laf-deploy`) | receber o pacote e publicar |
+| `sysadmin` | a chave pessoal de quem administra | completo, `NOPASSWD` (`/etc/sudoers.d/laf-sysadmin`) | administrar a máquina: `criar-ambiente.sh`, reprovisionar, investigar |
+
+São dois de propósito. O `sudo` do `deploy` é fechado porque a chave dele vive num segredo do
+repositório: irrestrito, qualquer vazamento daquele segredo viraria root na máquina da
+instituição. Mas com o login de root desativado alguém precisa continuar podendo administrar o
+servidor, e nada em `criar-ambiente.sh` cabe naquela lista — daí o `sysadmin`, com a chave
+pessoal e mais nada.
+
+> **Quem tem a chave do `sysadmin` tem root na máquina.** O `NOPASSWD` não é conveniência: a
+> conta entra só com chave e tem a senha travada (`passwd -l`), e a regra padrão do grupo
+> `sudo` do Ubuntu pede senha — sem ele o usuário estaria no grupo certo e ainda assim não
+> viraria root, que é o servidor sem administrador que ele existe para evitar. O poder é o
+> mesmo de `PermitRootLogin prohibit-password`, com três ganhos: a conta tem nome, o `sudo`
+> registra cada comando, e revogar uma chave é apagar uma linha.
+
+O nome é `sysadmin`, e não `admin`, porque o Ubuntu já traz um grupo `admin` legado e o
+`/etc/sudoers` da distribuição dá `%admin ALL=(ALL) ALL` a ele: um usuário chamado `admin`
+colidiria na criação do grupo primário e ganharia sudo por um caminho que não é o nosso.
 
 ## 2. Ambientes
 
@@ -64,6 +103,13 @@ compartilhado entre os dois além do sistema operacional.
 
 Os três hosts de cada ambiente ficam sob o **mesmo domínio raiz**, exigência do modo cookie do
 Sanctum (ver `docs/decisoes/0003-sanctum-cookie-mode.md`).
+
+> **Homologação em domínio próprio.** A tabela acima supõe a homologação dentro do domínio de
+> produção (`homologacao.DOMINIO`). Quando ela mora num domínio dedicado — que é o caso hoje,
+> em `homologacao-laf.softhing.com.br` — passe `--hosts-na-raiz` para `criar-ambiente.sh` e os
+> três hosts saem da raiz do domínio informado: `DOMINIO`, `api.DOMINIO`, `painel.DOMINIO`.
+> Sem a opção, o nome sairia repetido (`homologacao.homologacao-laf…`). A opção vale só para
+> `staging`: em produção os hosts já saem da raiz, e o script recusa recebê-la lá.
 
 > **O prefixo do Redis é por ambiente, e isso não é detalhe.** O padrão do projeto é derivado
 > de `APP_NAME` e seria idêntico nos dois. Com um Redis só na máquina, staging e production
@@ -105,6 +151,12 @@ preencher à mão, depois, é **SMTP e destinatários**:
 - `FORM_RECIPIENT_*` — endereços **reais** da instituição nos dois. Em staging ninguém recebe
   nada mesmo assim, por causa do `MAIL_ALWAYS_TO`, e é de propósito que estejam lá: é assim que
   a homologação testa a configuração que vai para produção.
+
+> **`MAIL_MAILER=log` engole o e-mail em `LOG_LEVEL=info`.** O transporte `log` grava no
+> nível **debug**; com o log em `info`, a fila registra `DONE` e não existe arquivo nenhum
+> para olhar. Para conferir um envio de homologação: baixar `LOG_LEVEL` para `debug`,
+> `config:cache`, reiniciar `laf-queue@staging`, enviar, ler `storage/logs/laravel.log` e
+> voltar o nível. A armadilha está anotada no próprio `.env` do servidor.
 
 > Deixar um `FORM_RECIPIENT_*` **definido e vazio** é pior que não defini-lo: o Laravel usa a
 > string vazia como destinatário em vez de cair no padrão de `config/forms.php` (bug real deste
@@ -185,35 +237,52 @@ Pré-requisitos, fora do Claude Code e fora destes scripts:
 # Envie infra/ para o servidor. O repositório NÃO vai junto (ADR 0014).
 rsync -av --delete infra/ root@IP:/root/laf-infra/
 
-# 1. Base do servidor, e cria o usuário `deploy` com a sua chave.
-ssh root@IP '/root/laf-infra/provisionar.sh --chave-publica "'"$(cat ~/.ssh/id_ed25519.pub)"'"'
+# 1. Base do servidor, e cria os dois usuários com a chave de cada um.
+ssh root@IP '/root/laf-infra/provisionar.sh \
+  --chave-publica       "'"$(cat ~/.ssh/laf-deploy.pub)"'" \
+  --chave-publica-admin "'"$(cat ~/.ssh/id_ed25519.pub)"'"'
 
-# 2. CONFIRME o acesso do usuário novo — em outro terminal, sem fechar o primeiro.
-ssh deploy@IP 'echo entrou'
+# 2. CONFIRME os dois acessos novos — em outro terminal, sem fechar o primeiro.
+ssh deploy@IP   'echo entrou'
+ssh sysadmin@IP 'sudo -n whoami'      # precisa imprimir "root"
 
-# 3. Só agora: desativa login de root e senha por SSH.
-ssh root@IP '/root/laf-infra/provisionar.sh --trancar-ssh --eu-confirmo'
-
-# 4. Ambiente de homologação (banco, TLS, serviços, backup).
+# 3. Ambiente de homologação (banco, TLS, serviços, backup). Ainda como root, ou já
+#    como `sudo` pelo sysadmin — tanto faz, desde que o passo 2 tenha passado.
 ssh root@IP '/root/laf-infra/criar-ambiente.sh \
-  --ambiente staging --dominio SEUDOMINIO \
+  --ambiente staging --dominio SEUDOMINIO --hosts-na-raiz \
   --email-tls voce@exemplo.org --email-de-teste teste@exemplo.org'
+
+# 4. POR ÚLTIMO: desativa login de root e senha por SSH.
+ssh root@IP '/root/laf-infra/provisionar.sh --trancar-ssh --eu-confirmo'
 ```
 
-O passo 3 é separado do 1 de propósito: desativar senha e root antes de confirmar que a chave
-do usuário novo funciona é trancar a porta com a chave do lado de dentro, e recuperar isso numa
-VPS depende do console da hospedagem.
+**A ordem importa em dois lugares.**
 
-O passo 4 imprime, uma única vez, **as três chaves, a senha do banco e a senha da autenticação
-básica do site de homologação**. Anote antes de fechar o terminal.
+Trancar o SSH vem **depois** de confirmar os acessos novos (passo 2), e não antes: desativar
+senha e root sem saber se a chave do usuário novo funciona é trancar a porta com a chave do
+lado de dentro, e recuperar isso numa VPS depende do console da hospedagem. O
+`provisionar.sh --trancar-ssh` se recusa a rodar se `deploy` ou `sysadmin` estiverem sem
+chave, ou se o `sysadmin` não estiver no grupo `sudo`.
+
+Trancar vem **por último**, depois de criar o ambiente, porque o passo 3 roda como root — e
+é justamente o root por SSH que o passo 4 desativa. Depois de trancado, qualquer
+`criar-ambiente.sh` novo (produção, por exemplo) passa a ser `ssh sysadmin@IP` +
+`sudo /root/laf-infra/criar-ambiente.sh …`.
+
+O passo 3 imprime, uma única vez, **as três chaves, a senha do banco e a senha da autenticação
+básica do site de homologação**. Anote antes de fechar o terminal. Se ele falhar no meio (por
+DNS, por exemplo) depois de já ter criado o `.env`, a execução seguinte **não reimprime as
+chaves** — elas continuam no `.env` do servidor, e a senha da autenticação básica, que é
+guardada só como hash, se recupera apagando `/etc/nginx/laf-<ambiente>.htpasswd` e rodando o
+script de novo.
 
 ### Ligar a publicação automática
 
-Chave dedicada de deploy — **não** reaproveite a sua chave pessoal:
+Chave dedicada de deploy — **não** reaproveite a sua chave pessoal. É ela que vai no
+`--chave-publica` do passo 1 acima, então gere antes de provisionar:
 
 ```bash
 ssh-keygen -t ed25519 -f ~/.ssh/laf-deploy -C 'github-actions@laf' -N ''
-ssh-copy-id -i ~/.ssh/laf-deploy.pub deploy@IP
 
 gh secret   set DEPLOY_SSH_KEY     < ~/.ssh/laf-deploy
 gh secret   set DEPLOY_HOST        --body 'IP_OU_HOST'
@@ -226,6 +295,9 @@ gh variable set DEPLOY_STAGING_HABILITADO --body true
 Enquanto `DEPLOY_STAGING_HABILITADO` não for `true`, o workflow roda o CI e o empacotamento
 e **pula** a publicação. É o que permite o automatismo existir antes do servidor existir, sem
 deixar a `main` vermelha a cada push.
+
+> O trinco vale **também para o disparo manual**: o botão não publica com a variável em
+> `false`. Ligar não é um passo posterior ao primeiro deploy — é pré-requisito dele.
 
 `DEPLOY_KNOWN_HOSTS` existe para não usar `StrictHostKeyChecking=no`: sem ele, qualquer coisa
 que responda naquele IP receberia o pacote e o comando de deploy.
@@ -355,12 +427,17 @@ colar em log de deploy nem em chat de equipe. Perdido ou expirado, gerar outro p
 **Conferir que ficou de pé:**
 
 ```bash
-curl -sI https://api.DOMINIO/up                      # 200
-curl -sI https://DOMINIO/ | grep -i x-robots-tag     # produção: nada; homologação: noindex
-curl -sI https://homologacao.DOMINIO/                # homologação: 401 sem usuário e senha
-curl -s  https://DOMINIO/robots.txt                  # produção: Allow; homologação: Disallow
-php8.5 artisan schedule:list                         # os dois expurgos agendados
+curl -sI https://api.DOMINIO/up                       # 200
+curl -sI https://HOST_DO_SITE/                        # homologação: 401 sem usuário e senha
+# Em homologação, tudo o que for atrás da autenticação básica precisa de -u:
+curl -sI -u 'homologacao:SENHA' https://HOST_DO_SITE/            | grep -i x-robots-tag
+curl -sI -u 'homologacao:SENHA' https://HOST_DO_SITE/nao-existe  | grep -i x-robots-tag
+curl -s  -u 'homologacao:SENHA' https://HOST_DO_SITE/robots.txt  # homologação: Disallow
+php8.5 artisan schedule:list                          # os dois expurgos agendados
 ```
+
+O `X-Robots-Tag` precisa aparecer **também no 404**: quem emite é o Nitro, em toda resposta,
+e conferir só a home deixaria de fora justamente as respostas que escapam da navegação.
 
 E, no navegador: entrar no painel pelo link de definição de senha, editar uma página e ver a
 alteração no site.
@@ -373,9 +450,12 @@ lançamento for decidido. Quando for:
 1. **DNS.** Três registros A novos para o IP da VPS: o apex (`DOMINIO`), `api` e `painel`.
 2. **Decidir a política de backup** com a instituição, antes de haver dado real de assistido
    (§14). O padrão do script é 30 dias, que é um mínimo, não uma decisão.
-3. **Criar o ambiente:**
+3. **Criar o ambiente.** Root por SSH já está desativado a esta altura, então o caminho é o
+   `sysadmin`. Sem `--hosts-na-raiz`: em produção os hosts já saem da raiz do domínio, e o
+   script recusa a opção lá.
    ```bash
-   ssh root@IP '/root/laf-infra/criar-ambiente.sh \
+   rsync -av --delete infra/ sysadmin@IP:/tmp/laf-infra/ && \
+   ssh sysadmin@IP 'sudo /tmp/laf-infra/criar-ambiente.sh \
      --ambiente production --dominio SEUDOMINIO --email-tls voce@exemplo.org'
    ```
    Sem `--email-de-teste`: `MAIL_ALWAYS_TO` fica **ausente** em produção. Preenchida lá,
