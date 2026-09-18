@@ -289,6 +289,23 @@
       (`docs/decisoes/0014-pacote-de-deploy-minimo.md`) e `docs/deploy.md`. Simulado o primeiro
       deploy num banco vazio, a partir do pacote podado. Ver `docs/relatorio-sessao-16.md`.
 
+- [x] **Servidor, homologação e deploy automático (sessão 17,
+      `docs/tarefas/07b-servidor-homologacao-e-deploy-automatico.md`).** Escrito, não
+      executado: o domínio ainda não está registrado e a VPS ainda não existe, então nada foi
+      provisionado de verdade. O que existe agora é `infra/` — o servidor descrito em script
+      idempotente em vez de na memória de quem provisionar: `provisionar.sh` (Nginx, PHP-FPM
+      8.5, Node 24, PostgreSQL 16, Redis, Certbot, `ufw`, `fail2ban`, usuário `deploy` com
+      `sudo` de lista fechada, trancamento do SSH em segunda passada), `criar-ambiente.sh` (um
+      ambiente inteiro: banco e usuário próprios, três hosts com TLS por `--webroot`,
+      autenticação básica só no site de homologação, pool de PHP-FPM, três serviços systemd,
+      backup diário), `publicar.sh` (release ao lado, troca atômica por `mv -T`, checagem de
+      saúde e reversão automática), `reverter.sh` e `backup-banco.sh`. `.github/workflows/
+      deploy.yml` publica em homologação a cada push na `main` e em produção por tag `v*`,
+      travado por variável de repositório enquanto o servidor não existe. O painel passou a
+      ler a configuração em tempo de execução
+      (`docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md`), o que tornou o pacote
+      promovível inteiro. `docs/deploy.md` reescrito. Ver `docs/relatorio-sessao-17.md`.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
