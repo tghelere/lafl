@@ -81,6 +81,12 @@ consequência, "promover para produção o mesmo pacote já validado em homologa
 de produção**. Ou isso, ou o painel passa a ler a configuração em tempo de execução — decisão
 para a 07b, não para esta.
 
+> **Decidido na 07b pela segunda saída** — ver
+> `docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md`. O painel lê
+> `window.__LAF_CONFIG__` de um `/config.js` servido fora do bundle e reescrito no servidor,
+> e com isso o pacote passou a ser promovível inteiro, painel incluído. O parágrafo acima
+> descreve a consequência que existia; ela não vale mais.
+
 **Nada de `artisan make:*` no servidor útil** — os `stubs/` do projeto não vão junto. É o
 esperado: ninguém desenvolve no servidor.
 

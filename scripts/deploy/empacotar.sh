@@ -10,9 +10,11 @@
 # Uso:
 #   scripts/deploy/empacotar.sh [--saida DIR] [--permitir-arvore-suja] [--sem-tar]
 #
-# Variáveis de build do PAINEL (Vite grava o valor DENTRO do bundle, ver a ADR):
-#   VITE_API_URL, VITE_SITE_URL, VITE_SESSION_IDLE_TIMEOUT_MINUTES
-# O site (Nuxt) não precisa de nenhuma: as NUXT_PUBLIC_* são lidas em tempo de execução.
+# Nenhuma variável de ambiente é necessária para gerar o pacote, e é de propósito: o painel
+# lê a configuração de `painel/config.js` em tempo de EXECUÇÃO (ver
+# docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md) e o site lê as NUXT_PUBLIC_*
+# do processo Nitro. O mesmo pacote atende homologação e produção — o que muda é o `.env` e o
+# `config.js`, os dois criados no servidor.
 
 set -euo pipefail
 
@@ -233,6 +235,10 @@ exigido 'site/server/index.mjs'
 exigido 'site/public/_nuxt'
 exigido 'painel/index.html'
 exigido 'painel/assets'
+# Configuração do painel em tempo de execução. Sem este arquivo o `<script src="/config.js">`
+# do index.html dá 404, o painel cai no valor gravado no bundle e passa a falar com a API de
+# outro ambiente — sem nenhum sinal na tela (ver a ADR 0015).
+exigido 'painel/config.js'
 
 # Marca: o que o site serve de fato. Os dois frontends leem shared/brand/ em tempo de BUILD
 # (ver frontend-site/nuxt.config.ts), então o pacote não carrega `shared/` — o que precisa
