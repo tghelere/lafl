@@ -20,7 +20,7 @@ retenção).
 
 | | |
 |---|---|
-| VPS | Hostinger, `2.25.223.146`, Ubuntu 24.04 LTS |
+| VPS | Hostinger, `2.25.223.146`, Ubuntu 24.04 LTS, **nos Estados Unidos** |
 | Homologação | site `homologacao-laf.softhing.com.br`, API `api.homologacao-laf…`, painel `painel.homologacao-laf…` |
 | Produção | **não existe** — só é criada quando o lançamento for decidido (ver §10) |
 | Publicação automática | ligada para `staging`, desligada para `production` |
@@ -29,6 +29,13 @@ Onde estão os segredos deste ambiente: as três chaves e a senha do banco só e
 `/var/www/laf/staging/shared/.env`, no servidor; a senha da autenticação básica do site
 existe só como hash em `/etc/nginx/laf-staging.htpasswd`. Nenhum dos dois é recuperável a
 partir do repositório — a cópia de trabalho vive no cofre de senhas.
+
+**A máquina fica nos Estados Unidos**, não no Brasil — o data center brasileiro do provedor
+estava indisponível na contratação. Isso não é detalhe de infraestrutura: torna todo dado
+enviado pelos formulários do site uma **transferência internacional** sob a LGPD, que
+`/politica-de-privacidade` precisa declarar e declara. Ver `docs/protecao-de-dados.md`,
+"Transferência internacional". Trocar a região do servidor é mudança de política pública, não
+só de infra: exige atualizar aquela página e subir `FORM_CONSENT_TERMS_VERSION`.
 
 Pendência conhecida deste ambiente: **SMTP não configurado**. O `.env` está com
 `MAIL_MAILER=log`, então nenhum e-mail sai da máquina — o conteúdo renderizado vai para

@@ -168,6 +168,28 @@ de tudo que se tentou proteger.
 5. Servir por rota autenticada com Policy; foto de assistido nunca tem URL pública direta
 6. Foto no site público: apenas com consentimento vigente e **sem nome completo associado**
 
+## Transferência internacional
+
+**O servidor fica nos Estados Unidos** (Hostinger; `whois` do IP devolve `country: US`). Não foi
+escolha de arquitetura: o data center brasileiro do provedor está indisponível, e essa foi a
+alternativa. Vale para homologação e, enquanto a situação não mudar, valerá para produção.
+
+Isso é **transferência internacional de dados** (LGPD art. 33). Consequências práticas, não
+formais:
+
+- Os Estados Unidos não constam de decisão de adequação da ANPD. A transferência se apoia no
+  consentimento do titular (art. 33, VIII), que precisa ser **específico e destacado** — é por
+  isso que `/politica-de-privacidade` tem seção própria sobre isso, e não uma linha perdida no
+  meio de outro parágrafo.
+- Consentimento como base de transferência é o fundamento mais frágil dos disponíveis: é
+  revogável, e não cobre tratamento sem consentimento. **Nenhum dado de assistido pode ir para
+  esse servidor** enquanto o domínio de assistidos existir só no papel — quando existir, a
+  decisão de onde ele roda volta à mesa, e a resposta provavelmente não é "no mesmo lugar".
+- A cifra de campo (`FieldEncrypted`) e a chave fora do banco continuam sendo a única proteção
+  que independe de jurisdição. Isso é argumento a favor de cifrar mais campos, não de relaxar.
+- Voltar a hospedagem para o Brasil é mudança de política pública: exige atualizar
+  `/politica-de-privacidade` e subir `FORM_CONSENT_TERMS_VERSION`.
+
 ## Resposta a incidente
 
 Plano documentado, com responsável nomeado e prazo de comunicação à ANPD e aos titulares.
@@ -179,6 +201,7 @@ Ensaiar pelo menos uma vez antes de produção.
       legal, prazo de retenção
 - [ ] Nomear Encarregado (DPO) e publicar contato no site
 - [ ] Redigir e versionar termos de consentimento (atendimento, imagem, comunicação)
-- [ ] Publicar política de privacidade
+- [x] Publicar política de privacidade — `/politica-de-privacidade`, reescrita na sessão 20 a
+      partir do código. Continua dependendo dos dois itens acima antes de produção
 - [ ] Validação jurídica antes de produção
 - [ ] Definir prazos legais de guarda por tipo de documento

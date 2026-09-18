@@ -515,10 +515,39 @@ uma camada de cache de HTML por cima.
       serviço do site público (Nuxt) — sem isso, o rate limit por IP dos cinco formulários passa
       a ver sempre o IP do próprio Nuxt, não o do visitante
       (ver `frontend-site/server/api/forms/[tipo].post.ts`)
-- [ ] `/politica-de-privacidade` é rascunho de trabalho — mesmo tratamento do resto do
-      conteúdo institucional (ver `docs/contexto.md`): precisa de validação jurídica antes de
-      produção (já registrado como pendência geral em `docs/protecao-de-dados.md`), e de um
-      Encarregado/DPO nomeado antes de publicar um canal de contato específico para isso
+- [x] `/politica-de-privacidade` deixou de ser rascunho: reescrita na sessão 20 a partir de um
+      levantamento do código (ver `docs/relatorio-sessao-20.md`), afirmação por afirmação. O
+      aviso de "rascunho de trabalho" saiu do texto público.
+
+### Política de privacidade — pendências que sobreviveram à reescrita
+
+Nenhuma delas pode virar texto público antes de estar resolvida. Todas são **bloqueantes para
+produção**, não para homologação.
+
+- [ ] **Validação jurídica antes de produção.** O texto é fiel ao código, o que é uma garantia
+      de engenharia — não é parecer jurídico. Já registrado como pendência geral em
+      `docs/protecao-de-dados.md`; fica repetido aqui porque agora existe uma página publicada
+      que dá a impressão de estar pronta.
+- [ ] **Encarregado (DPO) nomeado**, com canal próprio publicado na política. Hoje a página
+      direciona aos canais gerais da instituição (formulário de contato, telefone, endereço) —
+      correto enquanto não há DPO, insuficiente quando houver.
+- [ ] **`FORM_CONSENT_TERMS_VERSION` no `.env` de cada servidor.** A variável vive em
+      `shared/.env`, que o deploy **não** sobrescreve: subir a nova política sem atualizar o
+      `.env` do servidor faz a API gravar em `consent_terms_version` o número de uma versão que
+      já saiu do ar. Atualizar no mesmo deploy em que o texto muda, em homologação e em
+      produção.
+- [ ] **A política afirma coisas que dependem da configuração do servidor, não do código.** Se
+      qualquer uma mudar, o texto mente até ser corrigido:
+      - "o registro técnico de acesso do servidor é descartado após 14 dias" — vem do
+        `logrotate` do nginx (`daily`, `rotate 14`), não do repositório;
+      - "nenhuma ferramenta de medição de audiência está ativa" — vale enquanto
+        `NUXT_PUBLIC_UMAMI_*` estiver vazia no `site.env`. Ligar o Umami exige atualizar a
+        política **e** subir a versão, antes de ligar;
+      - "o servidor fica nos Estados Unidos" — muda quando a hospedagem voltar para o Brasil.
+- [ ] **Retenção das cópias de segurança em produção.** A política diz que uma cópia pode
+      conter registro já apagado até ser descartada, sem prometer prazo — porque produção ainda
+      não tem política de retenção definida (homologação usa 7 dias, ver
+      `/etc/laf/<ambiente>.conf`). Definido o prazo de produção, vale dizê-lo na página.
 - [ ] `php artisan queue:work` (ou `schedule:work` para os jobs de expurgo) precisa estar
       rodando em produção — nada disparado por este código roda sozinho sem um worker; ver
       `docker-compose.yml`, que hoje não tem um serviço dedicado a isso
@@ -528,7 +557,11 @@ uma camada de cache de HTML por cima.
       Aceitamos") e Educação Infantil (link para a nova página de Matrícula). Notícias,
       Voluntariado e Contato ainda dependem de página própria que não existe.
 - [ ] Prazos de retenção usados (12/6/24/36/6 meses, ver `docs/estrutura-site.md` §2.2) são
-      os sugeridos no documento, não confirmados pela instituição — ver `[VALIDAR]` abaixo
+      os sugeridos no documento, não confirmados pela instituição — ver `[VALIDAR]` abaixo.
+      **Subiu de importância na sessão 20:** esses números agora estão publicados em
+      `/politica-de-privacidade`, então deixaram de ser sugestão interna e viraram compromisso
+      com o titular. Confirmar com a instituição antes de produção; mudá-los depois exige mudar
+      a política e subir a versão do termo
 
 ### Validações pendentes com a instituição
 
