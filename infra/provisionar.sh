@@ -405,7 +405,7 @@ cat <<RESUMO
   node      $(node --version)
   postgres  $(psql --version | awk '{print $3}')
   redis     $(redis-server --version | grep -oE 'v=[0-9.]+' | cut -d= -f2)
-  nginx     $(nginx -v 2>&1 | grep -oE '[0-9.]+$')
+  nginx     $(nginx -v 2>&1 | grep -oE 'nginx/[0-9.]+' | cut -d/ -f2)
   certbot   $(certbot --version 2>&1 | awk '{print $2}')
 
   Próximos passos:

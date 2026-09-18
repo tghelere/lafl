@@ -8,10 +8,10 @@ Leia `docs/tarefas/README.md`, `docs/deploy.md` e a ADR do pacote de deploy (amb
 ## Preencher antes de rodar (Thyago)
 
 ```
-DOMINIO=                      # ex.: laranaliafrancolondrina.org.br
-IP_DA_VPS=
-USUARIO_SSH_INICIAL=root      # ou o usuário que a Hostinger criou
-EMAIL_DE_TESTE=               # recebe todos os e-mails da homologação
+DOMINIO=homologacao-laf.softhing.com.br
+IP_DA_VPS=2.25.223.146
+USUARIO_SSH_INICIAL=root
+EMAIL_DE_TESTE=thyagoghelere@hotmail.com
 ```
 
 Pré-requisitos manuais, fora do Claude Code:

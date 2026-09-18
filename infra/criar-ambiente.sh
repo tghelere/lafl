@@ -9,8 +9,13 @@
 #
 # Uso:
 #   ./criar-ambiente.sh --ambiente staging    --dominio exemplo.org.br --email-tls voce@exemplo.org \
-#                       [--email-de-teste teste@exemplo.org]
+#                       [--email-de-teste teste@exemplo.org] [--hosts-na-raiz]
 #   ./criar-ambiente.sh --ambiente production --dominio exemplo.org.br --email-tls voce@exemplo.org
+#
+# --hosts-na-raiz (só staging): o domínio passado JÁ É o domínio da homologação, e os três
+# hosts saem dele direto — `exemplo.org.br`, `api.exemplo.org.br`, `painel.exemplo.org.br` —
+# em vez do prefixo `homologacao.`. É o caso de quem hospeda a homologação num domínio
+# próprio (ver docs/deploy.md §2), e não num subdomínio do domínio de produção.
 #
 # O que este script NUNCA sobrescreve, mesmo rodando de novo:
 #   - o `.env` do ambiente (guarda as três chaves; regerar é perder o dado cifrado)
@@ -27,6 +32,7 @@ DOMINIO=''
 EMAIL_TLS=''
 EMAIL_DE_TESTE=''
 SEM_TLS=0
+HOSTS_NA_RAIZ=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -35,7 +41,8 @@ while [[ $# -gt 0 ]]; do
     --email-tls)      EMAIL_TLS="$2"; shift 2 ;;
     --email-de-teste) EMAIL_DE_TESTE="$2"; shift 2 ;;
     --sem-tls)        SEM_TLS=1; shift ;;
-    -h|--help) sed -n '2,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --hosts-na-raiz)  HOSTS_NA_RAIZ=1; shift ;;
+    -h|--help) sed -n '2,31p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opção desconhecida: $1" >&2; exit 2 ;;
   esac
 done
@@ -63,10 +70,19 @@ USUARIO_DEPLOY='deploy'
 # diferenças pelo script é como um ambiente acaba com meia configuração do outro.
 case "$AMBIENTE" in
   staging)
-    HOST_SITE="homologacao.${DOMINIO}"
-    HOST_API="api.homologacao.${DOMINIO}"
-    HOST_PAINEL="painel.homologacao.${DOMINIO}"
-    DOMINIO_COOKIE=".homologacao.${DOMINIO}"
+    # Com --hosts-na-raiz o domínio passado já é o da homologação e não leva prefixo; sem
+    # ele, a homologação mora em `homologacao.` dentro do domínio de produção. Os dois
+    # arranjos mantêm os três hosts sob um mesmo domínio raiz, que é o que o modo cookie do
+    # Sanctum exige (ver docs/decisoes/0003-sanctum-cookie-mode.md).
+    if [[ "$HOSTS_NA_RAIZ" -eq 1 ]]; then
+      RAIZ_DE_HOSTS="${DOMINIO}"
+    else
+      RAIZ_DE_HOSTS="homologacao.${DOMINIO}"
+    fi
+    HOST_SITE="${RAIZ_DE_HOSTS}"
+    HOST_API="api.${RAIZ_DE_HOSTS}"
+    HOST_PAINEL="painel.${RAIZ_DE_HOSTS}"
+    DOMINIO_COOKIE=".${RAIZ_DE_HOSTS}"
     BANCO='lar_analia_franco_staging'
     USUARIO_BANCO='laf_staging'
     PORTA_SITE=3101
@@ -78,6 +94,9 @@ case "$AMBIENTE" in
     RETENCAO_BACKUP_DIAS=7
     ;;
   production)
+    # Em produção os hosts já saem da raiz do domínio. Aceitar --hosts-na-raiz aqui, calado,
+    # daria a impressão de que a opção muda alguma coisa neste ambiente.
+    [[ "$HOSTS_NA_RAIZ" -eq 0 ]] || { erro '--hosts-na-raiz só vale para --ambiente staging.'; exit 1; }
     HOST_SITE="${DOMINIO}"
     HOST_API="api.${DOMINIO}"
     HOST_PAINEL="painel.${DOMINIO}"
@@ -378,6 +397,25 @@ fi
 # referencia o certificado. Um `nginx -t` com ssl_certificate apontando para arquivo
 # inexistente FALHA, e um nginx que não recarrega deixa o servidor inteiro no ar com a
 # configuração velha — inclusive os outros ambientes.
+# `http2 on;` só existe a partir do nginx 1.25.1. O Ubuntu 24.04 traz o 1.24, onde HTTP/2 é
+# parâmetro do `listen` — e esse parâmetro, por sua vez, fica OBSOLETO a partir do 1.25.1.
+# Não existe forma única que sirva às duas versões, e `provisionar.sh` instala o nginx
+# estável da distribuição, que muda a cada LTS. Escolher aqui, pela versão que está
+# instalada, é o que impede o modelo de ficar certo numa máquina e errado na seguinte: na
+# 1.24 um `http2 on;` derruba o `nginx -t` inteiro, e na 1.25+ o parâmetro do `listen` só
+# avisa — mas avisa em todo reload, para sempre.
+versao_pelo_menos() { [[ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -1)" == "$2" ]]; }
+
+VERSAO_NGINX="$(nginx -v 2>&1 | grep -oE 'nginx/[0-9.]+' | cut -d/ -f2)"
+if versao_pelo_menos "$VERSAO_NGINX" '1.25.1'; then
+  BLOCO_ESCUTA='    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;'
+else
+  BLOCO_ESCUTA='    listen 443 ssl http2;
+    listen [::]:443 ssl http2;'
+fi
+
 gerar_site() {
   local modelo="$1" destino="$2"
 
@@ -387,7 +425,10 @@ gerar_site() {
       -e "s|__HOST_PAINEL__|${HOST_PAINEL}|g" \
       -e "s|__PORTA_SITE__|${PORTA_SITE}|g" \
       "$modelo" \
-    | awk -v bloco="$BLOCO_AUTH" '{ if ($0 == "__AUTH_BASICA__") { if (bloco != "") print bloco } else print }' \
+    | awk -v auth="$BLOCO_AUTH" -v escuta="$BLOCO_ESCUTA" '
+        /^[[:space:]]*__AUTH_BASICA__[[:space:]]*$/ { if (auth != "") print auth; next }
+        /^[[:space:]]*__ESCUTA_443__[[:space:]]*$/  { print escuta; next }
+        { print }' \
     > "$destino"
 }
 
