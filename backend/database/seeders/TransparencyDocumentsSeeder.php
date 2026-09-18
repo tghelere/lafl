@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Enums\TransparencyDocumentType;
 use App\Models\TransparencyDocument;
+use App\Support\Transparency\DocumentSlug;
 use Database\Seeders\Support\PlaceholderPdf;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
@@ -32,6 +33,9 @@ class TransparencyDocumentsSeeder extends Seeder
 
             TransparencyDocument::query()->create([
                 'title' => $data['title'],
+                // Mesma regra da Action (que este seeder não usa, por criar direto): o slug é
+                // o que dá ao PDF uma URL legível — ver App\Support\Transparency\DocumentSlug.
+                'slug' => DocumentSlug::unique($data['title']),
                 'year' => $data['year'],
                 'type' => $data['type'],
                 'file_path' => $path,

@@ -65,6 +65,16 @@ Route::prefix('public')->name('public.')->group(function (): void {
 
     Route::get('/transparency-documents', [PublicTransparencyDocumentController::class, 'index'])
         ->name('transparency-documents.index');
+
+    // Espelha, segmento a segmento, a URL pública do site (/transparencia/documentos/{ano}/
+    // {slug}.pdf, ver App\Support\Transparency\DocumentUrl): a rota do Nitro que a serve é
+    // proxy puro, sem traduzir nada pelo caminho. É aqui, e não no site, que se decide 404,
+    // 301 de ano trocado e contagem de download (regra 1 do CLAUDE.md).
+    Route::get('/transparency-documents/{year}/{slug}.pdf', [PublicTransparencyDocumentController::class, 'file'])
+        ->where(['year' => '[0-9]{4}', 'slug' => '[a-z0-9-]+'])
+        ->name('transparency-documents.file');
+
+    // Endereço antigo — só 301 para o de cima (ver o docblock do controller).
     Route::get('/transparency-documents/{uuid}/download', [PublicTransparencyDocumentController::class, 'download'])
         ->where('uuid', '[0-9a-fA-F-]{36}')
         ->name('transparency-documents.download');

@@ -8,6 +8,7 @@ use App\Enums\Role;
 use App\Enums\TransparencyDocumentType;
 use App\Models\TransparencyDocument;
 use App\Models\User;
+use App\Support\Transparency\DocumentSlug;
 use Database\Seeders\Support\PlaceholderPdf;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -176,6 +177,7 @@ class E2eSeeder extends Seeder
 
         $document = TransparencyDocument::query()->create([
             'title' => $title,
+            'slug' => DocumentSlug::unique($title),
             'year' => $year,
             'type' => $type,
             'file_path' => $path,

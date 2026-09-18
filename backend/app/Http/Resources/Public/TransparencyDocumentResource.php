@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Resources\Public;
 
 use App\Models\TransparencyDocument;
+use App\Support\Transparency\DocumentUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Resource público — nunca expõe file_path (detalhe interno de armazenamento) nem timestamp
  * de auditoria (ver docs/estrutura-site.md, Parte 3).
+ *
+ * `path` é o caminho canônico do PDF no site, montado aqui e não no frontend: a URL pública é
+ * regra de negócio (slug persistido + ano corrente), e o site só segue o que a API mandar
+ * (ver App\Support\Transparency\DocumentUrl).
  *
  * @mixin TransparencyDocument
  */
@@ -24,6 +29,7 @@ final class TransparencyDocumentResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'title' => $this->title,
+            'path' => DocumentUrl::path($this->resource),
             'year' => $this->year,
             'type' => $this->type->value,
             'type_label' => $this->type->label(),

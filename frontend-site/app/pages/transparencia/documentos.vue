@@ -19,6 +19,8 @@ type TransparencyDocumentType =
 type TransparencyDocument = {
   uuid: string
   title: string
+  /** Caminho canônico do PDF no site, montado pela API — nunca remontado aqui. */
+  path: string
   year: number
   type: TransparencyDocumentType
   type_label: string
@@ -74,10 +76,6 @@ function formatSize(bytes: number): string {
   const kb = bytes / 1024
   if (kb < 1024) return `${kb.toFixed(0)} KB`
   return `${(kb / 1024).toFixed(1)} MB`
-}
-
-function downloadUrl(uuid: string): string {
-  return `${config.public.apiUrl}/api/v1/public/transparency-documents/${uuid}/download`
 }
 
 // Reaproveita o filtro atual nos links de paginação — cada link já chega com a URL completa,
@@ -162,7 +160,10 @@ useSeoMeta({
         <p class="doc-list__details">
           {{ formatSize(document.file_size) }} · {{ document.download_count }} downloads
         </p>
-        <a :href="downloadUrl(document.uuid)" class="btn btn--secondary">
+        <!-- Mesma URL para ver e para baixar: ela é a canônica, indexável, e o atributo
+             `download` é o que faz o navegador salvar em vez de abrir. Duas URLs para o mesmo
+             arquivo dividiriam o sinal de busca entre as duas. -->
+        <a :href="document.path" class="btn btn--secondary" download>
           <Download :size="16" aria-hidden="true" />
           Baixar PDF
         </a>

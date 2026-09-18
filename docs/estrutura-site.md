@@ -178,7 +178,8 @@ administrativos: nunca expõem autor, rascunho ou campo de controle.
 | GET | `/api/v1/public/posts` | Notícias, paginado, filtro por categoria |
 | GET | `/api/v1/public/posts/{slug}` | Notícia |
 | GET | `/api/v1/public/transparency-documents` | Filtro por ano e tipo |
-| GET | `/api/v1/public/transparency-documents/{uuid}/download` | Download com contagem |
+| GET | `/api/v1/public/transparency-documents/{ano}/{slug}.pdf` | PDF `inline`, com contagem |
+| GET | `/api/v1/public/transparency-documents/{uuid}/download` | Endereço antigo — 301 para o de cima |
 | GET | `/api/v1/public/testimonials` | Depoimentos autorizados |
 | GET | `/api/v1/public/partners` | Parceiros e apoiadores |
 | GET | `/api/v1/public/bazaar/showcase` | Vitrine "novidades da semana" |
@@ -189,6 +190,14 @@ administrativos: nunca expõem autor, rascunho ou campo de controle.
 
 `settings` é um único endpoint com os dados institucionais que aparecem no rodapé e em
 várias páginas — evita seis chamadas para montar o layout.
+
+O PDF de transparência **não é servido por esta URL ao visitante**: quem a chama é a rota de
+proxy do site (`/transparencia/documentos/{ano}/{slug}.pdf`, ver
+`frontend-site/server/routes/transparencia/documentos/`), para que o arquivo indexado esteja no
+domínio do site e não no da API. A rota da API espelha o mesmo caminho e é ela que decide 404,
+301 de ano trocado e contagem de download. O `slug` nasce do título na criação e nunca é
+recalculado — renomear o documento não pode quebrar link já indexado (ver
+`docs/tarefas/06-seo-e-pdfs-da-transparencia.md`).
 
 `institution-facts` e `stats` não são a mesma coisa e vão conviver: `institution-facts`
 devolve o que é DERIVADO (idade a partir de uma data, contagem do acervo publicado) e por isso

@@ -220,3 +220,64 @@ test('excluir documento é auditado e some das listagens', function (): void {
         ->and($document->fresh()->deleted_at)->not->toBeNull()
         ->and(Activity::where('event', 'deleted')->where('subject_id', $document->id)->where('subject_type', TransparencyDocument::class)->exists())->toBeTrue();
 });
+
+test('o slug do documento nasce do título, na criação', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+
+    $this->actingAs($user)->post('/api/v1/transparency-documents', [
+        'title' => 'Balanço patrimonial 2024',
+        'year' => 2024,
+        'type' => TransparencyDocumentType::Balance->value,
+        'file' => UploadedFile::fake()->create('balanco-2024.pdf', 100, 'application/pdf'),
+    ])->assertCreated();
+
+    expect(TransparencyDocument::query()->firstOrFail()->slug)->toBe('balanco-patrimonial-2024');
+});
+
+test('renomear o título NÃO muda o slug — a URL já indexada continua valendo', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    $document = TransparencyDocument::factory()->published()->create([
+        'title' => 'Balanço patrimonial 2024',
+        'slug' => 'balanco-patrimonial-2024',
+    ]);
+
+    $this->actingAs($user)->put("/api/v1/transparency-documents/{$document->uuid}", [
+        'title' => 'Balanço patrimonial do exercício de 2024',
+        'year' => $document->year,
+        'type' => $document->type->value,
+    ])->assertOk();
+
+    expect($document->fresh())
+        ->title->toBe('Balanço patrimonial do exercício de 2024')
+        ->slug->toBe('balanco-patrimonial-2024');
+});
+
+test('dois documentos com o mesmo título recebem slugs distintos', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+
+    foreach ([1, 2] as $_) {
+        $this->actingAs($user)->post('/api/v1/transparency-documents', [
+            'title' => 'Ata de assembleia',
+            'year' => 2024,
+            'type' => TransparencyDocumentType::Minutes->value,
+            'file' => UploadedFile::fake()->create('ata.pdf', 10, 'application/pdf'),
+        ])->assertCreated();
+    }
+
+    expect(TransparencyDocument::query()->orderBy('id')->pluck('slug')->all())
+        ->toBe(['ata-de-assembleia', 'ata-de-assembleia-2']);
+});
+
+test('o slug ignora documento excluído por engano — soft delete continua ocupando o endereço', function (): void {
+    $user = userWithRole(Role::Direcao->value);
+    TransparencyDocument::factory()->create(['title' => 'Edital 2025', 'slug' => 'edital-2025'])->delete();
+
+    $this->actingAs($user)->post('/api/v1/transparency-documents', [
+        'title' => 'Edital 2025',
+        'year' => 2025,
+        'type' => TransparencyDocumentType::Notice->value,
+        'file' => UploadedFile::fake()->create('edital.pdf', 10, 'application/pdf'),
+    ])->assertCreated();
+
+    expect(TransparencyDocument::query()->latest('id')->firstOrFail()->slug)->toBe('edital-2025-2');
+});

@@ -6,6 +6,7 @@ namespace App\Actions\Transparency;
 
 use App\Actions\Transparency\Data\TransparencyDocumentData;
 use App\Models\TransparencyDocument;
+use App\Support\Transparency\DocumentSlug;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
@@ -38,6 +39,14 @@ final class SaveTransparencyDocument
 
                 $document->file_path = $path;
                 $document->file_size = $data->file->getSize();
+            }
+
+            // Slug só na criação, nunca no update: a URL pública do PDF é montada a partir
+            // dele (ver App\Support\Transparency\DocumentUrl) e pode já estar indexada pelo
+            // Google ou citada num ofício. Corrigir o título depois muda o que se lê na
+            // página, não o endereço do arquivo.
+            if (! $document->exists) {
+                $document->slug = DocumentSlug::unique($data->title);
             }
 
             $document->title = $data->title;

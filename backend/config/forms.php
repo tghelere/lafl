@@ -72,6 +72,12 @@ return [
     | e-mail não carrega caminho relativo nem import de módulo JS: precisa ser HTTP(S)
     | completo.
     |
+    | Segundo consumidor, fora de formulário: a URL canônica do PDF de transparência
+    | (App\Support\Transparency\DocumentUrl), que vive no domínio do SITE e não no da API —
+    | o 301 do endereço antigo sai de um host e aponta para o outro, então precisa ser
+    | absoluto. Mesma situação de `admin_base_url` acima, que o link de definição de senha já
+    | usa fora do contexto de formulário.
+    |
     */
 
     'site_base_url' => env('SITE_BASE_URL', 'http://localhost:3000'),

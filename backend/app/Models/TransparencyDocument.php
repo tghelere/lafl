@@ -18,7 +18,10 @@ use Spatie\Activitylog\Support\LogOptions;
 /**
  * @use HasFactory<TransparencyDocumentFactory>
  */
-#[Fillable(['title', 'year', 'type', 'file_path', 'file_size', 'published_at'])]
+// `slug` é atribuível porque seeder e factory criam o registro direto (a Action atribui campo
+// a campo) — nenhum FormRequest o aceita, e nenhuma rota o recebe: quem o gera é sempre
+// App\Support\Transparency\DocumentSlug, na criação.
+#[Fillable(['title', 'slug', 'year', 'type', 'file_path', 'file_size', 'published_at'])]
 class TransparencyDocument extends Model
 {
     /** @use HasFactory<TransparencyDocumentFactory> */
