@@ -12,10 +12,11 @@
 #
 # Uso, na ordem:
 #
-#   1)  ./provisionar.sh --chave-publica "ssh-ed25519 AAAA... deploy@laf"
-#       Instala tudo e cria o usuário `deploy` (sem senha, só com chave).
+#   1)  ./provisionar.sh --chave-publica       "ssh-ed25519 AAAA... deploy@laf" \
+#                          --chave-publica-admin "ssh-ed25519 AAAA... voce@sua-maquina"
+#       Instala tudo e cria os DOIS usuários (sem senha, só com chave).
 #
-#   2)  De OUTRA máquina: ssh deploy@IP  — precisa funcionar.
+#   2)  De OUTRA máquina: ssh deploy@IP e ssh sysadmin@IP  — os dois precisam funcionar.
 #
 #   3)  ./provisionar.sh --trancar-ssh
 #       Só depois do passo 2: desativa login de root e senha por SSH.
@@ -23,6 +24,14 @@
 # O passo 3 é separado de propósito. Desativar senha e root antes de confirmar que a chave
 # do usuário novo funciona é trancar a porta com a chave do lado de dentro — e, numa VPS,
 # recuperar isso depende do console da hospedagem.
+#
+# Por que DOIS usuários. `deploy` carrega a chave que vive num segredo do GitHub, e por isso
+# tem `sudo` restrito a uma lista fechada de recarregamentos: sudo irrestrito ali
+# transformaria qualquer vazamento daquele segredo em root na máquina da instituição. Mas
+# com o login de root desativado alguém precisa continuar podendo administrar o servidor —
+# rodar `criar-ambiente.sh`, reprovisionar, investigar. Esse alguém é `sysadmin`, com sudo
+# completo e só a chave pessoal de quem administra. Um usuário só não dá conta dos dois
+# papéis sem desfazer um dos dois.
 #
 # As versões abaixo são as mesmas do docker-compose.yml e do .github/workflows/ci.yml.
 # Divergir aqui reabre o buraco que fez o projeto abandonar o SQLite: "verde no CI" só
@@ -37,9 +46,15 @@ VERSAO_POSTGRES='16'
 EXTENSOES_PHP=(pgsql mbstring intl gd bcmath zip redis curl xml)
 
 USUARIO_DEPLOY='deploy'
+# `sysadmin`, e não `admin`: o Ubuntu já traz um grupo `admin` (legado) e o /etc/sudoers da
+# distribuição dá `%admin ALL=(ALL) ALL` a ele. Um usuário chamado `admin` colide na criação
+# do grupo primário e passaria a ter sudo por um caminho que não é o nosso — duas surpresas
+# num lugar onde a regra precisa ser exatamente a que está escrita aqui.
+USUARIO_ADMIN='sysadmin'
 RAIZ='/var/www/laf'
 
 CHAVE_PUBLICA=''
+CHAVE_PUBLICA_ADMIN=''
 TRANCAR_SSH=0
 EU_CONFIRMO=0
 
@@ -47,9 +62,11 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --chave-publica) CHAVE_PUBLICA="$2"; shift 2 ;;
     --chave-publica-arquivo) CHAVE_PUBLICA="$(cat "$2")"; shift 2 ;;
+    --chave-publica-admin) CHAVE_PUBLICA_ADMIN="$2"; shift 2 ;;
+    --chave-publica-admin-arquivo) CHAVE_PUBLICA_ADMIN="$(cat "$2")"; shift 2 ;;
     --trancar-ssh) TRANCAR_SSH=1; shift ;;
     --eu-confirmo) EU_CONFIRMO=1; shift ;;
-    -h|--help) sed -n '2,30p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,40p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opção desconhecida: $1" >&2; exit 2 ;;
   esac
 done
@@ -67,19 +84,31 @@ erro()   { printf '\033[31mERRO: %s\033[0m\n' "$1" >&2; }
 if [[ "$TRANCAR_SSH" -eq 1 ]]; then
   passo 'Desativando login de root e senha por SSH'
 
-  autorizadas="/home/${USUARIO_DEPLOY}/.ssh/authorized_keys"
-  if [[ ! -s "$autorizadas" ]]; then
-    erro "${autorizadas} não existe ou está vazio — o usuário ${USUARIO_DEPLOY} não tem chave nenhuma."
-    echo '  Rode primeiro a passada normal, com --chave-publica.' >&2
+  # Os DOIS usuários precisam de chave antes de root sair de cena. Trancar com só o
+  # `deploy` no ar deixaria a máquina sem administrador: o sudo dele é uma lista fechada de
+  # recarregamentos, e nada em `criar-ambiente.sh` ou num reprovisionamento cabe ali.
+  for usuario in "$USUARIO_DEPLOY" "$USUARIO_ADMIN"; do
+    autorizadas="/home/${usuario}/.ssh/authorized_keys"
+    if [[ ! -s "$autorizadas" ]]; then
+      erro "${autorizadas} não existe ou está vazio — o usuário ${usuario} não tem chave nenhuma."
+      echo '  Rode primeiro a passada normal, com --chave-publica e --chave-publica-admin.' >&2
+      exit 1
+    fi
+  done
+
+  # Sem sudo completo, `sysadmin` não substitui o root que está prestes a ser desativado.
+  if ! id -nG "$USUARIO_ADMIN" | grep -qw sudo; then
+    erro "${USUARIO_ADMIN} não está no grupo sudo — desativar root deixaria a máquina sem administrador."
     exit 1
   fi
 
   # A confirmação de que a chave FUNCIONA não pode ser deduzida de dentro da máquina: o
   # arquivo estar lá não prova que o cliente consegue entrar com ela. Ou existe uma sessão
-  # SSH do `deploy` aberta agora (prova viva), ou alguém confirma explicitamente.
-  if ! who | grep -qE "^${USUARIO_DEPLOY}\b" && [[ "$EU_CONFIRMO" -eq 0 ]]; then
-    erro "nenhuma sessão de ${USUARIO_DEPLOY} aberta — não dá para confirmar daqui que a chave funciona."
-    echo "  Abra 'ssh ${USUARIO_DEPLOY}@IP' em outro terminal e rode de novo," >&2
+  # SSH do `sysadmin` aberta agora (prova viva), ou alguém confirma explicitamente. É o
+  # `sysadmin` que importa aqui: é ele que herda o papel do root.
+  if ! who | grep -qE "^${USUARIO_ADMIN}\b" && [[ "$EU_CONFIRMO" -eq 0 ]]; then
+    erro "nenhuma sessão de ${USUARIO_ADMIN} aberta — não dá para confirmar daqui que a chave funciona."
+    echo "  Abra 'ssh ${USUARIO_ADMIN}@IP' em outro terminal e rode de novo," >&2
     echo '  ou passe --eu-confirmo se você JÁ testou e sabe que funciona.' >&2
     exit 1
   fi
@@ -352,6 +381,49 @@ install -d -m 750 -o root -g root /etc/laf
 ok "$RAIZ"
 
 # ---------------------------------------------------------------------------
+# 7b. Usuário de administração
+# ---------------------------------------------------------------------------
+# Com `--trancar-ssh`, root deixa de entrar por SSH e este passa a ser o único caminho
+# humano de administração da máquina: rodar `criar-ambiente.sh`, reprovisionar, investigar.
+# É um usuário SEPARADO do `deploy` de propósito — ver a explicação no cabeçalho.
+passo "Usuário ${USUARIO_ADMIN}"
+if ! id -u "$USUARIO_ADMIN" >/dev/null 2>&1; then
+  adduser --disabled-password --gecos '' "$USUARIO_ADMIN"
+fi
+passwd -l "$USUARIO_ADMIN" >/dev/null
+usermod -aG sudo "$USUARIO_ADMIN"
+
+install -d -m 700 -o "$USUARIO_ADMIN" -g "$USUARIO_ADMIN" "/home/${USUARIO_ADMIN}/.ssh"
+autorizadas_admin="/home/${USUARIO_ADMIN}/.ssh/authorized_keys"
+touch "$autorizadas_admin"
+if [[ -n "$CHAVE_PUBLICA_ADMIN" ]]; then
+  grep -qxF "$CHAVE_PUBLICA_ADMIN" "$autorizadas_admin" || echo "$CHAVE_PUBLICA_ADMIN" >> "$autorizadas_admin"
+  ok 'chave pública registrada'
+elif [[ ! -s "$autorizadas_admin" ]]; then
+  aviso "nenhuma chave em ${autorizadas_admin} — passe --chave-publica-admin, ou --trancar-ssh vai se recusar a rodar."
+fi
+chmod 600 "$autorizadas_admin"
+chown "${USUARIO_ADMIN}:${USUARIO_ADMIN}" "$autorizadas_admin"
+
+# NOPASSWD é OBRIGATÓRIO aqui, não conveniência. A conta entra só com chave e tem a senha
+# travada (`passwd -l`), e a regra padrão do grupo `sudo` do Ubuntu PEDE senha: sem esta
+# linha, `sysadmin` estaria no grupo certo e mesmo assim não conseguiria virar root — um
+# servidor sem administrador nenhum no instante em que `--trancar-ssh` desativa o root.
+#
+# O que isso significa, dito com todas as letras: quem tem a chave do `sysadmin` tem root
+# na máquina. É o mesmo poder que `PermitRootLogin prohibit-password` daria, com três
+# ganhos — a conta tem nome, o `sudo` registra cada comando, e revogar uma chave é apagar
+# uma linha em vez de mexer no root. A chave do `deploy`, que é a que vive num segredo do
+# GitHub, continua presa à lista fechada de /etc/sudoers.d/laf-deploy.
+cat > /etc/sudoers.d/laf-sysadmin <<CONF
+# Lar Anália Franco — ver infra/provisionar.sh. Administração humana, só com chave.
+${USUARIO_ADMIN} ALL=(ALL) NOPASSWD: ALL
+CONF
+chmod 440 /etc/sudoers.d/laf-sysadmin
+visudo -c -f /etc/sudoers.d/laf-sysadmin >/dev/null
+ok 'sudo completo, só com chave'
+
+# ---------------------------------------------------------------------------
 # 8. Firewall, fail2ban, atualizações automáticas
 # ---------------------------------------------------------------------------
 passo 'Firewall (ufw)'
@@ -409,7 +481,7 @@ cat <<RESUMO
   certbot   $(certbot --version 2>&1 | awk '{print $2}')
 
   Próximos passos:
-    1. De outra máquina: ssh ${USUARIO_DEPLOY}@<IP>   (precisa funcionar)
+    1. De outra máquina: ssh ${USUARIO_DEPLOY}@<IP> e ssh ${USUARIO_ADMIN}@<IP>  (os dois precisam funcionar)
     2. Aqui:             ./provisionar.sh --trancar-ssh
-    3. Aqui:             ./criar-ambiente.sh --ambiente staging --dominio <DOMINIO> ...
+    3. Como ${USUARIO_ADMIN}:      sudo ./criar-ambiente.sh --ambiente staging --dominio <DOMINIO> ...
 RESUMO

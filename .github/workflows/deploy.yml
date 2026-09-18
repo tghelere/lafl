@@ -149,6 +149,18 @@ jobs:
     environment:
       name: ${{ needs.preparar.outputs.ambiente }}
     steps:
+      # O pacote NÃO carrega `infra/` (ADR 0014), e os scripts de publicação são enviados
+      # ao servidor a partir do repositório — então este job precisa do repositório. Sem
+      # este checkout o runner começa com o diretório de trabalho vazio e o rsync de
+      # `infra/publicar.sh` falha com "No such file or directory", em TODO deploy.
+      # Primeiro passo de propósito: `checkout` limpa o diretório de trabalho, e rodá-lo
+      # depois do download apagaria o pacote recém-baixado.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: infra
+          sparse-checkout-cone-mode: false
+
       - name: Baixar o pacote desta execução
         if: ${{ inputs.run_id == '' }}
         uses: actions/download-artifact@v4
