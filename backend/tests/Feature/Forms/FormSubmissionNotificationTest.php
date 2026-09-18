@@ -75,6 +75,36 @@ test('e-mail de notificação traz a logo do site no cabeçalho, com URL absolut
     });
 });
 
+test('rodapé do e-mail de notificação está em português', function (): void {
+    Mail::fake();
+
+    $this->postJson('/api/v1/public/contact-messages', [
+        'name' => 'Fernanda Costa',
+        'email' => 'fernanda@example.com',
+        'subject' => 'Elogio',
+        'message' => 'Parabéns pelo trabalho.',
+        'consent' => true,
+    ])->assertCreated();
+
+    Mail::assertQueued(FormSubmissionReceived::class, function (FormSubmissionReceived $mail) {
+        // .env.testing não define APP_LOCALE (só produção/desenvolvimento têm pt_BR — ver
+        // backend/.env) — fixa o locale aqui para reproduzir a condição real em vez de
+        // depender do padrão 'en' do ambiente de teste.
+        app()->setLocale('pt_BR');
+
+        $rendered = $mail->render();
+
+        // `__('All rights reserved.')` é a string padrão do tema de e-mail do Laravel — sem
+        // lang/pt_BR.json, ela renderiza em inglês mesmo com APP_LOCALE=pt_BR (ver
+        // relatório desta sessão).
+        expect($rendered)
+            ->toContain('Todos os direitos reservados.')
+            ->not->toContain('All rights reserved.');
+
+        return true;
+    });
+});
+
 test('honeypot disparado não enfileira e-mail nenhum', function (): void {
     Mail::fake();
 
