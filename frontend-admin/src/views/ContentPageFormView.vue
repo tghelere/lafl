@@ -8,6 +8,7 @@ import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import RichTextEditor from '@/components/RichTextEditor.vue'
+import { siteUrl } from '@/config'
 import { fetchContentMarkers } from '@/services/contentMarkers'
 import { fetchContentPage, updateContentPage } from '@/services/pages'
 import type { ContentMarker, ContentPage } from '@/types/pages'
@@ -50,7 +51,7 @@ const publicUrl = computed(() => {
     return null
   }
 
-  const base = String(import.meta.env.VITE_SITE_URL ?? '').replace(/\/$/, '')
+  const base = siteUrl.replace(/\/$/, '')
 
   return `${base}/${record.value.slug}`
 })

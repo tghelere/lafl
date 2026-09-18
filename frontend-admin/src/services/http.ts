@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios'
 
+import { apiUrl } from '@/config'
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -8,7 +9,7 @@ import { useAuthStore } from '@/stores/auth'
  * chamar axios/fetch diretamente.
  */
 export const httpClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: apiUrl,
   withCredentials: true,
   withXSRFToken: true,
   headers: {

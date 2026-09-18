@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Lar Anália Franco — Painel administrativo</title>
+
+    <!--
+      Configuração em tempo de execução, fora do bundle e reescrita no servidor a cada
+      publicação (ver public/config.js e src/config.ts). No <head> e clássico (sem
+      type="module") de propósito: o bundle lê window.__LAF_CONFIG__ na avaliação do
+      módulo, e o Vite move o <script type="module"> para o <head> no build — deixar isto
+      no <body> passaria a depender da ordem "módulo é adiado, clássico não", que é
+      verdadeira mas é o tipo de coisa que quebra em silêncio numa mudança de bundler.
+    -->
+    <script src="/config.js"></script>
   </head>
   <body>
     <div id="app"></div>

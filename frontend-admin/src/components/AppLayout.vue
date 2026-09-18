@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import AccessDeniedState from '@/components/AccessDeniedState.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import NotFoundState from '@/components/NotFoundState.vue'
+import { sessionIdleTimeoutMinutes } from '@/config'
 import { useIdleTimeout } from '@/composables/useIdleTimeout'
 import { useAuthStore } from '@/stores/auth'
 
@@ -24,9 +25,7 @@ const props = defineProps<{
 const authStore = useAuthStore()
 const router = useRouter()
 
-const idleTimeoutMinutes = Number(import.meta.env.VITE_SESSION_IDLE_TIMEOUT_MINUTES ?? '15')
-
-useIdleTimeout(idleTimeoutMinutes, () => {
+useIdleTimeout(sessionIdleTimeoutMinutes, () => {
   void handleLogout()
 })
 
