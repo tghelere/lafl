@@ -143,3 +143,164 @@ terminasse no domínio de homologação: nenhum.
 provedor está indisponível, então a hospedagem de homologação — e a de produção, pelo mesmo
 motivo — fica nos **Estados Unidos**. Isso caracteriza transferência internacional de dados sob
 a LGPD e precisa estar na política. Ver etapa 2.
+
+## Etapa 2 e 3 — a página reescrita (commit `ceab0f8`)
+
+As duas etapas num commit só. A constante `VERSAO` da página e o
+`FORM_CONSENT_TERMS_VERSION` do backend são o mesmo fato em dois lugares: separá-las em dois
+commits deixaria, no meio, uma árvore em que o banco grava o número de uma versão que ninguém
+leu.
+
+O que saiu do texto público, ponto a ponto:
+
+| O texto anterior dizia | O código diz |
+|---|---|
+| "Este texto é um rascunho de trabalho" | — (não é assunto do visitante) |
+| Formulário "Interesse em matrícula": nome, telefone, e-mail, faixa etária da criança, período | o formulário não existe; a matrícula é pela Central de Vagas |
+| Contraturno: nome, telefone, e-mail, idade do adolescente, escola | nome e telefone do responsável, e nada mais |
+| "Dados da criança coletados presencialmente junto do termo" | nenhum dado de criança entra por este site, ponto — o resto não é assunto desta política |
+| "Dados pessoais ficam criptografados no banco de dados" | metade das colunas não é; a página agora lista as duas metades |
+| "O apagamento ao fim do prazo é automático" | verdade — e agora com o agendador de fato no ar para sustentá-la |
+
+O que entrou e não existia:
+
+- **Controlador identificado.** Razão social, CNPJ, endereço e telefone. Faltava, e é o
+  primeiro requisito de uma política de privacidade.
+- **Os campos que não são cifrados, ditos em voz alta.** Assunto da mensagem, descrição dos
+  itens, janela de disponibilidade, área de interesse, nome da empresa, tipo de apoio. Dizer
+  isso custa menos que ser pego prometendo o que não se faz.
+- **O IP não é guardado.** Vira HMAC no registro. Em claro, só no limite de taxa (minutos) e no
+  log do nginx (14 dias).
+- **Quem vê, e o que a auditoria registra.** Por papel, e o log guarda o acesso, nunca o
+  conteúdo.
+- **Transferência internacional.** Seção própria, com o motivo (data center brasileiro
+  indisponível), o enquadramento (art. 33, sem decisão de adequação para os EUA, apoiada no
+  consentimento) e o que a instituição pretende fazer.
+- **Número de versão visível**, amarrado ao que o banco grava.
+- **Uma nota sobre cópias de segurança** — um registro apagado pode sobreviver numa cópia até
+  ela ser descartada. É desconfortável e é verdade.
+
+Um bloco por formulário substituiu a tabela de três colunas: no celular ela virava coluna
+esmagada ou rolagem lateral. Conferido no Firefox em 1280px e em 380px, sem rolagem horizontal
+e sem erro de JavaScript.
+
+`consent_terms_version` passou de `2026-08-25` para `2026-09-18` em `config/forms.php`,
+`.env.example`, `.env.e2e` e `infra/criar-ambiente.sh`. As factories continuam com
+`'2026-08-25'` escrito à mão, de propósito: um registro de teste nascido sob a versão anterior
+é um registro realista, e é o que o sistema de fato terá em produção depois desta mudança.
+
+## Etapa 4 — as pendências (commit `f82ff42`)
+
+No `docs/roadmap.md`, seção própria. As duas que a tarefa pedia — validação jurídica e
+Encarregado/DPO nomeado, ambas bloqueantes para produção e nenhuma delas assunto do texto
+público — e três que o próprio trabalho criou:
+
+- **`FORM_CONSENT_TERMS_VERSION` vive em `shared/.env`, que o deploy não sobrescreve.** Subir a
+  política nova sem atualizar o `.env` do servidor faz a API gravar o número da versão velha.
+- **Três afirmações da política dependem de configuração de servidor, não do repositório:** os
+  14 dias de log do nginx, o Umami desligado e o servidor nos Estados Unidos. Mudar qualquer uma
+  sem mexer no texto transforma a página em mentira.
+- **Os prazos de retenção subiram de importância.** Eram sugestão interna não confirmada pela
+  instituição; publicados, viraram compromisso com o titular.
+
+A transferência internacional também entrou em `docs/protecao-de-dados.md` (seção nova, com o
+que ela custa — inclusive que nenhum dado de assistido pode ir para esse servidor) e em
+`docs/deploy.md` (trocar a região do servidor é mudança de política pública, não só de infra).
+
+## Etapa 5 — a guarda que faltava (commit `987a694`)
+
+A reescrita criou um acoplamento sem rede: `VERSAO` na página e `FORM_CONSENT_TERMS_VERSION` no
+backend precisam ser iguais, e nada obrigava. A divergência é silenciosa — nada quebra, o site
+continua no ar, e o banco passa a guardar como prova de consentimento o número de uma versão
+que nunca esteve publicada.
+
+`e2e/tests/formularios/politica-de-privacidade.spec.ts`: lê a versão do HTML renderizado, envia
+o formulário de contato pela interface e compara com o `consent_terms_version` do registro
+gravado. Conferido que **falha de verdade** — com o `.env.e2e` apontando para outra data, quebra
+apontando para a pendência no roadmap. Um teste que não se viu falhar não é uma guarda.
+
+## Verificação
+
+Tudo contra a pilha real, nada simulado.
+
+| | |
+|---|---|
+| `php artisan test` | 398 testes, 1082 asserções, verde |
+| `./vendor/bin/pint --test` | limpo |
+| `./vendor/bin/phpstan analyse` | 0 erros |
+| `npm run build` (site) | ok |
+| `npm run test:e2e` | 66 testes, verde (67 com o novo) |
+| Página no Firefox | 1280px e 380px, sem rolagem horizontal, sem erro de JavaScript |
+| Cookies e terceiros no Firefox | site público: nenhum cookie, nenhum host externo |
+
+## As duas correções de segurança
+
+Pedidas fora da tarefa 08, no fim da sessão. `docs/relatorio-sessao-19.md` tinha duas
+credenciais escritas por extenso num arquivo versionado.
+
+### Senha da autenticação básica — rotacionada
+
+Feito direto no servidor, pelo caminho que o `infra/criar-ambiente.sh` já usa para esse passo:
+senha nova de `openssl rand`, `htpasswd -iB` sobre `/etc/nginx/laf-staging.htpasswd`
+(por stdin, não por argumento — senha em `argv` aparece no `ps`), dono `root:www-data` e modo
+`640` restaurados. Sem `nginx -t` nem reload: o nginx lê o arquivo de senha a cada requisição.
+
+Conferido de fora: senha nova 200, **senha antiga 401**, sem credencial 401, e a API continua
+em 200 sem pedir senha nenhuma.
+
+A senha nova foi entregue por fora do repositório, e não está escrita em lugar nenhum da árvore.
+
+### Link de definição de senha — removido do texto, **ainda precisa de você**
+
+O link e a senha saíram de `docs/relatorio-sessao-19.md`, substituídos por uma nota de que foram
+entregues por fora, com um aviso do que foi rotacionado.
+
+**Remover de um arquivo não remove do histórico do git.** Para a senha da autenticação básica
+isso não importa mais — a que está no histórico não abre mais nada. Para o link de definição de
+senha, importa: o token foi criado em 18/09 às 13:59 UTC e o corretor `user_setup` expira em
+1440 minutos (`backend/config/auth.php`), ou seja, **ele continua válido até 19/09 por volta das
+13:59 UTC**. Quem tiver o histórico do repositório nessa janela pode definir a senha daquela
+conta.
+
+Tentei invalidá-lo de duas formas e as duas foram barradas pelo classificador de segurança do
+Claude Code — gerar um link novo (que apagaria o anterior) caiu em "Credential Materialization",
+e apagar a linha do `password_reset_tokens` caiu em "Remote Shell Writes". Não insisti. Qualquer
+uma das duas, rodada por você, resolve:
+
+```bash
+# Opção A — gera um link novo e já invalida o antigo (a URL sai no terminal, só uma vez)
+ssh sysadmin@2.25.223.146 'sudo -u deploy php8.5 /var/www/laf/staging/current/backend/artisan \
+  tinker --execute="echo app(App\\Actions\\Users\\GeneratePasswordLink::class)->handle(App\\Models\\User::where(\"email\",\"SEU_EMAIL\")->firstOrFail());"'
+
+# Opção B — só invalida, sem gerar nada (use se já definiu sua senha)
+ssh sysadmin@2.25.223.146 'sudo -u postgres psql -d lar_analia_franco_staging \
+  -c "delete from password_reset_tokens where email = '"'"'SEU_EMAIL'"'"'"'
+```
+
+## O que ficou de fora, e por quê
+
+- **Nada foi publicado em homologação.** A tarefa não pede deploy e a sessão não empurrou nada
+  para a `main` — um push publica sozinho (`DEPLOY_STAGING_HABILITADO=true`, ver sessão 19).
+  Quando a publicação acontecer, o `FORM_CONSENT_TERMS_VERSION` do
+  `/var/www/laf/staging/shared/.env` precisa ir junto, senão a API grava `2026-08-25` sob o
+  texto de `2026-09-18`. Está no roadmap.
+- **`npm run generate` não foi rodado**, só `npm run build`. O site não é estático e nunca foi
+  (o Nitro é exigido pelos cinco formulários e por `/transparencia/documentos`, ver
+  `nuxt.config.ts`); `generate` prerrenderiza o mesmo conjunto de rotas que o `build` já cobre,
+  e a bateria de e2e sobe o site pelo caminho de produção de verdade.
+- **O inventário de dados da LGPD (`docs/lgpd/inventario-de-dados.md`) continua vazio.** Ele é,
+  por decisão registrada no próprio arquivo, para ser preenchido **junto com a instituição** —
+  não unilateralmente pela engenharia. A política cobre os formulários do site; o inventário
+  cobre o domínio de assistidos, que ainda não existe em código.
+
+## O que precisa de conferência humana
+
+1. **Ler a política inteira.** É o documento em que o texto importa mais que o código, e é o
+   único artefato desta sessão cuja qualidade uma suíte verde não atesta.
+2. **Confirmar os prazos de retenção com a instituição** (12/6/24/36/6 meses). Estão publicados
+   agora.
+3. **Confirmar a razão do servidor nos Estados Unidos** como está escrita: "a instituição
+   contratou hospedagem pretendendo usar o data center brasileiro do provedor, que está
+   indisponível". Foi como me foi passado; é uma afirmação sobre a instituição, não sobre o
+   código, e é a única frase da página que eu não pude conferir rodando alguma coisa.
+4. **Invalidar o link de definição de senha** — ver acima, há prazo.

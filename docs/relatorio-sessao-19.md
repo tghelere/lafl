@@ -168,19 +168,18 @@ afrouxei nada: o `fail2ban` fez exatamente o trabalho dele.
 
 ## O que precisa de você
 
-1. **Link de definição de senha, novo** (24 h, uso único). O primeiro foi consumido na
-   verificação e a senha temporária que usei fica inválida assim que você definir a sua:
+1. **Link de definição de senha** (24 h, uso único) — entregue fora do repositório. O primeiro
+   foi consumido na verificação e a senha temporária que usei fica inválida assim que você
+   definir a sua.
 
-   ```
-   https://painel.homologacao-laf.softhing.com.br/definir-senha?token=d8082b99218ecb0f2f21dc00924be7671e3f67bd81c09384343ba2495577b329
-   ```
+2. **Autenticação básica do site de homologação** (usuário `homologacao`) — senha entregue fora
+   do repositório, para o cofre.
 
-2. **Autenticação básica do site de homologação** — para o cofre:
-
-   ```
-   usuário: homologacao
-   senha:   YcAImXZOLXFGzdkvVzNaOeXtTA6Y
-   ```
+> **Correção de segurança, sessão 20.** As duas credenciais acima estavam escritas por extenso
+> aqui, num arquivo versionado. Foram removidas do texto e entregues por fora. Remover de um
+> arquivo não remove do histórico do git: a senha da autenticação básica foi **rotacionada** no
+> servidor, e o link de definição de senha precisa ser invalidado por você — ver
+> `docs/relatorio-sessao-20.md`, "As duas correções de segurança".
 
 3. **As três chaves.** O classificador de segurança do Claude Code bloqueou a cópia automática
    delas para a sua máquina, duas vezes. Elas estão só no servidor. Rode você mesmo:
