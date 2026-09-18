@@ -533,14 +533,12 @@ uma camada de cache de HTML por cima.
 
 ### Decisões técnicas em aberto, registradas mas não bloqueantes
 
-- [ ] **O painel é o único artefato de deploy amarrado ao ambiente em tempo de build.** O Vite
-      grava `VITE_API_URL`, `VITE_SITE_URL` e `VITE_SESSION_IDLE_TIMEOUT_MINUTES` dentro do
-      bundle; o site (Nuxt) lê as `NUXT_PUBLIC_*` em tempo de execução e por isso o mesmo
-      `.output` serve homologação ou produção. Em consequência, "promover para produção o
-      mesmo pacote já validado em homologação" (previsto na tarefa 07b) vale para o backend e
-      para o site, mas **o painel precisa ser rebuildado**. A alternativa — o painel ler a
-      configuração em tempo de execução, de um `config.json` servido ao lado do `index.html` —
-      é decisão da 07b, não da 07. Ver `docs/decisoes/0014-pacote-de-deploy-minimo.md`.
+- [x] ~~**O painel é o único artefato de deploy amarrado ao ambiente em tempo de build.**~~
+      Resolvido na sessão 17 (tarefa 07b), pela alternativa que estava anotada aqui: o painel
+      lê `window.__LAF_CONFIG__` de um `/config.js` servido fora do bundle e reescrito no
+      servidor a cada publicação. As `VITE_*` continuam valendo como origem secundária, em
+      desenvolvimento e na bateria de ponta a ponta. O pacote passou a ser promovível inteiro.
+      Ver `docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md`.
 - [ ] `pages.og_image_id`: entra numa migration futura, junto da entidade `media` — decisão
       de sessão anterior, para não criar coluna sem uso funcional possível antes de `media`
       existir

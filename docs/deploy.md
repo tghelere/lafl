@@ -1,40 +1,50 @@
 # Deploy
 
-Como o Lar Anália Franco vai ao ar, o que precisa existir no servidor e em que ordem o
-primeiro deploy acontece. O **provisionamento** do servidor (Nginx, systemd, certificados,
-firewall, backup) e o **deploy automático** pelo GitHub Actions são a tarefa 07b — este
-documento é o que aquela tarefa implementa, e vale sozinho para quem precisar publicar à mão.
+Como o Lar Anália Franco vai ao ar: o que precisa existir no servidor, como se publica, como
+se volta atrás e o que fazer quando chegar a hora de criar produção.
+
+O servidor é descrito em script, em `infra/` — não na memória de quem provisionou. Este
+documento explica o porquê e a ordem; os scripts são o "como", e rodar de novo qualquer um
+deles devolve a máquina ao estado descrito.
 
 Leia junto: `docs/arquitetura.md` (camadas e autenticação),
 `docs/decisoes/0014-pacote-de-deploy-minimo.md` (por que o servidor recebe um pacote e não o
-repositório) e `docs/protecao-de-dados.md` (chaves e retenção).
+repositório), `docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md` (por que o mesmo
+pacote atende os dois ambientes) e `docs/protecao-de-dados.md` (chaves e retenção).
 
 ---
 
 ## 1. O que o servidor precisa ter
 
-As versões são as mesmas do `docker-compose.yml` e do `.github/workflows/ci.yml`. Divergir
-aqui é reabrir o buraco que fez o projeto abandonar o SQLite: "verde no CI" só quer dizer
-alguma coisa quando o CI roda contra o que produção roda.
+Instalado por `infra/provisionar.sh`. As versões são as mesmas do `docker-compose.yml` e do
+`.github/workflows/ci.yml`. Divergir aqui é reabrir o buraco que fez o projeto abandonar o
+SQLite: "verde no CI" só quer dizer alguma coisa quando o CI roda contra o que produção roda.
 
 | Componente | Versão | Observação |
 |---|---|---|
-| PHP | **8.5** | FPM. `composer.lock` foi resolvido em 8.5 e trava uma dependência em ">= 8.4.1" |
-| Extensões PHP | `pdo_pgsql pgsql mbstring intl exif gd bcmath zip redis` | mesma lista do `docker/php/Dockerfile` e do CI |
+| PHP | **8.5** | FPM, do PPA `ondrej/php`. `composer.lock` foi resolvido em 8.5 e trava uma dependência em ">= 8.4.1" |
+| Extensões PHP | `pdo_pgsql pgsql mbstring intl exif gd bcmath zip redis` | mesma lista do `docker/php/Dockerfile` e do CI; o script confere uma a uma e falha se faltar |
 | PostgreSQL | **16** | escutando só em `localhost` |
 | Redis | **7** | escutando só em `localhost`; cache, sessão e fila |
 | Node.js | **24** | só para rodar o Nitro do site (`node site/server/index.mjs`) |
 | Composer | 2 | usado só no runner do CI, não no servidor |
-| Nginx | estável da distro | TLS pelo Certbot |
+| Nginx | estável da distro | TLS pelo Certbot, por `--webroot` |
 
 Nada é buildado no servidor: `composer install`, `nuxt build` e `vite build` acontecem no CI,
 dentro de `scripts/deploy/empacotar.sh`. O servidor recebe o pacote pronto.
 
+Segurança básica, também do `provisionar.sh`: usuário `deploy` sem senha e só com chave, login
+de root e senha por SSH desativados, `ufw` com 22/80/443, `fail2ban` no `sshd`, atualizações
+automáticas só do repositório de segurança e sem reinício automático.
+
+O `sudo` do `deploy` é uma **lista fechada** de recarregamentos (`/etc/sudoers.d/laf-deploy`) —
+a chave que o GitHub Actions usa não pode virar root na máquina se um dia vazar.
+
 ## 2. Ambientes
 
 `staging` (homologação) e `production` convivem no mesmo VPS, com **base, usuário de banco,
-índice de Redis, `.env` e unidades de systemd separados**. Nada é compartilhado entre os dois
-além do sistema operacional.
+índices e prefixo de Redis, `.env`, pool do PHP-FPM e unidades de systemd separados**. Nada é
+compartilhado entre os dois além do sistema operacional.
 
 | | staging | production |
 |---|---|---|
@@ -42,155 +52,347 @@ além do sistema operacional.
 | API | `api.homologacao.DOMINIO` | `api.DOMINIO` |
 | Painel | `painel.homologacao.DOMINIO` | `painel.DOMINIO` |
 | Banco | `lar_analia_franco_staging` | `lar_analia_franco` |
+| Usuário do banco | `laf_staging` | `laf_production` |
+| Redis | `REDIS_DB=1`, `REDIS_CACHE_DB=2`, prefixo `laf-staging-` | `3`, `4`, prefixo `laf-production-` |
+| Porta do Nitro | 3101 | 3001 |
 | `APP_ENV` | `staging` | `production` |
-| Indexação | bloqueada (ver §6) | liberada |
+| Indexação | bloqueada (ver §11) | liberada |
+| Autenticação básica | **só no site** | nenhuma |
 | E-mail | tudo para `MAIL_ALWAYS_TO` | destinatários reais |
+| Backup | diário, 7 dias | diário, retenção a definir (ver §14) |
 | Dado real de assistido | **nunca** | sim |
 
 Os três hosts de cada ambiente ficam sob o **mesmo domínio raiz**, exigência do modo cookie do
 Sanctum (ver `docs/decisoes/0003-sanctum-cookie-mode.md`).
 
+> **O prefixo do Redis é por ambiente, e isso não é detalhe.** O padrão do projeto é derivado
+> de `APP_NAME` e seria idêntico nos dois. Com um Redis só na máquina, staging e production
+> disputariam as mesmas chaves de sessão e de cache — e o efeito é gente deslogando sozinha em
+> produção quando alguém abre homologação.
+
 ## 3. Processos permanentes
 
-Quatro por ambiente. Os três primeiros já existem em qualquer deploy Laravel; o quarto e o
+Cinco por ambiente. Os três primeiros já existem em qualquer deploy Laravel; o quarto e o
 quinto são os que costumam faltar, e a falta deles não quebra nada de imediato — só faz
 notificação e expurgo nunca acontecerem.
 
-| Processo | Comando | Sem ele |
+| Processo | Quem é | Sem ele |
 |---|---|---|
-| API | PHP-FPM servindo `backend/public` | a API não responde |
-| Site | `node site/server/index.mjs` (Nitro) | o site não responde |
+| API | pool `laf-<ambiente>` do PHP-FPM, socket próprio | a API não responde |
+| Site | `laf-site@<ambiente>.service` (Nitro, em `127.0.0.1:<porta>`) | o site não responde |
 | Painel | Nginx servindo `painel/` como estático | o painel não abre |
-| Fila | `php artisan queue:work` | e-mail de formulário fica parado no Redis, para sempre |
-| Agendador | `cron` de minuto em minuto chamando `php artisan schedule:run` | expurgo por retenção e expurgo de endereço de coleta nunca rodam (ver `backend/routes/console.php`) |
+| Fila | `laf-queue@<ambiente>.service` (`queue:work`) | e-mail de formulário fica parado no Redis, para sempre |
+| Agendador | `laf-scheduler@<ambiente>.service` (`schedule:work`) | expurgo por retenção e expurgo de endereço de coleta nunca rodam (ver `backend/routes/console.php`) |
 
-O painel é SPA: o Nginx precisa devolver `index.html` para qualquer rota que não seja arquivo
-existente, senão recarregar a página em `/admin/usuarios` dá 404.
+O agendador é `schedule:work` num serviço, e não uma linha de `cron`: é o mesmo arranjo do
+container `scheduler` do `docker-compose.yml`, de propósito, e ganha reinício automático de
+graça. Quem **executa** os jobs agendados é o worker — o agendador só os despacha; os dois
+precisam estar no ar.
 
-Em desenvolvimento os dois últimos são os containers `queue` e `scheduler` do
-`docker-compose.yml` — é a mesma separação, de propósito.
+O painel é SPA: o Nginx devolve `index.html` para qualquer rota que não seja arquivo existente,
+senão recarregar a página em `/admin/usuarios` dá 404.
 
 ## 4. Checklist de variáveis de ambiente
 
-O `.env` de cada ambiente é criado **no servidor** e nunca sai de lá: não vai para o
-repositório, não vai para o GitHub, não entra no pacote (o script apaga qualquer `.env*`).
-`backend/.env.example` tem a lista completa comentada; o que segue é o que precisa de decisão
-humana.
+O `.env` de cada ambiente é criado **no servidor**, por `infra/criar-ambiente.sh`, e nunca sai
+de lá: não vai para o repositório, não vai para o GitHub, não entra no pacote (o script de
+empacotamento apaga qualquer `.env*`). `backend/.env.example` tem a lista completa comentada.
 
-### Chaves — as três, distintas, uma por ambiente
+O script preenche tudo o que consegue deduzir do ambiente e do domínio. O que sobra para
+preencher à mão, depois, é **SMTP e destinatários**:
 
-| Variável | Gerar com |
-|---|---|
-| `APP_KEY` | `php artisan key:generate` |
-| `FIELD_ENCRYPTION_KEY` | `php artisan key:generate --show` |
-| `BLIND_INDEX_KEY` | `php artisan key:generate --show` |
+- `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` — SMTP real nos dois ambientes.
+- `FORM_RECIPIENT_*` — endereços **reais** da instituição nos dois. Em staging ninguém recebe
+  nada mesmo assim, por causa do `MAIL_ALWAYS_TO`, e é de propósito que estejam lá: é assim que
+  a homologação testa a configuração que vai para produção.
+
+> Deixar um `FORM_RECIPIENT_*` **definido e vazio** é pior que não defini-lo: o Laravel usa a
+> string vazia como destinatário em vez de cair no padrão de `config/forms.php` (bug real deste
+> projeto). Ou preenche, ou deixa comentado — que é como o script os escreve.
+
+Depois de **qualquer** alteração no `.env`:
+
+```bash
+cd /var/www/laf/<ambiente>/current/backend && php8.5 artisan config:cache
+sudo systemctl restart laf-queue@<ambiente> laf-scheduler@<ambiente>
+```
+
+### As três chaves
+
+| Variável | Gerada por | Perder significa |
+|---|---|---|
+| `APP_KEY` | `criar-ambiente.sh` | sessões e cookies assinados invalidados |
+| `FIELD_ENCRYPTION_KEY` | `criar-ambiente.sh` | **irreversível** |
+| `BLIND_INDEX_KEY` | `criar-ambiente.sh` | **irreversível** |
+
+O script gera as três e as imprime **uma única vez**, no fim. Não há como recuperá-las depois
+a não ser lendo o `.env` do servidor.
 
 > **Perder `FIELD_ENCRYPTION_KEY` ou `BLIND_INDEX_KEY` é irreversível.** Os campos pessoais
 > cifrados viram lixo e **nenhum backup do banco os traz de volta** — o backup guarda o texto
 > cifrado, não a chave. Guardar as três em cofre de senhas, **em lugar distinto do backup do
 > banco**: backup e chave no mesmo lugar significa que quem pegar um pega os dois. Nunca
-> reaproveitar a chave de staging em production, nem o `APP_KEY` como qualquer uma das outras
-> duas. Rotação: ver `FIELD_ENCRYPTION_PREVIOUS_KEYS` em `docs/protecao-de-dados.md`.
+> reaproveitar a chave de staging em production. Rotação: ver
+> `FIELD_ENCRYPTION_PREVIOUS_KEYS` em `docs/protecao-de-dados.md`.
+
+`criar-ambiente.sh` **nunca sobrescreve um `.env` existente**, justamente por causa disso.
 
 ### Domínio e sessão
 
-| Variável | Valor | Se estiver errado |
-|---|---|---|
-| `SESSION_DOMAIN` | domínio raiz com ponto (`.DOMINIO`) | o login "funciona" e a sessão não gruda: o cookie é emitido e o navegador descarta |
-| `SANCTUM_STATEFUL_DOMAINS` | hosts do site e do painel, sem protocolo | a API responde 401 mesmo com cookie válido |
-| `CORS_ALLOWED_ORIGINS` | URLs completas do site e do painel | o painel não consegue nem chamar `/csrf-cookie` |
-| `TRUSTED_PROXIES` | IP do Nginx/Nitro | todo formulário público é registrado com o IP do proxy, e o limite por IP passa a valer para o servidor inteiro |
-| `APP_URL` | `https://api…` | links absolutos e o Scramble saem errados |
+Preenchidas pelo script a partir de `--dominio`. O que cada uma quebra quando está errada:
 
-### E-mail
-
-`MAIL_MAILER=smtp` e as credenciais do provedor nos dois ambientes.
-`FORM_RECIPIENT_PROGRAM_APPLICATION`, `..._PICKUP_REQUEST`, `..._VOLUNTEER_APPLICATION`,
-`..._PARTNERSHIP_INQUIRY` e `..._CONTACT_MESSAGE` recebem os endereços **reais** da instituição
-nos dois — em staging ninguém recebe nada mesmo assim, por causa de:
-
-`MAIL_ALWAYS_TO` — **só em staging.** Definida, reendereça todo e-mail para esse endereço e
-descarta cc e bcc. É o que permite a instituição testar formulário em homologação sem que
-chegue mensagem na caixa de ninguém. **Vazia em produção**; preenchida lá, ninguém recebe as
-notificações e o sistema parece calado.
-
-Deixar um `FORM_RECIPIENT_*` **definido e vazio** é pior que não defini-lo: o Laravel usa a
-string vazia como destinatário em vez de cair no padrão de `config/forms.php` (bug real deste
-projeto). Ou preenche, ou comenta a linha.
-
-### URLs usadas em conteúdo
-
-| Variável | Para quê |
+| Variável | Se estiver errado |
 |---|---|
-| `ADMIN_BASE_URL` | monta o link de `/definir-senha` e o link do e-mail de notificação |
-| `SITE_BASE_URL` | monta a URL absoluta da logo no cabeçalho do e-mail |
-| `FORM_CONSENT_TERMS_VERSION` | versão do termo gravada a cada envio — mudar quando a política de privacidade mudar |
+| `SESSION_DOMAIN` | o login "funciona" e a sessão não gruda: o cookie é emitido e o navegador descarta |
+| `SANCTUM_STATEFUL_DOMAINS` | a API responde 401 mesmo com cookie válido |
+| `CORS_ALLOWED_ORIGINS` | o painel não consegue nem chamar `/csrf-cookie` |
+| `TRUSTED_PROXIES` | todo formulário público é registrado com o IP do proxy, e o limite por IP passa a valer para o servidor inteiro |
+| `APP_URL` | links absolutos e o Scramble saem errados |
 
-### Frontends — entram no BUILD, não no `.env` do servidor
+### Frontends — tudo em tempo de execução
 
-O site (Nuxt) lê `NUXT_PUBLIC_*` em **tempo de execução**: `NUXT_PUBLIC_API_URL`,
-`NUXT_PUBLIC_SITE_URL`, `NUXT_PUBLIC_ENVIRONMENT` (só `staging`), `NUXT_PUBLIC_UMAMI_WEBSITE_ID`
-e `NUXT_PUBLIC_UMAMI_URL` são variáveis de ambiente do processo Nitro. O mesmo `site/` serve
-homologação ou produção só trocando isso.
+Nenhum dos dois frontends precisa ser rebuildado por ambiente.
 
-O painel (Vite) grava `VITE_API_URL`, `VITE_SITE_URL` e
-`VITE_SESSION_IDLE_TIMEOUT_MINUTES` **dentro do bundle**, em tempo de build — então o `painel/`
-do pacote é específico do ambiente e precisa ser reempacotado para produção (ver as
-consequências na ADR 0014).
+**Site (Nuxt).** Lê `NUXT_PUBLIC_*` em tempo de execução, do ambiente do processo Nitro. Ficam
+em `/var/www/laf/<ambiente>/shared/site.env`, lido pelo `EnvironmentFile` do systemd:
+`NUXT_PUBLIC_API_URL`, `NUXT_PUBLIC_SITE_URL`, `NUXT_PUBLIC_ENVIRONMENT` (só `staging`),
+`NUXT_PUBLIC_UMAMI_WEBSITE_ID` e `NUXT_PUBLIC_UMAMI_URL`.
+
+**Painel (Vite).** Lê `window.__LAF_CONFIG__` de `/config.js`, servido fora do bundle. O
+arquivo de verdade é `/var/www/laf/<ambiente>/shared/painel-config.js`, e `publicar.sh` aponta
+o `painel/config.js` de cada release para ele. Ver
+`docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md` — antes dessa decisão, as
+`VITE_*` ficavam gravadas dentro do bundle e um painel de produção construído com a URL de
+homologação abria normalmente, editando o conteúdo errado sem nenhum sinal na tela.
+
+Os dois arquivos são **reescritos a cada execução** de `criar-ambiente.sh`, e podem ser: só
+guardam endereço, nenhum segredo.
 
 Umami é cookieless e não exige banner de consentimento (ver
 `docs/decisoes/0006-umami-em-vez-de-google-analytics.md`); sem as duas variáveis, o script
 simplesmente não é injetado.
 
-## 5. Primeiro deploy, na ordem
+## 5. Provisionar o servidor, do zero
 
-Depois de o pacote estar no servidor e o `.env` criado. Cada passo depende do anterior.
+Pré-requisitos, fora do Claude Code e fora destes scripts:
+
+1. Acesso SSH **com chave** ao usuário inicial da VPS (a chave pública entra pelo painel da
+   hospedagem).
+2. No DNS do domínio, registros A apontando para o IP da VPS. Homologação precisa de três:
+   `homologacao`, `api.homologacao`, `painel.homologacao`.
+
+```bash
+# Envie infra/ para o servidor. O repositório NÃO vai junto (ADR 0014).
+rsync -av --delete infra/ root@IP:/root/laf-infra/
+
+# 1. Base do servidor, e cria o usuário `deploy` com a sua chave.
+ssh root@IP '/root/laf-infra/provisionar.sh --chave-publica "'"$(cat ~/.ssh/id_ed25519.pub)"'"'
+
+# 2. CONFIRME o acesso do usuário novo — em outro terminal, sem fechar o primeiro.
+ssh deploy@IP 'echo entrou'
+
+# 3. Só agora: desativa login de root e senha por SSH.
+ssh root@IP '/root/laf-infra/provisionar.sh --trancar-ssh --eu-confirmo'
+
+# 4. Ambiente de homologação (banco, TLS, serviços, backup).
+ssh root@IP '/root/laf-infra/criar-ambiente.sh \
+  --ambiente staging --dominio SEUDOMINIO \
+  --email-tls voce@exemplo.org --email-de-teste teste@exemplo.org'
+```
+
+O passo 3 é separado do 1 de propósito: desativar senha e root antes de confirmar que a chave
+do usuário novo funciona é trancar a porta com a chave do lado de dentro, e recuperar isso numa
+VPS depende do console da hospedagem.
+
+O passo 4 imprime, uma única vez, **as três chaves, a senha do banco e a senha da autenticação
+básica do site de homologação**. Anote antes de fechar o terminal.
+
+### Ligar a publicação automática
+
+Chave dedicada de deploy — **não** reaproveite a sua chave pessoal:
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/laf-deploy -C 'github-actions@laf' -N ''
+ssh-copy-id -i ~/.ssh/laf-deploy.pub deploy@IP
+
+gh secret   set DEPLOY_SSH_KEY     < ~/.ssh/laf-deploy
+gh secret   set DEPLOY_HOST        --body 'IP_OU_HOST'
+gh secret   set DEPLOY_USER        --body 'deploy'
+gh secret   set DEPLOY_KNOWN_HOSTS --body "$(ssh-keyscan -H IP_OU_HOST 2>/dev/null)"
+
+gh variable set DEPLOY_STAGING_HABILITADO --body true
+```
+
+Enquanto `DEPLOY_STAGING_HABILITADO` não for `true`, o workflow roda o CI e o empacotamento
+e **pula** a publicação. É o que permite o automatismo existir antes do servidor existir, sem
+deixar a `main` vermelha a cada push.
+
+`DEPLOY_KNOWN_HOSTS` existe para não usar `StrictHostKeyChecking=no`: sem ele, qualquer coisa
+que responda naquele IP receberia o pacote e o comando de deploy.
+
+## 6. Publicar
+
+| Quero | Faço |
+|---|---|
+| Publicar em homologação | `git push` na `main` |
+| Publicar em produção | `git tag v1.0.0 && git push origin v1.0.0` |
+| Publicar à mão | Actions → **Deploy** → *Run workflow* → escolher o ambiente |
+| Promover para produção o pacote exato que homologação validou | *Run workflow* → ambiente `production` → **run_id** da execução que publicou em homologação |
+| Conferir que a reversão automática funciona | *Run workflow* → **forçar falha de saúde** (nunca em produção) |
+
+Em todos os casos a publicação só acontece **depois de todos os jobs do CI passarem** — Pint,
+Larastan, Pest, `composer audit`, lint e build dos dois frontends, `npm audit` e a bateria de
+ponta a ponta. A única exceção é a promoção por `run_id`, e ela é exceção porque o artefato
+promovido veio de uma execução em que tudo isso já passou.
+
+O que acontece no servidor, em ordem (`infra/publicar.sh`):
+
+1. a release nova é montada **inteira**, ao lado da que está no ar, em
+   `releases/<data-hora>-<commit>`;
+2. `.env`, `storage/` e `painel/config.js` são ligados ao `shared/` do ambiente;
+3. `migrate --force` e os caches do Laravel — **antes** da troca, para que uma migration que
+   falhe não chegue a mexer no que está no ar;
+4. o link `current` muda, por renomeação (`mv -T`), que é atômica: em nenhum instante `current`
+   deixa de apontar para uma release válida;
+5. PHP-FPM recarrega, `queue:restart`, os três serviços reiniciam;
+6. checagem de saúde: `https://api…/up` e a home do Nitro;
+7. se a checagem falhar, o link **volta sozinho** para a release anterior, os serviços
+   recarregam de novo e o workflow fica vermelho. A release com defeito **fica em disco**, para
+   investigar;
+8. só depois de a checagem passar, as releases além das 5 últimas são apagadas.
+
+> **Workflow vermelho no passo de publicação significa "está no ar a release ANTERIOR", não
+> "o ambiente está quebrado".** A mensagem de erro diz qual dos dois aconteceu.
+
+A checagem confere a API pela URL pública — é o caminho inteiro: TLS, Nginx, FPM, `.env`,
+banco — e o site pela porta de loopback do Nitro. O host público de homologação exige
+autenticação básica, e conferi-lo por lá faria a senha circular pelo log do deploy.
+
+## 7. Voltar para a release anterior, à mão
+
+Quando o deploy passou na checagem e o defeito apareceu depois, olhando a tela:
+
+```bash
+ssh deploy@IP
+/var/www/laf/bin/reverter.sh --ambiente staging --listar     # o que existe; → marca a do ar
+/var/www/laf/bin/reverter.sh --ambiente staging              # volta uma
+/var/www/laf/bin/reverter.sh --ambiente staging --para 20260918-142233-a1b2c3d
+```
+
+> **A reversão devolve o CÓDIGO, não o BANCO.** As migrations aplicadas continuam aplicadas.
+> É por isso que migration deste projeto é reversível e aditiva (`CLAUDE.md`, regra 9): se uma
+> release removeu ou renomeou coluna, a anterior pode não funcionar com o schema novo, e aí o
+> caminho é restaurar o backup (§14).
+
+## 8. Logs e reinício
+
+```bash
+# Aplicação (Laravel) — é o mesmo arquivo em todas as releases: fica no shared/.
+tail -f /var/www/laf/<ambiente>/shared/storage/logs/laravel.log
+
+# Site, fila e agendador
+journalctl -u laf-site@<ambiente>      -f
+journalctl -u laf-queue@<ambiente>     -f
+journalctl -u laf-scheduler@<ambiente> -f
+
+# Nginx, por host
+tail -f /var/log/nginx/laf-<ambiente>-{site,api,painel}.{access,error}.log
+
+# PHP-FPM (erro que acontece antes de o Laravel subir)
+tail -f /var/log/php/laf-<ambiente>.error.log
+
+# Backup
+journalctl -u laf-backup@<ambiente>
+systemctl list-timers laf-backup@<ambiente>.timer
+```
+
+```bash
+sudo systemctl restart laf-site@<ambiente>       # site (Nitro)
+sudo systemctl restart laf-queue@<ambiente>      # worker da fila
+sudo systemctl restart laf-scheduler@<ambiente>  # agendador
+sudo systemctl reload  php8.5-fpm                # API
+sudo systemctl reload  nginx                     # painel e roteamento
+```
+
+Conferir o que está no ar:
+
+```bash
+cat /var/www/laf/<ambiente>/current/RELEASE      # commit, data e versões do build
+```
+
+## 9. Primeiro deploy, na ordem
+
+Depois de a primeira release estar publicada e o `.env` completo (SMTP e `FORM_RECIPIENT_*`).
+Cada passo depende do anterior.
 
 ```bash
 cd /var/www/laf/<ambiente>/current/backend
 
-# 1. Estrutura do banco. --force porque em production o Artisan pede confirmação interativa.
-php artisan migrate --force
+# 1. Papéis. Sem isto o passo 3 se recusa a rodar (não existe super_admin para atribuir).
+#    As migrations já rodaram: publicar.sh as aplica a cada deploy.
+php8.5 artisan db:seed --class=Database\\Seeders\\RoleSeeder --force
 
-# 2. Papéis. Sem isto o passo 4 se recusa a rodar (não existe super_admin para atribuir).
-php artisan db:seed --class=Database\\Seeders\\RoleSeeder --force
-
-# 3. Conteúdo institucional inicial. Só CRIA o que não existe; rodar de novo depois de a
+# 2. Conteúdo institucional inicial. Só CRIA o que não existe; rodar de novo depois de a
 #    instituição editar as páginas não sobrescreve nada (ver ImportInitialPages).
-php artisan conteudo:importar-inicial
+php8.5 artisan conteudo:importar-inicial
 
-# 4. Primeira conta capaz de entrar no painel. Pergunta nome e e-mail e imprime o link de
+# 3. Primeira conta capaz de entrar no painel. Pergunta nome e e-mail e imprime o link de
 #    definição de senha — nenhuma senha em argumento nem no histórico do shell.
-php artisan usuarios:criar-super-admin
-
-# 5. Caches de produção (config, rotas, views). Depois de QUALQUER mudança no .env, repetir.
-php artisan config:cache && php artisan route:cache && php artisan view:cache
+php8.5 artisan usuarios:criar-super-admin
 ```
 
-O link impresso no passo 4 vale 24 horas e é de uso único. Entregar por canal privado; não
+O link impresso no passo 3 vale 24 horas e é de uso único. Entregar por canal privado; não
 colar em log de deploy nem em chat de equipe. Perdido ou expirado, gerar outro pelo painel
 (a geração invalida o anterior).
 
 **Depois disso, pelo painel, com a conta criada:**
 
-6. **Documentos de transparência reais.** O acervo de exemplo (`TransparencyDocumentsSeeder`,
+4. **Documentos de transparência reais.** O acervo de exemplo (`TransparencyDocumentsSeeder`,
    PDFs em branco) **não roda** em staging nem em production, de propósito — o que estiver lá
    é o que alguém subiu. Os documentos reais entram pela tela de Transparência, um a um.
-7. **Conferir o conteúdo das páginas** e ajustar o que a instituição quiser, pelo painel.
+5. **Conferir o conteúdo das páginas** e ajustar o que a instituição quiser, pelo painel.
 
 **Conferir que ficou de pé:**
 
 ```bash
 curl -sI https://api.DOMINIO/up                      # 200
 curl -sI https://DOMINIO/ | grep -i x-robots-tag     # produção: nada; homologação: noindex
+curl -sI https://homologacao.DOMINIO/                # homologação: 401 sem usuário e senha
 curl -s  https://DOMINIO/robots.txt                  # produção: Allow; homologação: Disallow
-php artisan schedule:list                            # os dois expurgos agendados
+php8.5 artisan schedule:list                         # os dois expurgos agendados
 ```
 
 E, no navegador: entrar no painel pelo link de definição de senha, editar uma página e ver a
 alteração no site.
 
-## 6. Homologação não é indexável
+## 10. Criar o ambiente de produção, quando chegar a hora
+
+Produção **não é criada junto com homologação**, de propósito: ela só existe quando o
+lançamento for decidido. Quando for:
+
+1. **DNS.** Três registros A novos para o IP da VPS: o apex (`DOMINIO`), `api` e `painel`.
+2. **Decidir a política de backup** com a instituição, antes de haver dado real de assistido
+   (§14). O padrão do script é 30 dias, que é um mínimo, não uma decisão.
+3. **Criar o ambiente:**
+   ```bash
+   ssh root@IP '/root/laf-infra/criar-ambiente.sh \
+     --ambiente production --dominio SEUDOMINIO --email-tls voce@exemplo.org'
+   ```
+   Sem `--email-de-teste`: `MAIL_ALWAYS_TO` fica **ausente** em produção. Preenchida lá,
+   ninguém recebe as notificações e o sistema parece calado.
+4. **Anotar as chaves novas.** São outras — nunca as de homologação.
+5. **Completar o `.env`**: SMTP e `FORM_RECIPIENT_*` reais.
+6. **Ligar a publicação:** `gh variable set DEPLOY_PRODUCTION_HABILITADO --body true`.
+7. **Publicar por promoção**, não por build novo: Actions → Deploy → *Run workflow* →
+   `production` → `run_id` da execução que publicou em homologação a versão aprovada. O
+   artefato é o mesmo, byte a byte.
+8. **Marcar a versão:** `git tag v1.0.0 && git push origin v1.0.0` — a partir daí, tag publica
+   em produção sozinha.
+9. Rodar o §9 neste ambiente (papéis, conteúdo inicial, super admin) e conferir que
+   `NUXT_PUBLIC_ENVIRONMENT` está **vazia** em `shared/site.env`: preenchida, o site de
+   produção sai da busca, de que a captação da instituição depende.
+
+## 11. Homologação não é indexável
 
 Em `staging`, **toda** resposta do site sai com `X-Robots-Tag: noindex, nofollow` e o
 `robots.txt` bloqueia o site inteiro — página, arquivo estático, PDF, 404, tudo. Homologação
@@ -199,11 +401,18 @@ de verdade na busca orgânica, de que a instituição depende.
 
 Quem liga isso é `NUXT_PUBLIC_ENVIRONMENT=staging` no processo do Nitro (ver
 `frontend-site/server/plugins/staging-noindex.ts` e o middleware ao lado). É decidido em tempo
-de execução: o mesmo `site/` do pacote responde como produção sem a variável. A autenticação
-básica do Nginx no host de homologação (tarefa 07b) é a outra metade — as duas juntas, nunca
-uma só.
+de execução: o mesmo `site/` do pacote responde como produção sem a variável.
 
-## 7. Cache de HTML e CDN
+A **autenticação básica** do Nginx no host de homologação é a outra metade — as duas juntas,
+nunca uma só. A autenticação impede a leitura; o cabeçalho impede a indexação de qualquer coisa
+que escape dela. Não existe equivalente na API nem no painel, de propósito: a API é consumida
+pelo painel por XHR e uma senha de Nginx quebraria toda requisição; o painel já exige login de
+verdade.
+
+O desafio do Certbot (`/.well-known/acme-challenge/`) tem `auth_basic off` — sem isso, a
+renovação do certificado de homologação falharia calada até o certificado vencer.
+
+## 12. Cache de HTML e CDN
 
 O painel edita `pages.content`, e por isso **toda rota cujo conteúdo vem do CMS é SSR a cada
 requisição** — nenhuma delas é prerenderizada. Salvar pelo painel invalida o cache de 10
@@ -224,28 +433,56 @@ de `/fotos/**` já saem com `Cache-Control: public, max-age=2592000` **sem** `im
 propósito: o nome do arquivo não tem hash, então trocar a foto mantendo o nome precisa poder
 ser visto antes de 30 dias.
 
-## 8. Gerar o pacote
+`/config.js` e `/index.html` do painel saem com `no-cache` — os dois não têm hash no nome e
+mudam a cada publicação; cacheados, o navegador continuaria carregando a configuração do
+ambiente anterior.
+
+## 13. Gerar o pacote à mão
 
 ```bash
-# Painel: as VITE_* entram no bundle, então precisam estar corretas AQUI, não no servidor.
-VITE_API_URL=https://api.DOMINIO \
-VITE_SITE_URL=https://DOMINIO \
 scripts/deploy/empacotar.sh
 ```
 
+Sem nenhuma variável de ambiente: desde a ADR 0015 o pacote é o mesmo para os dois ambientes.
 Sai em `.pacotes/lar-analia-franco-<data>-<commit>/` e no tarball ao lado. O script exige
 árvore limpa (o pacote sai de `git archive HEAD`), roda os três builds, poda o que não roda em
 servidor e **falha sem gerar nada** se encontrar no pacote qualquer item da lista da ADR 0014.
 
-## 9. Backup
+Para publicar esse pacote sem passar pelo GitHub Actions:
 
-Mínimo, antes de haver dado real de assistido em produção:
+```bash
+rsync -az --delete .pacotes/lar-analia-franco-.../ deploy@IP:/var/www/laf/staging/incoming/pacote/
+rsync -az infra/publicar.sh deploy@IP:/var/www/laf/bin/
+ssh deploy@IP '/var/www/laf/bin/publicar.sh --ambiente staging --pacote /var/www/laf/staging/incoming/pacote'
+```
 
-- **Banco**: dump diário, retenção a definir com a instituição; restauração testada pelo menos
-  uma vez — backup nunca restaurado não é backup.
-- **`backend/storage/app`**: onde ficam os PDFs de transparência enviados pelo painel. Não está
-  no pacote nem no repositório; só existe no servidor.
+## 14. Backup
+
+`infra/backup-banco.sh`, disparado por `laf-backup@<ambiente>.timer` todo dia de madrugada.
+Dump comprimido em `/var/backups/laf/<ambiente>/`, escrito num arquivo temporário e renomeado
+só no fim — um dump interrompido no meio não vira um backup aparentemente válido.
+
+| Ambiente | Retenção |
+|---|---|
+| staging | 7 dias |
+| production | **a decidir com a instituição**, antes de haver dado real de assistido. O script usa 30 dias como mínimo até que haja decisão. |
+
+O dump guarda o dado pessoal **já cifrado**. A chave que o abre está no `.env`, não no backup —
+e é por isso que `docs/protecao-de-dados.md` exige que as chaves fiquem em cofre de senhas, em
+lugar distinto do backup: quem pegar os dois juntos pega tudo; quem pegar só um não pega nada.
+
+Restaurar (destrutivo — confira o ambiente duas vezes):
+
+```bash
+sudo systemctl stop laf-queue@<amb> laf-scheduler@<amb>
+gunzip -c /var/backups/laf/<amb>/<arquivo>.sql.gz | sudo -u postgres psql -d <banco>
+sudo systemctl start laf-queue@<amb> laf-scheduler@<amb>
+```
+
+**Backup nunca restaurado não é backup** — a restauração precisa ser testada pelo menos uma vez.
+
+Falta cobrir, além do banco:
+
+- **`backend/storage/app`** (em `shared/storage/app`): onde ficam os PDFs de transparência
+  enviados pelo painel. Não está no pacote nem no repositório; só existe no servidor.
 - **As três chaves**: em cofre de senhas, fora do servidor e **fora do backup do banco**.
-
-Homologação tem backup diário com 7 dias de retenção (tarefa 07b). Produção precisa de política
-própria, decidida com a instituição, antes de receber dado real.
