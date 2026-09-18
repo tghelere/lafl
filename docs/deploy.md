@@ -232,6 +232,13 @@ homologação abria normalmente, editando o conteúdo errado sem nenhum sinal na
 Os dois arquivos são **reescritos a cada execução** de `criar-ambiente.sh`, e podem ser: só
 guardam endereço, nenhum segredo.
 
+> **Isto vale para SSR, não para rota prerenderizada.** Prerender roda no BUILD e grava no
+> pacote o valor que a variável tinha ali — e o pacote é um só para os dois ambientes. Por
+> isso nenhuma rota indexável pode ser prerenderizada: o canônico, o `og:url` e o `og:image`
+> de toda página são absolutos e saem de `NUXT_PUBLIC_SITE_URL`. Ver
+> `docs/decisoes/0018-nenhuma-rota-indexavel-e-prerenderizada.md`, que tem a medição. Sobrou
+> na lista de prerender só o que é `noindex` e não emite nenhuma dessas tags.
+
 Umami é cookieless e não exige banner de consentimento (ver
 `docs/decisoes/0006-umami-em-vez-de-google-analytics.md`); sem as duas variáveis, o script
 simplesmente não é injetado.

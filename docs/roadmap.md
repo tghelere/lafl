@@ -362,6 +362,10 @@
       mínima de slug e `updated_at`) e todos os documentos publicados, pela URL legível da
       etapa 3. Saiu de `nitro.prerender.routes` pelo mesmo motivo das páginas do CMS. Falta
       `posts`, que ainda não existe — acrescentar a busca aqui quando existir.
+- [x] PDFs de transparência indexáveis — feito na sessão 21 (tarefa 06, etapa 3):
+      `/transparencia/documentos/{ano}/{slug}.pdf`, `inline`, no domínio do site, com slug
+      persistido na criação, 301 do endereço antigo e contagem que não soma robô. Ver
+      `docs/decisoes/0017-url-publica-dos-documentos-de-transparencia.md`.
 - [x] JSON-LD `NGO` na home — feito na sessão 21 (tarefa 06, etapa 2), em
       `app/composables/useOrganizationJsonLd.ts`: CNPJ como `identifier`, logo PNG, telefone,
       `foundingDate` vindo da API (nunca digitada na página) e os dois locais distintos em
@@ -613,6 +617,17 @@ produção**, não para homologação.
 - [ ] `pages.og_image_id`: entra numa migration futura, junto da entidade `media` — decisão
       de sessão anterior, para não criar coluna sem uso funcional possível antes de `media`
       existir
+- [ ] **Ordenação de listagem sem critério de desempate.** Todas as listagens administrativas
+      dos cinco formulários ordenam só por `created_at`, que o Laravel grava com precisão de
+      **segundo** (`timestamps()` cria `timestamp(0)` no Postgres). Dois registros criados no
+      mesmo segundo empatam, e aí a ordem que o Postgres devolve não é definida: com
+      `LIMIT/OFFSET`, a mesma linha pode aparecer em duas páginas ou sumir entre elas.
+      Descoberto na sessão 21 por uma falha real da bateria de ponta a ponta — o teste da
+      política de privacidade pegava "a primeira da lista" e recebeu a mensagem do teste
+      anterior, criada 0,9 s antes. O teste foi corrigido (procura pelo assunto), mas a
+      listagem continua sem desempate: acrescentar `->orderByDesc('id')` depois do
+      `latest('created_at')` nas seis listagens resolve. Não foi feito na sessão 21 por ser
+      escopo de outra tarefa
 - [ ] PHPStan (Larastan) estoura o limite padrão de memória do PHP (128M) com o volume atual
       de código — rodar sempre com `./vendor/bin/phpstan analyse --memory-limit=512M`. Vale
       considerar fixar isso em `phpstan.neon` ou num script composer numa sessão futura, para

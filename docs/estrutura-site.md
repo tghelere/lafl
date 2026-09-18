@@ -197,8 +197,9 @@ proxy do site (`/transparencia/documentos/{ano}/{slug}.pdf`, ver
 `frontend-site/server/routes/transparencia/documentos/`), para que o arquivo indexado esteja no
 domínio do site e não no da API. A rota da API espelha o mesmo caminho e é ela que decide 404,
 301 de ano trocado e contagem de download. O `slug` nasce do título na criação e nunca é
-recalculado — renomear o documento não pode quebrar link já indexado (ver
-`docs/tarefas/06-seo-e-pdfs-da-transparencia.md`).
+recalculado — renomear o documento não pode quebrar link já indexado. O desenho inteiro, com
+as alternativas descartadas, está em
+`docs/decisoes/0017-url-publica-dos-documentos-de-transparencia.md`.
 
 `institution-facts` e `stats` não são a mesma coisa e vão conviver: `institution-facts`
 devolve o que é DERIVADO (idade a partir de uma data, contagem do acervo publicado) e por isso
