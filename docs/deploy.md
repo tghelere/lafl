@@ -274,6 +274,19 @@ Trancar vem **por último**, depois de criar o ambiente, porque o passo 3 roda c
 `criar-ambiente.sh` novo (produção, por exemplo) passa a ser `ssh sysadmin@IP` +
 `sudo /root/laf-infra/criar-ambiente.sh …`.
 
+> **Conferir o trancamento bane o seu IP.** Depois do passo 4, a conferência natural é tentar
+> `ssh root@IP` e tentar entrar por senha, e ver as duas serem recusadas. As duas contam como
+> falha de autenticação para o `fail2ban`, que está com `maxretry = 5` e `findtime = 10m`: meia
+> dúzia de tentativas e a sua máquina leva `bantime = 1h`. O sintoma é **`Connection refused` na
+> porta 22**, com a 443 respondendo normalmente e o deploy do GitHub Actions continuando a
+> funcionar — o banimento é por IP, e o runner tem outro.
+>
+> É indistinguível, à primeira vista, de ter se trancado do lado de fora. Para separar os dois:
+> se `https://api.DOMINIO/up` responde 200 e uma publicação pelo GitHub Actions passa, o
+> servidor está inteiro e o problema é o seu IP. Saídas: esperar a hora passar, entrar de outra
+> rede, ou soltar pelo console da hospedagem com
+> `fail2ban-client set sshd unbanip SEU_IP`.
+
 O passo 3 imprime, uma única vez, **as três chaves, a senha do banco e a senha da autenticação
 básica do site de homologação**. Anote antes de fechar o terminal. Se ele falhar no meio (por
 DNS, por exemplo) depois de já ter criado o `.env`, a execução seguinte **não reimprime as

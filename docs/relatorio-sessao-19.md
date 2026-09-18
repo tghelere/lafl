@@ -148,7 +148,23 @@ Além do que a tarefa pedia:
 - **Backup disparado uma vez:** dump de 15 KB, 48 comandos de schema/dados, arquivo `0600`,
   retenção aplicada, timer armado para 03:25 UTC.
 - **PostgreSQL, Redis e Nitro escutando só em loopback**; `ufw` com 22/80/443; `fail2ban` ativo
-  no `sshd`.
+  no `sshd` — ativo a ponto de **me banir**: ver abaixo.
+
+## O `fail2ban` funciona, e me baniu
+
+A conferência do trancamento do SSH (tentar `root@`, tentar senha, ver as duas recusadas) é
+exatamente o que o `fail2ban` conta como falha de autenticação. Cinco em dez minutos e a
+máquina leva uma hora de banimento — foi o que aconteceu com o meu IP no fim da sessão.
+
+O sintoma é `Connection refused` na porta 22, e é **indistinguível, à primeira vista, de ter se
+trancado do lado de fora** — que é justamente o medo que o `--trancar-ssh` em duas passadas
+existe para evitar. O que separa os dois: a porta 443 continuou aberta, `https://api…/up`
+continuou em 200 e o deploy do GitHub Actions rodou depois disso e passou (o runner tem outro
+IP). O servidor estava inteiro; só eu estava do lado de fora.
+
+Anotado em `docs/deploy.md` §5, com como distinguir e como soltar
+(`fail2ban-client set sshd unbanip SEU_IP`, pelo console da hospedagem). Não desliguei nem
+afrouxei nada: o `fail2ban` fez exatamente o trabalho dele.
 
 ## O que precisa de você
 
