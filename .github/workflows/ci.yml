@@ -1,9 +1,16 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
+  # Chamado por .github/workflows/deploy.yml, que é quem roda em push na main: o deploy
+  # depende de TODOS os jobs daqui passarem, e um workflow separado não consegue esperar
+  # outro. Sem `workflow_call`, a alternativa seria `workflow_run`, que dispara DEPOIS e
+  # num contexto onde o commit já não é o mesmo — e que publicaria em cima de um CI vermelho
+  # se alguém empurrasse duas vezes seguidas.
+  #
+  # Não há `push: branches: [main]` aqui de propósito: a main passa pelo deploy.yml, e
+  # manter os dois gatilhos faria a suíte inteira rodar duas vezes por push.
+  workflow_call:
 
 jobs:
   backend:

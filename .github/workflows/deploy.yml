@@ -1,0 +1,235 @@
+# Publicação automática — ver docs/deploy.md e docs/tarefas/07b.
+#
+#   push na main  → homologação, e só se TODOS os jobs do CI passarem
+#   tag v*        → produção, com o mesmo pacote (ver "Promoção", abaixo)
+#   botão         → qualquer um dos dois, à mão
+#
+# O servidor nunca recebe o repositório: o CI roda os testes, gera o pacote mínimo da
+# ADR 0014 e envia só ele, por rsync. Nada é buildado lá.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: Ambiente de destino
+        type: choice
+        options: [staging, production]
+        default: staging
+      run_id:
+        description: >-
+          Promover o pacote de uma execução anterior (ID numérico da execução). Em branco,
+          empacota este commit.
+        type: string
+        default: ''
+      forcar_falha_de_saude:
+        description: >-
+          Falhar a checagem de saúde de propósito, para conferir a reversão automática.
+          NÃO use em produção.
+        type: boolean
+        default: false
+
+# Uma publicação por vez, por ambiente. Sem isto, dois pushes seguidos na main viram dois
+# publicar.sh disputando o mesmo link `current` e a mesma tabela de migrations.
+concurrency:
+  group: deploy-${{ github.ref_type == 'tag' && 'production' || inputs.ambiente || 'staging' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read          # baixar o pacote de outra execução (promoção)
+
+jobs:
+  # ---------------------------------------------------------------------------
+  preparar:
+    name: Decidir o ambiente
+    runs-on: ubuntu-latest
+    outputs:
+      ambiente: ${{ steps.decidir.outputs.ambiente }}
+      habilitado: ${{ steps.decidir.outputs.habilitado }}
+    steps:
+      - id: decidir
+        env:
+          # A flag por ambiente é o que permite este workflow existir ANTES de o servidor
+          # existir: sem ela definida como 'true', o CI e o empacotamento rodam normalmente
+          # e a publicação é pulada, em vez de deixar a main vermelha a cada push.
+          STAGING_HABILITADO: ${{ vars.DEPLOY_STAGING_HABILITADO }}
+          PRODUCTION_HABILITADO: ${{ vars.DEPLOY_PRODUCTION_HABILITADO }}
+          ENTRADA: ${{ inputs.ambiente }}
+        run: |
+          if [ "${{ github.ref_type }}" = 'tag' ]; then
+            ambiente=production
+          elif [ -n "$ENTRADA" ]; then
+            ambiente="$ENTRADA"
+          else
+            ambiente=staging
+          fi
+
+          if [ "$ambiente" = 'production' ]; then
+            habilitado="$PRODUCTION_HABILITADO"
+          else
+            habilitado="$STAGING_HABILITADO"
+          fi
+
+          echo "ambiente=$ambiente"                        >> "$GITHUB_OUTPUT"
+          echo "habilitado=${habilitado:-false}"           >> "$GITHUB_OUTPUT"
+          echo "### Destino: \`$ambiente\`"                >> "$GITHUB_STEP_SUMMARY"
+          if [ "${habilitado:-false}" != 'true' ]; then
+            {
+              echo
+              echo "A publicação em \`$ambiente\` está **desligada**."
+              echo "Para ligar: \`gh variable set DEPLOY_$(echo "$ambiente" | tr '[:lower:]' '[:upper:]')_HABILITADO --body true\`."
+              echo "O CI e o empacotamento rodam assim mesmo."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  # ---------------------------------------------------------------------------
+  ci:
+    name: CI
+    # Na promoção de um pacote já validado não há o que testar de novo: o artefato veio de
+    # uma execução em que todo o CI passou.
+    if: ${{ inputs.run_id == '' }}
+    uses: ./.github/workflows/ci.yml
+
+  # ---------------------------------------------------------------------------
+  empacotar:
+    name: Empacotar
+    runs-on: ubuntu-latest
+    needs: [preparar, ci]
+    if: >-
+      ${{ always()
+          && inputs.run_id == ''
+          && needs.preparar.result == 'success'
+          && needs.ci.result == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # O empacotar.sh sai de `git archive HEAD` e exige árvore limpa; precisa do .git.
+          fetch-depth: 1
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          # Mesmas versões do CI e de docker/php/Dockerfile. Divergir aqui faria o pacote
+          # ser gerado com uma pilha que ninguém testou.
+          php-version: '8.5'
+          extensions: pdo_pgsql, pgsql, mbstring, intl, exif, gd, bcmath, zip, redis
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # Nenhuma VITE_*/NUXT_PUBLIC_* aqui, de propósito: desde a ADR 0015 o painel lê a
+      # configuração de /config.js em tempo de execução e o site lê as NUXT_PUBLIC_* do
+      # processo Nitro. O pacote é o mesmo para homologação e para produção.
+      - name: Gerar o pacote
+        run: scripts/deploy/empacotar.sh --saida "$RUNNER_TEMP/pacotes"
+
+      - name: Publicar o pacote como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: pacote
+          path: ${{ runner.temp }}/pacotes/*.tar.gz
+          retention-days: 30
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  publicar:
+    name: Publicar em ${{ needs.preparar.outputs.ambiente }}
+    runs-on: ubuntu-latest
+    needs: [preparar, empacotar]
+    if: >-
+      ${{ always()
+          && needs.preparar.outputs.habilitado == 'true'
+          && (needs.empacotar.result == 'success' || inputs.run_id != '') }}
+    environment:
+      name: ${{ needs.preparar.outputs.ambiente }}
+    steps:
+      - name: Baixar o pacote desta execução
+        if: ${{ inputs.run_id == '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: pacote
+          path: pacote-tar
+
+      # Promoção: o MESMO artefato já validado em homologação, sem rebuild. É o que torna
+      # "promover para produção" uma promoção de verdade, e não um build novo com outro nome.
+      - name: Baixar o pacote de uma execução anterior
+        if: ${{ inputs.run_id != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download "${{ inputs.run_id }}" \
+            --repo "${{ github.repository }}" --name pacote --dir pacote-tar
+
+      - name: Desempacotar
+        run: |
+          set -euo pipefail
+          tarball="$(find pacote-tar -name '*.tar.gz' -type f | head -1)"
+          [ -n "$tarball" ] || { echo 'nenhum tarball no artefato' >&2; exit 1; }
+          mkdir -p pacote
+          tar -xzf "$tarball" -C pacote --strip-components=1
+          echo "### Pacote"                >> "$GITHUB_STEP_SUMMARY"
+          echo '```'                       >> "$GITHUB_STEP_SUMMARY"
+          cat pacote/RELEASE               >> "$GITHUB_STEP_SUMMARY"
+          echo '```'                       >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preparar a chave de SSH
+        env:
+          CHAVE: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOST_CONHECIDO: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -m 700 -p ~/.ssh
+          printf '%s\n' "$CHAVE" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          # known_hosts de verdade, e não StrictHostKeyChecking=no: sem ele, qualquer coisa
+          # que responda no IP recebe o pacote e o comando de deploy.
+          printf '%s\n' "$HOST_CONHECIDO" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Enviar o pacote e os scripts
+        env:
+          ALVO: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+          AMBIENTE: ${{ needs.preparar.outputs.ambiente }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/deploy "$ALVO" "mkdir -p /var/www/laf/${AMBIENTE}/incoming /var/www/laf/bin"
+
+          # `incoming/pacote` é um caminho ESTÁVEL, e é isso que faz o rsync valer a pena: a
+          # cada deploy só o que mudou atravessa a rede — `vendor/` inteiro fica parado entre
+          # releases. `--delete` garante que o que saiu do pacote sai de lá também.
+          rsync -az --delete -e "ssh -i $HOME/.ssh/deploy" \
+            pacote/ "${ALVO}:/var/www/laf/${AMBIENTE}/incoming/pacote/"
+
+          # Os scripts de publicação vão a cada deploy, do próprio commit: assim a lógica de
+          # release no servidor nunca fica atrás do repositório.
+          rsync -az -e "ssh -i $HOME/.ssh/deploy" \
+            infra/publicar.sh infra/reverter.sh "${ALVO}:/var/www/laf/bin/"
+          ssh -i ~/.ssh/deploy "$ALVO" 'chmod +x /var/www/laf/bin/publicar.sh /var/www/laf/bin/reverter.sh'
+
+      - name: Publicar
+        env:
+          ALVO: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+          AMBIENTE: ${{ needs.preparar.outputs.ambiente }}
+          FORCAR: ${{ inputs.forcar_falha_de_saude }}
+        run: |
+          set -euo pipefail
+          extra=''
+          if [ "$FORCAR" = 'true' ]; then
+            extra='--forcar-falha-de-saude'
+          fi
+
+          # publicar.sh reverte sozinho se a checagem de saúde falhar, e sai com erro quando
+          # isso acontece — então este passo ficar vermelho significa "o ambiente está no ar
+          # com a release ANTERIOR", não "o ambiente está quebrado".
+          ssh -i ~/.ssh/deploy "$ALVO" \
+            "/var/www/laf/bin/publicar.sh --ambiente ${AMBIENTE} --pacote /var/www/laf/${AMBIENTE}/incoming/pacote ${extra}"
+
+      - name: Limpar a chave
+        if: always()
+        run: rm -f ~/.ssh/deploy
