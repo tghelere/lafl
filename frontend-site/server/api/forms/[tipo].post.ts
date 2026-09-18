@@ -43,24 +43,29 @@ export default defineEventHandler(async (event) => {
   }
 
   const route = FORM_ROUTES[tipo]
-  const form = await readFormData(event)
-
-  // Honeypot (ver App\Support\Honeypot no backend, mesmo princípio): resposta idêntica à de
-  // sucesso, sem sequer chamar a API.
-  if (form.get('website')) {
-    return sendRedirect(event, `/obrigado/${tipo}`, 303)
-  }
-
-  const config = useRuntimeConfig()
-  const ip = getRequestIP(event, { xForwardedFor: true }) ?? '0.0.0.0'
-
-  const body: Record<string, string> = {}
-  for (const [key, value] of form.entries()) {
-    if (key === 'website' || typeof value !== 'string') continue
-    body[key] = value
-  }
 
   try {
+    // Dentro do try: um Content-Type que não seja multipart/form-data nem
+    // application/x-www-form-urlencoded (visitante nenhum manda isso por um <form> de
+    // verdade, mas um curl de conferência manual ou um bot mandam) faz readFormData rejeitar
+    // — sem o try aqui, essa rejeição não tinha catch nenhum e virava 500 sem redirect.
+    const form = await readFormData(event)
+
+    // Honeypot (ver App\Support\Honeypot no backend, mesmo princípio): resposta idêntica à de
+    // sucesso, sem sequer chamar a API.
+    if (form.get('website')) {
+      return sendRedirect(event, `/obrigado/${tipo}`, 303)
+    }
+
+    const config = useRuntimeConfig()
+    const ip = getRequestIP(event, { xForwardedFor: true }) ?? '0.0.0.0'
+
+    const body: Record<string, string> = {}
+    for (const [key, value] of form.entries()) {
+      if (key === 'website' || typeof value !== 'string') continue
+      body[key] = value
+    }
+
     await $fetch(`${config.public.apiUrl}/api/v1/public/${route.endpoint}`, {
       method: 'POST',
       body,
