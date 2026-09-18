@@ -39,7 +39,8 @@ use Illuminate\Support\Str;
  *   ContentPagesSeeder guarda o content em forma canônica do editor (ver o comentário no
  *   topo daquele arquivo), não há mais motivo para manter cópia sintética só para isso;
  * - um documento de transparência propositalmente fora da primeira página da listagem
- *   administrativa.
+ *   administrativa, e acervo grande o bastante (21 documentos) para a listagem PÚBLICA também
+ *   paginar — ela mostra 20 por página.
  */
 class E2eSeeder extends Seeder
 {
@@ -53,7 +54,7 @@ class E2eSeeder extends Seeder
      * Ano e título do documento que a bateria usa para provar que o filtro alcança o que a
      * primeira página da listagem não mostra. Ele nasce com `updated_at` cinco anos atrás e a
      * listagem administrativa ordena por `updated_at` decrescente, então ele é sempre o
-     * último de todos — com 16 documentos e 15 por página, sempre na segunda.
+     * último de todos — com 21 documentos e 15 por página, sempre fora da primeira.
      */
     public const MARKER_DOCUMENT_YEAR = 2019;
 
@@ -154,9 +155,12 @@ class E2eSeeder extends Seeder
         // Doze documentos, todos com updated_at = agora.
         $this->call(TransparencyDocumentsSeeder::class);
 
-        // Mais três, só para o acervo passar de 15 (o padrão de itens por página da listagem
-        // administrativa) e o documento-marco abaixo cair mesmo na segunda página.
-        foreach ([2021, 2020, 2018] as $year) {
+        // Mais oito, para o acervo passar dos DOIS limites que importam: 15, o padrão de itens
+        // por página da listagem administrativa (é o que faz o documento-marco abaixo cair na
+        // segunda página), e 20, o da listagem pública — sem passar do segundo, a paginação
+        // do site nunca apareceria, e o teste de que os links de página são rastreáveis não
+        // teria o que conferir.
+        foreach ([2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013] as $year) {
             $this->createDocument("Relatório anual de atividades {$year}", $year, TransparencyDocumentType::AnnualReport, now());
         }
 

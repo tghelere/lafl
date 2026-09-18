@@ -46,15 +46,28 @@ const yearQuery = queryParam('year')
 const typeQuery = queryParam('type')
 const pageQuery = queryParam('page')
 
-const typeOptions: Array<{ value: TransparencyDocumentType; label: string }> = [
-  { value: 'balance', label: 'Balanço' },
-  { value: 'bylaws', label: 'Estatuto' },
-  { value: 'minutes', label: 'Ata' },
-  { value: 'certificate', label: 'Certidão' },
-  { value: 'agreement_accounting', label: 'Prestação de contas do convênio' },
-  { value: 'notice', label: 'Edital' },
-  { value: 'annual_report', label: 'Relatório anual' },
+// Espelho de App\Enums\TransparencyDocumentType (o `label` da API vem em `type_label`; estes
+// existem para montar o <select> antes de qualquer documento chegar). O plural é só daqui: é
+// o que permite o <title> dizer "Balanços de 2024" em vez de repetir o rótulo do singular.
+const typeOptions: Array<{ value: TransparencyDocumentType; label: string; plural: string }> = [
+  { value: 'balance', label: 'Balanço', plural: 'Balanços' },
+  { value: 'bylaws', label: 'Estatuto', plural: 'Estatutos' },
+  { value: 'minutes', label: 'Ata', plural: 'Atas' },
+  { value: 'certificate', label: 'Certidão', plural: 'Certidões' },
+  { value: 'agreement_accounting', label: 'Prestação de contas do convênio', plural: 'Prestações de contas do convênio' },
+  { value: 'notice', label: 'Edital', plural: 'Editais' },
+  { value: 'annual_report', label: 'Relatório anual', plural: 'Relatórios anuais' },
 ]
+
+// Só filtro que a API de fato aplica entra no título e no canônico. `?type=xyz` é ignorado
+// pela API (ver o controller público), então a página responde o acervo inteiro — anunciar
+// esse endereço como canônico faria o buscador indexar duas URLs com o mesmo conteúdo.
+const tipoValido = computed(() => typeOptions.find((option) => option.value === typeQuery) ?? null)
+const anoValido = computed(() => (yearQuery && /^\d{4}$/.test(yearQuery) ? yearQuery : null))
+const paginaAtual = computed(() => {
+  const numero = Number(pageQuery)
+  return Number.isInteger(numero) && numero > 1 ? numero : 1
+})
 
 const { data } = await useAsyncData<PaginatedTransparencyDocuments>(
   `transparency-documents:${yearQuery ?? ''}:${typeQuery ?? ''}:${pageQuery ?? ''}`,
@@ -88,10 +101,47 @@ function pageHref(page: number): string {
   return `/transparencia/documentos?${params.toString()}`
 }
 
-useSeoMeta({
-  title: 'Documentos — Transparência — Lar Anália Franco',
-  description:
-    'Acervo de prestação de contas do Lar Anália Franco: balanços, atas, editais e relatórios, filtráveis por ano e por tipo.',
+// O que a pessoa vê na aba e no resultado de busca precisa dizer QUAL recorte ela está
+// olhando: "Balanços de 2024" e o acervo inteiro são páginas diferentes, e sem isso as duas
+// disputam a mesma busca com o mesmo título.
+const tituloSemSufixo = computed(() => {
+  const substantivo = tipoValido.value?.plural ?? 'Documentos'
+  const ano = anoValido.value ? ` de ${anoValido.value}` : ''
+  const pagina = paginaAtual.value > 1 ? ` — página ${paginaAtual.value}` : ''
+
+  return `${substantivo}${ano}${pagina}`
+})
+
+const descricao = computed(() => {
+  const recorte = tipoValido.value
+    ? `${tipoValido.value.plural} do Lar Anália Franco`
+    : 'Balanços, atas, editais, certidões e relatórios do Lar Anália Franco'
+  const ano = anoValido.value ? ` referentes a ${anoValido.value}` : ''
+
+  return `${recorte}${ano}, em PDF, para consulta e download. Prestação de contas pública, atualizada pela própria instituição.`
+})
+
+/**
+ * Canônico com o filtro, sem o lixo: `page=1` não entra (é o mesmo endereço sem parâmetro
+ * nenhum) e parâmetro que a API ignora também não. `page=2` entra, porque é outra página de
+ * resultados de verdade — apontá-la para a primeira esconderia do buscador tudo que não cabe
+ * na página 1.
+ */
+const canonicalPath = computed(() => {
+  const params = new URLSearchParams()
+  if (anoValido.value) params.set('year', anoValido.value)
+  if (tipoValido.value) params.set('type', tipoValido.value.value)
+  if (paginaAtual.value > 1) params.set('page', String(paginaAtual.value))
+
+  const query = params.toString()
+
+  return `/transparencia/documentos${query ? `?${query}` : ''}`
+})
+
+usePageSeo({
+  title: () => `${tituloSemSufixo.value} — Transparência — Lar Anália Franco`,
+  description: () => descricao.value,
+  canonicalPath: () => canonicalPath.value,
 })
 </script>
 
@@ -171,9 +221,12 @@ useSeoMeta({
     </ul>
 
     <nav v-if="meta && meta.last_page > 1" class="doc-pagination" aria-label="Paginação de documentos">
-      <a v-if="meta.current_page > 1" :href="pageHref(meta.current_page - 1)">← Anterior</a>
+      <!-- Âncoras comuns, com o filtro embutido na URL: um rastreador segue estes links sem
+           executar JavaScript nenhum, que é o que torna o acervo inteiro alcançável. `rel`
+           diz a ordem da série a quem a usa. -->
+      <a v-if="meta.current_page > 1" rel="prev" :href="pageHref(meta.current_page - 1)">← Anterior</a>
       <span>Página {{ meta.current_page }} de {{ meta.last_page }}</span>
-      <a v-if="meta.current_page < meta.last_page" :href="pageHref(meta.current_page + 1)">Próxima →</a>
+      <a v-if="meta.current_page < meta.last_page" rel="next" :href="pageHref(meta.current_page + 1)">Próxima →</a>
     </nav>
   </div>
 </template>
