@@ -235,8 +235,10 @@ Registradas com justificativa nos commits correspondentes; resumo:
   não** — o pedido original listava só a troca autenticada nos endpoints, mas mencionava rate
   limit também para "recuperação de senha". Ficou fora do escopo desta fatia.
 - **`sitemap.xml`/`robots.txt` como rotas Nitro dinâmicas**, não arquivos estáticos nem
-  módulo de terceiros — evita depender de conteúdo que ainda não existe (`pages`/`posts`) ou
-  instalar um pacote novo sem necessidade real ainda.
+  módulo de terceiros. O `sitemap.xml` monta a lista a cada requisição, a partir das páginas
+  publicadas (`GET /api/v1/public/pages`) e dos documentos de transparência publicados —
+  publicar pelo painel aparece no sitemap sem novo deploy. Módulo de terceiro
+  (`@nuxtjs/sitemap`) continua fora: a rota inteira tem menos de 120 linhas.
 - **`docker/php/Dockerfile` usa `php -S` direto no `CMD`, não `php artisan serve`** —
   descoberto validando o compose de ponta a ponta: `artisan serve` spawna um subprocesso PHP
   para o servidor embutido que **não herda o ambiente do container** (só repassa `APP_ENV` e

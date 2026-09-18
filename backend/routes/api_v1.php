@@ -53,6 +53,9 @@ Route::prefix('auth')->name('auth.')->group(function () use ($authenticated): vo
 // aceita barra porque pages é plana com slug de até dois níveis (ex.:
 // "quem-somos/nossa-historia") — ver decisão de formato de slug em docs/roadmap.md.
 Route::prefix('public')->name('public.')->group(function (): void {
+    // Antes da rota de slug, que casa com qualquer coisa: "/pages" sem slug é a listagem.
+    Route::get('/pages', [PublicPageController::class, 'index'])->name('pages.index');
+
     Route::get('/pages/{slug}', [PublicPageController::class, 'show'])
         ->where('slug', '.*')
         ->name('pages.show');

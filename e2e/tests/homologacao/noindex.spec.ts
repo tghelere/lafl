@@ -30,7 +30,7 @@ const PATHS = [
   { path: '/o-que-fazemos', descricao: 'página prerenderizada' },
   { path: '/obrigado/contato', descricao: 'confirmação prerenderizada' },
   { path: '/transparencia/documentos', descricao: 'listagem que consulta a API' },
-  { path: '/sitemap.xml', descricao: 'sitemap prerenderizado' },
+  { path: '/sitemap.xml', descricao: 'sitemap (rota de servidor, consulta a API)' },
   { path: '/robots.txt', descricao: 'rota de servidor' },
   { path: '/favicon.svg', descricao: 'arquivo estático de public/' },
   { path: '/rota-que-nao-existe', descricao: 'página de erro (404)' },

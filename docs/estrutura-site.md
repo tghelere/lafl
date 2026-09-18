@@ -174,6 +174,7 @@ administrativos: nunca expõem autor, rascunho ou campo de controle.
 
 | Método | Rota | Uso |
 |---|---|---|
+| GET | `/api/v1/public/pages` | Inventário para o sitemap: slug e `updated_at`, paginado |
 | GET | `/api/v1/public/pages/{slug}` | Página institucional |
 | GET | `/api/v1/public/posts` | Notícias, paginado, filtro por categoria |
 | GET | `/api/v1/public/posts/{slug}` | Notícia |

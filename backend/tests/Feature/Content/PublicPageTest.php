@@ -79,3 +79,52 @@ test('renomear página via admin muda a resolução pública imediatamente', fun
         ->assertOk()
         ->assertJsonPath('data.slug', 'novo');
 });
+
+test('listagem pública traz só slug e data de alteração das páginas publicadas', function (): void {
+    Page::factory()->published()->create(['slug' => 'quem-somos', 'title' => 'Quem Somos']);
+
+    $response = $this->getJson('/api/v1/public/pages');
+
+    $response->assertOk()
+        ->assertJsonPath('data.0.slug', 'quem-somos')
+        ->assertJsonMissingPath('data.0.title')
+        ->assertJsonMissingPath('data.0.content')
+        ->assertJsonMissingPath('data.0.status')
+        ->assertJsonMissingPath('data.0.id');
+
+    expect($response->json('data.0.updated_at'))->not->toBeNull();
+});
+
+test('listagem pública não inclui rascunho nem arquivada', function (): void {
+    Page::factory()->published()->create(['slug' => 'publicada']);
+    Page::factory()->create(['slug' => 'rascunho', 'status' => PageStatus::Draft]);
+    Page::factory()->archived()->create(['slug' => 'arquivada']);
+
+    $response = $this->getJson('/api/v1/public/pages');
+
+    expect($response->json('data'))->toHaveCount(1)
+        ->and($response->json('data.0.slug'))->toBe('publicada');
+});
+
+test('listagem pública é paginada e o sitemap consegue percorrer o acervo inteiro', function (): void {
+    Page::factory()->published()->count(5)->create();
+
+    $primeira = $this->getJson('/api/v1/public/pages?per_page=2');
+
+    $primeira->assertOk()
+        ->assertJsonPath('meta.last_page', 3)
+        ->assertJsonPath('meta.total', 5);
+    expect($primeira->json('data'))->toHaveCount(2);
+
+    $ultima = $this->getJson('/api/v1/public/pages?per_page=2&page=3');
+
+    expect($ultima->json('data'))->toHaveCount(1);
+});
+
+test('per_page da listagem pública tem teto', function (): void {
+    Page::factory()->published()->count(3)->create();
+
+    $this->getJson('/api/v1/public/pages?per_page=5000')
+        ->assertOk()
+        ->assertJsonPath('meta.per_page', 100);
+});

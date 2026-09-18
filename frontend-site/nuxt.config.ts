@@ -94,7 +94,12 @@ export default defineNuxtConfig({
         // '/robots.txt' NÃO entra aqui: precisa ser decidido em tempo de execução, porque o
         // mesmo pacote de deploy vai para homologação e para produção e só uma das duas pode
         // ser indexada (ver server/routes/robots.txt.ts).
-        '/sitemap.xml',
+        //
+        // '/sitemap.xml' saiu daqui na sessão 21, pelo mesmo motivo que tirou as páginas do
+        // CMS: ele agora lista as páginas publicadas e os documentos de transparência lidos
+        // da API. Prerenderizado, congelaria o acervo no dia do build — publicar um balanço
+        // pelo painel exigiria novo deploy para o Google saber que ele existe.
+        //
         // Conteúdo fixo no próprio .vue, sem `usePublicPage` — o painel não edita nenhuma
         // destas, então prerenderizar continua sendo a melhor opção.
         '/o-que-fazemos',

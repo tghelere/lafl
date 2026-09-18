@@ -4,15 +4,31 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Public;
 
+use App\Actions\Content\ListPublicPages;
 use App\Actions\Content\ResolveContentMarkers;
 use App\Actions\Content\ResolvePublicPageBySlug;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Public\PageListItemResource;
 use App\Http\Resources\Public\PageResource;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 final class PageController extends Controller
 {
+    /**
+     * Inventário das páginas publicadas (slug e data de alteração), para o sitemap do site —
+     * ver frontend-site/server/routes/sitemap.xml.ts. Sem conteúdo e sem título: é listagem
+     * de endereços, não de texto.
+     */
+    public function index(Request $request, ListPublicPages $action): AnonymousResourceCollection
+    {
+        $perPage = min($request->integer('per_page', 50), 100);
+
+        return PageListItemResource::collection($action->handle($perPage));
+    }
+
     public function show(
         string $slug,
         ResolvePublicPageBySlug $resolver,

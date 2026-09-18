@@ -357,8 +357,11 @@
 - [ ] `/bazar/novidades` (vitrine do bazar) — fora de escopo desta sessão, depende de
       `bazaar_showcase_items` e ainda tem `[VALIDAR]` pendente (preço, quem alimenta)
 - [ ] Seção de notícias (`/noticias`, `/noticias/:slug`) — depende de `posts`
-- [ ] `sitemap.xml`/`robots.txt` consumindo conteúdo real (hoje geram só a partir de
-      `NUXT_PUBLIC_SITE_URL`, sem `pages`/`posts`/`transparency-documents`)
+- [x] `sitemap.xml` consumindo conteúdo real — feito na sessão 21 (tarefa 06, etapa 1): rotas
+      fixas indexáveis, todas as páginas publicadas (`GET /api/v1/public/pages`, listagem
+      mínima de slug e `updated_at`) e todos os documentos publicados, pela URL legível da
+      etapa 3. Saiu de `nitro.prerender.routes` pelo mesmo motivo das páginas do CMS. Falta
+      `posts`, que ainda não existe — acrescentar a busca aqui quando existir.
 - [ ] JSON-LD `NGO`/`Organization` — modelar Sede/CEI e Bazar como dois locais distintos
       (`location`/`department` separados), não um endereço só; ver os dois endereços
       confirmados em `docs/contexto.md`. Quando chegar a vez de `/contraturno`: descrição
@@ -426,8 +429,9 @@ Desde que o painel passou a editar `pages.content`, **toda rota cujo conteúdo v
 de `nitro.prerender.routes`** e passou a ser SSR a cada request. Prerenderizar essas rotas
 gravaria o texto no build, e a edição pelo painel só apareceria depois de um novo
 `nuxt generate` — exatamente o que a tela existe para evitar. Continuam prerenderizadas
-apenas as páginas de conteúdo fixo no `.vue` (`/`, `/o-que-fazemos`,
-`/politica-de-privacidade`, `/obrigado/:tipo`) mais `sitemap.xml`.
+apenas as páginas de conteúdo fixo no `.vue` (`/o-que-fazemos`, `/politica-de-privacidade`,
+`/obrigado/:tipo`). A home saiu na mesma sessão (lê `institution-facts`), e o `sitemap.xml`
+saiu na 21, quando passou a listar páginas e documentos lidos da API.
 
 `robots.txt` saiu do prerender na sessão 16: gravado no build, o mesmo pacote de deploy diria
 "Allow: /" em homologação e em produção, e só uma das duas pode ser indexada. Consequência
