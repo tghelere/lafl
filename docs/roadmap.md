@@ -306,6 +306,21 @@
       (`docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md`), o que tornou o pacote
       promovível inteiro. `docs/deploy.md` reescrito. Ver `docs/relatorio-sessao-17.md`.
 
+- [x] **Homologação no ar (sessão 19, mesma tarefa 07b, agora executada).** A VPS e o DNS
+      passaram a existir, e tudo o que a 17 tinha escrito foi rodado de verdade contra um
+      Ubuntu 24.04. **Homologação está no ar** em `homologacao-laf.softhing.com.br` (site),
+      `api.homologacao-laf…` e `painel.homologacao-laf…`, com TLS, autenticação básica no
+      site, 26 páginas importadas, super administrador criado e
+      `DEPLOY_STAGING_HABILITADO=true` — push na `main` publica sozinho.
+      A execução encontrou seis defeitos que nenhuma revisão de código tinha pego, todos
+      corrigidos: o job de publicação do workflow não fazia checkout e por isso **todo deploy**
+      morria antes de começar; `--trancar-ssh` deixaria o servidor sem administrador nenhum;
+      `/etc/laf` era criado sem travessia para o usuário `deploy`; os modelos de Nginx usavam
+      `http2 on;`, que não existe no nginx do Ubuntu 24.04; o ensaio de reversão terminava
+      acusando ambiente quebrado quando tudo dera certo; e o passo a passo do `docs/deploy.md`
+      mandava trancar o SSH antes de um passo que precisa de root. Ver
+      `docs/relatorio-sessao-19.md`.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista

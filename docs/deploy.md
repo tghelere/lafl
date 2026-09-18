@@ -10,7 +10,9 @@ deles devolve a máquina ao estado descrito.
 Leia junto: `docs/arquitetura.md` (camadas e autenticação),
 `docs/decisoes/0014-pacote-de-deploy-minimo.md` (por que o servidor recebe um pacote e não o
 repositório), `docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md` (por que o mesmo
-pacote atende os dois ambientes) e `docs/protecao-de-dados.md` (chaves e retenção).
+pacote atende os dois ambientes), `docs/decisoes/0016-dois-usuarios-de-acesso-ao-servidor.md`
+(quem consegue entrar na máquina, e com qual poder) e `docs/protecao-de-dados.md` (chaves e
+retenção).
 
 ---
 
@@ -78,6 +80,9 @@ pessoal e mais nada.
 O nome é `sysadmin`, e não `admin`, porque o Ubuntu já traz um grupo `admin` legado e o
 `/etc/sudoers` da distribuição dá `%admin ALL=(ALL) ALL` a ele: um usuário chamado `admin`
 colidiria na criação do grupo primário e ganharia sudo por um caminho que não é o nosso.
+
+O porquê completo, e as duas alternativas descartadas, estão em
+`docs/decisoes/0016-dois-usuarios-de-acesso-ao-servidor.md`.
 
 ## 2. Ambientes
 
