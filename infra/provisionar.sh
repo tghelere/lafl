@@ -377,7 +377,12 @@ ok 'sudo restrito aos recarregamentos de deploy'
 
 install -d -m 755 -o "$USUARIO_DEPLOY" -g www-data "$RAIZ"
 install -d -m 755 -o "$USUARIO_DEPLOY" -g www-data "${RAIZ}/bin"
-install -d -m 750 -o root -g root /etc/laf
+# Grupo `deploy`, não `root`: publicar.sh, reverter.sh e a checagem de saúde rodam COMO
+# deploy e leem /etc/laf/<ambiente>.conf a cada publicação. Com o diretório fechado em
+# root:root o arquivo lá dentro pode estar 644 e mesmo assim não ser alcançável — falta a
+# travessia do diretório. Escrita continua só para root: quem descreve o ambiente é
+# criar-ambiente.sh, e o conteúdo (hosts, caminhos, nome do banco) não guarda segredo.
+install -d -m 750 -o root -g "$USUARIO_DEPLOY" /etc/laf
 ok "$RAIZ"
 
 # ---------------------------------------------------------------------------
