@@ -82,12 +82,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | Gravada em consent_terms_version a cada envio (ver docs/protecao-de-dados.md,
-    | "Consentimento": termos versionados). A página /politica-de-privacidade ainda não existe
-    | (ver docs/roadmap.md) — quando existir, esta versão precisa mudar junto de qualquer
-    | alteração relevante no texto da política.
+    | "Consentimento": termos versionados). Precisa ser SEMPRE igual à constante VERSAO de
+    | frontend-site/app/pages/politica-de-privacidade.vue, que é o texto que a pessoa aceita:
+    | mudou o texto da política de forma relevante, muda a data nos dois lugares, no mesmo
+    | commit. Divergir aqui grava no banco o número de uma versão que ninguém leu.
     |
     */
 
-    'consent_terms_version' => env('FORM_CONSENT_TERMS_VERSION', '2026-08-25'),
+    'consent_terms_version' => env('FORM_CONSENT_TERMS_VERSION', '2026-09-18'),
 
 ];
