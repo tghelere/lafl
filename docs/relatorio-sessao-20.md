@@ -228,7 +228,8 @@ Tudo contra a pilha real, nada simulado.
 | `php artisan test` | 398 testes, 1082 asserções, verde |
 | `./vendor/bin/pint --test` | limpo |
 | `./vendor/bin/phpstan analyse` | 0 erros |
-| `npm run build` (site) | ok |
+| `npm run build` e `npm run generate` (site) | ok; `generate` prerrenderizou 17 rotas, `/politica-de-privacidade` entre elas |
+| `npm run build` e `npm run lint` (painel) | ok, sem aviso |
 | `npm run test:e2e` | 66 testes, verde (67 com o novo) |
 | Página no Firefox | 1280px e 380px, sem rolagem horizontal, sem erro de JavaScript |
 | Cookies e terceiros no Firefox | site público: nenhum cookie, nenhum host externo |
@@ -284,10 +285,6 @@ ssh sysadmin@2.25.223.146 'sudo -u postgres psql -d lar_analia_franco_staging \
   Quando a publicação acontecer, o `FORM_CONSENT_TERMS_VERSION` do
   `/var/www/laf/staging/shared/.env` precisa ir junto, senão a API grava `2026-08-25` sob o
   texto de `2026-09-18`. Está no roadmap.
-- **`npm run generate` não foi rodado**, só `npm run build`. O site não é estático e nunca foi
-  (o Nitro é exigido pelos cinco formulários e por `/transparencia/documentos`, ver
-  `nuxt.config.ts`); `generate` prerrenderiza o mesmo conjunto de rotas que o `build` já cobre,
-  e a bateria de e2e sobe o site pelo caminho de produção de verdade.
 - **O inventário de dados da LGPD (`docs/lgpd/inventario-de-dados.md`) continua vazio.** Ele é,
   por decisão registrada no próprio arquivo, para ser preenchido **junto com a instituição** —
   não unilateralmente pela engenharia. A política cobre os formulários do site; o inventário
