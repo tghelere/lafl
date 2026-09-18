@@ -9,8 +9,10 @@
 # Uso:
 #   publicar.sh --ambiente staging --pacote /var/www/laf/staging/incoming/<nome>
 #
-#   --forcar-falha-de-saude   faz a checagem de saúde falhar de propósito, para exercitar a
-#                             reversão automática sem quebrar nada de verdade
+#   --forcar-falha-de-saude   faz a checagem de saúde da release NOVA falhar de propósito,
+#                             para exercitar a reversão automática sem quebrar nada de
+#                             verdade. Vale uma vez: a checagem posterior à reversão é real,
+#                             e é ela que prova que o ambiente voltou saudável.
 #
 # O desenho: a release nova é montada INTEIRA ao lado da que está no ar, e só no fim o link
 # `current` muda. Até a troca, o site continua servindo a release anterior; depois dela, se a
@@ -196,7 +198,14 @@ fi
 conferir_saude() {
   local falhas=0 codigo
 
+  # O trinco vale UMA vez: derruba a checagem da release nova e se desarma. A checagem que
+  # vem DEPOIS da reversão precisa ser de verdade — é ela que prova que a reversão devolveu
+  # um ambiente saudável, que é a única coisa que o ensaio existe para demonstrar. Enquanto
+  # ela também era forçada, o ensaio terminava sempre em "a reversão TAMBÉM não passou na
+  # checagem — o ambiente precisa de olho humano AGORA", com o ambiente perfeitamente no ar:
+  # o alarme mais grave do script, disparado justamente quando tudo deu certo.
   if [[ "$FORCAR_FALHA" -eq 1 ]]; then
+    FORCAR_FALHA=0
     erro 'checagem de saúde falhada de propósito (--forcar-falha-de-saude)'
     return 1
   fi
