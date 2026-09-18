@@ -44,15 +44,22 @@ test.describe('site — política de privacidade', () => {
     try {
       // `consent_terms_version` só existe no detalhe (ContactMessageResource), não na
       // listagem — daí os dois passos.
-      const listagem = await api.get('/api/v1/contact-messages', { per_page: 1 })
+      //
+      // Procura pelo assunto em vez de pegar o primeiro da lista: `created_at` é gravado com
+      // precisão de SEGUNDO (todas as tabelas de formulário usam o `timestamps()` padrão do
+      // Laravel), e a listagem ordena só por ele. Duas mensagens criadas no mesmo segundo —
+      // que é o que acontece quando o teste de formulários roda logo antes deste — empatam, e
+      // aí a ordem que o Postgres devolve é indiferente. Isto já falhou de verdade.
+      const listagem = await api.get('/api/v1/contact-messages', { per_page: 50 })
 
       expect(listagem.ok(), `GET /api/v1/contact-messages respondeu ${listagem.status()}`).toBe(true)
 
       const { data } = (await listagem.json()) as { data: Array<{ uuid: string; subject: string }> }
+      const enviada = data.find((mensagem) => mensagem.subject === subject)
 
-      expect(data[0]?.subject).toBe(subject)
+      expect(enviada, `a mensagem "${subject}" não apareceu na listagem`).toBeDefined()
 
-      const detalhe = await api.get(`/api/v1/contact-messages/${data[0]!.uuid}`)
+      const detalhe = await api.get(`/api/v1/contact-messages/${enviada!.uuid}`)
 
       expect(detalhe.ok(), `GET do detalhe respondeu ${detalhe.status()}`).toBe(true)
 
