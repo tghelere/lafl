@@ -5,6 +5,11 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
 
+// Fonte única em shared/brand/ — ver LEIA-ME.md. Import direto (não cópia), como em
+// LoginView.vue: sai empacotada no bundle do painel, não é um recurso externo — não conflita
+// com o referrer=no-referrer abaixo, que é sobre requisição a domínio terceiro.
+import logoVertical from '../../../shared/brand/lar-analia-franco/lar-analia-franco-vertical.svg'
+
 /**
  * Link de definição de senha (ver App\Actions\Users\GeneratePasswordLink) — página pública,
  * alcançável por quem recebe a URL fora do sistema (WhatsApp, por exemplo), com o token na
@@ -91,6 +96,13 @@ async function handleSubmit(): Promise<void> {
       class="login__form card"
       @submit.prevent="handleSubmit"
     >
+      <img
+        :src="logoVertical"
+        width="96"
+        height="142"
+        alt="Lar Anália Franco"
+        class="login__logo"
+      >
       <p class="login__eyebrow">
         Painel administrativo
       </p>
@@ -180,6 +192,11 @@ async function handleSubmit(): Promise<void> {
 .login__form {
   width: 100%;
   max-width: 22rem;
+}
+
+.login__logo {
+  display: block;
+  margin: 0 auto var(--space-5);
 }
 
 .login__eyebrow {

@@ -14,6 +14,11 @@ const NOVA_SENHA = 'senha-nova-do-teste-e2e'
  */
 async function definirSenhaEEntrar(page: import('@playwright/test').Page, link: string, email: string): Promise<void> {
   await page.goto(link)
+
+  // Mesma logo da tela de login (ver LoginView.vue) — ficou de fora quando a marca chegou ao
+  // painel (sessão 14) e foi corrigido depois (ver relatório desta sessão).
+  await expect(page.getByRole('img', { name: 'Lar Anália Franco' })).toBeVisible()
+
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Nova senha', { exact: true }).fill(NOVA_SENHA)
   await page.getByLabel('Confirmar nova senha').fill(NOVA_SENHA)
