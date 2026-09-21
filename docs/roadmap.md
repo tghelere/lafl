@@ -351,7 +351,7 @@
       lidos de `app/config/institution.ts`, nunca da API (`tel:` e `wa.me`). A lacuna que a
       sessão 22 deixou registrada — o 503 é do SSR, fora do `page.route()` do Playwright — foi
       fechada reaproveitando a terceira instância do site do item acima
-      (`e2e/tests/site-sem-api/pagina-sem-api.spec.ts`).
+      (`e2e/tests/site-sem-api/pagina-sem-api.spec.ts`). Ver `docs/relatorio-sessao-23.md`.
 
 ## Em andamento
 
