@@ -250,6 +250,29 @@ Registradas com justificativa nos commits correspondentes; resumo:
 
 ## Troubleshooting
 
+- **Login do painel falha E a maioria das páginas do site responde 404, os dois ao mesmo
+  tempo** — o sintoma parece ser de conteúdo (sumiu do banco? seeder mudou?), mas a causa
+  quase sempre é infraestrutura: o **motor do Docker Desktop parado**, e com ele o Postgres e
+  o Redis. Nada no código precisa ter mudado, e por isso rebuildar o front não resolve.
+  Confirma na ordem, sem mexer em nada:
+
+  ```bash
+  docker compose ps                                  # vazio/Exited = motor ou serviços parados
+  docker info                                        # "failed to connect to the docker API" = motor parado
+  tail -n 5 backend/storage/logs/laravel.log         # RedisException / SQLSTATE "Connection refused"
+  curl -s -o /dev/null -w '%{http_code}\n' \
+    http://localhost:8000/api/v1/public/pages/educacao-infantil   # 500, não 404
+  ```
+
+  O `500` na API é a evidência que separa as duas coisas: página que de fato não existe
+  responde `404`, API fora do ar responde `500`. Vale conferir esse `curl` antes de suspeitar
+  do banco — o banco de desenvolvimento não se apaga sozinho, e `docker compose ps` já teria
+  mostrado o Postgres de pé se ele estivesse.
+
+  Sobe de novo com `docker compose up -d` (o volume do Postgres sobrevive ao motor parado —
+  não é preciso reseedar). O `php artisan serve`, o `npm run dev` do site e o do painel
+  continuam de pé durante a queda e voltam a funcionar sozinhos assim que os serviços sobem.
+
 - **Tela do painel admin em branco, sem erro visível na UI** — alguma extensão de navegador
   (bloqueador de rastreamento, "anti-fingerprint") pode fazer `window.localStorage` **lançar
   exceção** em vez de simplesmente não existir. Isso derruba bibliotecas de terceiros
