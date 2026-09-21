@@ -9,7 +9,9 @@ const rawSlug = route.params.slug
 const segments = Array.isArray(rawSlug) ? rawSlug : rawSlug ? [rawSlug] : []
 
 if (segments.length === 0 || segments.length > 2) {
-  throw createError({ statusCode: 404, statusMessage: 'Página não encontrada', fatal: true })
+  // Endereço impossível pela forma, sem envolver a API: 404 é a resposta certa e definitiva.
+  // `statusMessage` em inglês pelo motivo explicado em app/utils/apiPageError.ts.
+  throw createError({ statusCode: 404, statusMessage: 'Not Found', fatal: true })
 }
 
 const slug = segments.join('/')
@@ -18,7 +20,9 @@ const parentSlug = segments.length === 2 ? segments[0] : null
 const { data, error } = await usePublicPage(slug)
 
 if (error.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Página não encontrada', fatal: true })
+  // 404 só quando a API disse que a página não existe; qualquer outra falha vira 503 (ver
+  // app/utils/apiPageError.ts).
+  lancarErroDePagina(error.value)
 }
 
 if (data.value && 'redirect_to' in data.value) {

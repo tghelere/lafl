@@ -69,7 +69,7 @@ const paginaAtual = computed(() => {
   return Number.isInteger(numero) && numero > 1 ? numero : 1
 })
 
-const { data } = await useAsyncData<PaginatedTransparencyDocuments>(
+const { data, error } = await useAsyncData<PaginatedTransparencyDocuments>(
   `transparency-documents:${yearQuery ?? ''}:${typeQuery ?? ''}:${pageQuery ?? ''}`,
   () =>
     $fetch(`${config.public.apiUrl}/api/v1/public/transparency-documents`, {
@@ -78,8 +78,22 @@ const { data } = await useAsyncData<PaginatedTransparencyDocuments>(
         type: typeQuery,
         page: pageQuery,
       },
+      // Mesmo teto e mesma ausência de retentativa de usePublicPage, pelo mesmo motivo: esta
+      // chamada segura o SSR.
+      timeout: 4000,
+      retry: 0,
     }),
 )
+
+// Esta página É o acervo — sem a resposta da API não sobra conteúdo, só a moldura. Antes da
+// sessão 22 a falha era engolida (`data.value?.data ?? []`) e a página saía em 200 dizendo
+// "Nenhum documento encontrado": a instituição anunciando que não presta contas, no endereço
+// que existe para provar o contrário, e com o 200 convidando o buscador a indexar isso.
+// Agora vira 503 — ver app/utils/apiPageError.ts. Um filtro que não casa com nada continua
+// sendo 200 com a lista vazia, porque aí a resposta veio e está certa.
+if (error.value) {
+  lancarErroDePagina(error.value)
+}
 
 const documents = computed(() => data.value?.data ?? [])
 const meta = computed(() => data.value?.meta)

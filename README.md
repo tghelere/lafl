@@ -269,6 +269,10 @@ Registradas com justificativa nos commits correspondentes; resumo:
   do banco — o banco de desenvolvimento não se apaga sozinho, e `docker compose ps` já teria
   mostrado o Postgres de pé se ele estivesse.
 
+  Desde a sessão 22 o próprio site já faz essa distinção: `404` da API vira `404` do site,
+  qualquer outra falha vira `503` (ver `frontend-site/app/utils/apiPageError.ts`). Se as
+  páginas estão respondendo **503**, a conclusão já está dada — é a API, não o conteúdo.
+
   Sobe de novo com `docker compose up -d` (o volume do Postgres sobrevive ao motor parado —
   não é preciso reseedar). O `php artisan serve`, o `npm run dev` do site e o do painel
   continuam de pé durante a queda e voltam a funcionar sozinhos assim que os serviços sobem.

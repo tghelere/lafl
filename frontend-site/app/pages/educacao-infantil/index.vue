@@ -3,7 +3,9 @@
 const { data, error } = await usePublicPage('educacao-infantil')
 
 if (error.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Página não encontrada', fatal: true })
+  // 404 só quando a API disse que a página não existe; qualquer outra falha vira 503 (ver
+  // app/utils/apiPageError.ts).
+  lancarErroDePagina(error.value)
 }
 
 const page = computed(() => (data.value && 'data' in data.value ? data.value.data : null))
