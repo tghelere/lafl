@@ -116,6 +116,26 @@ nunca reaproveitar `FIELD_ENCRYPTION_KEY` entre staging e produção). `docs/dep
 pendência do roadmap (`docs/roadmap.md`, "esqueci minha senha por e-mail") atualizadas para
 apontar Resend em vez de SMTP.
 
+## Decisões tomadas sem consulta
+
+- **Registrar a escolha do Resend como ADR** (`docs/decisoes/0020-resend-via-api-http-em-vez-
+  de-smtp.md`), mesmo a tarefa já direcionando o provedor: é escolha de stack (mailer de
+  produção, igual em espírito a `docs/decisoes/0006`, Umami x GA4) e futuras sessões
+  precisariam do porquê de API HTTP em vez de SMTP e de Resend em vez de SES/Postmark.
+- **Não mexer no worker/deploy nem no docker-compose** (etapas 4 e 5): a investigação
+  confirmou que já atendiam ao pedido; abrir uma mudança sem necessidade seria o tipo de
+  "correção" que a regra do projeto contra funcionalidade além do necessário existe para
+  evitar.
+
+## O que não foi verificado
+
+Nenhuma mudança de frontend nesta sessão — `npm run build`/`npm run generate` dos dois
+frontends não foram rodados, e não havia nada para conferir visualmente no navegador. Não foi
+enviado um e-mail de verdade contra o Resend (não há domínio verificado nem chave de API
+disponíveis neste ambiente de trabalho) — a etapa 2 foi validada por `Mail::fake()` na suíte
+Pest, não por envio real; confirmar contra o Resend real é o primeiro passo depois do runbook
+de DNS ser executado em homologação.
+
 ## O que ainda falta para o e-mail funcionar de verdade
 
 Nada de código. O que falta é operacional, e só pode ser feito por quem administra o domínio
