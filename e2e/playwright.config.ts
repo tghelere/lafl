@@ -2,7 +2,15 @@ import { fileURLToPath } from 'node:url'
 
 import { defineConfig, devices } from '@playwright/test'
 
-import { ADMIN_URL, API_URL, BIND_HOST, SITE_URL, portOf } from './support/env'
+import {
+  ADMIN_URL,
+  API_URL,
+  API_URL_FORA_DO_AR,
+  BIND_HOST,
+  SITE_SEM_API_URL,
+  SITE_URL,
+  portOf,
+} from './support/env'
 
 const BACKEND_DIR = fileURLToPath(new URL('../backend/', import.meta.url))
 const ADMIN_DIR = fileURLToPath(new URL('../frontend-admin/', import.meta.url))
@@ -61,6 +69,15 @@ export default defineConfig({
   projects: [
     {
       name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+      // tests/site-sem-api roda só no projeto abaixo — ficam dentro de ./tests por
+      // conveniência (um testDir só), mas exercitam uma terceira instância do site com a API
+      // fora do ar, não a normal. Rodar aqui também seria a mesma bateria em dobro.
+      testIgnore: '**/site-sem-api/**',
+    },
+    {
+      name: 'site-sem-api',
+      testDir: './tests/site-sem-api',
       use: { ...devices['Desktop Firefox'] },
     },
   ],
@@ -121,6 +138,32 @@ export default defineConfig({
       stdout: 'pipe',
       stderr: 'pipe',
       timeout: process.env.CI ? 600_000 : 300_000,
+    },
+    // Quarta instância do MESMO build do site (reaproveita o `.output` que a entrada acima
+    // acabou de gerar — sem `npm run build` aqui, de propósito: os itens do array `webServer`
+    // sobem em sequência, cada um esperando o anterior responder antes de começar, então o
+    // build já está pronto quando este comando roda). `NUXT_PUBLIC_API_URL` aponta para uma
+    // porta fechada — é o "API fora do ar" que tests/site-sem-api/ exercita: o 503 das páginas
+    // que leem o CMS e a frase de fundação alternativa da home, os dois pontos que dependem do
+    // SSR e por isso ficam fora do alcance do page.route() do Playwright (ver
+    // docs/decisoes/0019-falha-da-api-responde-503-nao-404.md). A checagem de saúde do
+    // Playwright aceita qualquer status abaixo de 404, e a home responde 200 mesmo sem API
+    // (ver frontend-site/app/pages/index.vue) — é por isso que a URL de saúde abaixo é a home,
+    // e não uma página que dependeria da própria API que este servidor não tem.
+    {
+      command: 'node .output/server/index.mjs',
+      cwd: SITE_DIR,
+      url: SITE_SEM_API_URL,
+      env: {
+        HOST: BIND_HOST,
+        PORT: portOf(SITE_SEM_API_URL),
+        NUXT_PUBLIC_API_URL: API_URL_FORA_DO_AR,
+        NUXT_PUBLIC_SITE_URL: SITE_SEM_API_URL,
+      },
+      reuseExistingServer: false,
+      stdout: 'pipe',
+      stderr: 'pipe',
+      timeout: 60_000,
     },
   ],
 })

@@ -23,6 +23,23 @@ export const SITE_URL = process.env.E2E_SITE_URL ?? 'http://localhost:3100'
  */
 export const STAGING_SITE_URL = process.env.E2E_STAGING_SITE_URL ?? 'http://localhost:3101'
 
+/**
+ * Terceira instância do MESMO build do site (ver playwright.config.ts), com
+ * `NUXT_PUBLIC_API_URL` apontado para `API_URL_FORA_DO_AR` — uma porta sem nada escutando.
+ * Existe só para o projeto `site-sem-api`, que cobre o que a bateria normal não alcança: a
+ * chamada que precisaria falhar é do SSR, fora do page.route() do Playwright (ver
+ * docs/decisoes/0019-falha-da-api-responde-503-nao-404.md). Nasce sempre — não só quando o
+ * projeto `site-sem-api` roda — porque o `webServer` do Playwright sobe todo o array antes de
+ * escolher quais projetos rodam.
+ */
+export const SITE_SEM_API_URL = process.env.E2E_SITE_SEM_API_URL ?? 'http://localhost:3102'
+
+/**
+ * Porta fechada de propósito, para simular a API fora do ar sem depender de derrubar nada.
+ * `SITE_SEM_API_URL` acima aponta para cá.
+ */
+export const API_URL_FORA_DO_AR = process.env.E2E_API_URL_FORA_DO_AR ?? 'http://localhost:8199'
+
 /** Host de escuta dos três servidores. Loopback: nada da bateria fica exposto na rede. */
 export const BIND_HOST = '127.0.0.1'
 

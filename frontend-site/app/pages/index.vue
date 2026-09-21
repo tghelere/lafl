@@ -108,6 +108,15 @@ const pillars = [
             :date="marcos.association_founded.age_formatted"
           />
         </template>
+        <!-- Falhando useInstitutionFacts, value/date de cima ficam sem número para exibir — e
+             uma LedgerLine sem número é uma linha truncada, não uma linha ausente. Uma frase
+             cheia no lugar das duas, sem nenhum número calculado, é o que ADR 0019 e
+             docs/roadmap.md pedem em vez disso. -->
+        <p v-else class="ledger__fallback">
+          A fundação da associação e o tempo de funcionamento do Bazar Beneficente estão
+          temporariamente indisponíveis — voltam a aparecer aqui assim que o sistema conseguir
+          calculá-los de novo.
+        </p>
       </div>
     </section>
 
@@ -207,6 +216,15 @@ const pillars = [
 
 .home__ledger h2 {
   margin-top: 0;
+}
+
+.ledger__fallback {
+  padding-block: var(--space-4);
+  margin: 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  max-width: 58ch;
 }
 
 .home__ledger-note {

@@ -4,7 +4,7 @@ import { AdminApi, fetchPageContent, markerValue } from '../../support/api'
 import { acceptNextDialog, unique } from '../../support/admin'
 import { replaceEditorText, saveContentPage } from '../../support/editor'
 import { createPage, deletePage, placeholderPdf } from '../../support/fixtures'
-import { serverHtml } from '../../support/site'
+import { gotoSite, serverHtml } from '../../support/site'
 import { storageStatePath } from '../../support/users'
 
 /**
@@ -23,6 +23,26 @@ async function contagemDoAcervo(): Promise<number> {
 
   return Number(match![1]!.replace(/\./g, ''))
 }
+
+/**
+ * O caso "com dados" da fundação e do tempo de bazar na home — o contraponto do caso "sem
+ * dados" em e2e/tests/site-sem-api/home-sem-api.spec.ts, que só é alcançável numa segunda
+ * instância do site com a API fora do ar. Aqui a API está de pé, como em toda a bateria
+ * normal.
+ */
+test.describe('home — fundação e tempo de bazar', () => {
+  test('com a API de pé, a home mostra as quatro linhas de registro, não a frase alternativa', async ({ page }) => {
+    await gotoSite(page, '/')
+
+    await expect(page.locator('.ledger__fallback')).toHaveCount(0)
+
+    const itens = page.locator('.ledger__item')
+    await expect(itens).toHaveCount(4)
+
+    await expect(page.getByText('Fundação da associação')).toBeVisible()
+    await expect(page.getByText('Bazar beneficente em funcionamento desde')).toBeVisible()
+  })
+})
 
 test.describe('comunicacao', () => {
   test.use({ storageState: storageStatePath('comunicacao') })
