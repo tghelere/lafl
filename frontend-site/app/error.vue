@@ -22,7 +22,7 @@
 import { MapPin, Phone } from '@lucide/vue'
 
 import AppWhatsappIcon from '~/components/AppWhatsappIcon.vue'
-import { institutionContact, whatsappHref } from '~/config/institution'
+import { addressLine, headquarters, phone, phoneHref, whatsappHref } from '~/config/institution'
 import { navigation } from '~/config/navigation'
 
 const props = defineProps<{ error: { statusCode?: number } }>()
@@ -84,13 +84,13 @@ usePageSeo({
 
         <p class="erro__contato-linha">
           <MapPin :size="16" aria-hidden="true" />
-          {{ institutionContact.address }}
+          {{ addressLine(headquarters) }}
         </p>
 
         <div class="erro__contato-links">
-          <a :href="institutionContact.phoneHref" class="btn btn--secondary">
+          <a :href="phoneHref(headquarters)" class="btn btn--secondary">
             <Phone :size="16" aria-hidden="true" />
-            {{ institutionContact.phone }}
+            {{ phone(headquarters) }}
           </a>
           <a
             :href="whatsappHref()"

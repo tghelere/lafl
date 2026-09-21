@@ -1,28 +1,27 @@
 import type { MaybeRefOrGetter } from 'vue'
 
+import {
+  bazaar,
+  headquarters,
+  type InstitutionLocation,
+  jsonLdStreetAddress,
+  jsonLdTelephone,
+} from '~/config/institution'
+
 /**
  * Dados institucionais publicados como JSON-LD. Todos confirmados pela instituição e
  * registrados em `docs/contexto.md` — nenhum valor `[CONFIRMAR]` entra aqui.
  *
- * Os mesmos endereços e telefones aparecem em prosa no rodapé (AppFooter.vue) e em /contato.
- * São três lugares com o mesmo dado, hoje; unificá-los depende de a instituição virar entidade
- * editável no painel (`settings`, ver docs/roadmap.md) — até lá, mudar um endereço exige mudar
- * os três, e é este comentário que avisa.
+ * Endereço e telefone de cada local vêm de app/config/institution.ts — fonte única desde a
+ * sessão 23 (ver docs/relatorio-sessao-23.md), compartilhada com AppFooter.vue e contato.vue.
+ * A descrição de cada local é só do JSON-LD e fica aqui mesmo.
  */
-const LOCAIS = [
-  {
-    name: 'Sede e CEI Anália Franco',
-    description: 'Sede da associação e Centro de Educação Infantil Anália Franco.',
-    streetAddress: 'Av. Anália Franco, 33 — Jardim Aeroporto',
-    telephone: '+55 43 3325-8060',
-  },
-  {
-    name: 'Bazar Beneficente',
-    description: 'Loja de doações que sustenta o que o convênio da creche não cobre.',
-    streetAddress: 'Rua Rosa Siqueira, 152 — Jardim Aeroporto',
-    telephone: '+55 43 3322-2373',
-  },
-]
+const DESCRICOES: Record<string, string> = {
+  [headquarters.name]: 'Sede da associação e Centro de Educação Infantil Anália Franco.',
+  [bazaar.name]: 'Loja de doações que sustenta o que o convênio da creche não cobre.',
+}
+
+const LOCAIS: InstitutionLocation[] = [headquarters, bazaar]
 
 const CNPJ = '78.614.096/0001-75'
 
@@ -39,10 +38,10 @@ const DESCRICAO =
   + 'A escola de contraturno para crianças e adolescentes de 6 a 15 anos é um programa em '
   + 'preparação, com início de turmas previsto para 2027.'
 
-function endereco(local: (typeof LOCAIS)[number]) {
+function endereco(local: InstitutionLocation) {
   return {
     '@type': 'PostalAddress',
-    'streetAddress': local.streetAddress,
+    'streetAddress': jsonLdStreetAddress(local),
     'addressLocality': 'Londrina',
     'addressRegion': 'PR',
     'addressCountry': 'BR',
@@ -80,14 +79,14 @@ export function useOrganizationJsonLd(foundingDate?: MaybeRefOrGetter<string | u
       'value': CNPJ,
     },
     ...(toValue(foundingDate) ? { foundingDate: toValue(foundingDate) } : {}),
-    'telephone': LOCAIS[0]!.telephone,
+    'telephone': jsonLdTelephone(LOCAIS[0]!),
     'address': endereco(LOCAIS[0]!),
     'areaServed': { '@type': 'City', 'name': 'Londrina' },
     'location': LOCAIS.map((local) => ({
       '@type': 'Place',
       'name': local.name,
-      'description': local.description,
-      'telephone': local.telephone,
+      'description': DESCRICOES[local.name],
+      'telephone': jsonLdTelephone(local),
       'address': endereco(local),
     })),
   }))

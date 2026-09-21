@@ -1,8 +1,10 @@
 <script setup lang="ts">
-// Endereços, telefones e CNPJ vêm de docs/contexto.md — dados confirmados, sem marca
-// [CONFIRMAR]. Sede/CEI e Bazar são dois locais distintos, não um só (ver docs/contexto.md).
-// Não inventar número novo aqui; qualquer outro dado institucional (e-mail, PIX) fica para
-// quando /api/v1/public/settings existir (ver docs/estrutura-site.md §3.1).
+// Endereço e telefone de cada local vêm de app/config/institution.ts — fonte única desde a
+// sessão 23 (ver docs/relatorio-sessao-23.md), compartilhada com contato.vue e
+// useOrganizationJsonLd.ts. CNPJ fica hardcoded aqui mesmo: é o único lugar que o mostra, sem
+// duplicação para eliminar. Sede/CEI e Bazar são dois locais distintos, não um só (ver
+// docs/contexto.md). Qualquer outro dado institucional (e-mail, PIX) fica para quando
+// /api/v1/public/settings existir (ver docs/estrutura-site.md §3.1).
 //
 // Links vêm de app/config/navigation.ts — mesma fonte do header e da gaveta (ver
 // docs/design/navegacao.md §3). Uma coluna por item de topo: o título da coluna é o próprio
@@ -10,6 +12,7 @@
 // dentro de "Quem somos"). Item sem filhos (Transparência, Contato) fica só com o título
 // clicável, sem lista. Nenhum link solto aqui além destes.
 import { MapPin, Phone } from '@lucide/vue'
+import { addressLine, bazaar, headquarters, phone } from '~/config/institution'
 import { navigation } from '~/config/navigation'
 
 import logoHorizontal from '../../../shared/brand/lar-analia-franco/lar-analia-franco-horizontal.svg'
@@ -53,15 +56,15 @@ function trackCreditoSofthing(): void {
         <p>LAR ANÁLIA FRANCO DE LONDRINA — CNPJ 78.614.096/0001-75.</p>
         <p class="site-footer__line">
           <MapPin :size="14" aria-hidden="true" />
-          Sede / CEI: Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR
+          Sede / CEI: {{ addressLine(headquarters) }}
           <Phone :size="14" aria-hidden="true" />
-          (43) 3325-8060
+          {{ phone(headquarters) }}
         </p>
         <p class="site-footer__line">
           <MapPin :size="14" aria-hidden="true" />
-          Bazar: Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR
+          Bazar: {{ addressLine(bazaar) }}
           <Phone :size="14" aria-hidden="true" />
-          (43) 3322-2373
+          {{ phone(bazaar) }}
         </p>
         <p>
           © {{ year }} Lar Anália Franco.

@@ -367,7 +367,10 @@
       armazenamento fora do webroot) — inclui a coluna `og_image_id` em `pages`, adiada nesta
       sessão porque `media` ainda não existe (ver decisão abaixo)
 - [ ] `testimonials`, `partners`, `institution_stats`
-- [ ] `settings`
+- [ ] `settings` — quando existir, substitui só `frontend-site/app/config/institution.ts`
+      (endereço, telefone e WhatsApp da sede e do bazar, hoje fonte única de AppFooter.vue,
+      contato.vue, useOrganizationJsonLd.ts e app/error.vue desde a sessão 23, ver
+      `docs/relatorio-sessao-23.md`) — os quatro consumidores continuam lendo a mesma forma
 - [ ] `bazaar_showcase_items`
 - [ ] Fotos opcionais em `pickup_requests` (`media_ids` no domínio) — depende da entidade
       `media`, fora de escopo

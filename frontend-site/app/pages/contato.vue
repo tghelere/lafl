@@ -2,14 +2,22 @@
 // Formulário de contato geral — titular é o próprio visitante (adulto).
 import { MapPin, Phone } from '@lucide/vue'
 
+import {
+  addressLine,
+  bazaar,
+  headquarters,
+  institutionContact,
+  mapQuery,
+  phone,
+  whatsappHref,
+} from '~/config/institution'
+
 const { hasError, fieldFailed } = useFormErrorState()
 
-// WhatsApp do Bazar (único número confirmado — não há WhatsApp da sede, ver
-// docs/roadmap.md). Mensagem própria do contexto desta página: contato geral, não
-// agendamento de coleta (esse é o texto usado em /bazar/agendar-coleta).
-const WHATSAPP_NUMBER = '5543999500183'
-const WHATSAPP_MESSAGE = 'Olá! Gostaria de falar com o Lar Anália Franco.'
-const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
+// Endereço, telefone e WhatsApp vêm de app/config/institution.ts — fonte única desde a sessão
+// 23 (ver docs/relatorio-sessao-23.md), compartilhada com AppFooter.vue e
+// useOrganizationJsonLd.ts. A mensagem do WhatsApp usa o padrão do arquivo (contato geral) —
+// diferente da de /bazar/agendar-coleta, que é sobre agendamento de coleta.
 
 usePageSeo({
   title: 'Contato — Lar Anália Franco',
@@ -36,39 +44,39 @@ usePageSeo({
         <h2>Sede / CEI Anália Franco</h2>
         <p class="contact-locations__line">
           <MapPin :size="16" aria-hidden="true" />
-          Av. Anália Franco, 33 — Jd. Aeroporto, Londrina/PR
+          {{ addressLine(headquarters) }}
         </p>
         <p class="contact-locations__line">
           <Phone :size="16" aria-hidden="true" />
-          (43) 3325-8060
+          {{ phone(headquarters) }}
         </p>
         <AppMapaLocal
           label="Sede / CEI Anália Franco"
-          address="Av. Anália Franco, 33, Jd. Aeroporto, Londrina/PR"
+          :address="mapQuery(headquarters)"
         />
       </div>
       <div class="card">
         <h2>Bazar Beneficente</h2>
         <p class="contact-locations__line">
           <MapPin :size="16" aria-hidden="true" />
-          Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR
+          {{ addressLine(bazaar) }}
         </p>
         <p class="contact-locations__line">
           <Phone :size="16" aria-hidden="true" />
-          (43) 3322-2373
+          {{ phone(bazaar) }}
         </p>
         <AppMapaLocal
           label="Bazar Beneficente"
-          address="Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR"
+          :address="mapQuery(bazaar)"
         />
         <a
           class="btn btn--secondary contact-locations__whatsapp"
-          :href="whatsappHref"
+          :href="whatsappHref()"
           target="_blank"
           rel="noopener noreferrer"
         >
           <AppWhatsappIcon :size="16" />
-          WhatsApp (43) 99950-0183
+          WhatsApp {{ institutionContact.whatsappPhone }}
         </a>
       </div>
     </div>
