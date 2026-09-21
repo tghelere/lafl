@@ -37,9 +37,10 @@ enviado pelos formulários do site uma **transferência internacional** sob a LG
 "Transferência internacional". Trocar a região do servidor é mudança de política pública, não
 só de infra: exige atualizar aquela página e subir `FORM_CONSENT_TERMS_VERSION`.
 
-Pendência conhecida deste ambiente: **SMTP não configurado**. O `.env` está com
+Pendência conhecida deste ambiente: **Resend não configurado**. O `.env` está com
 `MAIL_MAILER=log`, então nenhum e-mail sai da máquina — o conteúdo renderizado vai para
-`storage/logs/laravel.log`, com o destinatário já reescrito por `MAIL_ALWAYS_TO`. Ver §4.
+`storage/logs/laravel.log`, com o destinatário já reescrito por `MAIL_ALWAYS_TO`. Ver §4,
+"E-mail (Resend)".
 
 ## 1. O que o servidor precisa ter
 
@@ -157,9 +158,10 @@ de lá: não vai para o repositório, não vai para o GitHub, não entra no paco
 empacotamento apaga qualquer `.env*`). `backend/.env.example` tem a lista completa comentada.
 
 O script preenche tudo o que consegue deduzir do ambiente e do domínio. O que sobra para
-preencher à mão, depois, é **SMTP e destinatários**:
+preencher à mão, depois, é **Resend e destinatários**:
 
-- `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` — SMTP real nos dois ambientes.
+- `RESEND_API_KEY` — uma chave por ambiente (ver "E-mail (Resend)", abaixo).
+- `MAIL_MAILER=resend`, `MAIL_FROM_ADDRESS` — remetente no subdomínio de envio verificado.
 - `FORM_RECIPIENT_*` — endereços **reais** da instituição nos dois. Em staging ninguém recebe
   nada mesmo assim, por causa do `MAIL_ALWAYS_TO`, e é de propósito que estejam lá: é assim que
   a homologação testa a configuração que vai para produção.
@@ -212,6 +214,54 @@ Preenchidas pelo script a partir de `--dominio`. O que cada uma quebra quando es
 | `CORS_ALLOWED_ORIGINS` | o painel não consegue nem chamar `/csrf-cookie` |
 | `TRUSTED_PROXIES` | todo formulário público é registrado com o IP do proxy, e o limite por IP passa a valer para o servidor inteiro |
 | `APP_URL` | links absolutos e o Scramble saem errados |
+
+### E-mail (Resend)
+
+O envio usa o transporte nativo do Laravel para o Resend (`resend/resend-php`), por **API
+HTTP** — não SMTP. `MAIL_MAILER=resend` e a chave em `RESEND_API_KEY` (lida por
+`config/services.php`, não por `config/mail.php`) são as duas variáveis que ligam o envio; sem
+elas o mailer cai no padrão `log` e nenhum e-mail sai da máquina (é o estado de hoje, ver §0).
+
+**Por que API HTTP e não SMTP.** Menos uma porta de saída para liberar no `ufw`/provedor
+(443, já aberta, contra 587/465 de SMTP) e uma superfície de configuração menor — chave de
+API em vez de host/porta/usuário/senha. A troca não muda nada do lado da aplicação: quem
+monta e enfileira o e-mail é sempre `App\Mail\FormSubmissionReceived`, por
+`App\Actions\Forms\NotifyFormSubmissionReceived` — só o transporte muda.
+
+**Domínio de envio.** Um **subdomínio dedicado**, nunca o domínio raiz — `envio.SEUDOMINIO`,
+por exemplo. Isolar a reputação de entrega do domínio de envio da do domínio principal
+(site, e-mail administrativo etc.) é o motivo: se o subdomínio de envio for marcado como
+spam em algum momento, o domínio raiz — e o e-mail de quem trabalha na instituição, se usar o
+mesmo domínio — não é afetado.
+
+**Remetente sugerido:** `nao-responda@envio.SEUDOMINIO`. Os e-mails de notificação (ver §3 e
+`config/forms.php`) não esperam resposta — quem precisa agir abre o link para o painel, não
+responde ao e-mail.
+
+**Passo a passo de verificação do domínio, no painel do Resend:**
+
+1. Adicionar o domínio de envio (`envio.SEUDOMINIO`) em Resend → Domains.
+2. O Resend gera três registros DNS para cadastrar no provedor de DNS do domínio:
+   | Registro | Tipo | Finalidade |
+   |---|---|---|
+   | SPF | `TXT` | lista o Resend como remetente autorizado do subdomínio |
+   | DKIM | `TXT` (ou `CNAME`, conforme o Resend apresentar) | assina cada e-mail; é o que a maioria dos provedores de destino confere para não jogar em spam |
+   | DMARC | `TXT`, em `_dmarc.envio.SEUDOMINIO` | declara o que fazer com e-mail que falhar SPF/DKIM — começar em `p=none` (só monitora) e apertar depois |
+3. Cadastrar os três exatamente como o Resend apresenta — o valor de DKIM é gerado por
+   domínio e não é reaproveitável entre staging e produção nem entre dois domínios.
+4. Esperar a propagação (minutos a algumas horas, conforme o TTL do provedor de DNS) e clicar
+   em "Verify" no painel do Resend. O status some de "Pending" para "Verified" nos três
+   registros — enviar antes disso funciona, mas cai em spam com frequência maior, ou é
+   recusado por alguns destinos.
+5. Gerar uma **chave de API por ambiente** (Resend → API Keys), com permissão de envio
+   (`Sending access`), e preencher `RESEND_API_KEY` no `.env` daquele ambiente. Não
+   reaproveitar a chave de staging em produção — mesma razão de nunca reaproveitar
+   `FIELD_ENCRYPTION_KEY` entre ambientes: revogar uma não deveria afetar o outro.
+
+Depois de configurado: mesmo checklist de qualquer alteração de `.env` (`config:cache` +
+reiniciar fila e agendador, no início desta seção). Conferir um envio de verdade é criar uma
+mensagem de contato pelo site e checar se o e-mail chegou ao `FORM_RECIPIENT_CONTACT_MESSAGE`
+(em staging, ao endereço de `MAIL_ALWAYS_TO`) — não só o `200` da API.
 
 ### Frontends — tudo em tempo de execução
 
@@ -408,6 +458,14 @@ tail -f /var/log/php/laf-<ambiente>.error.log
 # Backup
 journalctl -u laf-backup@<ambiente>
 systemctl list-timers laf-backup@<ambiente>.timer
+```
+
+Job de fila que falhou (esgotou as `--tries=3`) é reportado em `laravel.log` **e** gravado em
+`failed_jobs` — é o worker padrão do Laravel, sem nada customizado neste projeto:
+
+```bash
+cd /var/www/laf/<ambiente>/current/backend && php8.5 artisan queue:failed   # lista
+php8.5 artisan queue:retry <uuid|all>                                       # reprocessa
 ```
 
 ```bash

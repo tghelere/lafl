@@ -536,8 +536,10 @@ uma camada de cache de HTML por cima.
 
 ### Autenticação — pendências pós-lançamento
 
-- [ ] **"Esqueci minha senha" por e-mail** — depende de SMTP configurado em produção (ver
-      `MAIL_MAILER` em `.env.example`, hoje só Mailpit em dev). O broker `users` em
+- [ ] **"Esqueci minha senha" por e-mail** — depende de Resend configurado no ambiente (ver
+      `MAIL_MAILER`/`RESEND_API_KEY` em `.env.example` e `docs/deploy.md`, "E-mail (Resend)";
+      hoje só Mailpit em dev, e staging ainda não tem domínio de envio verificado). O broker
+      `users` em
       `config/auth.php` já existe pronto para isso (60 min de validade, padrão), separado do
       broker `user_setup` que o link administrativo usa (24h) — implementar como
       `POST /api/v1/auth/forgot-password` + `POST /api/v1/auth/reset-password` reaproveitando
