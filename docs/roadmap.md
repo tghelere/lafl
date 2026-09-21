@@ -321,6 +321,23 @@
       mandava trancar o SSH antes de um passo que precisa de root. Ver
       `docs/relatorio-sessao-19.md`.
 
+- [x] **Site distingue "página não existe" de "API falhou", e ganhou página de erro própria**
+      — sessão 22. As sete páginas que leem o CMS traduziam *qualquer* falha da API em 404,
+      inclusive 500, timeout e conexão recusada; em produção, uma instabilidade da API
+      anunciaria ao Google que o site inteiro foi removido. Agora só o 404 vindo da API vira
+      404 do site, e o resto vira 503 com `Cache-Control: no-store`
+      (`app/utils/apiPageError.ts`, `server/plugins/sem-cache-em-erro.ts`, teto de 4s em
+      `usePublicPage`). `app/error.vue` substituiu a tela padrão do Nuxt, dentro do layout do
+      site e em pt-BR, com links para as seções principais no 404 e sem eles no 503. Ver
+      `docs/decisoes/0019-falha-da-api-responde-503-nao-404.md` e
+      `docs/relatorio-sessao-22.md`.
+- [x] **O setup do zero passou a ser verificado, não só executado** — sessão 22.
+      `migrate:fresh --seed` terminar em verde não dizia nada sobre o que ele promete; agora
+      há teste Pest atravessando os endpoints reais de login e de conteúdo
+      (`tests/Feature/Seeders/SetupDoZeroTest.php`). O `DevSuperAdminSeeder` também passou a
+      reativar o dev — `db:seed` num banco já existente não limpava `deactivated_at`, e o
+      login era recusado logo depois de rodar o seeder que existe para devolver o acesso.
+
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
@@ -373,6 +390,13 @@
       preparação — sem `makesOffer`, `hasOfferCatalog` ou `Service`, e há teste de ponta a
       ponta que falha se alguém acrescentar um deles. Falta marcação por página (`WebPage`,
       `BreadcrumbList`), que depende de nada — só não foi pedida ainda
+- [ ] **A home e os números institucionais ficaram fora da regra de 503** (sessão 22, ver
+      `docs/decisoes/0019-falha-da-api-responde-503-nao-404.md`). O conteúdo da home é fixo no
+      `.vue`; só as idades vêm de `useInstitutionFacts` e já degradam para nada quando a API
+      falha. Derrubar a home inteira em 503 por causa de um número é desproporcional, mas
+      servi-la em 200 com a frase de fundação incompleta também não está certo. Sem decisão —
+      as saídas prováveis são um texto de reserva para o número ou aceitar o 503. Vale junto
+      com isso conferir as outras leituras que hoje degradam em silêncio.
 - [ ] Eventos Umami nos CTAs
 - [ ] `/educacao-infantil/estrutura` menciona uma galeria de fotos que ainda não existe —
       depende da entidade `media`
