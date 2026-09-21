@@ -46,10 +46,16 @@ sem confirmação.
 05/10/2025 (ata 05/2025), biênio 2026–2027, posse em 15/01/2026. Substitui o registro
 anterior deste documento (presidente "Júlio Palmiro", `[CONFIRMAR]`).
 
+**Atualização de governança em 21/09/2026:** o presidente Valdomiro Ferreira dos Santos
+renunciou. Assumiu como interino Sidnei Pereira do Nascimento, exibido como "Presidente
+(interino): Sidnei Pereira do Nascimento" — por isso a Diretoria Executiva fica sem
+vice-presidente até a eleição (a linha é omitida, nunca escrita como "vago"). No Conselho
+Deliberativo, a vice-presidência passa a Rogério Caetano da Silva, no lugar de Jonatas
+Beranger.
+
 Diretoria Executiva:
 
-- Presidente: Valdomiro Ferreira dos Santos
-- Vice-presidente: Sidnei Pereira do Nascimento
+- Presidente (interino): Sidnei Pereira do Nascimento
 - Secretário: Marcos Aurélio Batyras
 - Diretor de Patrimônio: Domingos Geraldo Stersa Junior
 - 1º Tesoureiro: Marcos Adriano Dornelas Pinheiro
@@ -58,7 +64,7 @@ Diretoria Executiva:
 Conselho Deliberativo:
 
 - Presidente: André Luiz Gonçalves Salvador
-- Vice-presidente: Jonatas Beranger
+- Vice-presidente: Rogério Caetano da Silva
 
 No site público, escrever sempre "gestão 2026–2027", nunca datas de início/fim de mandato.
 A ata de origem contém RG, CPF, estado civil, profissão e endereço residencial de cada
