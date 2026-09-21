@@ -11,8 +11,9 @@ Leia junto: `docs/arquitetura.md` (camadas e autenticação),
 `docs/decisoes/0014-pacote-de-deploy-minimo.md` (por que o servidor recebe um pacote e não o
 repositório), `docs/decisoes/0015-painel-configurado-em-tempo-de-execucao.md` (por que o mesmo
 pacote atende os dois ambientes), `docs/decisoes/0016-dois-usuarios-de-acesso-ao-servidor.md`
-(quem consegue entrar na máquina, e com qual poder) e `docs/protecao-de-dados.md` (chaves e
-retenção).
+(quem consegue entrar na máquina, e com qual poder),
+`docs/decisoes/0020-resend-via-api-http-em-vez-de-smtp.md` (por que Resend e por que API HTTP)
+e `docs/protecao-de-dados.md` (chaves e retenção).
 
 ---
 
