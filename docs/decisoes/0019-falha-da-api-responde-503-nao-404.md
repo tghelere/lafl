@@ -79,11 +79,19 @@ isso às páginas.
   instituição anunciando que não presta contas, no endereço que existe para provar o
   contrário. Filtro que não casa com nada continua 200 com lista vazia: ali a resposta veio e
   está certa.
-- **A home ficou de fora, por ora.** O conteúdo dela é fixo no `.vue`; só as idades vêm da API
-  (`useInstitutionFacts`) e já degradam para nada. Derrubar a home inteira em 503 por causa de
-  um número é desproporcional, mas servi-la em 200 com a frase incompleta também não é certo.
-  Anotado em `docs/roadmap.md`, sem decisão.
-- **O 503 não é exercitável pela bateria de e2e**: o `webServer` mantém a API de pé, e a
-  chamada que precisaria falhar é do SSR, fora do alcance do `page.route()`. Foi conferido à
-  mão contra o build de produção (Nitro apontado para uma porta fechada), e o arquivo de teste
-  diz isso em vez de fingir cobertura.
+- **A home fica de fora da regra do 503, decidido.** O conteúdo dela é fixo no `.vue`; só as
+  idades vêm da API (`useInstitutionFacts`) e degradam para nada. Derrubar a home inteira em
+  503 por causa de um número seguiu desproporcional — a saída foi a segunda opção que este
+  documento deixava em aberto: uma frase alternativa completa, sem nenhum número calculado, no
+  lugar das duas linhas de registro (fundação e tempo de bazar) quando `useInstitutionFacts`
+  falha. Ver `frontend-site/app/pages/index.vue`. Cobertura de ponta a ponta dos dois casos
+  (com e sem os números) em `e2e/tests/paginas/numeros-calculados.spec.ts` e
+  `e2e/tests/site-sem-api/home-sem-api.spec.ts` — o segundo só é alcançável numa terceira
+  instância do site com a API fora do ar (`playwright.config.ts`, projeto `site-sem-api`, novo
+  nesta sessão), pelo mesmo motivo do item abaixo.
+- **O 503 passou a ser exercitável pela bateria de e2e.** A mesma terceira instância do site
+  usada acima cobre o que o `webServer` normal não alcança para as páginas que leem o CMS: API
+  de pé o tempo todo lá, e a chamada que precisaria falhar é do SSR, fora do `page.route()`. Ver
+  `e2e/tests/site-sem-api/pagina-sem-api.spec.ts`: 503 com `Cache-Control: no-store`, e
+  telefone/WhatsApp da sede (lidos de `frontend-site/app/config/institution.ts`, nunca da API)
+  no lugar dos links de seção que `app/error.vue` mostra no 404.

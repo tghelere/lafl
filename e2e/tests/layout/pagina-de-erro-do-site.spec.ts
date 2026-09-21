@@ -9,12 +9,13 @@ import { gotoSite } from '../../support/site'
  *
  * **O que fica de fora, e por quê.** A outra metade do desenho é o 503: falha ou timeout da
  * API responde 503 com `Cache-Control: no-store`, e só ausência real de conteúdo responde 404
- * (ver frontend-site/app/utils/apiPageError.ts). Essa metade não é exercitável aqui — o
+ * (ver frontend-site/app/utils/apiPageError.ts). Essa metade não é exercitável AQUI — o
  * `webServer` desta bateria sobe a API e a mantém de pé, e a chamada que precisaria falhar
- * acontece no SSR, fora do alcance do `page.route()`. Ela foi conferida à mão contra o build
- * de produção na sessão 22, subindo o Nitro apontado para uma porta fechada; está registrada
- * em docs/relatorio-sessao-22.md. O que este arquivo tranca é o caminho que a bateria alcança
- * de verdade: o 404.
+ * acontece no SSR, fora do alcance do `page.route()`. Ela tem cobertura própria, numa terceira
+ * instância do site com a API apontada para uma porta fechada:
+ * `tests/site-sem-api/pagina-sem-api.spec.ts` (ver playwright.config.ts, projeto
+ * `site-sem-api`, e docs/decisoes/0019-falha-da-api-responde-503-nao-404.md). O que este
+ * arquivo tranca é o caminho que a bateria normal alcança de verdade: o 404.
  */
 test.describe('página de erro do site público', () => {
   test('endereço que não existe responde 404 e mostra a tela do site, não a do Nuxt', async ({ page }) => {

@@ -11,13 +11,18 @@
  *
  * **Os links de seção aparecem SÓ no 404, de propósito.** No 503 o que falhou foi a API, e
  * toda página de seção lê a API: oferecer os links ali seria oferecer uma fila de becos sem
- * saída.
- * O que serve nesse caso é dizer que o problema é nosso e pedir para voltar depois.
+ * saída. **No 503, em vez dos links, entram telefone e WhatsApp da sede** — lidos de
+ * `app/config/institution.ts`, nunca da API, pelo mesmo motivo: se a API caiu, é exatamente
+ * quando um canal alternativo mais importa.
  *
  * Header e rodapé entram por `<NuxtLayout>`, o mesmo do site inteiro — e podem entrar porque
  * nenhum dos dois consulta a API (leem `app/config/navigation.ts`, que é arquivo). Se um dia
  * passarem a consultar, esta página cai junto com o que ela existe para cobrir.
  */
+import { MapPin, Phone } from '@lucide/vue'
+
+import AppWhatsappIcon from '~/components/AppWhatsappIcon.vue'
+import { institutionContact, whatsappHref } from '~/config/institution'
 import { navigation } from '~/config/navigation'
 
 const props = defineProps<{ error: { statusCode?: number } }>()
@@ -26,13 +31,13 @@ const status = computed(() => props.error?.statusCode ?? 500)
 const naoEncontrada = computed(() => status.value === 404)
 
 const titulo = computed(() =>
-  naoEncontrada.value ? 'Página não encontrada' : 'Página indisponível no momento',
+  naoEncontrada.value ? 'Página não encontrada' : 'Instabilidade momentânea',
 )
 
 const explicacao = computed(() =>
   naoEncontrada.value
-    ? 'O endereço que você abriu não existe ou foi movido. Pode ser um link antigo, um endereço digitado com algum engano, ou uma página que saiu do ar.'
-    : 'Não conseguimos carregar o conteúdo desta página agora. A falha é do nosso lado e costuma durar pouco — tente de novo em alguns minutos.',
+    ? 'Não encontramos esta página. Ela pode ter mudado de endereço.'
+    : 'O site está com uma instabilidade momentânea. Tente novamente em alguns minutos.',
 )
 
 usePageSeo({
@@ -71,6 +76,33 @@ usePageSeo({
           </li>
         </ul>
       </nav>
+
+      <!-- Só no 503: telefone e WhatsApp da sede, lidos de app/config/institution.ts, nunca da
+           API (ver comentário no topo do script). -->
+      <div v-else class="erro__contato" aria-labelledby="erro-contato-titulo">
+        <h2 id="erro-contato-titulo" class="erro__contato-titulo">Se for urgente, fale com a gente</h2>
+
+        <p class="erro__contato-linha">
+          <MapPin :size="16" aria-hidden="true" />
+          {{ institutionContact.address }}
+        </p>
+
+        <div class="erro__contato-links">
+          <a :href="institutionContact.phoneHref" class="btn btn--secondary">
+            <Phone :size="16" aria-hidden="true" />
+            {{ institutionContact.phone }}
+          </a>
+          <a
+            :href="whatsappHref()"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn--secondary"
+          >
+            <AppWhatsappIcon :size="16" />
+            WhatsApp
+          </a>
+        </div>
+      </div>
     </div>
   </NuxtLayout>
 </template>
@@ -123,5 +155,36 @@ usePageSeo({
 
 .erro__lista a {
   font-weight: var(--weight-medium);
+}
+
+.erro__contato {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.erro__contato-titulo {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+}
+
+.erro__contato-linha {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+}
+
+.erro__contato-linha svg {
+  flex-shrink: 0;
+}
+
+.erro__contato-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
 }
 </style>

@@ -337,6 +337,21 @@
       (`tests/Feature/Seeders/SetupDoZeroTest.php`). O `DevSuperAdminSeeder` também passou a
       reativar o dev — `db:seed` num banco já existente não limpava `deactivated_at`, e o
       login era recusado logo depois de rodar o seeder que existe para devolver o acesso.
+- [x] **A pendência da sessão 22 sobre a home sem `useInstitutionFacts` foi fechada** —
+      sessão 23. A home continua respondendo 200 e mostra uma frase alternativa completa no
+      lugar da fundação e do tempo de bazar, nunca uma linha de registro sem número
+      (`frontend-site/app/pages/index.vue`). Os dois casos (com e sem os números) ganharam
+      cobertura de ponta a ponta — o segundo só é alcançável numa terceira instância do site
+      com a API apontada para uma porta fechada, criada nesta sessão
+      (`playwright.config.ts`, projeto `site-sem-api`). Ver
+      `docs/decisoes/0019-falha-da-api-responde-503-nao-404.md`.
+- [x] **`app/error.vue` ganhou os textos definidos pela instituição, e o 503 passou a ter
+      cobertura de ponta a ponta** — sessão 23. 404: "Página não encontrada"; 503:
+      "Instabilidade momentânea", com telefone e WhatsApp da sede no lugar dos links de seção,
+      lidos de `app/config/institution.ts`, nunca da API (`tel:` e `wa.me`). A lacuna que a
+      sessão 22 deixou registrada — o 503 é do SSR, fora do `page.route()` do Playwright — foi
+      fechada reaproveitando a terceira instância do site do item acima
+      (`e2e/tests/site-sem-api/pagina-sem-api.spec.ts`).
 
 ## Em andamento
 
@@ -390,13 +405,6 @@
       preparação — sem `makesOffer`, `hasOfferCatalog` ou `Service`, e há teste de ponta a
       ponta que falha se alguém acrescentar um deles. Falta marcação por página (`WebPage`,
       `BreadcrumbList`), que depende de nada — só não foi pedida ainda
-- [ ] **A home e os números institucionais ficaram fora da regra de 503** (sessão 22, ver
-      `docs/decisoes/0019-falha-da-api-responde-503-nao-404.md`). O conteúdo da home é fixo no
-      `.vue`; só as idades vêm de `useInstitutionFacts` e já degradam para nada quando a API
-      falha. Derrubar a home inteira em 503 por causa de um número é desproporcional, mas
-      servi-la em 200 com a frase de fundação incompleta também não está certo. Sem decisão —
-      as saídas prováveis são um texto de reserva para o número ou aceitar o 503. Vale junto
-      com isso conferir as outras leituras que hoje degradam em silêncio.
 - [ ] Eventos Umami nos CTAs
 - [ ] `/educacao-infantil/estrutura` menciona uma galeria de fotos que ainda não existe —
       depende da entidade `media`
