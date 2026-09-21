@@ -7,15 +7,19 @@
 // telefone e WhatsApp. O formulário abaixo é o caminho secundário, para fora do horário de
 // atendimento; ele já notifica o setor do bazar automaticamente (ver
 // config/forms.php:notification_recipients.pickup_request no backend).
+//
+// Número vem de app/config/institution.ts — fonte única desde a sessão 23 (ver
+// docs/relatorio-sessao-23.md). A mensagem é própria desta página (agendamento de coleta),
+// diferente do padrão de contato geral que whatsappHref() usa por default.
+import { institutionContact, whatsappHref } from '~/config/institution'
+
 const { hasError, fieldFailed } = useFormErrorState()
 
-const WHATSAPP_NUMBER = '5543999500183'
 const WHATSAPP_MESSAGE = 'Olá! Gostaria de agendar uma coleta de doação para o Bazar Beneficente.'
-const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
 
 usePageSeo({
   title: 'Agendar Coleta — Bazar — Lar Anália Franco',
-  description: 'Agende a coleta de itens para doação ao Bazar Beneficente do Lar Anália Franco pelo WhatsApp (43) 99950-0183.',
+  description: `Agende a coleta de itens para doação ao Bazar Beneficente do Lar Anália Franco pelo WhatsApp ${institutionContact.whatsappPhone}.`,
 })
 </script>
 
@@ -40,12 +44,12 @@ usePageSeo({
     <p>
       <a
         class="btn btn--primary"
-        :href="whatsappHref"
+        :href="whatsappHref(WHATSAPP_MESSAGE)"
         target="_blank"
         rel="noopener noreferrer"
       >
         <AppWhatsappIcon />
-        Chamar no WhatsApp (43) 99950-0183
+        Chamar no WhatsApp {{ institutionContact.whatsappPhone }}
       </a>
     </p>
 

@@ -80,8 +80,8 @@ export function jsonLdStreetAddress(location: InstitutionLocation): string {
 /**
  * O WhatsApp é o do Bazar (único número confirmado — não há WhatsApp da sede, ver
  * docs/contexto.md), usado como canal geral da instituição em /contato e em app/error.vue.
- * `bazar/agendar-coleta.vue` usa o mesmo número com mensagem própria do contexto de coleta e
- * fica fora desta fonte única, de propósito — a mensagem muda por página, o número não.
+ * `bazar/agendar-coleta.vue` também lê o número daqui, mas passa a `whatsappHref` uma
+ * mensagem própria do contexto de coleta — a mensagem muda por página, o número não.
  */
 export const institutionContact = {
   whatsappNumber: '5543999500183',
