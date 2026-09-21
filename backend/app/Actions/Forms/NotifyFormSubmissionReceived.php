@@ -19,6 +19,8 @@ final class NotifyFormSubmissionReceived
         $recipient = config("forms.notification_recipients.{$type->value}");
         $adminUrl = rtrim((string) config('forms.admin_base_url'), '/')."/admin/{$type->adminResourceSlug()}/{$uuid}";
 
-        Mail::to($recipient)->queue(new FormSubmissionReceived($type, now()->format('d/m/Y H:i'), $adminUrl));
+        // Horário sempre em America/Sao_Paulo no e-mail, independente do timezone da
+        // aplicação (UTC — ver config/app.php): quem lê é gente na sede da instituição.
+        Mail::to($recipient)->queue(new FormSubmissionReceived($type, now('America/Sao_Paulo')->format('d/m/Y H:i'), $adminUrl));
     }
 }

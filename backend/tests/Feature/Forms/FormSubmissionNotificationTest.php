@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\FormSubmissionType;
 use App\Mail\FormSubmissionReceived;
 use App\Models\ContactMessage;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Mail;
 
 test('envio de formulário enfileira e-mail de notificação ao setor responsável', function (): void {
@@ -118,6 +119,24 @@ test('honeypot disparado não enfileira e-mail nenhum', function (): void {
     ])->assertCreated();
 
     Mail::assertNothingQueued();
+});
+
+test('horário do e-mail de notificação é sempre America/Sao_Paulo, mesmo com timezone da aplicação em UTC', function (): void {
+    Mail::fake();
+
+    // 02h UTC é 23h do dia anterior em America/Sao_Paulo (UTC-3, sem horário de verão) — o
+    // caso que expõe o bug se a conversão de timezone for esquecida.
+    $this->travelTo(CarbonImmutable::parse('2026-07-12 02:00:00', 'UTC'));
+
+    $this->postJson('/api/v1/public/contact-messages', [
+        'name' => 'Fernanda Costa',
+        'email' => 'fernanda@example.com',
+        'subject' => 'Elogio',
+        'message' => 'Parabéns pelo trabalho.',
+        'consent' => true,
+    ])->assertCreated();
+
+    Mail::assertQueued(FormSubmissionReceived::class, fn (FormSubmissionReceived $mail) => $mail->submittedAt === '11/07/2026 23:00');
 });
 
 test('destinatário vem de config, um por tipo de formulário', function (): void {
