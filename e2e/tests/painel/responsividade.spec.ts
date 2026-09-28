@@ -141,3 +141,122 @@ test.describe('a partir de 1024px a navegação volta a ser coluna fixa', () => 
     expect(posicao, 'a navegação lateral não deveria estar fora do fluxo em 1024px').toBe('static')
   })
 })
+
+/** As cinco listagens de formulário mais as quatro demais telas de tabela do painel. */
+const LISTAGENS = [
+  ['/admin/program-applications', 'Avisos de interesse no contraturno'],
+  ['/admin/partnership-inquiries', 'Propostas de apoio'],
+  ['/admin/volunteer-applications', 'Voluntários'],
+  ['/admin/contact-messages', 'Mensagens de contato'],
+  ['/admin/pickup-requests', 'Pedidos de coleta'],
+  ['/admin/paginas', 'Páginas'],
+  ['/admin/transparencia', 'Transparência'],
+  ['/admin/usuarios', 'Usuários'],
+  ['/admin/auditoria', 'Auditoria'],
+]
+
+/** Quanto a página passa da largura da janela. Zero é o único valor aceitável. */
+function excessoHorizontal(page: Page): Promise<number> {
+  return page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+}
+
+test.describe('listagens viram lista de cards abaixo de 768px', () => {
+  test.use({ viewport: CELULAR })
+
+  for (const [caminho, titulo] of LISTAGENS) {
+    test(`${caminho} vira cards, sem cabeçalho de tabela e sem rolagem lateral`, async ({ page }) => {
+      await page.goto(caminho!)
+      await expect(page.locator('.page-header__title')).toHaveText(titulo!)
+      await expect(page.locator('.table tbody tr').first()).toBeVisible()
+
+      // O cabeçalho da tabela sai de cena: o rótulo de cada coluna passou a acompanhar o seu
+      // valor dentro do card, e manter os dois faria o leitor de tela dizer tudo duas vezes.
+      await expect(page.locator('.table thead')).toBeHidden()
+
+      const linha = page.locator('.table tbody tr').first()
+      const empilhado = await linha.evaluate((el) => getComputedStyle(el).display)
+      expect(empilhado, 'a linha da listagem continua sendo linha de tabela').toBe('block')
+
+      expect(await excessoHorizontal(page), `${caminho} rola de lado`).toBe(0)
+    })
+  }
+
+  test('cada valor do card vem com o rótulo da sua coluna', async ({ page }) => {
+    await page.goto('/admin/usuarios')
+    await expect(page.locator('.table tbody tr').first()).toBeVisible()
+
+    // O rótulo é desenhado pelo `content: attr(data-label)` do ::before (ver components.css).
+    // Ler o `content` calculado é o que prova que ele chegou à tela — a presença do atributo
+    // no HTML provaria só que alguém o escreveu.
+    const rotulos = await page.locator('.table tbody tr').first().locator('td').evaluateAll((celulas) =>
+      celulas.map((celula) => ({
+        atributo: celula.getAttribute('data-label'),
+        desenhado: getComputedStyle(celula, '::before').content,
+      })),
+    )
+
+    expect(rotulos.length, 'nenhuma célula no primeiro card').toBeGreaterThan(1)
+
+    // A primeira célula é o título do card e não leva rótulo — "NOME" acima do próprio nome.
+    expect(rotulos[0]!.desenhado, 'a primeira célula não deveria ter rótulo').toBe('none')
+
+    for (const celula of rotulos.slice(1)) {
+      expect(celula.atributo, 'célula sem data-label').toBeTruthy()
+      expect(celula.desenhado, `rótulo de ${celula.atributo}`).toContain(celula.atributo!)
+    }
+  })
+
+  test('o card de um formulário mostra nome, recebido em, status e o indicador de não lido', async ({ page }) => {
+    await page.goto('/admin/contact-messages')
+
+    const naoLido = page.locator('.table tbody tr.table__row--unread').first()
+    await expect(naoLido).toBeVisible()
+
+    // O indicador não é só a cor nem só o peso da fonte: é um ponto com texto próprio, que o
+    // leitor de tela anuncia (ver SubmissionListView.vue).
+    await expect(naoLido.getByRole('img', { name: 'Não lido' })).toBeVisible()
+    await expect(naoLido.locator('[data-label="Recebido em"]')).toBeVisible()
+    await expect(naoLido.locator('[data-label="Status"] .badge')).toBeVisible()
+    await expect(naoLido.getByRole('link')).toBeVisible()
+  })
+
+  test('os filtros empilham em largura inteira', async ({ page }) => {
+    await page.goto('/admin/contact-messages')
+    await expect(page.locator('.filter-bar')).toBeVisible()
+
+    const barra = (await page.locator('.filter-bar').boundingBox())!
+    const campos = await page.locator('.filter-bar__field select, .filter-bar__field input').all()
+    const botoes = await page.locator('.filter-bar .btn').all()
+
+    expect(campos.length, 'a barra de filtro desta tela não tem campo nenhum').toBeGreaterThan(1)
+
+    const caixas = await Promise.all([...campos, ...botoes].map((alvo) => alvo.boundingBox()))
+    const larguraUtil = barra.width - 2 * 16 // padding lateral de --space-4 dos dois lados
+
+    for (const caixa of caixas) {
+      expect(Math.abs(caixa!.width - larguraUtil), `campo com ${caixa!.width}px numa barra de ${larguraUtil}px`).toBeLessThanOrEqual(2)
+    }
+
+    // Empilhados: cada controle começa abaixo do anterior, nenhum dividindo linha.
+    const topos = caixas.map((caixa) => caixa!.y)
+    for (let i = 1; i < topos.length; i++) {
+      expect(topos[i]!, 'dois controles da barra de filtro na mesma linha').toBeGreaterThan(topos[i - 1]!)
+    }
+  })
+})
+
+test.describe('a partir de 768px a listagem volta a ser tabela', () => {
+  test.use({ viewport: { width: 768, height: 900 } })
+
+  test('o cabeçalho da tabela reaparece e a página não rola de lado', async ({ page }) => {
+    await page.goto('/admin/auditoria')
+    await expect(page.locator('.table thead')).toBeVisible()
+
+    const linha = page.locator('.table tbody tr').first()
+    expect(await linha.evaluate((el) => getComputedStyle(el).display)).toBe('table-row')
+
+    // A tabela larga rola DENTRO do seu próprio contêiner (.table-wrapper), não arrastando a
+    // página inteira junto.
+    expect(await excessoHorizontal(page), 'a página inteira rola de lado em 768px').toBe(0)
+  })
+})

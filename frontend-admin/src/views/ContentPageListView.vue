@@ -139,7 +139,7 @@ watch(
               :key="page.id"
               class="table__row--clickable"
             >
-              <td>
+              <td data-label="Título">
                 <RouterLink
                   :to="{ name: 'pages.edit', params: { uuid: page.id } }"
                   class="table__row-link"
@@ -147,8 +147,10 @@ watch(
                   {{ page.title }}
                 </RouterLink>
               </td>
-              <td><code>/{{ page.slug }}</code></td>
-              <td>
+              <td data-label="Endereço público">
+                <code>/{{ page.slug }}</code>
+              </td>
+              <td data-label="Situação">
                 <StatusBadge
                   :status="page.status === 'published' ? 'published' : 'draft'"
                   :label="page.status_label"

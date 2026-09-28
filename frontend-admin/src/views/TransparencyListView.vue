@@ -198,7 +198,7 @@ watch(
               :key="document.uuid"
               class="table__row--clickable"
             >
-              <td>
+              <td data-label="Título">
                 <RouterLink
                   :to="{ name: 'transparency.edit', params: { uuid: document.uuid } }"
                   class="table__row-link"
@@ -206,11 +206,19 @@ watch(
                   {{ document.title }}
                 </RouterLink>
               </td>
-              <td>{{ document.year }}</td>
-              <td>{{ document.type_label }}</td>
-              <td>{{ formatFileSize(document.file_size) }}</td>
-              <td>{{ document.download_count }}</td>
-              <td>
+              <td data-label="Ano">
+                {{ document.year }}
+              </td>
+              <td data-label="Tipo">
+                {{ document.type_label }}
+              </td>
+              <td data-label="Tamanho">
+                {{ formatFileSize(document.file_size) }}
+              </td>
+              <td data-label="Downloads">
+                {{ document.download_count }}
+              </td>
+              <td data-label="Status">
                 <StatusBadge
                   :status="document.published_at ? 'published' : 'draft'"
                   :label="document.published_at ? 'Publicado' : 'Rascunho'"

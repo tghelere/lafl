@@ -192,7 +192,7 @@ void loadRoles()
               :key="user.id"
               class="table__row--clickable"
             >
-              <td>
+              <td data-label="Nome">
                 <RouterLink
                   :to="{ name: 'users.edit', params: { uuid: user.id } }"
                   class="table__row-link"
@@ -200,9 +200,13 @@ void loadRoles()
                   {{ user.name }}
                 </RouterLink>
               </td>
-              <td>{{ user.email }}</td>
-              <td>{{ roleNames(user.roles) }}</td>
-              <td>
+              <td data-label="E-mail">
+                {{ user.email }}
+              </td>
+              <td data-label="Papéis">
+                {{ roleNames(user.roles) }}
+              </td>
+              <td data-label="Situação">
                 <StatusBadge
                   :status="user.active ? 'active' : 'inactive'"
                   :label="user.active ? 'Ativo' : 'Inativo'"

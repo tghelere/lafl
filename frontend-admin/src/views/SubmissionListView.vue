@@ -164,6 +164,7 @@ watch(
                 <td
                   v-for="(column, index) in config.listColumns"
                   :key="column.key"
+                  :data-label="column.label"
                 >
                   <RouterLink
                     v-if="index === 0"
@@ -182,8 +183,10 @@ watch(
                     {{ item[column.key] ?? '—' }}
                   </template>
                 </td>
-                <td>{{ item.created_at_label ?? '—' }}</td>
-                <td>
+                <td data-label="Recebido em">
+                  {{ item.created_at_label ?? '—' }}
+                </td>
+                <td data-label="Status">
                   <StatusBadge
                     :status="item.status"
                     :label="item.status_label"

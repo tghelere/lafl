@@ -598,6 +598,26 @@ body.has-open-drawer {
   height: var(--control-height-sm);
 }
 
+/* Abaixo de 48rem os campos empilham em largura inteira. Lado a lado, num viewport de 360px,
+   um `min-width: 9rem` de select mais um botão já estouram a linha — e o que sobra são dois
+   campos de 40px em que ninguém acerta o toque. */
+@media (max-width: 47.999rem) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-bar__field select,
+  .filter-bar__field input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .filter-bar .btn {
+    width: 100%;
+  }
+}
+
 /* Tabela de listagem */
 .table-wrapper {
   overflow-x: auto;
@@ -652,6 +672,94 @@ body.has-open-drawer {
 .table tbody tr.table__row--unread td {
   font-weight: var(--weight-semibold);
   color: var(--color-heading);
+}
+
+/* Abaixo de 48rem a listagem deixa de ser tabela e vira uma LISTA DE CARDS, um card por
+   registro, com o rótulo de cada coluna ao lado do valor (o `data-label` que as cinco
+   listagens escrevem em cada célula). Uma tabela de cinco ou seis colunas em 360px só existe
+   de duas formas — rolando de lado ou com a fonte ilegível —, e as duas obrigam a pessoa a
+   caçar o que ela veio ver.
+
+   Este bloco é `max-width`, ao contrário do resto do arquivo (ver a gaveta da navegação, que é
+   mobile-first): aqui a forma normal do componente é a tabela, e escrevê-la ao contrário
+   exigiria desfazer regra por regra — `display`, `padding`, `border`, `white-space` — no
+   caminho de volta. Um bloco só, que descreve a exceção e some inteiro se um dia ela deixar de
+   existir, diz melhor o que está acontecendo.
+
+   O `<thead>` some junto: o rótulo que ele carregava passou a estar em cada célula, e mantê-lo
+   faria o leitor de tela anunciar cada nome de coluna duas vezes. */
+@media (max-width: 47.999rem) {
+  .table-wrapper {
+    border: none;
+    background: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody tr {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-raised);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .table tbody tr + tr {
+    margin-top: var(--space-3);
+  }
+
+  .table td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-1) 0;
+    border-bottom: none;
+    /* `nowrap` é o que faz a tabela larga rolar de lado; dentro do card, texto quebra. */
+    white-space: normal;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    flex: none;
+    text-align: left;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-muted);
+  }
+
+  /* A primeira célula é o título do card — o nome do registro, e o link que o abre. Sem
+     rótulo: "NOME" acima do próprio nome é ruído, e a linha inteira cabe melhor ao toque. */
+  .table tbody td:first-child {
+    display: block;
+    text-align: left;
+    padding-bottom: var(--space-2);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: var(--color-heading);
+  }
+
+  .table tbody td:first-child::before {
+    content: none;
+  }
+
+  /* O card inteiro já tem fundo próprio; o realce de linha clicável da tabela não se traduz
+     aqui e só deixaria o card cinza ao passar o dedo. */
+  .table tbody tr.table__row--clickable:hover {
+    background: var(--color-surface-raised);
+  }
 }
 
 .unread-dot {

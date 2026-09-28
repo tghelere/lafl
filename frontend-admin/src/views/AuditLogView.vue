@@ -224,12 +224,20 @@ watch(
               v-for="(entry, index) in entries"
               :key="entryKey(entry, index)"
             >
-              <td>{{ entry.occurred_at_label ?? '—' }}</td>
+              <td data-label="Data e hora">
+                {{ entry.occurred_at_label ?? '—' }}
+              </td>
               <!-- Sem autor: o formulário foi recebido pelo site, não por alguém do painel. -->
-              <td>{{ entry.user ?? '—' }}</td>
-              <td>{{ entry.action_label }}</td>
-              <td>{{ entry.form_type_label ?? '—' }}</td>
-              <td>
+              <td data-label="Usuário">
+                {{ entry.user ?? '—' }}
+              </td>
+              <td data-label="Ação">
+                {{ entry.action_label }}
+              </td>
+              <td data-label="Tipo de formulário">
+                {{ entry.form_type_label ?? '—' }}
+              </td>
+              <td data-label="Registro">
                 <RouterLink
                   v-if="entry.record_uuid && entry.record_resource"
                   :to="{
@@ -245,7 +253,9 @@ watch(
                   —
                 </template>
               </td>
-              <td>{{ entry.ip ?? '—' }}</td>
+              <td data-label="IP">
+                {{ entry.ip ?? '—' }}
+              </td>
             </tr>
           </tbody>
         </table>
