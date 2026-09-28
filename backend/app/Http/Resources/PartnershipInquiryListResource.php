@@ -6,6 +6,7 @@ namespace App\Http\Resources;
 
 use App\Models\PartnershipInquiry;
 use App\Support\FieldMasking;
+use App\Support\InstitutionalTime;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -35,6 +36,7 @@ final class PartnershipInquiryListResource extends JsonResource
             'status_label' => $this->status->label(),
             'handled_by' => $this->whenLoaded('handledBy', fn () => $this->handledBy?->name),
             'created_at' => $this->created_at?->toIso8601String(),
+            'created_at_label' => InstitutionalTime::label($this->created_at),
             'expires_at' => $this->expires_at?->toIso8601String(),
         ];
     }

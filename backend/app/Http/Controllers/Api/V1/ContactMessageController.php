@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\FormSubmissionStatus;
+use App\Http\Controllers\Api\V1\Concerns\ListsFormSubmissions;
 use App\Http\Controllers\Api\V1\Concerns\LogsSubmissionAccess;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Forms\IndexFormSubmissionsRequest;
 use App\Http\Requests\Forms\UpdateFormSubmissionStatusRequest;
 use App\Http\Resources\ContactMessageListResource;
 use App\Http\Resources\ContactMessageResource;
@@ -17,30 +19,17 @@ use Illuminate\Support\Facades\Gate;
 
 final class ContactMessageController extends Controller
 {
-    use LogsSubmissionAccess;
+    use ListsFormSubmissions, LogsSubmissionAccess;
 
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexFormSubmissionsRequest $request): AnonymousResourceCollection
     {
         Gate::authorize('viewAny', ContactMessage::class);
 
-        $perPage = min($request->integer('per_page', 15), 100);
-
         $query = ContactMessage::query()->with('handledBy')->latest('created_at');
 
-        $status = $request->filled('status') ? FormSubmissionStatus::tryFrom($request->string('status')->value()) : null;
-        if ($status !== null) {
-            $query->where('status', $status);
-        }
-
-        if ($request->filled('from')) {
-            $query->whereDate('created_at', '>=', $request->date('from'));
-        }
-
-        if ($request->filled('to')) {
-            $query->whereDate('created_at', '<=', $request->date('to'));
-        }
-
-        return ContactMessageListResource::collection($query->paginate($perPage));
+        return ContactMessageListResource::collection(
+            $this->applySubmissionFilters($query, $request)->paginate($this->submissionsPerPage($request)),
+        );
     }
 
     public function show(Request $request, ContactMessage $contactMessage): ContactMessageResource

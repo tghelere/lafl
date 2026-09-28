@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\FormSubmissionStatus;
+use App\Http\Controllers\Api\V1\Concerns\ListsFormSubmissions;
 use App\Http\Controllers\Api\V1\Concerns\LogsSubmissionAccess;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Forms\IndexFormSubmissionsRequest;
 use App\Http\Requests\Forms\UpdateFormSubmissionStatusRequest;
 use App\Http\Resources\PickupRequestListResource;
 use App\Http\Resources\PickupRequestResource;
@@ -17,36 +19,22 @@ use Illuminate\Support\Facades\Gate;
 
 final class PickupRequestController extends Controller
 {
-    use LogsSubmissionAccess;
+    use ListsFormSubmissions, LogsSubmissionAccess;
 
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexFormSubmissionsRequest $request): AnonymousResourceCollection
     {
         Gate::authorize('viewAny', PickupRequest::class);
 
-        $perPage = min($request->integer('per_page', 15), 100);
+        // Ordenado pela chegada, como as outras quatro listagens — não mais por
+        // `scheduled_for`. A agenda de coleta por data agendada continua fazendo sentido, mas
+        // não como ordenação FIXA de uma caixa de entrada: o que a tela mostra primeiro tem de
+        // ser o que chegou por último, senão um pedido novo nasce no meio da lista. A data
+        // agendada segue na listagem como coluna. Ver docs/relatorio-sessao-25.md.
+        $query = PickupRequest::query()->with('handledBy')->latest('created_at');
 
-        // Ordenado por scheduled_for quando existir, para "agenda por data" (ver
-        // docs/estrutura-site.md §4.2, tela Bazar) — o que ainda não tem data agendada vai
-        // por último, ordenado por criação.
-        $query = PickupRequest::query()->with('handledBy')
-            ->orderByRaw('scheduled_for IS NULL')
-            ->orderBy('scheduled_for')
-            ->latest('created_at');
-
-        $status = $request->filled('status') ? FormSubmissionStatus::tryFrom($request->string('status')->value()) : null;
-        if ($status !== null) {
-            $query->where('status', $status);
-        }
-
-        if ($request->filled('from')) {
-            $query->whereDate('created_at', '>=', $request->date('from'));
-        }
-
-        if ($request->filled('to')) {
-            $query->whereDate('created_at', '<=', $request->date('to'));
-        }
-
-        return PickupRequestListResource::collection($query->paginate($perPage));
+        return PickupRequestListResource::collection(
+            $this->applySubmissionFilters($query, $request)->paginate($this->submissionsPerPage($request)),
+        );
     }
 
     public function show(Request $request, PickupRequest $pickupRequest): PickupRequestResource

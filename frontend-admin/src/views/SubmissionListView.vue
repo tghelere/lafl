@@ -135,6 +135,12 @@ watch(
                 >
                   {{ column.label }}
                 </th>
+                <!-- Comum às cinco listagens, por isso aqui e não em
+                     src/config/submissionResources.ts. O texto vem pronto da API
+                     (created_at_label, já em America/Sao_Paulo — ver
+                     App\Support\InstitutionalTime): o painel não converte fuso nem formata
+                     data, só imprime. -->
+                <th>Recebido em</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -159,6 +165,7 @@ watch(
                     {{ item[column.key] ?? '—' }}
                   </template>
                 </td>
+                <td>{{ item.created_at_label ?? '—' }}</td>
                 <td>
                   <StatusBadge
                     :status="item.status"

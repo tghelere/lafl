@@ -107,6 +107,12 @@ watch(() => route.fullPath, load, { immediate: true })
         </p>
 
         <dl class="detail-grid">
+          <!-- Comum às cinco telas, por isso fora de config.detailFields. Primeiro campo da
+               grade: numa caixa de entrada, "quando isto chegou" é o contexto de tudo o mais. -->
+          <div>
+            <dt>Recebido em</dt>
+            <dd>{{ submission.created_at_label ?? '—' }}</dd>
+          </div>
           <template
             v-for="field in config.detailFields"
             :key="field.key"

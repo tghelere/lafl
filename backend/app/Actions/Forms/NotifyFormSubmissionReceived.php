@@ -6,6 +6,7 @@ namespace App\Actions\Forms;
 
 use App\Enums\FormSubmissionType;
 use App\Mail\FormSubmissionReceived;
+use App\Support\InstitutionalTime;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -19,8 +20,10 @@ final class NotifyFormSubmissionReceived
         $recipient = config("forms.notification_recipients.{$type->value}");
         $adminUrl = rtrim((string) config('forms.admin_base_url'), '/')."/admin/{$type->adminResourceSlug()}/{$uuid}";
 
-        // Horário sempre em America/Sao_Paulo no e-mail, independente do timezone da
-        // aplicação (UTC — ver config/app.php): quem lê é gente na sede da instituição.
-        Mail::to($recipient)->queue(new FormSubmissionReceived($type, now('America/Sao_Paulo')->format('d/m/Y H:i'), $adminUrl));
+        // Horário sempre no fuso institucional, independente do timezone da aplicação
+        // (UTC — ver config/app.php): quem lê é gente na sede da instituição. O formato e o
+        // fuso vêm de App\Support\InstitutionalTime, o mesmo que monta o "Recebido em" do
+        // painel — um e-mail que diz uma hora e uma tela que diz outra é o pior dos dois.
+        Mail::to($recipient)->queue(new FormSubmissionReceived($type, (string) InstitutionalTime::label(now()), $adminUrl));
     }
 }

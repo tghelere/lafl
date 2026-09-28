@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\FormSubmissionType;
 use App\Enums\Role;
 use App\Enums\TransparencyDocumentType;
+use App\Models\ContactMessage;
 use App\Models\TransparencyDocument;
 use App\Models\User;
 use App\Support\Transparency\DocumentSlug;
@@ -40,7 +42,10 @@ use Illuminate\Support\Str;
  *   topo daquele arquivo), não há mais motivo para manter cópia sintética só para isso;
  * - um documento de transparência propositalmente fora da primeira página da listagem
  *   administrativa, e acervo grande o bastante (21 documentos) para a listagem PÚBLICA também
- *   paginar — ela mostra 20 por página.
+ *   paginar — ela mostra 20 por página;
+ * - formulários recebidos dos cinco tipos, com datas de chegada diferentes, mais uma mensagem
+ *   de contato recebida num instante FIXO e conhecido (ver MARKER_SUBMISSION_*), que é como a
+ *   bateria confere o "Recebido em" sem recalcular fuso em TypeScript.
  */
 class E2eSeeder extends Seeder
 {
@@ -60,6 +65,22 @@ class E2eSeeder extends Seeder
 
     public const MARKER_DOCUMENT_TITLE = 'Prestação de contas do convênio — CEI Anália Franco 2019';
 
+    /**
+     * Mensagem de contato recebida num instante fixo, usada pela bateria para conferir a
+     * coluna "Recebido em".
+     *
+     * O instante foi escolhido de propósito na faixa em que o dia do UTC e o dia de
+     * America/Sao_Paulo DIVERGEM: 16/01/2026 01:30 UTC é 15/01/2026 22:30 em Londrina. Uma
+     * tela que mostrasse o UTC cru exibiria "16/01/2026 01:30" e passaria por qualquer teste
+     * feito ao meio-dia — aqui ela falha. Ver App\Support\InstitutionalTime.
+     */
+    public const MARKER_SUBMISSION_SUBJECT = 'Marco de listagem — recebido em horário fixo';
+
+    public const MARKER_SUBMISSION_RECEIVED_AT_UTC = '2026-01-16 01:30:00';
+
+    /** O que a tela tem de mostrar para MARKER_SUBMISSION_RECEIVED_AT_UTC. */
+    public const MARKER_SUBMISSION_RECEIVED_LABEL = '15/01/2026 22:30';
+
     public function run(): void
     {
         // Ambiente `e2e` e nada mais: as senhas abaixo são públicas (estão neste arquivo e em
@@ -72,6 +93,7 @@ class E2eSeeder extends Seeder
         $this->seedUsers();
         $this->seedPages();
         $this->seedTransparencyDocuments();
+        $this->seedFormSubmissions();
     }
 
     /**
@@ -170,6 +192,30 @@ class E2eSeeder extends Seeder
             TransparencyDocumentType::AgreementAccounting,
             now()->subYears(5),
         );
+    }
+
+    /**
+     * Formulários recebidos dos cinco tipos. Sem eles as cinco listagens do painel nascem
+     * vazias e não há o que conferir — nem coluna de data, nem ordenação, nem contador.
+     *
+     * Três registros por tipo, com chegadas diferentes, para que a ordenação (mais recente
+     * primeiro) seja observável. Nada de dado real: tudo vem das factories, com faker
+     * (CLAUDE.md, regra 10).
+     */
+    private function seedFormSubmissions(): void
+    {
+        foreach (FormSubmissionType::cases() as $type) {
+            $modelClass = $type->modelClass();
+
+            foreach ([now(), now()->subHours(2), now()->subDay()] as $receivedAt) {
+                $modelClass::factory()->create(['created_at' => $receivedAt]);
+            }
+        }
+
+        ContactMessage::factory()->create([
+            'subject' => self::MARKER_SUBMISSION_SUBJECT,
+            'created_at' => self::MARKER_SUBMISSION_RECEIVED_AT_UTC,
+        ]);
     }
 
     private function createDocument(string $title, int $year, TransparencyDocumentType $type, \DateTimeInterface $updatedAt): void
