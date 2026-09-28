@@ -7,6 +7,7 @@ import AppLayout from '@/components/AppLayout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
 import { fetchContentPageList } from '@/services/pages'
 import type { ContentPage } from '@/types/pages'
@@ -72,7 +73,7 @@ watch(
 
 <template>
   <AppLayout resource="pages">
-    <h1>Páginas</h1>
+    <PageHeader title="Páginas" />
 
     <p class="page-list__intro">
       O endereço público e a situação de cada página são definidos fora desta tela — aqui é

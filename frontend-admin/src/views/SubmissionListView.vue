@@ -7,6 +7,7 @@ import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import FilterBar from '@/components/FilterBar.vue'
 import LoadingState from '@/components/LoadingState.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
@@ -111,7 +112,7 @@ watch(
     <template v-if="!config" />
 
     <template v-else>
-      <h1>{{ config.title }}</h1>
+      <PageHeader :title="config.title" />
 
       <FilterBar
         v-model:status="statusFilter"

@@ -8,6 +8,7 @@ import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { fetchRoles } from '@/services/roles'
 import {
   createUser,
@@ -295,15 +296,19 @@ async function copyToClipboard(text: string): Promise<void> {
     />
 
     <template v-else>
-      <h1>{{ isEditing ? 'Editar usuário' : 'Novo usuário' }}</h1>
-
-      <span
-        v-if="isEditing && record"
-        class="badge"
-        :class="record.active ? 'badge--published' : 'badge--draft'"
-      >
-        {{ record.active ? 'Ativo' : 'Inativo' }}
-      </span>
+      <PageHeader :title="isEditing ? 'Editar usuário' : 'Novo usuário'">
+        <template
+          v-if="isEditing && record"
+          #badge
+        >
+          <span
+            class="badge"
+            :class="record.active ? 'badge--published' : 'badge--draft'"
+          >
+            {{ record.active ? 'Ativo' : 'Inativo' }}
+          </span>
+        </template>
+      </PageHeader>
 
       <NoticeBanner
         v-if="route.query.created"

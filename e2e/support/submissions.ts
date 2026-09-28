@@ -105,9 +105,11 @@ export function submissionDetailGrid(page: Page) {
 }
 
 /**
- * O selo de status de atendimento do detalhe. Pelo seletor da faixa de estado, não pelo texto:
- * o rótulo do status também existe como <option> no formulário de atendimento logo abaixo.
+ * O selo de status de atendimento do detalhe. Pelo seletor do cabeçalho de tela, não pelo
+ * texto: o rótulo do status também existe como <option> no formulário de atendimento logo
+ * abaixo. (Era `.detail-header` até os selos passarem para o cabeçalho padrão de tela — ver
+ * frontend-admin/src/components/PageHeader.vue.)
  */
 export function detailStatusBadge(page: Page) {
-  return page.locator('.detail-header .badge').first()
+  return page.locator('.page-header .badge').first()
 }

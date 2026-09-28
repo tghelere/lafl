@@ -6,6 +6,7 @@ import AppLayout from '@/components/AppLayout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
 import { FORM_TYPE_OPTIONS } from '@/config/formTypes'
 import { fetchAuditLog } from '@/services/auditLogs'
@@ -111,7 +112,7 @@ watch(
 
 <template>
   <AppLayout resource="audit-logs">
-    <h1>Auditoria</h1>
+    <PageHeader title="Auditoria" />
 
     <p class="page-intro">
       Registro de acessos e alterações nos formulários recebidos. Somente leitura.

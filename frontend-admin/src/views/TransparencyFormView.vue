@@ -8,6 +8,7 @@ import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import {
   createTransparencyDocument,
   deleteTransparencyDocument,
@@ -256,15 +257,20 @@ async function handleDelete(): Promise<void> {
     />
 
     <template v-else>
-      <h1>{{ isEditing ? 'Editar documento' : 'Novo documento' }}</h1>
-
-      <span
-        v-if="isEditing"
-        class="badge"
-        :class="published ? 'badge--published' : 'badge--draft'"
-      >
-        {{ published ? 'Publicado' : 'Rascunho' }}
-      </span>
+      <PageHeader :title="isEditing ? 'Editar documento' : 'Novo documento'">
+        <!-- Documento que ainda não existe não tem estado de publicação para mostrar. -->
+        <template
+          v-if="isEditing"
+          #badge
+        >
+          <span
+            class="badge"
+            :class="published ? 'badge--published' : 'badge--draft'"
+          >
+            {{ published ? 'Publicado' : 'Rascunho' }}
+          </span>
+        </template>
+      </PageHeader>
 
       <NoticeBanner
         v-if="submitErrorMessage"

@@ -347,6 +347,42 @@
   color: var(--color-text);
 }
 
+/* Cabeçalho de tela — ver src/components/PageHeader.vue.
+
+   O `<h1>` perde a margem de baixo que base.css lhe dá: quem espaça o cabeçalho do resto da
+   tela é o .page-header, senão a margem do título entraria na conta do flex e desceria o selo
+   ao lado dele. */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+/* Título e selo andam juntos: quando a linha quebra, o selo desce COM o título, nunca sozinho
+   entre o título e as ações. */
+.page-header__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.page-header__title {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
 /* Painel de pendências (tela Início) — auto-fit/minmax mantém os cards numa linha só
    enquanto o conteúdo (--content-max: 72rem) tiver espaço; quebra só quando a tela é estreita
    demais para a largura mínima de uma coluna. 14rem só cabia 4 colunas dentro de
@@ -572,15 +608,6 @@
 .badge--unread {
   background: var(--color-accent);
   color: var(--color-on-accent);
-}
-
-/* Faixa de estado do detalhe: os badges e o botão de desmarcar leitura na mesma linha. */
-.detail-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-5);
 }
 
 /* Estado de publicação de documento de transparência (ver tela de transparência) */

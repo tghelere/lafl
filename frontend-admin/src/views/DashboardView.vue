@@ -4,6 +4,7 @@ import { computed, onMounted } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
 import { useAuthStore } from '@/stores/auth'
 import { useUnreadCountsStore } from '@/stores/unreadCounts'
@@ -36,7 +37,7 @@ function resourceTitle(resource: string, fallback: string): string {
 
 <template>
   <AppLayout>
-    <h1>Início</h1>
+    <PageHeader title="Início" />
     <p v-if="authStore.user">
       Olá, {{ authStore.user.name }}.
     </p>

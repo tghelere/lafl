@@ -8,6 +8,7 @@ import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import RichTextEditor from '@/components/RichTextEditor.vue'
 import { siteUrl } from '@/config'
 import { fetchContentMarkers } from '@/services/contentMarkers'
@@ -222,27 +223,33 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
     />
 
     <template v-else-if="record">
-      <div class="page-form__header">
-        <h1>{{ record.title }}</h1>
-        <span
-          class="badge"
-          :class="isDraft ? 'badge--draft' : 'badge--published'"
+      <PageHeader :title="record.title">
+        <template #badge>
+          <span
+            class="badge"
+            :class="isDraft ? 'badge--draft' : 'badge--published'"
+          >
+            {{ record.status_label }}
+          </span>
+        </template>
+        <!-- Rascunho não tem endereço no ar para abrir. -->
+        <template
+          v-if="publicUrl && !isDraft"
+          #actions
         >
-          {{ record.status_label }}
-        </span>
-      </div>
+          <a
+            :href="publicUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn--secondary"
+          >
+            Abrir no site
+          </a>
+        </template>
+      </PageHeader>
 
       <p class="page-form__address">
         Endereço público: <code>/{{ record.slug }}</code>
-        <a
-          v-if="publicUrl && !isDraft"
-          :href="publicUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="page-form__open"
-        >
-          Abrir no site
-        </a>
       </p>
 
       <NoticeBanner v-if="isDraft">
@@ -383,21 +390,12 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
 </template>
 
 <style scoped>
-.page-form__header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
 .page-form__address {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
+  /* Encosta no cabeçalho: é a legenda dele, não um parágrafo solto. */
+  margin-top: calc(-1 * var(--space-3));
   margin-bottom: var(--space-5);
-}
-
-.page-form__open {
-  margin-left: var(--space-3);
 }
 
 .markers {

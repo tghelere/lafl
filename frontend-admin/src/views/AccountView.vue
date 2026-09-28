@@ -4,6 +4,7 @@ import { computed, reactive, ref } from 'vue'
 
 import AppLayout from '@/components/AppLayout.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -60,7 +61,7 @@ async function handleSubmit(): Promise<void> {
 
 <template>
   <AppLayout>
-    <h1>Minha conta</h1>
+    <PageHeader title="Minha conta" />
 
     <p class="field__hint">
       {{ authStore.user?.name }} · {{ authStore.user?.email }}

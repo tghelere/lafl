@@ -7,6 +7,7 @@ import AppLayout from '@/components/AppLayout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
 import { fetchRoles } from '@/services/roles'
 import { fetchUserList } from '@/services/users'
@@ -101,7 +102,16 @@ void loadRoles()
 
 <template>
   <AppLayout resource="users">
-    <h1>Usuários</h1>
+    <PageHeader title="Usuários">
+      <template #actions>
+        <RouterLink
+          :to="{ name: 'users.create' }"
+          class="btn btn--primary"
+        >
+          Novo usuário
+        </RouterLink>
+      </template>
+    </PageHeader>
 
     <form
       class="filter-bar"
@@ -148,13 +158,6 @@ void loadRoles()
       >
         Limpar
       </button>
-
-      <RouterLink
-        :to="{ name: 'users.create' }"
-        class="btn btn--primary user-list__new"
-      >
-        + Novo usuário
-      </RouterLink>
     </form>
 
     <LoadingState v-if="isLoading" />
@@ -214,9 +217,3 @@ void loadRoles()
     </template>
   </AppLayout>
 </template>
-
-<style scoped>
-.user-list__new {
-  margin-left: auto;
-}
-</style>

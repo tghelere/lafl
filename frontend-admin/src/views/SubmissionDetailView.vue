@@ -8,6 +8,7 @@ import ErrorState from '@/components/ErrorState.vue'
 import InternalNoteForm from '@/components/InternalNoteForm.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
 import { fetchAuditLog } from '@/services/auditLogs'
@@ -153,31 +154,35 @@ watch(() => route.fullPath, load, { immediate: true })
       />
 
       <template v-else-if="submission">
-        <h1>{{ config.title }}</h1>
-
-        <div class="detail-header">
-          <StatusBadge
-            :status="submission.status"
-            :label="submission.status_label"
-          />
-          <StatusBadge
-            v-if="!submission.is_read"
-            status="unread"
-            label="Não lido"
-          />
+        <PageHeader :title="config.title">
+          <template #badge>
+            <StatusBadge
+              :status="submission.status"
+              :label="submission.status_label"
+            />
+            <StatusBadge
+              v-if="!submission.is_read"
+              status="unread"
+              label="Não lido"
+            />
+          </template>
 
           <!-- Só o desmarcar tem botão: marcar como lido acontece ao abrir esta tela, então um
                botão "Marcar como lido" nunca teria o que fazer aqui. -->
-          <button
+          <template
             v-if="submission.is_read"
-            type="button"
-            class="btn btn--secondary"
-            :disabled="isMarkingUnread"
-            @click="handleMarkUnread"
+            #actions
           >
-            Marcar como não lido
-          </button>
-        </div>
+            <button
+              type="button"
+              class="btn btn--secondary"
+              :disabled="isMarkingUnread"
+              @click="handleMarkUnread"
+            >
+              Marcar como não lido
+            </button>
+          </template>
+        </PageHeader>
 
         <dl class="detail-grid">
           <!-- Comum às cinco telas, por isso fora de config.detailFields. Primeiro campo da

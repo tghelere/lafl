@@ -8,6 +8,7 @@ import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
 import { fetchTransparencyDocumentList } from '@/services/transparencyDocuments'
 import { TRANSPARENCY_DOCUMENT_TYPE_OPTIONS } from '@/types/transparency'
@@ -91,7 +92,16 @@ watch(
 
 <template>
   <AppLayout resource="transparency-documents">
-    <h1>Transparência</h1>
+    <PageHeader title="Transparência">
+      <template #actions>
+        <RouterLink
+          :to="{ name: 'transparency.create' }"
+          class="btn btn--primary"
+        >
+          Novo documento
+        </RouterLink>
+      </template>
+    </PageHeader>
 
     <NoticeBanner
       v-if="route.query.created"
@@ -152,13 +162,6 @@ watch(
       >
         Limpar
       </button>
-
-      <RouterLink
-        :to="{ name: 'transparency.create' }"
-        class="btn btn--primary transparency-list__new"
-      >
-        + Novo documento
-      </RouterLink>
     </form>
 
     <LoadingState v-if="isLoading" />
@@ -222,9 +225,3 @@ watch(
     </template>
   </AppLayout>
 </template>
-
-<style scoped>
-.transparency-list__new {
-  margin-left: auto;
-}
-</style>
