@@ -1,7 +1,12 @@
 import { expect, test } from '@playwright/test'
 
 import { pageAs, sidebar } from '../../support/admin'
-import { MARKER_SUBMISSION_SUBJECT, submissionRow, submissionTable } from '../../support/submissions'
+import {
+  MARKER_SUBMISSION_SUBJECT,
+  readSubmissionRow,
+  submissionRow,
+  submissionTable,
+} from '../../support/submissions'
 import { ROLE_USERS, storageStatePath } from '../../support/users'
 
 /**
@@ -52,7 +57,11 @@ test.describe('auditoria — super_admin', () => {
   test('filtra por usuário e por tipo de formulário', async ({ page, browser }) => {
     const atendimento = await pageAs(browser, 'atendimento')
     await atendimento.goto(RECURSO)
-    await submissionTable(atendimento).locator('tbody tr').first().getByRole('link').click()
+    // Um registro JÁ LIDO: abrir um não lido consumiria o estoque que
+    // tests/painel/formularios-leitura.spec.ts observa (o seeder deixa dois por tipo), e
+    // aquele arquivo passava a falhar conforme a ORDEM da execução. A auditoria registra o
+    // acesso do mesmo jeito — é isso que este teste precisa, não o estado de leitura.
+    await readSubmissionRow(atendimento).getByRole('link').click()
     await expect(atendimento.getByRole('button', { name: /Marcar como não lido|Atualizar atendimento/ }).first()).toBeVisible()
     await atendimento.context().close()
 

@@ -1,6 +1,7 @@
 import { type Page, expect, test } from '@playwright/test'
 
 import { breadcrumb, openContentPageByTitle } from '../../support/admin'
+import { readSubmissionRow } from '../../support/submissions'
 import { storageStatePath } from '../../support/users'
 
 /**
@@ -72,7 +73,7 @@ test('enquanto o registro não chega, o degrau do meio é esqueleto e não um va
 
 test('detalhe de formulário: recurso e tela atual, sem o nome de quem enviou', async ({ page }) => {
   await page.goto('/admin/volunteer-applications')
-  await page.locator('.table tbody tr').first().getByRole('link').click()
+  await readSubmissionRow(page).getByRole('link').click()
   await expect(page).toHaveURL(/\/admin\/volunteer-applications\/[0-9a-f-]{36}$/)
 
   await expectSteps(page, ['Voluntários', 'Detalhe'])

@@ -28,6 +28,21 @@ export function submissionRow(page: Page, text: string) {
 }
 
 /**
+ * A primeira linha JÁ LIDA da listagem — o registro que um teste pode abrir sem efeito
+ * colateral.
+ *
+ * Abrir um registro não lido é o que o marca como lido (ver
+ * docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md), e o seeder deixa só dois
+ * não lidos por tipo, que tests/painel/formularios-leitura.spec.ts observa. Um teste sobre
+ * outra coisa (trilha, cabeçalho, título da aba) que abrisse o primeiro registro da lista
+ * consumiria esse estoque e faria aquele arquivo falhar conforme a ORDEM da execução — o pior
+ * tipo de falha para investigar. O seeder cria um registro lido por tipo exatamente para isto.
+ */
+export function readSubmissionRow(page: Page) {
+  return submissionTable(page).locator('tbody tr:not(.table__row--unread)').first()
+}
+
+/**
  * Conteúdo da coluna "Recebido em" de cada linha, na ordem em que a tela mostra. Descobre o
  * índice da coluna pelo cabeçalho em vez de fixar um número: as colunas anteriores mudam de
  * um recurso para outro (ver src/config/submissionResources.ts).

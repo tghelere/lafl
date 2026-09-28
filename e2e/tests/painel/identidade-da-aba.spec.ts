@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 
+import { readSubmissionRow } from '../../support/submissions'
 import { storageStatePath } from '../../support/users'
 
 /**
@@ -97,7 +98,7 @@ test.describe('painel — título da aba por tela', () => {
 
   test('o detalhe de um formulário acrescenta o sufixo do recurso', async ({ page }) => {
     await page.goto('/admin/contact-messages')
-    await page.locator('.table tbody tr').first().getByRole('link').click()
+    await readSubmissionRow(page).getByRole('link').click()
 
     await expect(page).toHaveTitle('Mensagens de contato — detalhe · Painel LAF')
   })

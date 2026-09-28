@@ -1,6 +1,7 @@
 import { type Page, expect, test } from '@playwright/test'
 
 import { openContentPageByTitle, sidebar } from '../../support/admin'
+import { readSubmissionRow } from '../../support/submissions'
 import { storageStatePath } from '../../support/users'
 
 /**
@@ -64,7 +65,7 @@ test('listagem de formulário e detalhe de um registro acendem o mesmo item', as
   await page.goto('/admin/contact-messages')
   await expectMenuAceso(page, 'Mensagens de contato')
 
-  await page.locator('.table tbody tr').first().getByRole('link').click()
+  await readSubmissionRow(page).getByRole('link').click()
   await expect(page).toHaveURL(/\/admin\/contact-messages\/[0-9a-f-]{36}$/)
   await expectMenuAceso(page, 'Mensagens de contato')
 })
