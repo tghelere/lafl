@@ -1,9 +1,9 @@
 /* Tokens locais do site público — espaçamento, raio, sombra, layout e movimento.
 
    Cor, tipografia (família e escala) vêm de shared/design-tokens/tokens.css, carregado
-   antes deste arquivo (ver nuxt.config.ts) — não duplicar esses valores aqui. Ver
-   docs/decisoes/0009-direcao-visual.md para o histórico (paleta verde/ocre, substituída
-   nesta sessão) e ADR de substituição pendente de registro. */
+   antes deste arquivo (ver nuxt.config.ts) — não duplicar esses valores aqui. A paleta atual
+   é a derivada da logo — ver docs/decisoes/0013-paleta-derivada-da-logo-substitui-0009.md, que
+   substituiu a paleta verde/ocre de docs/decisoes/0009-direcao-visual.md. */
 
 :root {
   /* Espaçamento — escala de 4px */

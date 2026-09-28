@@ -40,6 +40,9 @@ function focusablesOf(container: HTMLElement | null): HTMLElement[] {
  * pelos links da tela ATRÁS do cortinado — invisíveis, mas focáveis. Quem navega por teclado
  * perderia o rastro do foco na primeira tecla.
  *
+ * Ver docs/decisoes/0022-responsividade-do-painel.md para os limiares e para por que esta
+ * gaveta prende o foco sem se declarar `role="dialog"`.
+ *
  * `drawerEl` devolve o elemento da gaveta; `toggleEl`, o botão que a abre — é para ele que o
  * foco volta quando a gaveta fecha, senão o foco cairia no `<body>` e a navegação por teclado
  * recomeçaria do topo da página. São funções, e não refs, porque a gaveta é um componente: o

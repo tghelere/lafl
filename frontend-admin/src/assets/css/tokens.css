@@ -5,8 +5,9 @@
    src/main.ts) — mesma paleta do site público: é a mesma instituição, inventar uma segunda
    linguagem visual para o painel seria retrabalho sem motivo. A fonte de TÍTULO também vem de
    lá; a de CORPO é a única exceção, sobreposta logo abaixo (Source Sans 3 em vez da Lora do
-   site). Ver docs/decisoes/0009-direcao-visual.md para o histórico (paleta verde/ocre,
-   substituída nesta sessão) e ADR de substituição pendente de registro.
+   site). A paleta atual é a derivada da logo — ver
+   docs/decisoes/0013-paleta-derivada-da-logo-substitui-0009.md, que substituiu a paleta
+   verde/ocre de docs/decisoes/0009-direcao-visual.md.
 
    Os tamanhos abaixo sobrescrevem, nome a nome, a escala base do arquivo compartilhado —
    um nível abaixo da do site (base 14px, não 17px): painel administrativo é lido de perto,
@@ -46,7 +47,8 @@
   --shadow-sm: 0 1px 2px rgb(34 31 27 / 8%);
   --shadow-md: 0 4px 16px rgb(34 31 27 / 12%);
 
-  /* Área de toque mínima — 44px (WCAG 2.2, critério 2.5.8, nível AAA; o AA pede 24px). O
+  /* Área de toque mínima — 44px (WCAG 2.2, critério 2.5.8, nível AAA; o AA pede 24px). Ver
+     docs/decisoes/0022-responsividade-do-painel.md. O
      painel é usado no celular pela coordenação, com o polegar e em pé no meio do corredor:
      44px é o alvo que não erra. */
   --touch-target: 2.75rem;

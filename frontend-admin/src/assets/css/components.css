@@ -1,4 +1,8 @@
-/* Componentes do painel administrativo. Repete os padrões do site público onde faz sentido
+/* Componentes do painel administrativo.
+
+   Os dois limiares de responsividade deste arquivo (48rem e 64rem), e por que a tabela que
+   vira card é o único bloco `max-width` no meio de um arquivo mobile-first, estão em
+   docs/decisoes/0022-responsividade-do-painel.md. Repete os padrões do site público onde faz sentido
    (breadcrumb, botão, card) e acrescenta só o que uma tela de trabalho precisa e o site não
    tinha: navegação lateral, tabela, filtro, paginação, badge de status, formulário de
    anotação, estados de vazio/carregamento/erro. Ver docs/decisoes/0009-direcao-visual.md. */
