@@ -3,6 +3,7 @@ import axios from 'axios'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
@@ -16,6 +17,7 @@ import {
   reactivateUser,
   updateUser,
 } from '@/services/users'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { RoleOption, UserAccount } from '@/types/users'
 
 const route = useRoute()
@@ -27,6 +29,17 @@ const isEditing = computed(() => uuid.value !== null)
 const record = ref<UserAccount | null>(null)
 const isLoading = ref(false)
 const loadErrorMessage = ref<string | null>(null)
+
+/** "Usuários / Alice Atendimento / Editar" na edição; "Usuários / Novo usuário" na criação. */
+const breadcrumb = computed<BreadcrumbItem[]>(() =>
+  isEditing.value
+    ? [
+        { label: 'Usuários', to: { name: 'users.index' } },
+        { label: record.value?.name ?? '', loading: isLoading.value },
+        { label: 'Editar' },
+      ]
+    : [{ label: 'Usuários', to: { name: 'users.index' } }, { label: 'Novo usuário' }],
+)
 
 const name = ref('')
 const email = ref('')
@@ -273,19 +286,7 @@ async function copyToClipboard(text: string): Promise<void> {
 
 <template>
   <AppLayout resource="users">
-    <nav
-      class="breadcrumb"
-      aria-label="Trilha de navegação"
-    >
-      <ol>
-        <li>
-          <RouterLink :to="{ name: 'users.index' }">
-            Usuários
-          </RouterLink>
-        </li>
-        <li><span aria-current="page">{{ isEditing ? 'Editar usuário' : 'Novo usuário' }}</span></li>
-      </ol>
-    </nav>
+    <AppBreadcrumb :items="breadcrumb" />
 
     <LoadingState v-if="isLoading" />
     <ErrorState

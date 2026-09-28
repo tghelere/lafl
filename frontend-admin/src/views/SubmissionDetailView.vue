@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import InternalNoteForm from '@/components/InternalNoteForm.vue'
@@ -14,6 +15,7 @@ import { fetchSubmissionDetail, markSubmissionUnread, updateSubmissionStatus } f
 import { useAuthStore } from '@/stores/auth'
 import { useUnreadCountsStore } from '@/stores/unreadCounts'
 import type { AuditEntry } from '@/types/audit'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { SubmissionDetail } from '@/types/submission'
 
 const route = useRoute()
@@ -31,6 +33,20 @@ const canSeeAccessHistory = computed(() => authStore.user?.access['audit-logs'] 
 const resourceSlug = computed(() => String(route.params.resource))
 const uuid = computed(() => String(route.params.uuid))
 const config = computed(() => SUBMISSION_RESOURCES[resourceSlug.value])
+
+/**
+ * "Voluntários / Detalhe" — dois degraus, e nunca o nome de quem enviou o formulário. O nome
+ * já está na tela, sob a mesma Policy, mas a trilha é copiada e colada em conversa e relato de
+ * erro com muito mais frequência que o corpo da tela; na dúvida sobre dado pessoal, a opção
+ * mais restritiva (ver CLAUDE.md, "Como trabalhar neste projeto").
+ */
+const breadcrumb = computed<BreadcrumbItem[]>(() => [
+  {
+    label: config.value?.title ?? '',
+    to: { name: 'submissions.index', params: { resource: resourceSlug.value } },
+  },
+  { label: 'Detalhe' },
+])
 
 const submission = ref<SubmissionDetail | null>(null)
 const isLoading = ref(false)
@@ -128,19 +144,7 @@ watch(() => route.fullPath, load, { immediate: true })
     <template v-if="!config" />
 
     <template v-else>
-      <nav
-        class="breadcrumb"
-        aria-label="Trilha de navegação"
-      >
-        <ol>
-          <li>
-            <RouterLink :to="{ name: 'submissions.index', params: { resource: resourceSlug } }">
-              {{ config.title }}
-            </RouterLink>
-          </li>
-          <li><span aria-current="page">Detalhe</span></li>
-        </ol>
-      </nav>
+      <AppBreadcrumb :items="breadcrumb" />
 
       <LoadingState v-if="isLoading" />
       <ErrorState

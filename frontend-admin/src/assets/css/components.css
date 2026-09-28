@@ -268,7 +268,15 @@
   padding: var(--space-5);
 }
 
-/* Breadcrumb — mesmo padrão do site público */
+/* Trilha de navegação — ver src/components/AppBreadcrumb.vue.
+
+   Sem `text-transform: uppercase` (e por consequência sem `--tracking-wide`, que existe para
+   compensar caixa alta): a trilha mostra nome de registro — "Páginas / Governança / Editar" —
+   e caixa alta forçada estraga nome próprio, sigla e acentuação. Também tirava do teste
+   automatizado a chance de comparar o texto como ele está no DOM.
+
+   `line-height` explícito em `ol` e o mesmo valor no esqueleto: é o que mantém todos os
+   degraus na mesma linha de base, inclusive quando um deles ainda é o bloco de carregamento. */
 .breadcrumb {
   margin-bottom: var(--space-5);
 }
@@ -281,9 +289,8 @@
   gap: var(--space-2);
   margin: 0;
   padding: 0;
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
   color: var(--color-text-muted);
 }
 
@@ -291,11 +298,39 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .breadcrumb li:not(:last-child)::after {
   content: '/';
   color: var(--color-border);
+}
+
+/* Esqueleto do degrau cujo rótulo ainda não chegou. Altura da própria linha (1em × altura de
+   linha), para o degrau não mudar de tamanho quando o texto entrar no lugar. */
+.breadcrumb__skeleton {
+  display: inline-block;
+  width: 8ch;
+  height: calc(1em * var(--leading-snug));
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-200) 25%,
+    var(--color-neutral-100) 50%,
+    var(--color-neutral-200) 75%
+  );
+  background-size: 200% 100%;
+  animation: breadcrumb-skeleton 1.4s var(--ease-standard) infinite;
+}
+
+@keyframes breadcrumb-skeleton {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
 }
 
 .breadcrumb a {

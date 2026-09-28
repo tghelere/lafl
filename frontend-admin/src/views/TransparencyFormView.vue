@@ -3,6 +3,7 @@ import axios from 'axios'
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
@@ -14,6 +15,7 @@ import {
   updateTransparencyDocument,
 } from '@/services/transparencyDocuments'
 import { TRANSPARENCY_DOCUMENT_TYPE_OPTIONS } from '@/types/transparency'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { TransparencyDocument } from '@/types/transparency'
 
 // Mesmo teto de StoreTransparencyDocumentRequest::rules() / UpdateTransparencyDocumentRequest::
@@ -29,6 +31,20 @@ const isEditing = computed(() => uuid.value !== null)
 const record = ref<TransparencyDocument | null>(null)
 const isLoading = ref(false)
 const loadErrorMessage = ref<string | null>(null)
+
+/**
+ * "Transparência / Balanço 2025 / Editar" na edição; "Transparência / Novo documento" na
+ * criação, onde não há registro nenhum para nomear o degrau do meio.
+ */
+const breadcrumb = computed<BreadcrumbItem[]>(() =>
+  isEditing.value
+    ? [
+        { label: 'Transparência', to: { name: 'transparency.index' } },
+        { label: record.value?.title ?? '', loading: isLoading.value },
+        { label: 'Editar' },
+      ]
+    : [{ label: 'Transparência', to: { name: 'transparency.index' } }, { label: 'Novo documento' }],
+)
 
 const title = ref('')
 const year = ref(new Date().getFullYear())
@@ -231,19 +247,7 @@ async function handleDelete(): Promise<void> {
 
 <template>
   <AppLayout resource="transparency-documents">
-    <nav
-      class="breadcrumb"
-      aria-label="Trilha de navegação"
-    >
-      <ol>
-        <li>
-          <RouterLink :to="{ name: 'transparency.index' }">
-            Transparência
-          </RouterLink>
-        </li>
-        <li><span aria-current="page">{{ isEditing ? 'Editar documento' : 'Novo documento' }}</span></li>
-      </ol>
-    </nav>
+    <AppBreadcrumb :items="breadcrumb" />
 
     <LoadingState v-if="isLoading" />
     <ErrorState

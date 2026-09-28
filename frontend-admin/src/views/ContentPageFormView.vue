@@ -3,6 +3,7 @@ import axios from 'axios'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
+import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
@@ -11,6 +12,7 @@ import RichTextEditor from '@/components/RichTextEditor.vue'
 import { siteUrl } from '@/config'
 import { fetchContentMarkers } from '@/services/contentMarkers'
 import { fetchContentPage, updateContentPage } from '@/services/pages'
+import type { BreadcrumbItem } from '@/types/breadcrumb'
 import type { ContentMarker, ContentPage } from '@/types/pages'
 
 /**
@@ -40,6 +42,17 @@ const submitErrorMessage = ref<string | null>(null)
 const fieldErrors = reactive<Record<string, string[]>>({})
 
 const isDraft = computed(() => record.value?.status === 'draft')
+
+/**
+ * "Páginas / Governança / Editar". O degrau do meio é o nome da página, que só chega com a
+ * resposta da API — enquanto ela não vem, esqueleto; se ela não vier (404/403), o degrau some
+ * em vez de ficar carregando para sempre.
+ */
+const breadcrumb = computed<BreadcrumbItem[]>(() => [
+  { label: 'Páginas', to: { name: 'pages.index' } },
+  { label: record.value?.title ?? '', loading: isLoading.value },
+  { label: 'Editar' },
+])
 
 const metaDescriptionLength = computed(() => metaDescription.value.length)
 const metaDescriptionOverAdvisory = computed(
@@ -200,20 +213,7 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
 
 <template>
   <AppLayout resource="pages">
-    <nav
-      class="breadcrumb"
-      aria-label="Trilha de navegação"
-    >
-      <ol>
-        <li>
-          <RouterLink :to="{ name: 'pages.index' }">
-            Páginas
-          </RouterLink>
-          /
-        </li>
-        <li><span aria-current="page">Editar página</span></li>
-      </ol>
-    </nav>
+    <AppBreadcrumb :items="breadcrumb" />
 
     <LoadingState v-if="isLoading" />
     <ErrorState
