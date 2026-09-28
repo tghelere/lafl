@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { LogIn } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppIcon from '@/components/AppIcon.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -104,6 +106,7 @@ async function handleSubmit(): Promise<void> {
           class="btn btn--primary login__submit"
           :disabled="isSubmitting"
         >
+          <AppIcon :icon="LogIn" />
           {{ isSubmitting ? 'Entrando…' : 'Entrar' }}
         </button>
       </form>

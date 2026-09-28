@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { KeyRound } from 'lucide-vue-next'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppIcon from '@/components/AppIcon.vue'
 import { useAuthStore } from '@/stores/auth'
 
 // Fonte única em shared/brand/ — ver LEIA-ME.md. Import direto (não cópia), como em
@@ -172,6 +174,7 @@ async function handleSubmit(): Promise<void> {
           class="btn btn--primary login__submit"
           :disabled="isSubmitting || passwordsMismatch"
         >
+          <AppIcon :icon="KeyRound" />
           {{ isSubmitting ? 'Salvando…' : 'Definir senha' }}
         </button>
       </template>

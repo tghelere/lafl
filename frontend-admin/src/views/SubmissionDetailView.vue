@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { Mail } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import InternalNoteForm from '@/components/InternalNoteForm.vue'
@@ -179,6 +181,7 @@ watch(() => route.fullPath, load, { immediate: true })
               :disabled="isMarkingUnread"
               @click="handleMarkUnread"
             >
+              <AppIcon :icon="Mail" />
               Marcar como não lido
             </button>
           </template>

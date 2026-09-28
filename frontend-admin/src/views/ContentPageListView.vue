@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { Funnel, X } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
 import { fetchContentPageList } from '@/services/pages'
 import type { ContentPage } from '@/types/pages'
 
@@ -98,6 +101,7 @@ watch(
         type="submit"
         class="btn btn--primary"
       >
+        <AppIcon :icon="Funnel" />
         Filtrar
       </button>
       <button
@@ -105,6 +109,7 @@ watch(
         class="btn btn--secondary"
         @click="clearFilters"
       >
+        <AppIcon :icon="X" />
         Limpar
       </button>
     </form>
@@ -144,12 +149,10 @@ watch(
               </td>
               <td><code>/{{ page.slug }}</code></td>
               <td>
-                <span
-                  class="badge"
-                  :class="page.status === 'published' ? 'badge--published' : 'badge--draft'"
-                >
-                  {{ page.status_label }}
-                </span>
+                <StatusBadge
+                  :status="page.status === 'published' ? 'published' : 'draft'"
+                  :label="page.status_label"
+                />
               </td>
             </tr>
           </tbody>

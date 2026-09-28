@@ -6,6 +6,9 @@
  * diferente (rota inexistente vs. bug de integração de nome de recurso). Por isso é a mesma
  * tela nos dois casos, não duas mensagens parecidas.
  */
+import { ArrowLeft } from 'lucide-vue-next'
+
+import AppIcon from '@/components/AppIcon.vue'
 </script>
 
 <template>
@@ -19,6 +22,7 @@
       :to="{ name: 'dashboard' }"
       class="btn btn--secondary"
     >
+      <AppIcon :icon="ArrowLeft" />
       Voltar ao Início
     </RouterLink>
   </div>

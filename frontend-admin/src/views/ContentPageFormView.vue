@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { ExternalLink, Save } from 'lucide-vue-next'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import RichTextEditor from '@/components/RichTextEditor.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
 import { siteUrl } from '@/config'
 import { fetchContentMarkers } from '@/services/contentMarkers'
 import { fetchContentPage, updateContentPage } from '@/services/pages'
@@ -225,12 +228,10 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
     <template v-else-if="record">
       <PageHeader :title="record.title">
         <template #badge>
-          <span
-            class="badge"
-            :class="isDraft ? 'badge--draft' : 'badge--published'"
-          >
-            {{ record.status_label }}
-          </span>
+          <StatusBadge
+            :status="isDraft ? 'draft' : 'published'"
+            :label="record.status_label"
+          />
         </template>
         <!-- Rascunho não tem endereço no ar para abrir. -->
         <template
@@ -243,6 +244,7 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
             rel="noopener noreferrer"
             class="btn btn--secondary"
           >
+            <AppIcon :icon="ExternalLink" />
             Abrir no site
           </a>
         </template>
@@ -382,6 +384,7 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
           class="btn btn--primary"
           :disabled="isSaving"
         >
+          <AppIcon :icon="Save" />
           {{ isSaving ? 'Salvando…' : 'Salvar' }}
         </button>
       </form>

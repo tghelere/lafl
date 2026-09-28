@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { Funnel, Plus, X } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
@@ -10,6 +12,7 @@ import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
 import { fetchTransparencyDocumentList } from '@/services/transparencyDocuments'
 import { TRANSPARENCY_DOCUMENT_TYPE_OPTIONS } from '@/types/transparency'
 import type { TransparencyDocument } from '@/types/transparency'
@@ -98,6 +101,7 @@ watch(
           :to="{ name: 'transparency.create' }"
           class="btn btn--primary"
         >
+          <AppIcon :icon="Plus" />
           Novo documento
         </RouterLink>
       </template>
@@ -153,6 +157,7 @@ watch(
         type="submit"
         class="btn btn--primary"
       >
+        <AppIcon :icon="Funnel" />
         Filtrar
       </button>
       <button
@@ -160,6 +165,7 @@ watch(
         class="btn btn--secondary"
         @click="clearFilters"
       >
+        <AppIcon :icon="X" />
         Limpar
       </button>
     </form>
@@ -205,12 +211,10 @@ watch(
               <td>{{ formatFileSize(document.file_size) }}</td>
               <td>{{ document.download_count }}</td>
               <td>
-                <span
-                  class="badge"
-                  :class="document.published_at ? 'badge--published' : 'badge--draft'"
-                >
-                  {{ document.published_at ? 'Publicado' : 'Rascunho' }}
-                </span>
+                <StatusBadge
+                  :status="document.published_at ? 'published' : 'draft'"
+                  :label="document.published_at ? 'Publicado' : 'Rascunho'"
+                />
               </td>
             </tr>
           </tbody>

@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { EyeOff, Globe, Save, Trash2 } from 'lucide-vue-next'
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
 import {
   createTransparencyDocument,
   deleteTransparencyDocument,
@@ -263,12 +266,10 @@ async function handleDelete(): Promise<void> {
           v-if="isEditing"
           #badge
         >
-          <span
-            class="badge"
-            :class="published ? 'badge--published' : 'badge--draft'"
-          >
-            {{ published ? 'Publicado' : 'Rascunho' }}
-          </span>
+          <StatusBadge
+            :status="published ? 'published' : 'draft'"
+            :label="published ? 'Publicado' : 'Rascunho'"
+          />
         </template>
       </PageHeader>
 
@@ -379,6 +380,7 @@ async function handleDelete(): Promise<void> {
           class="btn btn--primary"
           :disabled="isSaving"
         >
+          <AppIcon :icon="Save" />
           {{ isSaving ? 'Salvando…' : 'Salvar' }}
         </button>
       </form>
@@ -393,6 +395,7 @@ async function handleDelete(): Promise<void> {
           :disabled="isTogglingPublish"
           @click="togglePublish"
         >
+          <AppIcon :icon="published ? EyeOff : Globe" />
           {{ isTogglingPublish ? 'Aguarde…' : published ? 'Despublicar' : 'Publicar' }}
         </button>
         <button
@@ -401,6 +404,7 @@ async function handleDelete(): Promise<void> {
           :disabled="isDeleting"
           @click="handleDelete"
         >
+          <AppIcon :icon="Trash2" />
           {{ isDeleting ? 'Excluindo…' : 'Excluir' }}
         </button>
       </div>

@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { Funnel, Plus, X } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
 import { fetchRoles } from '@/services/roles'
 import { fetchUserList } from '@/services/users'
 import type { RoleOption, UserAccount } from '@/types/users'
@@ -108,6 +111,7 @@ void loadRoles()
           :to="{ name: 'users.create' }"
           class="btn btn--primary"
         >
+          <AppIcon :icon="Plus" />
           Novo usuário
         </RouterLink>
       </template>
@@ -149,6 +153,7 @@ void loadRoles()
         type="submit"
         class="btn btn--primary"
       >
+        <AppIcon :icon="Funnel" />
         Filtrar
       </button>
       <button
@@ -156,6 +161,7 @@ void loadRoles()
         class="btn btn--secondary"
         @click="clearFilters"
       >
+        <AppIcon :icon="X" />
         Limpar
       </button>
     </form>
@@ -197,12 +203,10 @@ void loadRoles()
               <td>{{ user.email }}</td>
               <td>{{ roleNames(user.roles) }}</td>
               <td>
-                <span
-                  class="badge"
-                  :class="user.active ? 'badge--published' : 'badge--draft'"
-                >
-                  {{ user.active ? 'Ativo' : 'Inativo' }}
-                </span>
+                <StatusBadge
+                  :status="user.active ? 'active' : 'inactive'"
+                  :label="user.active ? 'Ativo' : 'Inativo'"
+                />
               </td>
             </tr>
           </tbody>

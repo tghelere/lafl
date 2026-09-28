@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import type { Component } from 'vue'
 import { useRoute } from 'vue-router'
 import type { RouteLocationRaw } from 'vue-router'
 
+import AppIcon from '@/components/AppIcon.vue'
+import { DASHBOARD_ICON, RESOURCE_ICONS } from '@/config/icons'
 import { SECTION, resolveRouteMetaText } from '@/router/meta'
 import { useAuthStore } from '@/stores/auth'
 import { useUnreadCountsStore } from '@/stores/unreadCounts'
@@ -51,6 +54,7 @@ type NavItem = {
   label: string
   to: RouteLocationRaw
   section: string
+  icon: Component
   /** Recurso cujo contador de não lidos aparece ao lado do rótulo. */
   unread?: string
   /** Quando presente, o item só aparece para quem tem acesso a este recurso. */
@@ -77,14 +81,22 @@ function submissionsRoute(resource: string): RouteLocationRaw {
  * `meta.section` das rotas /admin/:resource devolve.
  */
 function submissionItem(resource: string, label: string): NavItem {
-  return { label, to: submissionsRoute(resource), section: resource, unread: resource }
+  return {
+    label,
+    to: submissionsRoute(resource),
+    section: resource,
+    unread: resource,
+    icon: RESOURCE_ICONS[resource]!,
+  }
 }
 
 const GROUPS: NavGroup[] = [
   {
     label: 'Início',
     requires: [],
-    items: [{ label: 'Pendências', to: { name: 'dashboard' }, section: SECTION.dashboard }],
+    items: [
+      { label: 'Pendências', to: { name: 'dashboard' }, section: SECTION.dashboard, icon: DASHBOARD_ICON },
+    ],
   },
   {
     label: 'Contraturno',
@@ -110,21 +122,45 @@ const GROUPS: NavGroup[] = [
   {
     label: 'Conteúdo',
     requires: ['pages'],
-    items: [{ label: 'Páginas', to: { name: 'pages.index' }, section: SECTION.pages }],
+    items: [
+      {
+        label: 'Páginas',
+        to: { name: 'pages.index' },
+        section: SECTION.pages,
+        icon: RESOURCE_ICONS.pages!,
+      },
+    ],
   },
   {
     label: 'Transparência',
     requires: ['transparency-documents'],
     items: [
-      { label: 'Documentos', to: { name: 'transparency.index' }, section: SECTION.transparency },
+      {
+        label: 'Documentos',
+        to: { name: 'transparency.index' },
+        section: SECTION.transparency,
+        icon: RESOURCE_ICONS['transparency-documents']!,
+      },
     ],
   },
   {
     label: 'Configurações',
     requires: ['users', 'audit-logs'],
     items: [
-      { label: 'Usuários', to: { name: 'users.index' }, section: SECTION.users, requires: 'users' },
-      { label: 'Auditoria', to: { name: 'audit.index' }, section: SECTION.audit, requires: 'audit-logs' },
+      {
+        label: 'Usuários',
+        to: { name: 'users.index' },
+        section: SECTION.users,
+        requires: 'users',
+        icon: RESOURCE_ICONS.users!,
+      },
+      {
+        label: 'Auditoria',
+        to: { name: 'audit.index' },
+        section: SECTION.audit,
+        requires: 'audit-logs',
+        icon: RESOURCE_ICONS['audit-logs']!,
+      },
     ],
   },
 ]
@@ -192,7 +228,8 @@ function unreadOf(resource: string | undefined): number | null {
           :class="{ 'app-sidebar__link--active': currentSection === item.section }"
           :aria-current="currentSection === item.section ? 'page' : undefined"
         >
-          {{ item.label }}
+          <AppIcon :icon="item.icon" />
+          <span class="app-sidebar__label">{{ item.label }}</span>
           <span
             v-if="unreadOf(item.unread)"
             class="app-sidebar__badge"

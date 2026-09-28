@@ -177,6 +177,17 @@
   border: 0;
 }
 
+/* Ícone — ver src/components/AppIcon.vue. O componente já pede 18px ao lucide (que vira
+   width/height no <svg>); a regra abaixo existe para o caso de o ícone estar dentro de um
+   contêiner flex apertado, onde um SVG sem `flex: none` encolhe em vez de manter o tamanho.
+   Alinhamento ao texto não precisa de `vertical-align`: todo lugar que recebe ícone no painel
+   (botão, item de menu, selo, card) já é um flex com `align-items: center`. */
+.icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
 /* Botão — mesmas duas variantes do site, densidade menor. --color-accent (laranja-500)
    mantém o tom exato da marca como fundo; o rótulo usa --color-heading (não branco: branco
    sobre --color-accent dá só ~2,96:1, abaixo do mínimo AA — --color-heading dá 5,54:1). */
@@ -416,6 +427,9 @@
 }
 
 .summary-card__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
@@ -553,6 +567,9 @@
 }
 
 .pagination button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   background: transparent;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -574,6 +591,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-1);
   padding: 0.2em 0.6em;
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
@@ -617,6 +635,19 @@
 }
 
 .badge--draft {
+  background: color-mix(in srgb, var(--color-heading) 10%, var(--color-surface));
+  color: var(--color-text-muted);
+}
+
+/* Conta de usuário ativa/inativa. Mesmos dois tons de publicado/rascunho — é a mesma ideia de
+   "no ar" e "fora do ar" —, mas com nome próprio: antes a tela de usuário reaproveitava as
+   classes de publicação, e um selo de conta não deveria depender do CSS de documento. */
+.badge--active {
+  background: color-mix(in srgb, var(--color-accent) 28%, var(--color-surface));
+  color: var(--color-text);
+}
+
+.badge--inactive {
   background: color-mix(in srgb, var(--color-heading) 10%, var(--color-surface));
   color: var(--color-text-muted);
 }

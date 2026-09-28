@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Save } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 
+import AppIcon from '@/components/AppIcon.vue'
 import { STATUS_OPTIONS } from '@/types/forms'
 
 const props = withDefaults(
@@ -81,6 +83,7 @@ function handleSubmit(): void {
       class="btn btn--primary"
       :disabled="submitting"
     >
+      <AppIcon :icon="Save" />
       {{ submitting ? 'Salvando…' : 'Salvar' }}
     </button>
   </form>

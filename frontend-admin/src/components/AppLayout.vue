@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { LogOut } from 'lucide-vue-next'
 import { computed, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AccessDeniedState from '@/components/AccessDeniedState.vue'
+import AppIcon from '@/components/AppIcon.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import NotFoundState from '@/components/NotFoundState.vue'
 import { sessionIdleTimeoutMinutes } from '@/config'
@@ -88,6 +90,7 @@ async function handleLogout(): Promise<void> {
           class="btn btn--secondary"
           @click="handleLogout"
         >
+          <AppIcon :icon="LogOut" />
           Sair
         </button>
       </header>

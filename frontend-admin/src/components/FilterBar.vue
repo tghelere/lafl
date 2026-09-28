@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Funnel, X } from 'lucide-vue-next'
+
+import AppIcon from '@/components/AppIcon.vue'
 import type { StatusOption } from '@/types/forms'
 
 defineProps<{
@@ -84,6 +87,7 @@ const emit = defineEmits<{
       type="submit"
       class="btn btn--primary"
     >
+      <AppIcon :icon="Funnel" />
       Filtrar
     </button>
     <button
@@ -91,6 +95,7 @@ const emit = defineEmits<{
       class="btn btn--secondary"
       @click="emit('clear')"
     >
+      <AppIcon :icon="X" />
       Limpar
     </button>
   </form>

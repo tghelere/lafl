@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { Copy, KeyRound, Save, UserCheck, UserX } from 'lucide-vue-next'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue'
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import StatusBadge from '@/components/StatusBadge.vue'
 import { fetchRoles } from '@/services/roles'
 import {
   createUser,
@@ -301,12 +304,10 @@ async function copyToClipboard(text: string): Promise<void> {
           v-if="isEditing && record"
           #badge
         >
-          <span
-            class="badge"
-            :class="record.active ? 'badge--published' : 'badge--draft'"
-          >
-            {{ record.active ? 'Ativo' : 'Inativo' }}
-          </span>
+          <StatusBadge
+            :status="record.active ? 'active' : 'inactive'"
+            :label="record.active ? 'Ativo' : 'Inativo'"
+          />
         </template>
       </PageHeader>
 
@@ -406,6 +407,7 @@ async function copyToClipboard(text: string): Promise<void> {
           class="btn btn--primary"
           :disabled="isSaving"
         >
+          <AppIcon :icon="Save" />
           {{ isSaving ? 'Salvando…' : 'Salvar' }}
         </button>
       </form>
@@ -421,6 +423,7 @@ async function copyToClipboard(text: string): Promise<void> {
           :disabled="isDeactivating"
           @click="handleDeactivate"
         >
+          <AppIcon :icon="UserX" />
           {{ isDeactivating ? 'Desativando…' : 'Desativar' }}
         </button>
         <button
@@ -430,6 +433,7 @@ async function copyToClipboard(text: string): Promise<void> {
           :disabled="isReactivating"
           @click="handleReactivate"
         >
+          <AppIcon :icon="UserCheck" />
           {{ isReactivating ? 'Reativando…' : 'Reativar' }}
         </button>
 
@@ -439,6 +443,7 @@ async function copyToClipboard(text: string): Promise<void> {
           :disabled="isGeneratingLink"
           @click="handleGenerateLink"
         >
+          <AppIcon :icon="KeyRound" />
           {{ isGeneratingLink ? 'Gerando…' : 'Gerar link de definição de senha' }}
         </button>
       </div>
@@ -462,6 +467,7 @@ async function copyToClipboard(text: string): Promise<void> {
             class="btn btn--primary"
             @click="copyToClipboard(generatedLink)"
           >
+            <AppIcon :icon="Copy" />
             Copiar link
           </button>
           <button
@@ -469,6 +475,7 @@ async function copyToClipboard(text: string): Promise<void> {
             class="btn btn--secondary"
             @click="copyToClipboard(whatsappMessage)"
           >
+            <AppIcon :icon="Copy" />
             Copiar mensagem
           </button>
         </div>

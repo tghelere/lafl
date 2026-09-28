@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import { RESOURCE_ICONS } from '@/config/icons'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
 import { useAuthStore } from '@/stores/auth'
 import { useUnreadCountsStore } from '@/stores/unreadCounts'
@@ -32,6 +34,11 @@ const entries = computed(() => unreadCounts.entries)
  */
 function resourceTitle(resource: string, fallback: string): string {
   return SUBMISSION_RESOURCES[resource]?.title ?? fallback
+}
+
+/** Mesmo ícone que o recurso tem na navegação lateral — ver src/config/icons.ts. */
+function resourceIcon(resource: string) {
+  return RESOURCE_ICONS[resource]
 }
 </script>
 
@@ -66,7 +73,13 @@ function resourceTitle(resource: string, fallback: string): string {
         class="card summary-card"
       >
         <span class="summary-card__value">{{ entry.unread }}</span>
-        <span class="summary-card__label">{{ resourceTitle(entry.resource, entry.label) }}</span>
+        <span class="summary-card__label">
+          <AppIcon
+            v-if="resourceIcon(entry.resource)"
+            :icon="resourceIcon(entry.resource)!"
+          />
+          {{ resourceTitle(entry.resource, entry.label) }}
+        </span>
         <span class="summary-card__hint">não lidos</span>
       </RouterLink>
     </div>

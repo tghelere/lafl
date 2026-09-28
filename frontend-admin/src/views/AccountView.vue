@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import axios from 'axios'
+import { KeyRound } from 'lucide-vue-next'
 import { computed, reactive, ref } from 'vue'
 
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageHeader from '@/components/PageHeader.vue'
@@ -147,6 +149,7 @@ async function handleSubmit(): Promise<void> {
         class="btn btn--primary"
         :disabled="isSubmitting || passwordsMismatch"
       >
+        <AppIcon :icon="KeyRound" />
         {{ isSubmitting ? 'Salvando…' : 'Trocar senha' }}
       </button>
     </form>

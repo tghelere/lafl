@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { Funnel, X } from 'lucide-vue-next'
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import ErrorState from '@/components/ErrorState.vue'
@@ -182,6 +184,7 @@ watch(
         type="submit"
         class="btn btn--primary"
       >
+        <AppIcon :icon="Funnel" />
         Filtrar
       </button>
       <button
@@ -189,6 +192,7 @@ watch(
         class="btn btn--secondary"
         @click="clearFilters"
       >
+        <AppIcon :icon="X" />
         Limpar
       </button>
     </form>
