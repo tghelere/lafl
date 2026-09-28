@@ -356,9 +356,9 @@
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
-      abaixo. A sessão 25 fechou os três itens que tinha (data/hora, lido/não lido, auditoria)
-      e não deixou nada pela metade; o que ela decidiu não fazer está listado como pendência em
-      "Painel administrativo (Vue)".
+      abaixo. A sessão 26 fechou os sete itens da tarefa 10 (acabamento visual e
+      responsividade do painel) e não deixou nada pela metade; o que ela decidiu não fazer
+      está listado como pendência em "Painel administrativo (Vue)".
 
 ## Pendente
 
@@ -529,6 +529,20 @@ uma camada de cache de HTML por cima.
       (só leitura, só `super_admin`) e o "Histórico de acessos" do detalhe fecham a pendência de
       `GET /api/v1/audit-logs` que `docs/estrutura-site.md` §4.5 previa desde o começo. Ver
       `docs/relatorio-sessao-25.md`.
+- [x] **Acabamento visual e responsividade do painel** — sessão 26, os sete itens de
+      `docs/tarefas/10-acabamento-visual-do-painel.md`. Identidade da aba (ícones, manifesto e
+      título por tela); item do menu aceso nas rotas filhas por `meta.section`, não por
+      comparação de URL; `AppBreadcrumb` único, com o nome do registro no degrau do meio e
+      esqueleto enquanto ele não chega; `PageHeader` único nas doze telas, com o selo no centro
+      vertical do título; Source Sans 3 auto-hospedada no corpo (Poppins segue nos títulos,
+      nenhuma serifa no painel); ícones lucide no menu, nos botões, nos cards e nos selos, todos
+      por `AppIcon` e sempre `aria-hidden`. A responsividade entrou em quatro faixas: gaveta
+      abaixo de 64rem (foco preso, Esc, clique fora, fecha ao navegar), listagens como lista de
+      cards abaixo de 48rem com filtros empilhados, barra do editor rolável com Salvar grudado
+      no rodapé, e alvos de toque de 44px abaixo de 64rem — com a densidade de tela larga
+      preservada e travada por teste. Antes desta sessão o painel não tinha **nenhuma** media
+      query. 53 casos novos de ponta a ponta (`icones.spec.ts`, `responsividade.spec.ts`). Ver
+      `docs/relatorio-sessao-26.md`.
 - [x] Tela de "página não encontrada" (sessão 15) — rota coringa no vue-router e `:resource`
       fora do mapa de acesso levam à mesma tela (`NotFoundState.vue`), dentro do layout
       autenticado. Antes, URL desconhecida renderizava em branco e recurso inválido caía num
@@ -536,6 +550,12 @@ uma camada de cache de HTML por cima.
       dois são a mesma coisa ("isto não existe").
 - [x] Editor de texto rico com sanitização no backend — Tiptap no painel, allowlist em
       `App\Support\Html\ContentSanitizer`, dependências justificadas no ADR 0010.
+- [ ] Entre 1024px e ~1200px a tabela das listagens mais largas (mensagens, auditoria,
+      transparência) rola dentro do próprio contêiner: a coluna fixa de 15rem volta em 1024px e
+      as colunas em `white-space: nowrap` não cabem no que sobra. Não é regressão — o
+      `overflow-x: auto` do `.table-wrapper` é anterior à sessão 26 —, e a página em si não rola
+      de lado. Resolver exige decidir quais colunas somem ou quebram nessa faixa, que é decisão
+      de produto.
 - [ ] Preview de SERP nos campos de SEO — hoje há só contador de caracteres na descrição,
       avisando a partir de 160 (onde o Google costuma cortar), sem a simulação visual do
       resultado de busca.
