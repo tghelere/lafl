@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ContactMessageController;
 use App\Http\Controllers\Api\V1\ContentMarkerController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\FormAuditController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\PartnershipInquiryController;
 use App\Http\Controllers\Api\V1\PickupRequestController;
@@ -120,6 +121,11 @@ Route::middleware($authenticated)->group(function (): void {
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
+
+    // Auditoria dos formulários recebidos — só leitura, e só super_admin (ver
+    // App\Policies\ActivityPolicy). Serve à tela "Auditoria" e, com `?record={uuid}`, à seção
+    // "Histórico de acessos" do detalhe de um registro.
+    Route::get('/audit-logs', [FormAuditController::class, 'index'])->name('audit-logs.index');
 
     // Leitura administrativa dos cinco formulários recebidos (ver docs/estrutura-site.md
     // §4.5): listagem, detalhe, mudança de status com anotação e o desfazer da leitura — nada

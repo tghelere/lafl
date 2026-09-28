@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Enums\Role;
 use App\Models\User;
+use App\Policies\ActivityPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -67,6 +69,11 @@ class AppServiceProvider extends ServiceProvider
         // sem nenhum papel de área autorizado (ver App\Policies\UserPolicy), então não dá
         // para confiar em descoberta automática silenciosa aqui.
         Gate::policy(User::class, UserPolicy::class);
+
+        // O model de auditoria é de um pacote (spatie/laravel-activitylog), então descoberta
+        // por convenção de nome não o alcançaria de jeito nenhum. Mesmo desenho da de cima:
+        // tudo `false`, só o bypass de super_admin passa (ver App\Policies\ActivityPolicy).
+        Gate::policy(Activity::class, ActivityPolicy::class);
     }
 
     private function configureRateLimiting(): void

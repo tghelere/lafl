@@ -10,6 +10,7 @@ use App\Models\TransparencyDocument;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\Activitylog\Models\Activity;
 
 /**
  * @mixin User
@@ -47,6 +48,10 @@ final class UserResource extends JsonResource
             'pages' => $user->can('viewAny', Page::class),
             'transparency-documents' => $user->can('viewAny', TransparencyDocument::class),
             'users' => $user->can('viewAny', User::class),
+            // Alimenta o item "Auditoria" do menu e a seção "Histórico de acessos" do detalhe de
+            // um formulário — as duas são de super_admin, e a Policy é quem diz isso, não um
+            // `roles.includes('super_admin')` no painel.
+            'audit-logs' => $user->can('viewAny', Activity::class),
         ];
 
         foreach (FormSubmissionType::cases() as $type) {

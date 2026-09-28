@@ -106,6 +106,13 @@ const router = createRouter({
       name: 'users.edit',
       component: () => import('@/views/UserFormView.vue'),
     },
+    // Auditoria — só leitura, só super_admin (ver App\Policies\ActivityPolicy). Rota própria,
+    // registrada antes das genéricas só por organização.
+    {
+      path: '/admin/auditoria',
+      name: 'audit.index',
+      component: () => import('@/views/AuditLogView.vue'),
+    },
     // Coringa — precisa ser a última entrada: qualquer URL que não bata com nenhuma rota
     // acima cai aqui em vez de deixar o vue-router não renderizar nada (ver
     // frontend-admin/src/views/NotFoundView.vue).

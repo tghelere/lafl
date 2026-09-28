@@ -57,7 +57,7 @@ final class PartnershipInquiryController extends Controller
      */
     public function markUnread(MarkFormSubmissionUnreadRequest $request, PartnershipInquiry $partnershipInquiry, MarkSubmissionAsUnread $markAsUnread): PartnershipInquiryResource
     {
-        $markAsUnread->handle($partnershipInquiry, $request->user());
+        $markAsUnread->handle($partnershipInquiry, $request->user(), $request->ip());
 
         return new PartnershipInquiryResource($partnershipInquiry->fresh(['handledBy', 'readBy']));
     }

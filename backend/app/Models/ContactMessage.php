@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Casts\FieldEncrypted;
 use App\Models\Concerns\IsFormSubmission;
+use App\Models\Contracts\FormSubmission;
 use Database\Factories\ContactMessageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +20,7 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
  * @use HasFactory<ContactMessageFactory>
  */
 #[Fillable(['name', 'email', 'subject', 'message'])]
-class ContactMessage extends Model
+class ContactMessage extends Model implements FormSubmission
 {
     /** @use HasFactory<ContactMessageFactory> */
     use HasFactory, IsFormSubmission, LogsActivity {

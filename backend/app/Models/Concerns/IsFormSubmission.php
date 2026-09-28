@@ -66,6 +66,14 @@ trait IsFormSubmission
     }
 
     /**
+     * Ver App\Models\Contracts\FormSubmission.
+     */
+    public function publicId(): string
+    {
+        return $this->uuid;
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function handledBy(): BelongsTo

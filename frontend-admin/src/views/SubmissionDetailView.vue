@@ -9,12 +9,24 @@ import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
+import { fetchAuditLog } from '@/services/auditLogs'
 import { fetchSubmissionDetail, markSubmissionUnread, updateSubmissionStatus } from '@/services/submissions'
+import { useAuthStore } from '@/stores/auth'
 import { useUnreadCountsStore } from '@/stores/unreadCounts'
+import type { AuditEntry } from '@/types/audit'
 import type { SubmissionDetail } from '@/types/submission'
 
 const route = useRoute()
 const unreadCounts = useUnreadCountsStore()
+const authStore = useAuthStore()
+
+/**
+ * O histórico de acessos deste registro é da auditoria, e auditoria é de super_admin. A checagem é
+ * pelo mapa `access` calculado por Policy no backend (ver
+ * App\Http\Resources\UserResource::accessMap), nunca por `roles.includes('super_admin')` aqui —
+ * e quem barra de verdade continua sendo a Policy: a chamada de um papel sem acesso volta 403.
+ */
+const canSeeAccessHistory = computed(() => authStore.user?.access['audit-logs'] === true)
 
 const resourceSlug = computed(() => String(route.params.resource))
 const uuid = computed(() => String(route.params.uuid))
@@ -27,6 +39,27 @@ const isSaving = ref(false)
 const saveConfirmedAt = ref<number | null>(null)
 const isMarkingUnread = ref(false)
 
+const accessHistory = ref<AuditEntry[] | null>(null)
+const accessHistoryError = ref<string | null>(null)
+
+/**
+ * Carregado só quando a seção é aberta, não junto do registro: é uma segunda chamada de rede que a
+ * maioria das visitas ao detalhe não precisa.
+ */
+async function loadAccessHistory(): Promise<void> {
+  if (accessHistory.value !== null) {
+    return
+  }
+
+  accessHistoryError.value = null
+
+  try {
+    accessHistory.value = (await fetchAuditLog({ record: uuid.value, per_page: 50 })).data
+  } catch {
+    accessHistoryError.value = 'Não foi possível carregar o histórico de acessos.'
+  }
+}
+
 async function load(): Promise<void> {
   if (!config.value) {
     return
@@ -35,6 +68,8 @@ async function load(): Promise<void> {
   isLoading.value = true
   errorMessage.value = null
   submission.value = null
+  accessHistory.value = null
+  accessHistoryError.value = null
 
   try {
     submission.value = await fetchSubmissionDetail(resourceSlug.value, uuid.value)
@@ -116,11 +151,6 @@ watch(() => route.fullPath, load, { immediate: true })
       <template v-else-if="submission">
         <h1>{{ config.title }}</h1>
 
-        <NoticeBanner variant="info">
-          Este acesso foi registrado — quem visualizou este registro, quando e de qual IP fica
-          na auditoria do sistema.
-        </NoticeBanner>
-
         <div class="detail-header">
           <StatusBadge
             :status="submission.status"
@@ -190,6 +220,53 @@ watch(() => route.fullPath, load, { immediate: true })
           :submitting="isSaving"
           @submit="handleStatusSubmit"
         />
+
+        <!-- Recolhido por padrão, e só para quem pode ver auditoria. `<details>` nativo: o
+             navegador já dá teclado, foco e anúncio de estado sem nenhum JavaScript. -->
+        <details
+          v-if="canSeeAccessHistory"
+          class="access-history"
+          @toggle="loadAccessHistory"
+        >
+          <summary>Histórico de acessos</summary>
+
+          <ErrorState
+            v-if="accessHistoryError"
+            :message="accessHistoryError"
+          />
+          <p
+            v-else-if="accessHistory === null"
+            class="record-footnote"
+          >
+            Carregando…
+          </p>
+          <p
+            v-else-if="accessHistory.length === 0"
+            class="record-footnote"
+          >
+            Nenhum acesso registrado para este registro.
+          </p>
+          <ul
+            v-else
+            class="access-history__list"
+          >
+            <li
+              v-for="(entry, index) in accessHistory"
+              :key="`${entry.occurred_at ?? ''}-${entry.event ?? ''}-${index}`"
+            >
+              <span class="access-history__when">{{ entry.occurred_at_label ?? '—' }}</span>
+              · {{ entry.action_label }}
+              · {{ entry.user ?? 'site público' }}
+              · {{ entry.ip ?? 'sem IP' }}
+            </li>
+          </ul>
+        </details>
+
+        <!-- Nota, não alerta: é verdade permanente sobre todo registro, e um banner destacado em
+             toda tela deixa de ser lido depois da terceira vez. -->
+        <p class="record-footnote">
+          Os acessos a este registro ficam na auditoria do sistema.
+        </p>
       </template>
     </template>
   </AppLayout>

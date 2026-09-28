@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Casts\FieldEncrypted;
 use App\Enums\FormSubmissionStatus;
 use App\Models\Concerns\IsFormSubmission;
+use App\Models\Contracts\FormSubmission;
 use Database\Factories\PickupRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,7 +27,7 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
  * @use HasFactory<PickupRequestFactory>
  */
 #[Fillable(['donor_name', 'phone', 'address', 'items_description', 'availability_window'])]
-class PickupRequest extends Model
+class PickupRequest extends Model implements FormSubmission
 {
     /** @use HasFactory<PickupRequestFactory> */
     use HasFactory, IsFormSubmission, LogsActivity {

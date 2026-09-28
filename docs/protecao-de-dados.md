@@ -158,6 +158,30 @@ autorizado, com o ato registrado em auditoria.
 **O log nunca registra valor descriptografado.** Caso contrário vira uma cópia em texto puro
 de tudo que se tentou proteger.
 
+### Onde os acessos são registrados hoje
+
+Tudo na tabela `activity_log`. Quatro origens, e nenhuma delas guarda valor de campo pessoal:
+
+| Origem | `log_name` | `event` | Grava IP? |
+|---|---|---|---|
+| `App\Http\Controllers\Api\V1\Concerns\LogsSubmissionAccess` — chamado em todo `show()` administrativo de formulário | `forms` | `viewed` | sim, em `properties.ip` |
+| `App\Actions\Forms\MarkSubmissionAsUnread` | `forms` | `marked_unread` | sim |
+| `LogsActivity` dos models de formulário (`App\Models\Concerns\IsFormSubmission`) | `default` | `created`, `updated` | não — não há requisição no evento de model |
+| Contas e sessão (`App\Actions\Users\*`, `App\Listeners\Auth\*`) | `users`, `auth` | vários | conforme a ação |
+
+Leitura: `GET /api/v1/audit-logs` e a tela **Auditoria** do painel, só `super_admin` (ver
+`App\Policies\ActivityPolicy`). A tela mostra apenas as entradas cujo sujeito é um formulário
+recebido — auditoria de conta é outra tela, quando existir.
+
+**O que a tela nunca mostra:** o `attribute_changes` do spatie. Ela diz QUE houve alteração, não o
+quê. Uma tela de auditoria que exibisse o diff seria a cópia em texto puro que a criptografia
+existe para evitar. Também não expõe o id da linha de log, que é sequencial.
+
+O detalhe de cada formulário traz, para `super_admin`, a mesma informação recortada para aquele
+registro ("Histórico de acessos", recolhido). Para todos os papéis, o rodapé do registro traz uma
+linha discreta dizendo que os acessos ficam na auditoria — nota, não alerta: é verdade permanente
+sobre todo registro, e um banner destacado em toda tela deixa de ser lido.
+
 ## Uploads de imagem
 
 1. Validar MIME real, não extensão

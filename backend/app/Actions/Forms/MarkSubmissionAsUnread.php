@@ -31,9 +31,13 @@ final class MarkSubmissionAsUnread
      * App\Models\Concerns\IsFormSubmission), do mesmo jeito que
      * App\Enums\FormSubmissionType::modelClass() já faz.
      *
+     * `$ip` chega de fora, e não de `request()->ip()` aqui dentro: é o mesmo dado que o log de
+     * acesso registra (ver App\Http\Controllers\Api\V1\Concerns\LogsSubmissionAccess), e a
+     * Action não precisa saber que existe uma requisição HTTP em volta.
+     *
      * @param  ProgramApplication|PickupRequest|VolunteerApplication|PartnershipInquiry|ContactMessage  $submission
      */
-    public function handle(Model $submission, ?User $actor): void
+    public function handle(Model $submission, ?User $actor, ?string $ip = null): void
     {
         if ($submission->read_at === null) {
             return;
@@ -46,6 +50,7 @@ final class MarkSubmissionAsUnread
         activity('forms')
             ->causedBy($actor)
             ->performedOn($submission)
+            ->withProperties(['ip' => $ip])
             ->event('marked_unread')
             ->log('Formulário marcado como não lido');
     }

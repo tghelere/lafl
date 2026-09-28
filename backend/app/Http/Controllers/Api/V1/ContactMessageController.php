@@ -57,7 +57,7 @@ final class ContactMessageController extends Controller
      */
     public function markUnread(MarkFormSubmissionUnreadRequest $request, ContactMessage $contactMessage, MarkSubmissionAsUnread $markAsUnread): ContactMessageResource
     {
-        $markAsUnread->handle($contactMessage, $request->user());
+        $markAsUnread->handle($contactMessage, $request->user(), $request->ip());
 
         return new ContactMessageResource($contactMessage->fresh(['handledBy', 'readBy']));
     }

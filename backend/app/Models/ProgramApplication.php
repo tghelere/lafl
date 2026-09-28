@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Casts\FieldEncrypted;
 use App\Models\Concerns\IsFormSubmission;
+use App\Models\Contracts\FormSubmission;
 use Database\Factories\ProgramApplicationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +22,7 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
  * @use HasFactory<ProgramApplicationFactory>
  */
 #[Fillable(['guardian_name', 'phone'])]
-class ProgramApplication extends Model
+class ProgramApplication extends Model implements FormSubmission
 {
     /** @use HasFactory<ProgramApplicationFactory> */
     use HasFactory, IsFormSubmission, LogsActivity {

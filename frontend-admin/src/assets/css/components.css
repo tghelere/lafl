@@ -556,6 +556,59 @@
   color: var(--color-text-muted);
 }
 
+/* Linha de apoio abaixo do título de uma tela, quando ela precisa de uma frase de contexto. */
+.page-intro {
+  margin-top: calc(-1 * var(--space-2));
+  margin-bottom: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Nota de pé do registro no detalhe de um formulário — a frase sobre auditoria (ver
+   docs/relatorio-sessao-25.md, item 3). Discreta de propósito: é informação permanente, verdadeira
+   para todo registro, e um alerta destacado em toda tela vira ruído que ninguém lê depois da
+   terceira vez. */
+.record-footnote {
+  margin-top: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Histórico de acessos recolhível, no detalhe, só para super_admin. */
+.access-history {
+  margin-top: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  padding: var(--space-4);
+}
+
+.access-history > summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-heading);
+}
+
+.access-history__list {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.access-history__list li {
+  color: var(--color-text-muted);
+}
+
+.access-history__when {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
 /* Estados de vazio, carregamento e erro — mesmo componente visual, cor diferente */
 .state-message {
   display: flex;

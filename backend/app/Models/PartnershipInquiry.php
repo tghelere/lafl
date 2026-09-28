@@ -8,6 +8,7 @@ use App\Casts\FieldEncrypted;
 use App\Enums\PartnershipSupportType;
 use App\Models\Concerns\HasBlindIndex;
 use App\Models\Concerns\IsFormSubmission;
+use App\Models\Contracts\FormSubmission;
 use Database\Factories\PartnershipInquiryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,7 +29,7 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
  * @use HasFactory<PartnershipInquiryFactory>
  */
 #[Fillable(['company_name', 'tax_id', 'contact_name', 'phone', 'email', 'support_type', 'message'])]
-class PartnershipInquiry extends Model
+class PartnershipInquiry extends Model implements FormSubmission
 {
     /** @use HasFactory<PartnershipInquiryFactory> */
     use HasBlindIndex, HasFactory, IsFormSubmission, LogsActivity {

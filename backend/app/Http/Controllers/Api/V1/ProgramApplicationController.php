@@ -57,7 +57,7 @@ final class ProgramApplicationController extends Controller
      */
     public function markUnread(MarkFormSubmissionUnreadRequest $request, ProgramApplication $programApplication, MarkSubmissionAsUnread $markAsUnread): ProgramApplicationResource
     {
-        $markAsUnread->handle($programApplication, $request->user());
+        $markAsUnread->handle($programApplication, $request->user(), $request->ip());
 
         return new ProgramApplicationResource($programApplication->fresh(['handledBy', 'readBy']));
     }

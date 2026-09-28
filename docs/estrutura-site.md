@@ -238,7 +238,7 @@ Todas as rotas sob `/admin`, `noindex`, atrás de login.
 | **Transparência** | Documentos (upload, ano, tipo, publicação) | `direcao` |
 | **Atendimento** | Interesses de matrícula · Inscrições contraturno · Propostas de apoio · Mensagens de contato · Voluntários | `atendimento`, `direcao` |
 | **Bazar** | Coletas (agenda, status) · Vitrine | `bazar`, `direcao` |
-| **Configurações** | Usuários e papéis · Dados institucionais · Auditoria | `super_admin` |
+| **Configurações** | Usuários e papéis · Auditoria (só leitura) · Dados institucionais | `super_admin` |
 
 A tela de Início é a mesma para todos, mas mostra só os blocos que o papel enxerga —
 `comunicacao` vê um painel sem nenhum formulário.
@@ -282,6 +282,7 @@ tabela.
 
 | Recurso | Papéis com acesso (leitura e escrita) |
 |---|---|
+| `audit-logs` | **só `super_admin`** — nem `direcao`; e só leitura |
 | `pages` | `direcao`, `comunicacao` |
 | `transparency-documents` | `direcao`, `financeiro` |
 | `program-applications` | `direcao`, `contraturno` |
@@ -298,6 +299,10 @@ gestão de usuários. `comunicacao` não tem acesso a nenhum formulário recebid
 
 **Notas de desenho:**
 
+- A auditoria é a outra área fechada a `super_admin`, e por um motivo diferente do de usuários:
+  quem audita não pode ser quem é auditado. `direcao` aparece nas linhas do log — dar a ela a
+  chave do log tiraria do registro a única propriedade que o faz valer algo. É só leitura, e
+  nunca deve deixar de ser: um log que o painel possa alterar não serve de log.
 - Gestão de usuários (criar, editar papel, desativar, reativar, gerar link de senha) é a
   única área sem nenhum papel de área autorizado — nem `direcao`, que administra todo o
   resto. Conceder acesso ao próprio painel é sempre ato deliberado de `super_admin`, nunca
@@ -336,7 +341,7 @@ Além disso:
 | DELETE | `/api/v1/{recurso}/{uuid}/read` | Marcar como **não** lido (não há POST: abrir o detalhe já marca como lido — ver ADR 0021) |
 | POST | `/api/v1/media` | Upload — remove EXIF, converte WebP |
 | POST | `/api/v1/{recurso}/{uuid}/publish` | Publicação, auditada |
-| GET | `/api/v1/audit-logs` | Auditoria |
+| GET | `/api/v1/audit-logs` | Auditoria dos formulários recebidos — só leitura, só `super_admin` (`App\Policies\ActivityPolicy`). Filtros: `user` (uuid da conta), `type`, `from`, `to` e `record` (uuid de um formulário, usado pelo "Histórico de acessos" do detalhe) |
 | GET | `/api/v1/me` | Usuário autenticado |
 
 ---

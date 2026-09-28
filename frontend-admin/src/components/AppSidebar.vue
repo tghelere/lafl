@@ -57,7 +57,7 @@ const showAtendimento = computed(() => hasAccess('volunteer-applications', 'cont
 const showBazar = computed(() => hasAccess('pickup-requests'))
 const showTransparencia = computed(() => hasAccess('transparency-documents'))
 const showConteudo = computed(() => hasAccess('pages'))
-const showConfiguracoes = computed(() => hasAccess('users'))
+const showConfiguracoes = computed(() => hasAccess('users', 'audit-logs'))
 
 function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
   return { name: 'submissions.index', params: { resource } }
@@ -191,10 +191,18 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           Configurações
         </p>
         <RouterLink
+          v-if="hasAccess('users')"
           :to="{ name: 'users.index' }"
           class="app-sidebar__link"
         >
           Usuários
+        </RouterLink>
+        <RouterLink
+          v-if="hasAccess('audit-logs')"
+          :to="{ name: 'audit.index' }"
+          class="app-sidebar__link"
+        >
+          Auditoria
         </RouterLink>
       </template>
     </nav>

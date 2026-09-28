@@ -9,6 +9,7 @@ use App\Models\PartnershipInquiry;
 use App\Models\PickupRequest;
 use App\Models\ProgramApplication;
 use App\Models\VolunteerApplication;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Um caso por entidade de formulário recebido (ver docs/dominio.md). Centraliza o que varia
@@ -64,6 +65,26 @@ enum FormSubmissionType: string
             self::PartnershipInquiry => 'partnership-inquiries',
             self::ContactMessage => 'contact-messages',
         };
+    }
+
+    /**
+     * O caminho de volta de `modelClass()`: dado um model qualquer, qual tipo de formulário ele é
+     * — `null` quando não é nenhum. Usado pela tela de Auditoria, que lê `activity_log`, onde o
+     * que existe é a classe do sujeito, não o tipo (ver App\Http\Resources\FormAuditEntryResource).
+     */
+    public static function forModel(?Model $model): ?self
+    {
+        if ($model === null) {
+            return null;
+        }
+
+        foreach (self::cases() as $case) {
+            if ($model instanceof ($case->modelClass())) {
+                return $case;
+            }
+        }
+
+        return null;
     }
 
     /**

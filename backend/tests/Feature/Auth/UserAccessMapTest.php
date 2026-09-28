@@ -13,6 +13,7 @@ test('mapa de acesso de comunicacao só libera pages', function (): void {
         'pages' => true,
         'transparency-documents' => false,
         'users' => false,
+        'audit-logs' => false,
         'program-applications' => false,
         'pickup-requests' => false,
         'volunteer-applications' => false,
@@ -29,10 +30,11 @@ test('mapa de acesso de financeiro só libera transparency-documents', function 
     expect($access['transparency-documents'])->toBeTrue()
         ->and($access['pages'])->toBeFalse()
         ->and($access['users'])->toBeFalse()
+        ->and($access['audit-logs'])->toBeFalse()
         ->and(collect($access)->except(['transparency-documents'])->every(fn (bool $value) => $value === false))->toBeTrue();
 });
 
-test('mapa de acesso de super_admin libera tudo, inclusive users', function (): void {
+test('mapa de acesso de super_admin libera tudo, inclusive users e audit-logs', function (): void {
     $user = userWithRole(Role::SuperAdmin->value);
 
     $access = $this->actingAs($user)->getJson('/api/v1/auth/user')->json('data.access');
@@ -53,5 +55,7 @@ test('mapa de acesso de usuário com dois papéis soma os dois', function (): vo
         ->and($access['pickup-requests'])->toBeFalse()
         ->and($access['volunteer-applications'])->toBeFalse()
         ->and($access['contact-messages'])->toBeFalse()
-        ->and($access['users'])->toBeFalse();
+        ->and($access['users'])->toBeFalse()
+        // Auditoria é de super_admin e de mais ninguém — nem da soma de dois papéis de área.
+        ->and($access['audit-logs'])->toBeFalse();
 });

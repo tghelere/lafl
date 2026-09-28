@@ -62,7 +62,7 @@ final class PickupRequestController extends Controller
      */
     public function markUnread(MarkFormSubmissionUnreadRequest $request, PickupRequest $pickupRequest, MarkSubmissionAsUnread $markAsUnread): PickupRequestResource
     {
-        $markAsUnread->handle($pickupRequest, $request->user());
+        $markAsUnread->handle($pickupRequest, $request->user(), $request->ip());
 
         return new PickupRequestResource($pickupRequest->fresh(['handledBy', 'readBy']));
     }

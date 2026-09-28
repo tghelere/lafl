@@ -57,7 +57,7 @@ final class VolunteerApplicationController extends Controller
      */
     public function markUnread(MarkFormSubmissionUnreadRequest $request, VolunteerApplication $volunteerApplication, MarkSubmissionAsUnread $markAsUnread): VolunteerApplicationResource
     {
-        $markAsUnread->handle($volunteerApplication, $request->user());
+        $markAsUnread->handle($volunteerApplication, $request->user(), $request->ip());
 
         return new VolunteerApplicationResource($volunteerApplication->fresh(['handledBy', 'readBy']));
     }
