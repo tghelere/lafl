@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { X } from 'lucide-vue-next'
 import { computed, onMounted } from 'vue'
 import type { Component } from 'vue'
 import { useRoute } from 'vue-router'
@@ -23,6 +24,17 @@ import softhingLogo from '../../../shared/brand/softhing/softhing-fundo-escuro.s
  * rota diretamente sem acesso devolve 403 de qualquer forma.
  */
 const authStore = useAuthStore()
+
+/**
+ * Abaixo de 64rem esta navegação é uma gaveta sobre o conteúdo (ver
+ * src/composables/useNavDrawer.ts, que fica no AppLayout com o botão que a abre). O botão
+ * Fechar daqui existe porque o de abrir fica atrás do cortinado quando a gaveta está aberta —
+ * e porque fechar sem sair do lugar em que a mão está é o gesto esperado. Em tela larga ele
+ * some pelo CSS, e some também da ordem de tabulação junto com a regra que o esconde.
+ */
+const emit = defineEmits<{
+  close: []
+}>()
 
 /**
  * Contadores de não lidos ao lado de cada seção de formulário (ver
@@ -195,19 +207,30 @@ function unreadOf(resource: string | undefined): number | null {
 
 <template>
   <aside class="app-sidebar">
-    <RouterLink
-      :to="{ name: 'dashboard' }"
-      class="app-sidebar__brand"
-      aria-label="Lar Anália Franco — página inicial do painel"
-    >
-      <img
-        :src="logoHorizontal"
-        width="65"
-        height="30"
-        alt=""
-        class="app-sidebar__logo"
+    <div class="app-sidebar__top">
+      <RouterLink
+        :to="{ name: 'dashboard' }"
+        class="app-sidebar__brand"
+        aria-label="Lar Anália Franco — página inicial do painel"
       >
-    </RouterLink>
+        <img
+          :src="logoHorizontal"
+          width="65"
+          height="30"
+          alt=""
+          class="app-sidebar__logo"
+        >
+      </RouterLink>
+
+      <button
+        type="button"
+        class="app-sidebar__close"
+        @click="emit('close')"
+      >
+        <AppIcon :icon="X" />
+        Fechar
+      </button>
+    </div>
 
     <nav
       class="app-sidebar__nav"

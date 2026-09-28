@@ -13,9 +13,25 @@
   min-height: 100vh;
 }
 
+/* Até 64rem a navegação lateral é uma GAVETA: sai do fluxo, entra pela esquerda por cima do
+   conteúdo e só aparece quando alguém abre pelo botão da barra superior (ver
+   src/composables/useNavDrawer.ts, que trata foco preso, Esc e clique fora). A partir de 64rem
+   volta a ser a coluna fixa ao lado do conteúdo, como sempre foi.
+
+   `visibility: hidden` ao lado do `transform`, e não só o transform: um elemento apenas
+   deslocado para fora da tela continua focável, e o Tab andaria por um menu invisível. A
+   transição inclui `visibility` para que ela só mude no fim do movimento, e não no começo. */
 .app-sidebar {
-  width: var(--sidebar-width);
-  flex-shrink: 0;
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  width: min(17rem, 85vw);
+  overflow-y: auto;
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition:
+    transform var(--duration-base) var(--ease-standard),
+    visibility var(--duration-base) var(--ease-standard);
   background: var(--color-heading);
   color: var(--color-surface-raised);
   padding: var(--space-5) var(--space-4);
@@ -24,8 +40,76 @@
   gap: var(--space-6);
 }
 
+.app-sidebar--open {
+  transform: none;
+  visibility: visible;
+}
+
+@media (min-width: 64rem) {
+  .app-sidebar {
+    position: static;
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+    overflow-y: visible;
+    transform: none;
+    visibility: visible;
+    transition: none;
+  }
+}
+
+/* Cortinado da gaveta — escurece o conteúdo e é quem recebe o clique "fora". Some acima de
+   64rem mesmo que o estado "aberta" tenha sobrado de uma janela estreita que foi alargada. */
+.app-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--color-heading) 55%, transparent);
+}
+
+@media (min-width: 64rem) {
+  .app-scrim {
+    display: none;
+  }
+}
+
+/* Enquanto a gaveta cobre a tela, o conteúdo de trás não rola: voltar de um menu e encontrar a
+   tela em outro ponto desorienta. A classe é posta no <body> pelo useNavDrawer. */
+body.has-open-drawer {
+  overflow: hidden;
+}
+
+/* Marca e botão Fechar na mesma linha. O Fechar só existe na gaveta — em tela larga ele
+   desaparece, e com ele sai da ordem de tabulação. */
+.app-sidebar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
 .app-sidebar__brand {
   display: inline-flex;
+}
+
+.app-sidebar__close {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-surface-raised) 30%, transparent);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-surface-raised);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+@media (min-width: 64rem) {
+  .app-sidebar__close {
+    display: none;
+  }
 }
 
 .app-sidebar__logo {
@@ -128,22 +212,47 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-3) var(--space-6);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: var(--color-surface-raised);
   border-bottom: 1px solid var(--color-border);
 }
 
+@media (min-width: 48rem) {
+  .app-topbar {
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-6);
+  }
+}
+
+/* Reticências em vez de quebra: o nome de quem está logado é o item que cede espaço numa barra
+   estreita — o botão Menu e o Sair não podem encolher. */
 .app-topbar__user {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
+/* Botão que abre a gaveta. Só é renderizado abaixo de 64rem (ver AppLayout.vue) — acima disso
+   não há gaveta para abrir. */
+.app-topbar__toggle {
+  flex: none;
+}
+
 .app-content {
   flex: 1;
-  padding: var(--space-6);
+  padding: var(--space-4);
   max-width: var(--content-max);
   width: 100%;
+}
+
+@media (min-width: 48rem) {
+  .app-content {
+    padding: var(--space-6);
+  }
 }
 
 .skip-link {

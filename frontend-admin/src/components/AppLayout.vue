@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { LogOut } from 'lucide-vue-next'
-import { computed, watchEffect } from 'vue'
+import { LogOut, Menu } from 'lucide-vue-next'
+import { computed, ref, watchEffect } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AccessDeniedState from '@/components/AccessDeniedState.vue'
@@ -9,6 +10,7 @@ import AppSidebar from '@/components/AppSidebar.vue'
 import NotFoundState from '@/components/NotFoundState.vue'
 import { sessionIdleTimeoutMinutes } from '@/config'
 import { useIdleTimeout } from '@/composables/useIdleTimeout'
+import { useNavDrawer } from '@/composables/useNavDrawer'
 import { useAuthStore } from '@/stores/auth'
 
 /**
@@ -30,6 +32,26 @@ const router = useRouter()
 useIdleTimeout(sessionIdleTimeoutMinutes, () => {
   void handleLogout()
 })
+
+/**
+ * Abaixo de 64rem a navegação lateral é uma gaveta, aberta pelo botão da barra superior (ver
+ * src/composables/useNavDrawer.ts). Acima disso nada disto existe: a coluna fica fixa ao lado
+ * do conteúdo, como sempre esteve.
+ */
+const sidebar = ref<ComponentPublicInstance | null>(null)
+const navToggle = ref<HTMLButtonElement | null>(null)
+
+const {
+  isOpen: isNavOpen,
+  isStatic: isNavStatic,
+  close: closeNav,
+  toggle: toggleNav,
+} = useNavDrawer(
+  // AppSidebar tem raiz única (<aside>), então `$el` é esse elemento — é nele que o foco fica
+  // preso enquanto a gaveta está aberta.
+  () => (sidebar.value?.$el as HTMLElement | undefined) ?? null,
+  () => navToggle.value,
+)
 
 // 'unmapped': a chave de `resource` não existe no mapa devolvido por /auth/user — tanto bug de
 // integração (nome usado na tela não bate com o nome que o backend calcula) quanto recurso
@@ -72,10 +94,37 @@ async function handleLogout(): Promise<void> {
       href="#main"
     >Pular para o conteúdo</a>
 
-    <AppSidebar />
+    <!-- Cortinado da gaveta: escurece o conteúdo, e é ele que recebe o clique "fora" que
+         fecha o menu. Um elemento de verdade, e não um ouvinte de clique no documento, porque
+         ele também impede o toque em qualquer coisa atrás da gaveta. -->
+    <div
+      v-if="isNavOpen && !isNavStatic"
+      class="app-scrim"
+      @click="closeNav"
+    />
+
+    <AppSidebar
+      id="app-nav"
+      ref="sidebar"
+      :class="{ 'app-sidebar--open': isNavOpen }"
+      @close="closeNav"
+    />
 
     <div class="app-main">
       <header class="app-topbar">
+        <button
+          v-if="!isNavStatic"
+          ref="navToggle"
+          type="button"
+          class="btn btn--secondary app-topbar__toggle"
+          :aria-expanded="isNavOpen"
+          aria-controls="app-nav"
+          @click="toggleNav"
+        >
+          <AppIcon :icon="Menu" />
+          Menu
+        </button>
+
         <span
           v-if="authStore.user"
           class="app-topbar__user"
