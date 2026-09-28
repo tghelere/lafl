@@ -379,14 +379,16 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
           >{{ fieldErrors.meta_description[0] }}</span>
         </div>
 
-        <button
-          type="submit"
-          class="btn btn--primary"
-          :disabled="isSaving"
-        >
-          <AppIcon :icon="Save" />
-          {{ isSaving ? 'Salvando…' : 'Salvar' }}
-        </button>
+        <div class="page-form__actions">
+          <button
+            type="submit"
+            class="btn btn--primary"
+            :disabled="isSaving"
+          >
+            <AppIcon :icon="Save" />
+            {{ isSaving ? 'Salvando…' : 'Salvar' }}
+          </button>
+        </div>
       </form>
     </template>
   </AppLayout>
@@ -449,6 +451,42 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
   margin-left: auto;
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* Abaixo de 48rem o Salvar gruda no rodapé da tela. O formulário desta tela tem editor de
+   texto, marcadores e dois campos de busca — no celular são várias telas de rolagem, e um
+   botão que só existe lá embaixo obriga a percorrer tudo de volta a cada alteração. Sangra até
+   as bordas do .card (as margens negativas) para o botão ficar realmente no rodapé, e não
+   flutuando sobre um pedaço de cartão.
+
+   `sticky`, e não `fixed`: o botão pertence ao formulário. Quando a página chega ao fim, ele
+   volta a ser o último elemento do cartão, sem cobrir o que vem depois. */
+.page-form__actions {
+  position: sticky;
+  bottom: 0;
+  margin: var(--space-5) calc(-1 * var(--space-5)) calc(-1 * var(--space-5));
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface-raised);
+  border-top: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.page-form__actions .btn {
+  width: 100%;
+}
+
+@media (min-width: 48rem) {
+  .page-form__actions {
+    position: static;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border-top: none;
+  }
+
+  .page-form__actions .btn {
+    width: auto;
+  }
 }
 
 .page-form__section {

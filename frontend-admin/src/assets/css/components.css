@@ -1126,6 +1126,23 @@ body.has-open-drawer {
   background: var(--color-surface);
 }
 
+/* Abaixo de 48rem a barra de formatação rola de lado em vez de quebrar em fileiras. São nove
+   botões: quebrados, ocupam três linhas e empurram o texto que está sendo escrito para fora da
+   tela — e a barra é justamente o que precisa ficar à mão enquanto se escreve. Rolando, ela
+   continua com uma linha só, e o que não coube segue alcançável com o dedo. */
+@media (max-width: 47.999rem) {
+  .rich-text__toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  /* Sem isto os botões encolheriam até o rótulo quebrar, em vez de deixar a barra rolar. */
+  .rich-text__button {
+    flex: none;
+  }
+}
+
 .rich-text__button {
   font: inherit;
   font-size: var(--text-sm);

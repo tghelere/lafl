@@ -1,6 +1,6 @@
 import { type Page, expect, test } from '@playwright/test'
 
-import { sidebar } from '../../support/admin'
+import { openContentPageByTitle, sidebar } from '../../support/admin'
 import { ROLE_USERS, storageStatePath } from '../../support/users'
 
 /**
@@ -258,5 +258,79 @@ test.describe('a partir de 768px a listagem volta a ser tabela', () => {
     // A tabela larga rola DENTRO do seu próprio contêiner (.table-wrapper), não arrastando a
     // página inteira junto.
     expect(await excessoHorizontal(page), 'a página inteira rola de lado em 768px').toBe(0)
+  })
+})
+
+test.describe('editor de páginas em tela estreita', () => {
+  test.use({ viewport: CELULAR })
+
+  test('a barra de formatação rola de lado, em uma linha só', async ({ page }) => {
+    await openContentPageByTitle(page, 'Governança')
+
+    const barra = page.locator('.rich-text__toolbar')
+    await expect(barra).toBeVisible()
+
+    const medida = await barra.evaluate((el) => ({
+      wrap: getComputedStyle(el).flexWrap,
+      transbordaDeLado: el.scrollWidth > el.clientWidth,
+      altura: el.clientHeight,
+      alturaDoBotao: el.querySelector('button')!.getBoundingClientRect().height,
+    }))
+
+    expect(medida.wrap, 'a barra ainda quebra em fileiras').toBe('nowrap')
+    expect(medida.transbordaDeLado, 'os nove botões caberiam em 390px?').toBe(true)
+
+    // Uma linha só: a barra não é mais alta que um botão mais o seu respiro. Quebrada em três
+    // fileiras, ela empurraria o texto que está sendo escrito para fora da tela.
+    expect(medida.altura, `barra de ${medida.altura}px para botão de ${medida.alturaDoBotao}px`).toBeLessThan(
+      medida.alturaDoBotao * 2,
+    )
+
+    // E rola de verdade — `overflow-x: auto` num contêiner que não transborda não rolaria.
+    const rolou = await barra.evaluate((el) => {
+      el.scrollLeft = 9999
+
+      return el.scrollLeft
+    })
+    expect(rolou, 'a barra não rolou').toBeGreaterThan(0)
+  })
+
+  test('o botão Salvar fica no rodapé da tela enquanto se edita', async ({ page }) => {
+    await openContentPageByTitle(page, 'Governança')
+
+    const salvar = page.getByRole('button', { name: 'Salvar', exact: true })
+    await expect(salvar).toBeVisible()
+
+    // Rola até o meio do formulário — é lá que o botão precisa estar à mão. Sem o rodapé fixo,
+    // ele estaria muitas telas abaixo, depois do editor e dos dois campos de busca.
+    await page.evaluate(() => window.scrollBy(0, 400))
+
+    const caixa = (await salvar.boundingBox())!
+    const altura = page.viewportSize()!.height
+
+    expect(caixa.y + caixa.height, 'o Salvar saiu da tela ao rolar o formulário').toBeLessThanOrEqual(altura + 1)
+
+    const posicao = await page.locator('.page-form__actions').evaluate((el) => getComputedStyle(el).position)
+    expect(posicao).toBe('sticky')
+  })
+
+  test('a edição de página não rola de lado', async ({ page }) => {
+    await openContentPageByTitle(page, 'Governança')
+
+    expect(await excessoHorizontal(page)).toBe(0)
+  })
+})
+
+test.describe('editor de páginas em tela larga', () => {
+  test.use({ viewport: { width: 1024, height: 900 } })
+
+  test('a barra volta a quebrar em fileiras e o Salvar volta ao fim do formulário', async ({ page }) => {
+    await openContentPageByTitle(page, 'Governança')
+
+    const wrap = await page.locator('.rich-text__toolbar').evaluate((el) => getComputedStyle(el).flexWrap)
+    expect(wrap).toBe('wrap')
+
+    const posicao = await page.locator('.page-form__actions').evaluate((el) => getComputedStyle(el).position)
+    expect(posicao).toBe('static')
   })
 })
