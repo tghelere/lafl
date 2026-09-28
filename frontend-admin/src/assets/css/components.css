@@ -1251,3 +1251,43 @@ body.has-open-drawer {
   color: var(--color-error);
   font-weight: var(--weight-semibold);
 }
+
+/* Área de toque — abaixo de 64rem todo alvo tem no mínimo 44px de altura (--touch-target, ver
+   tokens.css).
+
+   Botão, campo e select chegam lá sozinhos: nessa faixa as duas alturas de controle passam a
+   valer a área de toque. O que sobra é o que tem altura própria — item do menu, botão de
+   paginação, botão de formatação do editor, o link que abre o registro dentro do card e o
+   degrau da trilha de navegação. Todos medem hoje entre 28px e 34px: o bastante para o
+   ponteiro do mouse, pouco para o polegar.
+
+   A faixa vai até 64rem, e não até 48rem, porque tablet é tela de toque tanto quanto
+   celular — e é onde a listagem já voltou a ser tabela, com as ações de linha de volta. */
+@media (max-width: 63.999rem) {
+  .app-sidebar__brand,
+  .app-sidebar__link,
+  .pagination button,
+  .rich-text__button,
+  .role-checkbox {
+    min-height: var(--touch-target);
+  }
+
+  /* Estes dois são links de uma linha de texto: sem virar caixa, o `min-height` não teria onde
+     se aplicar. */
+  .breadcrumb a,
+  .table__row-link {
+    display: flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+
+  /* O nome de quem está logado é o link para /conta. `inline-flex`, e não `flex`: o <span> em
+     volta corta o texto com reticências, e isso só funciona enquanto ele continuar sendo um
+     bloco com conteúdo EM LINHA — um filho `flex` viraria item de flex e levaria as reticências
+     embora. */
+  .app-topbar__user a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+  }
+}

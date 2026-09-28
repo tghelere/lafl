@@ -334,3 +334,95 @@ test.describe('editor de páginas em tela larga', () => {
     expect(posicao).toBe('static')
   })
 })
+
+/**
+ * Tudo o que se toca no painel: item do menu, marca, botão (de tela, de filtro, de paginação,
+ * de formatação do editor), o link que abre o registro no card, o degrau da trilha, o card do
+ * Início e o nome de quem está logado, que leva ao /conta.
+ */
+const ALVOS_DE_TOQUE = [
+  '.app-sidebar__brand',
+  '.app-sidebar__link',
+  '.app-sidebar__close',
+  '.btn',
+  '.pagination button',
+  '.rich-text__button',
+  '.table__row-link',
+  '.breadcrumb a',
+  '.app-topbar__user a',
+  '.summary-card',
+].join(', ')
+
+/** Os alvos visíveis da tela que medem menos de 44px de altura. Lista vazia é o esperado. */
+async function alvosPequenos(page: Page): Promise<string[]> {
+  return page.locator(ALVOS_DE_TOQUE).evaluateAll((nodes) =>
+    nodes
+      .filter((node) => node.getClientRects().length > 0)
+      .map((node) => ({
+        descricao: `${node.tagName.toLowerCase()}.${node.className || '(sem classe)'}: ${(node.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 30)}`,
+        altura: node.getBoundingClientRect().height,
+      }))
+      // Meio pixel de tolerância: 44px vindo de `rem` em zoom fracionário arredonda para
+      // baixo em 43,98 sem que nada esteja errado.
+      .filter((alvo) => alvo.altura < 43.5)
+      .map((alvo) => `${alvo.descricao} — ${alvo.altura.toFixed(1)}px`),
+  )
+}
+
+test.describe('áreas de toque de 44px abaixo de 1024px', () => {
+  test.use({ viewport: CELULAR })
+
+  const TELAS = ['/admin', '/admin/usuarios', '/admin/contact-messages', '/admin/auditoria']
+
+  for (const tela of TELAS) {
+    test(`nenhum alvo de toque abaixo de 44px em ${tela}`, async ({ page }) => {
+      await page.goto(tela)
+      await expect(page.locator('.page-header__title')).toBeVisible()
+
+      await expect.poll(() => page.locator(ALVOS_DE_TOQUE).count(), `${tela}: nenhum alvo medido`).toBeGreaterThan(3)
+
+      expect(await alvosPequenos(page), `alvos pequenos em ${tela}`).toEqual([])
+    })
+  }
+
+  test('nenhum alvo de toque abaixo de 44px no menu aberto', async ({ page }) => {
+    await page.goto('/admin')
+    await abrirGaveta(page)
+
+    expect(await alvosPequenos(page), 'alvos pequenos na gaveta').toEqual([])
+  })
+
+  test('nenhum alvo de toque abaixo de 44px na edição de página', async ({ page }) => {
+    await openContentPageByTitle(page, 'Governança')
+
+    expect(await alvosPequenos(page), 'alvos pequenos na edição de página').toEqual([])
+  })
+
+  test('nenhum alvo de toque abaixo de 44px no detalhe de um registro', async ({ page }) => {
+    await page.goto('/admin/contact-messages')
+    await page.locator('.table tbody tr:not(.table__row--unread)').first().getByRole('link').click()
+    await expect(page).toHaveURL(/\/admin\/contact-messages\/[0-9a-f-]{36}$/)
+
+    expect(await alvosPequenos(page), 'alvos pequenos no detalhe').toEqual([])
+  })
+})
+
+test.describe('a densidade de tela larga continua a mesma', () => {
+  test.use({ viewport: { width: 1280, height: 900 } })
+
+  /**
+   * A área de toque vale abaixo de 64rem. Acima, onde há mouse, o painel volta à sua densidade
+   * — é uma tela de trabalho, lida de perto, e 44px por controle empurraria a listagem para
+   * fora da primeira dobra sem ganho nenhum.
+   */
+  test('os controles da barra de filtro voltam aos 36px', async ({ page }) => {
+    await page.goto('/admin/usuarios')
+    await expect(page.locator('.filter-bar .btn').first()).toBeVisible()
+
+    const alturas = await page
+      .locator('.filter-bar input, .filter-bar select, .filter-bar .btn')
+      .evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().height)))
+
+    expect([...new Set(alturas)], 'altura dos controles da barra de filtro em 1280px').toEqual([36])
+  })
+})
