@@ -14,14 +14,21 @@ import { ROLE_USERS, storageStatePath } from '../../support/users'
  */
 test.use({ storageState: storageStatePath('super_admin') })
 
-/** Telas estreitas usadas na bateria: um celular pequeno e um celular comum. */
+/** A largura de referência de celular da bateria. */
 const CELULAR = { width: 390, height: 844 }
+
+/** A largura mais estreita que a tarefa nomeia — celular pequeno. */
+const CELULAR_ESTREITO = { width: 360, height: 740 }
 
 function menuButton(page: Page) {
   return page.getByRole('button', { name: 'Menu', exact: true })
 }
 
 async function abrirGaveta(page: Page): Promise<void> {
+  // Espera o botão ANTES de clicar: ele só existe no painel autenticado e em tela estreita.
+  // Assim, uma sessão perdida ou uma janela larga falham dizendo "o botão Menu não apareceu",
+  // em vez de "o clique estourou o tempo" — que não diz nada sobre a causa.
+  await expect(menuButton(page), 'o botão Menu não apareceu: o painel carregou autenticado?').toBeVisible()
   await menuButton(page).click()
   await expect(sidebar(page)).toBeVisible()
 }
@@ -424,5 +431,31 @@ test.describe('a densidade de tela larga continua a mesma', () => {
       .evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().height)))
 
     expect([...new Set(alturas)], 'altura dos controles da barra de filtro em 1280px').toEqual([36])
+  })
+})
+
+test.describe('nada rola de lado em 360px', () => {
+  test.use({ viewport: CELULAR_ESTREITO })
+
+  /**
+   * As quatro telas da conferência visual da tarefa, na largura mais estreita que ela nomeia.
+   * Rolagem horizontal é o defeito que mais some numa conferência a olho — a página parece
+   * certa, e só um arrasto lateral acidental revela a faixa vazia à direita.
+   */
+  test('Início, listagem, detalhe e edição de página cabem na largura da tela', async ({ page }) => {
+    await page.goto('/admin')
+    await expect(page.getByRole('heading', { name: 'Início' })).toBeVisible()
+    expect(await excessoHorizontal(page), 'Início').toBe(0)
+
+    await page.goto('/admin/contact-messages')
+    await expect(page.locator('.table tbody tr').first()).toBeVisible()
+    expect(await excessoHorizontal(page), 'listagem').toBe(0)
+
+    await page.locator('.table tbody tr:not(.table__row--unread)').first().getByRole('link').click()
+    await expect(page).toHaveURL(/\/admin\/contact-messages\/[0-9a-f-]{36}$/)
+    expect(await excessoHorizontal(page), 'detalhe').toBe(0)
+
+    await openContentPageByTitle(page, 'Governança')
+    expect(await excessoHorizontal(page), 'edição de página').toBe(0)
   })
 })

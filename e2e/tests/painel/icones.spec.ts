@@ -193,6 +193,11 @@ for (const tela of TELAS) {
  * 18px é o tamanho único do painel (ver AppIcon.vue). Medido na caixa renderizada, não no
  * atributo: `.icon` também fixa largura e altura em CSS, e é o resultado das duas coisas
  * juntas que importa — um SVG dentro de flex apertado encolhe sem `flex: none`.
+ *
+ * Só o que está DESENHADO entra na conta. O botão Fechar da gaveta de navegação existe na
+ * marcação em qualquer largura e é escondido por CSS acima de 64rem (ver components.css); o
+ * ícone dele mede 0×0 nessa faixa, o que não é ícone fora de tamanho, é ícone que não está na
+ * tela.
  */
 test('todo ícone é desenhado em 18px', async ({ page }) => {
   await page.goto('/admin/volunteer-applications')
@@ -200,6 +205,7 @@ test('todo ícone é desenhado em 18px', async ({ page }) => {
 
   const foraDoTamanho = await page.locator('svg.icon').evaluateAll((nodes) =>
     nodes
+      .filter((node) => node.getClientRects().length > 0)
       .map((node) => ({ classe: node.getAttribute('class') ?? '', caixa: node.getBoundingClientRect() }))
       .filter(({ caixa }) => Math.abs(caixa.width - 18) > 1 || Math.abs(caixa.height - 18) > 1)
       .map(({ classe, caixa }) => `${classe}: ${caixa.width}×${caixa.height}`),
