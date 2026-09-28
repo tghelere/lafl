@@ -1,0 +1,27 @@
+{
+  "name": "Painel · Lar Anália Franco",
+  "short_name": "Painel LAF",
+  "description": "Painel administrativo do Lar Anália Franco.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f9f9f8",
+  "theme_color": "#221f1b",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

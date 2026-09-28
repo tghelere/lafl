@@ -2,10 +2,25 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Lar Anália Franco — Painel administrativo</title>
+
+    <!--
+      Ícones nos mesmos arquivos e na mesma ordem do site público (ver
+      frontend-site/nuxt.config.ts): .ico primeiro, para navegador antigo que ignora o SVG;
+      SVG depois, que é o que o navegador atual escolhe por ser o último que ele entende.
+    -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#221f1b" />
+
+    <!--
+      Título de partida, antes do Vue montar. A partir daí quem escreve document.title é o
+      afterEach do roteador, no formato "<Tela> · Painel LAF" — ver src/router/index.ts.
+    -->
+    <title>Painel LAF</title>
 
     <!--
       Configuração em tempo de execução, fora do bundle e reescrita no servidor a cada

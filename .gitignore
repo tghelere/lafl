@@ -57,3 +57,6 @@ docker/**/data/
 # Saída de verificação manual em navegador (Playwright MCP)
 .playwright-mcp/
 .pacotes/
+
+# Artefato do WSL ao copiar arquivo do Windows — metadado de "zona de origem", nunca conteúdo.
+*:Zone.Identifier
