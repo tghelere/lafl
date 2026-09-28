@@ -233,7 +233,7 @@ Todas as rotas sob `/admin`, `noindex`, atrás de login.
 
 | Seção | Telas | Papéis |
 |---|---|---|
-| **Início** | Painel com pendências: novos interesses, coletas a agendar, mensagens não lidas | todos, filtrado pelo papel |
+| **Início** | Painel com a contagem de formulários **não lidos** por seção (ver ADR 0021) | todos, filtrado pelo papel |
 | **Conteúdo** | Páginas · Notícias · Mídia · Depoimentos · Parceiros · Números da home | `comunicacao`, `direcao` |
 | **Transparência** | Documentos (upload, ano, tipo, publicação) | `direcao` |
 | **Atendimento** | Interesses de matrícula · Inscrições contraturno · Propostas de apoio · Mensagens de contato · Voluntários | `atendimento`, `direcao` |
@@ -333,6 +333,7 @@ Além disso:
 | Método | Rota | Uso |
 |---|---|---|
 | PATCH | `/api/v1/{recurso}/{uuid}/status` | Mudança de status com anotação |
+| DELETE | `/api/v1/{recurso}/{uuid}/read` | Marcar como **não** lido (não há POST: abrir o detalhe já marca como lido — ver ADR 0021) |
 | POST | `/api/v1/media` | Upload — remove EXIF, converte WebP |
 | POST | `/api/v1/{recurso}/{uuid}/publish` | Publicação, auditada |
 | GET | `/api/v1/audit-logs` | Auditoria |
@@ -347,6 +348,7 @@ Decidido:
 - [x] Manifestação de interesse, sem coleta de dado de menor pela web (§2.1)
 - [x] Páginas separadas, uma URL por subpágina (§1.4)
 - [x] Cinco papéis, modelados por tipo de dado (§4.4)
+- [x] Leitura compartilhada, separada do status de atendimento (ADR 0021)
 
 Em aberto — nenhum bloqueia a implementação:
 - [ ] `[VALIDAR]` Campos de cada formulário com quem hoje faz esse atendimento

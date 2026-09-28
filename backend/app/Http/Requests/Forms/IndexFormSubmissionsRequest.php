@@ -30,6 +30,7 @@ final class IndexFormSubmissionsRequest extends FormRequest
     {
         return [
             'status' => ['nullable', Rule::enum(FormSubmissionStatus::class)],
+            'read' => ['nullable', 'in:read,unread'],
             'from' => ['nullable', 'date_format:Y-m-d'],
             'to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:from'],
             'page' => ['nullable', 'integer', 'min:1'],
@@ -44,6 +45,7 @@ final class IndexFormSubmissionsRequest extends FormRequest
     {
         return [
             'status.enum' => 'Status desconhecido.',
+            'read.in' => 'O filtro de leitura aceita apenas "read" ou "unread".',
             'from.date_format' => 'Informe a data inicial no formato aaaa-mm-dd.',
             'to.date_format' => 'Informe a data final no formato aaaa-mm-dd.',
             'to.after_or_equal' => 'A data final não pode ser anterior à inicial.',

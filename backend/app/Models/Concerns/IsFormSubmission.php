@@ -38,6 +38,8 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property string $consent_terms_version
  * @property Carbon|null $consented_at
  * @property string $ip_hash
+ * @property Carbon|null $read_at
+ * @property int|null $read_by
  * @property int|null $handled_by
  * @property Carbon|null $handled_at
  * @property string|null $internal_note
@@ -53,7 +55,7 @@ trait IsFormSubmission
     {
         static::creating(function (self $model): void {
             $model->uuid ??= (string) Str::uuid();
-            $model->status ??= FormSubmissionStatus::New;
+            $model->status ??= FormSubmissionStatus::initial();
             $model->expires_at ??= now()->addMonths(static::retentionMonths());
         });
     }
@@ -72,12 +74,52 @@ trait IsFormSubmission
     }
 
     /**
+     * Quem abriu o registro pela primeira vez. Uma pessoa só, não a lista de todo mundo que já
+     * olhou — a lista completa é o log de auditoria (ver
+     * App\Http\Controllers\Api\V1\Concerns\LogsSubmissionAccess), que é onde ela tem de
+     * ficar de qualquer forma.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function readBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'read_by');
+    }
+
+    public function isRead(): bool
+    {
+        return $this->read_at !== null;
+    }
+
+    /**
      * @param  Builder<static>  $query
      * @return Builder<static>
      */
     public function scopeExpired(Builder $query): Builder
     {
         return $query->where('expires_at', '<=', now());
+    }
+
+    /**
+     * Não lido por NINGUÉM da equipe — a leitura é compartilhada (ver
+     * docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md). Alimenta o filtro da
+     * listagem e os contadores do menu e da tela Início.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeUnread(Builder $query): Builder
+    {
+        return $query->whereNull('read_at');
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeRead(Builder $query): Builder
+    {
+        return $query->whereNotNull('read_at');
     }
 
     /**
@@ -88,6 +130,7 @@ trait IsFormSubmission
         return [
             'status' => FormSubmissionStatus::class,
             'consented_at' => 'datetime',
+            'read_at' => 'datetime',
             'handled_at' => 'datetime',
             'expires_at' => 'datetime',
             'internal_note' => FieldEncrypted::class,
@@ -99,6 +142,13 @@ trait IsFormSubmission
      * docs/protecao-de-dados.md, "Auditoria": o log registra o acesso, nunca o valor
      * descriptografado). `internal_note` fica de fora mesmo cifrado, para não versionar seu
      * conteúdo no log a cada edição.
+     *
+     * `read_at`/`read_by` também ficam de fora, e não por esquecimento: a primeira leitura já
+     * gera o evento `viewed` do log de acesso, no mesmo instante e sobre o mesmo registro
+     * (ver App\Http\Controllers\Api\V1\Concerns\LogsSubmissionAccess) — logá-los aqui
+     * daria duas entradas para um acontecimento só, e a tela de Auditoria mostraria o dobro do
+     * que houve. Marcar como NÃO lido, que é ato deliberado e não decorre de nenhum acesso,
+     * tem evento próprio em App\Actions\Forms\MarkSubmissionAsUnread.
      */
     public function getActivitylogOptions(): LogOptions
     {

@@ -9,10 +9,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Colunas comuns às seis migrations de formulário recebido (ver docs/dominio.md,
- * "Formulários recebidos"). Cada migration chama `addCommon()` antes de suas colunas
- * específicas, e `addStatusCheckConstraint()` depois de `Schema::create` (só tem efeito no
- * Postgres — mesma disciplina de `pages` e `transparency_documents`).
+ * Colunas comuns às migrations de formulário recebido (ver docs/dominio.md, "Formulários
+ * recebidos"). Cada migration chama `addCommon()` e `addReadState()` antes de suas colunas
+ * específicas, e `addStatusCheckConstraint()` depois de `Schema::create` (mesma disciplina de
+ * `pages` e `transparency_documents`).
+ *
+ * `addReadState()` está separado porque as cinco tabelas atuais nasceram sem ele — as colunas
+ * de leitura chegaram na sessão 25, por migration própria, que é quem o chama para elas. Uma
+ * sexta tabela de formulário chama os dois.
  */
 final class FormSubmissionColumns
 {
@@ -24,7 +28,7 @@ final class FormSubmissionColumns
         // preparado para quando a leitura administrativa existir.
         $table->uuid('uuid')->unique();
 
-        $table->string('status')->default(FormSubmissionStatus::New->value)
+        $table->string('status')->default(FormSubmissionStatus::initial()->value)
             ->comment('Enum App\Enums\FormSubmissionStatus — espelhado em CHECK no Postgres.');
 
         // Consentimento: registro no banco, não pasta de papel (ver docs/protecao-de-dados.md).
@@ -41,6 +45,24 @@ final class FormSubmissionColumns
         $table->timestamp('expires_at')->index();
 
         $table->timestamps();
+    }
+
+    /**
+     * Leitura compartilhada pela equipe — ver
+     * docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md. `read_at` NULL é "não
+     * lido"; `read_by` é quem abriu primeiro.
+     */
+    public static function addReadState(Blueprint $table): void
+    {
+        $table->timestamp('read_at')->nullable()
+            ->comment('Primeira abertura do detalhe, por qualquer pessoa da equipe. NULL = não lido.');
+
+        // Índice explícito na FK — o Postgres não cria automaticamente (ver CLAUDE.md).
+        $table->foreignId('read_by')->nullable()->constrained('users')->nullOnDelete();
+
+        // O filtro "não lidos" e os contadores do menu e da tela Início consultam exatamente
+        // isto, em toda navegação do painel.
+        $table->index('read_at');
     }
 
     /**

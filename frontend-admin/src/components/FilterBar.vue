@@ -3,9 +3,11 @@ import type { StatusOption } from '@/types/forms'
 
 defineProps<{
   statusOptions: StatusOption[]
+  readOptions: StatusOption[]
 }>()
 
 const status = defineModel<string>('status', { default: '' })
+const read = defineModel<string>('read', { default: '' })
 const from = defineModel<string>('from', { default: '' })
 const to = defineModel<string>('to', { default: '' })
 
@@ -31,6 +33,27 @@ const emit = defineEmits<{
         </option>
         <option
           v-for="option in statusOptions"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Leitura e status são filtros independentes, de propósito: um registro concluído pode
+         estar não lido, e é justamente por isso que os dois campos existem. -->
+    <div class="filter-bar__field">
+      <label for="filter-read">Leitura</label>
+      <select
+        id="filter-read"
+        v-model="read"
+      >
+        <option value="">
+          Todos
+        </option>
+        <option
+          v-for="option in readOptions"
           :key="option.value"
           :value="option.value"
         >

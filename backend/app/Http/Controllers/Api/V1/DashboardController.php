@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Actions\Dashboard\GetPendingFormSubmissionCounts;
+use App\Actions\Dashboard\GetUnreadFormSubmissionCounts;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 final class DashboardController extends Controller
 {
-    public function show(Request $request, GetPendingFormSubmissionCounts $action): JsonResponse
+    public function show(Request $request, GetUnreadFormSubmissionCounts $action): JsonResponse
     {
         /** @var User $user */
         $user = $request->user();

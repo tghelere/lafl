@@ -3,6 +3,7 @@ import type { SubmissionDetail, SubmissionListResponse } from '@/types/submissio
 
 export type SubmissionListParams = {
   status?: string
+  read?: string
   from?: string
   to?: string
   page?: number
@@ -24,6 +25,18 @@ export async function fetchSubmissionList(
 
 export async function fetchSubmissionDetail(resource: string, uuid: string): Promise<SubmissionDetail> {
   const { data } = await httpClient.get<{ data: SubmissionDetail }>(`/api/v1/${resource}/${uuid}`)
+
+  return data.data
+}
+
+/**
+ * Devolve o registro ao estado "não lido", para a equipe inteira. Não existe o contrário: abrir
+ * o detalhe já marca como lido (ver
+ * docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md), por isso um DELETE sobre
+ * `/read` e nenhum POST.
+ */
+export async function markSubmissionUnread(resource: string, uuid: string): Promise<SubmissionDetail> {
+  const { data } = await httpClient.delete<{ data: SubmissionDetail }>(`/api/v1/${resource}/${uuid}/read`)
 
   return data.data
 }

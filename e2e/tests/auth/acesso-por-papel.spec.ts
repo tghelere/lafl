@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test'
 
-import { dashboardCardTitles, openContentPageByTitle, pageAs, sidebar } from '../../support/admin'
+import {
+  DASHBOARD_EMPTY_NOTICE,
+  dashboardCardTitles,
+  openContentPageByTitle,
+  pageAs,
+  sidebar,
+  sidebarLinkNames,
+} from '../../support/admin'
 import { storageStatePath } from '../../support/users'
 
 /**
@@ -16,14 +23,14 @@ test.describe('financeiro', () => {
   test('vê no menu apenas Transparência, além do Início', async ({ page }) => {
     await page.goto('/admin')
 
-    await expect(sidebar(page).getByRole('link')).toHaveText(['Pendências', 'Documentos'])
+    await expect.poll(() => sidebarLinkNames(page)).toEqual(['Pendências', 'Documentos'])
     await expect(sidebar(page)).toContainText('Transparência')
     await expect(sidebar(page)).not.toContainText('Páginas')
   })
 
-  test('não recebe card de pendência de formulário no Início', async ({ page }) => {
+  test('não recebe card de formulário no Início', async ({ page }) => {
     expect(await dashboardCardTitles(page)).toEqual([])
-    await expect(page.getByText('Não há pendências de formulário para o seu perfil no momento.')).toBeVisible()
+    await expect(page.getByText(DASHBOARD_EMPTY_NOTICE)).toBeVisible()
   })
 })
 
@@ -33,7 +40,7 @@ test.describe('comunicacao', () => {
   test('vê no menu apenas Páginas, além do Início', async ({ page }) => {
     await page.goto('/admin')
 
-    await expect(sidebar(page).getByRole('link')).toHaveText(['Pendências', 'Páginas'])
+    await expect.poll(() => sidebarLinkNames(page)).toEqual(['Pendências', 'Páginas'])
     await expect(sidebar(page)).toContainText('Conteúdo')
     await expect(sidebar(page)).not.toContainText('Transparência')
   })
@@ -79,7 +86,7 @@ test('usuário com financeiro + contraturno vê os dois blocos e a soma dos card
 
   await expect(sidebar(ambos)).toContainText('Contraturno')
   await expect(sidebar(ambos)).toContainText('Transparência')
-  await expect(sidebar(ambos).getByRole('link')).toHaveText([
+  await expect.poll(() => sidebarLinkNames(ambos)).toEqual([
     'Pendências',
     'Avisos do contraturno',
     'Propostas de apoio',

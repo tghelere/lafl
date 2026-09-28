@@ -31,7 +31,7 @@ test('envio válido cria o registro e devolve só uuid e data', function (): voi
     $message = ContactMessage::first();
     expect($message->name)->toBe('Beatriz Nogueira')
         ->and($message->subject)->toBe('Dúvida sobre visitação')
-        ->and($message->status->value)->toBe('new')
+        ->and($message->status->value)->toBe('in_progress')
         ->and($message->expires_at->diffInDays(now(), true))->toBeGreaterThan(150)
         ->and($message->expires_at->diffInDays(now(), true))->toBeLessThan(200);
 });

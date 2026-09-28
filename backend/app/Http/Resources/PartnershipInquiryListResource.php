@@ -32,6 +32,7 @@ final class PartnershipInquiryListResource extends JsonResource
             'email' => FieldMasking::email($this->email),
             'support_type' => $this->support_type->value,
             'support_type_label' => $this->support_type->label(),
+            'is_read' => $this->isRead(),
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
             'handled_by' => $this->whenLoaded('handledBy', fn () => $this->handledBy?->name),

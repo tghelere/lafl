@@ -9,10 +9,12 @@ import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
-import { fetchSubmissionDetail, updateSubmissionStatus } from '@/services/submissions'
+import { fetchSubmissionDetail, markSubmissionUnread, updateSubmissionStatus } from '@/services/submissions'
+import { useUnreadCountsStore } from '@/stores/unreadCounts'
 import type { SubmissionDetail } from '@/types/submission'
 
 const route = useRoute()
+const unreadCounts = useUnreadCountsStore()
 
 const resourceSlug = computed(() => String(route.params.resource))
 const uuid = computed(() => String(route.params.uuid))
@@ -23,6 +25,7 @@ const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 const isSaving = ref(false)
 const saveConfirmedAt = ref<number | null>(null)
+const isMarkingUnread = ref(false)
 
 async function load(): Promise<void> {
   if (!config.value) {
@@ -35,10 +38,29 @@ async function load(): Promise<void> {
 
   try {
     submission.value = await fetchSubmissionDetail(resourceSlug.value, uuid.value)
+
+    // Abrir o detalhe marca como lido do lado da API (ver
+    // docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md) — os contadores do menu
+    // e da tela Início têm de refletir isso sem esperar uma recarga da página.
+    void unreadCounts.refresh()
   } catch {
     errorMessage.value = 'Não foi possível carregar o registro. Tente novamente.'
   } finally {
     isLoading.value = false
+  }
+}
+
+async function handleMarkUnread(): Promise<void> {
+  isMarkingUnread.value = true
+  errorMessage.value = null
+
+  try {
+    submission.value = await markSubmissionUnread(resourceSlug.value, uuid.value)
+    void unreadCounts.refresh()
+  } catch {
+    errorMessage.value = 'Não foi possível marcar como não lido. Tente novamente.'
+  } finally {
+    isMarkingUnread.value = false
   }
 }
 
@@ -99,12 +121,29 @@ watch(() => route.fullPath, load, { immediate: true })
           na auditoria do sistema.
         </NoticeBanner>
 
-        <p>
+        <div class="detail-header">
           <StatusBadge
             :status="submission.status"
             :label="submission.status_label"
           />
-        </p>
+          <StatusBadge
+            v-if="!submission.is_read"
+            status="unread"
+            label="Não lido"
+          />
+
+          <!-- Só o desmarcar tem botão: marcar como lido acontece ao abrir esta tela, então um
+               botão "Marcar como lido" nunca teria o que fazer aqui. -->
+          <button
+            v-if="submission.is_read"
+            type="button"
+            class="btn btn--secondary"
+            :disabled="isMarkingUnread"
+            @click="handleMarkUnread"
+          >
+            Marcar como não lido
+          </button>
+        </div>
 
         <dl class="detail-grid">
           <!-- Comum às cinco telas, por isso fora de config.detailFields. Primeiro campo da
@@ -122,6 +161,10 @@ watch(() => route.fullPath, load, { immediate: true })
               <dd>{{ submission[field.key] || '—' }}</dd>
             </div>
           </template>
+          <div v-if="submission.read_at_label">
+            <dt>Lido por</dt>
+            <dd>{{ submission.read_by ?? '—' }} · {{ submission.read_at_label }}</dd>
+          </div>
           <div v-if="submission.handled_by">
             <dt>Atendido por</dt>
             <dd>{{ submission.handled_by }}</dd>

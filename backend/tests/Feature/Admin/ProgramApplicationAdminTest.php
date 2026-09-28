@@ -33,10 +33,10 @@ test('direcao lista com dado mascarado', function (): void {
 
 test('listagem filtra por status', function (): void {
     $user = userWithRole(Role::Direcao->value);
-    ProgramApplication::factory()->create(['status' => FormSubmissionStatus::New]);
-    ProgramApplication::factory()->create(['status' => FormSubmissionStatus::Discarded]);
+    ProgramApplication::factory()->create(['status' => FormSubmissionStatus::InProgress]);
+    ProgramApplication::factory()->create(['status' => FormSubmissionStatus::Archived]);
 
-    $response = $this->actingAs($user)->getJson('/api/v1/program-applications?status=discarded');
+    $response = $this->actingAs($user)->getJson('/api/v1/program-applications?status=archived');
 
     expect($response->json('data'))->toHaveCount(1);
 });

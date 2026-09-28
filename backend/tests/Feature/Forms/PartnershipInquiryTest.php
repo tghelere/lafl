@@ -33,7 +33,7 @@ test('envio válido cria o registro e limpa a máscara do CNPJ', function (): vo
     $inquiry = PartnershipInquiry::first();
     expect($inquiry->company_name)->toBe('Empresa Exemplo Ltda')
         ->and($inquiry->tax_id)->toBe('12345678000190')
-        ->and($inquiry->status->value)->toBe('new')
+        ->and($inquiry->status->value)->toBe('in_progress')
         ->and($inquiry->expires_at->diffInDays(now(), true))->toBeGreaterThan(1000);
 });
 

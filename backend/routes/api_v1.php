@@ -122,35 +122,50 @@ Route::middleware($authenticated)->group(function (): void {
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');
 
     // Leitura administrativa dos cinco formulários recebidos (ver docs/estrutura-site.md
-    // §4.5): listagem, detalhe e mudança de status com anotação — nada de criação/exclusão
-    // aqui, os registros só nascem pelo formulário público (ver Parte 3 daquele documento).
+    // §4.5): listagem, detalhe, mudança de status com anotação e o desfazer da leitura — nada
+    // de criação/exclusão aqui, os registros só nascem pelo formulário público (ver Parte 3
+    // daquele documento).
+    //
+    // Não existe rota para MARCAR como lido: abrir o detalhe é a leitura (ver
+    // docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md). `DELETE .../read`
+    // desfaz — a leitura é o recurso, e marcar como não lido é apagá-la.
     Route::apiResource('program-applications', ProgramApplicationController::class)
         ->only(['index', 'show'])
         ->parameters(['program-applications' => 'programApplication']);
     Route::patch('/program-applications/{programApplication}/status', [ProgramApplicationController::class, 'updateStatus'])
         ->name('program-applications.status');
+    Route::delete('/program-applications/{programApplication}/read', [ProgramApplicationController::class, 'markUnread'])
+        ->name('program-applications.read.destroy');
 
     Route::apiResource('pickup-requests', PickupRequestController::class)
         ->only(['index', 'show'])
         ->parameters(['pickup-requests' => 'pickupRequest']);
     Route::patch('/pickup-requests/{pickupRequest}/status', [PickupRequestController::class, 'updateStatus'])
         ->name('pickup-requests.status');
+    Route::delete('/pickup-requests/{pickupRequest}/read', [PickupRequestController::class, 'markUnread'])
+        ->name('pickup-requests.read.destroy');
 
     Route::apiResource('volunteer-applications', VolunteerApplicationController::class)
         ->only(['index', 'show'])
         ->parameters(['volunteer-applications' => 'volunteerApplication']);
     Route::patch('/volunteer-applications/{volunteerApplication}/status', [VolunteerApplicationController::class, 'updateStatus'])
         ->name('volunteer-applications.status');
+    Route::delete('/volunteer-applications/{volunteerApplication}/read', [VolunteerApplicationController::class, 'markUnread'])
+        ->name('volunteer-applications.read.destroy');
 
     Route::apiResource('partnership-inquiries', PartnershipInquiryController::class)
         ->only(['index', 'show'])
         ->parameters(['partnership-inquiries' => 'partnershipInquiry']);
     Route::patch('/partnership-inquiries/{partnershipInquiry}/status', [PartnershipInquiryController::class, 'updateStatus'])
         ->name('partnership-inquiries.status');
+    Route::delete('/partnership-inquiries/{partnershipInquiry}/read', [PartnershipInquiryController::class, 'markUnread'])
+        ->name('partnership-inquiries.read.destroy');
 
     Route::apiResource('contact-messages', ContactMessageController::class)
         ->only(['index', 'show'])
         ->parameters(['contact-messages' => 'contactMessage']);
     Route::patch('/contact-messages/{contactMessage}/status', [ContactMessageController::class, 'updateStatus'])
         ->name('contact-messages.status');
+    Route::delete('/contact-messages/{contactMessage}/read', [ContactMessageController::class, 'markUnread'])
+        ->name('contact-messages.read.destroy');
 });

@@ -27,6 +27,7 @@ final class VolunteerApplicationListResource extends JsonResource
             'email' => FieldMasking::email($this->email),
             'availability' => $this->availability,
             'interest_area' => $this->interest_area,
+            'is_read' => $this->isRead(),
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
             'handled_by' => $this->whenLoaded('handledBy', fn () => $this->handledBy?->name),

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { ensureCsrfCookie, httpClient } from '@/services/http'
+import { useUnreadCountsStore } from '@/stores/unreadCounts'
 import type { User } from '@/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -66,6 +67,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   function clearSession(): void {
     user.value = null
+
+    // A contagem de não lidos é por papel (ver
+    // App\Actions\Dashboard\GetUnreadFormSubmissionCounts): sem limpar, quem entrasse depois
+    // nesta mesma aba veria por um instante os números da sessão anterior — inclusive de seções
+    // a que o novo papel não tem acesso.
+    useUnreadCountsStore().clear()
   }
 
   return {

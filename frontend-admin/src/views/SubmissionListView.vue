@@ -11,7 +11,7 @@ import PaginationControls from '@/components/PaginationControls.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
 import { fetchSubmissionList } from '@/services/submissions'
-import { STATUS_OPTIONS } from '@/types/forms'
+import { READ_OPTIONS, STATUS_OPTIONS } from '@/types/forms'
 import type { SubmissionListItem } from '@/types/submission'
 
 /**
@@ -33,6 +33,7 @@ const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
 const statusFilter = ref('')
+const readFilter = ref('')
 const fromFilter = ref('')
 const toFilter = ref('')
 
@@ -47,6 +48,7 @@ async function load(): Promise<void> {
   try {
     const response = await fetchSubmissionList(resourceSlug.value, {
       status: statusFilter.value || undefined,
+      read: readFilter.value || undefined,
       from: fromFilter.value || undefined,
       to: toFilter.value || undefined,
       page: Number(route.query.page ?? 1),
@@ -65,6 +67,7 @@ function applyFilters(): void {
   void router.push({
     query: {
       ...(statusFilter.value ? { status: statusFilter.value } : {}),
+      ...(readFilter.value ? { read: readFilter.value } : {}),
       ...(fromFilter.value ? { from: fromFilter.value } : {}),
       ...(toFilter.value ? { to: toFilter.value } : {}),
     },
@@ -90,6 +93,7 @@ watch(
   () => route.fullPath,
   () => {
     statusFilter.value = String(route.query.status ?? '')
+    readFilter.value = String(route.query.read ?? '')
     fromFilter.value = String(route.query.from ?? '')
     toFilter.value = String(route.query.to ?? '')
     void load()
@@ -111,9 +115,11 @@ watch(
 
       <FilterBar
         v-model:status="statusFilter"
+        v-model:read="readFilter"
         v-model:from="fromFilter"
         v-model:to="toFilter"
         :status-options="STATUS_OPTIONS"
+        :read-options="READ_OPTIONS"
         @apply="applyFilters"
         @clear="clearFilters"
       />
@@ -145,10 +151,14 @@ watch(
               </tr>
             </thead>
             <tbody>
+              <!-- Não lido fica em negrito E com o indicador da primeira coluna: cor e peso de
+                   fonte sozinhos excluiriam quem não distingue os dois, e o texto do indicador
+                   ("Não lido") é o que um leitor de tela anuncia. -->
               <tr
                 v-for="item in items"
                 :key="item.uuid"
                 class="table__row--clickable"
+                :class="{ 'table__row--unread': !item.is_read }"
               >
                 <td
                   v-for="(column, index) in config.listColumns"
@@ -159,6 +169,12 @@ watch(
                     :to="detailRoute(item.uuid)"
                     class="table__row-link"
                   >
+                    <span
+                      v-if="!item.is_read"
+                      class="unread-dot"
+                      role="img"
+                      aria-label="Não lido"
+                    />
                     {{ item[column.key] ?? '—' }}
                   </RouterLink>
                   <template v-else>

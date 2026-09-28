@@ -25,7 +25,7 @@ test('envio válido cria o registro e devolve só uuid e data', function (): voi
     $application = ProgramApplication::first();
     expect($application->guardian_name)->toBe('João Pereira')
         ->and($application->phone)->toBe('(43) 98888-0000')
-        ->and($application->status->value)->toBe('new')
+        ->and($application->status->value)->toBe('in_progress')
         ->and($application->expires_at->diffInDays(now(), true))->toBeGreaterThan(300);
 });
 

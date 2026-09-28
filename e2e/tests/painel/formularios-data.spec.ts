@@ -4,6 +4,7 @@ import {
   MARKER_SUBMISSION_LOCAL_DATE,
   MARKER_SUBMISSION_RECEIVED_LABEL,
   MARKER_SUBMISSION_SUBJECT,
+  detailField,
   filterByDateRange,
   parseReceivedAt,
   receivedAtColumn,
@@ -45,8 +46,7 @@ test.describe('listagem de formulários — data de recebimento', () => {
 
     await submissionRow(page, MARKER_SUBMISSION_SUBJECT).getByRole('link').click()
 
-    await expect(page.getByRole('term').filter({ hasText: 'Recebido em' })).toBeVisible()
-    await expect(page.getByRole('definition').filter({ hasText: MARKER_SUBMISSION_RECEIVED_LABEL })).toBeVisible()
+    await expect(detailField(page, 'Recebido em')).toHaveText(MARKER_SUBMISSION_RECEIVED_LABEL)
   })
 
   test('ordena da mais recente para a mais antiga', async ({ page }) => {

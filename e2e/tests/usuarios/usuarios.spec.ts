@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { AdminApi } from '../../support/api'
-import { acceptNextDialog, breadcrumb, pageInCleanContext, sidebar, unique } from '../../support/admin'
+import { acceptNextDialog, breadcrumb, pageInCleanContext, sidebar, sidebarLinkNames, unique } from '../../support/admin'
 import { createUser, currentUserId, generatePasswordLink } from '../../support/fixtures'
 import { E2E_PASSWORD, ROLE_USERS, STANDALONE_USERS, storageStatePath } from '../../support/users'
 
@@ -61,7 +61,7 @@ test.describe('super_admin', () => {
     await definirSenhaEEntrar(pessoa, link, email)
 
     await expect(pessoa.getByRole('heading', { name: 'Início' })).toBeVisible()
-    await expect(sidebar(pessoa).getByRole('link')).toHaveText([
+    await expect.poll(() => sidebarLinkNames(pessoa)).toEqual([
       'Pendências',
       'Avisos do contraturno',
       'Propostas de apoio',

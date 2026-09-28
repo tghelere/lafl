@@ -1,46 +1,37 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import { SUBMISSION_RESOURCES } from '@/config/submissionResources'
-import { fetchDashboardSummary } from '@/services/dashboard'
 import { useAuthStore } from '@/stores/auth'
-import type { DashboardEntry } from '@/types/submission'
+import { useUnreadCountsStore } from '@/stores/unreadCounts'
 
 const authStore = useAuthStore()
 
-const entries = ref<DashboardEntry[]>([])
-const isLoading = ref(true)
-const errorMessage = ref<string | null>(null)
+/**
+ * Mesma store da navegação lateral (ver src/stores/unreadCounts.ts): o card e o contador do menu
+ * mostram o mesmo número porque leem a mesma coisa, não porque duas chamadas coincidem.
+ *
+ * `refresh`, e não `ensureLoaded`: entrar no Início é pedir o retrato de agora.
+ */
+const unreadCounts = useUnreadCountsStore()
 
-// Mapa reverso tipo -> slug de recurso (ver src/config/submissionResources.ts), só para
-// montar o link "ver lista" de cada card — o backend devolve o tipo (ex.:
-// "program_application"), a rota usa o slug em kebab-case (ex.: "program-applications").
-const TYPE_TO_RESOURCE: Record<string, string> = {
-  program_application: 'program-applications',
-  pickup_request: 'pickup-requests',
-  volunteer_application: 'volunteer-applications',
-  partnership_inquiry: 'partnership-inquiries',
-  contact_message: 'contact-messages',
-}
-
-function resourceTitle(type: string): string {
-  const slug = TYPE_TO_RESOURCE[type]
-
-  return slug ? SUBMISSION_RESOURCES[slug]?.title ?? '' : ''
-}
-
-onMounted(async () => {
-  try {
-    entries.value = await fetchDashboardSummary()
-  } catch {
-    errorMessage.value = 'Não foi possível carregar as pendências. Tente novamente.'
-  } finally {
-    isLoading.value = false
-  }
+onMounted(() => {
+  void unreadCounts.refresh()
 })
+
+const entries = computed(() => unreadCounts.entries)
+
+/**
+ * O título do card vem da config do painel quando existe (é o nome que a pessoa vê no menu e na
+ * listagem), com o rótulo da API como reserva. O slug do recurso vem da API — não há mais mapa
+ * reverso de tipo para recurso mantido à mão aqui.
+ */
+function resourceTitle(resource: string, fallback: string): string {
+  return SUBMISSION_RESOURCES[resource]?.title ?? fallback
+}
 </script>
 
 <template>
@@ -50,17 +41,17 @@ onMounted(async () => {
       Olá, {{ authStore.user.name }}.
     </p>
 
-    <LoadingState v-if="isLoading" />
+    <LoadingState v-if="unreadCounts.isLoading && !unreadCounts.hasLoaded" />
     <ErrorState
-      v-else-if="errorMessage"
-      :message="errorMessage"
+      v-else-if="unreadCounts.errorMessage"
+      :message="unreadCounts.errorMessage"
     />
 
     <!-- comunicacao (e qualquer papel sem viewAny em nenhum dos cinco formulários) recebe uma
          lista vazia da API — nunca uma exceção especial no front, ver
-         App\Actions\Dashboard\GetPendingFormSubmissionCounts no backend. -->
+         App\Actions\Dashboard\GetUnreadFormSubmissionCounts no backend. -->
     <p v-else-if="entries.length === 0">
-      Não há pendências de formulário para o seu perfil no momento.
+      Não há formulários para o seu perfil no momento.
     </p>
 
     <div
@@ -70,11 +61,12 @@ onMounted(async () => {
       <RouterLink
         v-for="entry in entries"
         :key="entry.type"
-        :to="{ name: 'submissions.index', params: { resource: TYPE_TO_RESOURCE[entry.type] } }"
+        :to="{ name: 'submissions.index', params: { resource: entry.resource }, query: { read: 'unread' } }"
         class="card summary-card"
       >
-        <span class="summary-card__value">{{ entry.pending }}</span>
-        <span class="summary-card__label">{{ resourceTitle(entry.type) || entry.label }}</span>
+        <span class="summary-card__value">{{ entry.unread }}</span>
+        <span class="summary-card__label">{{ resourceTitle(entry.resource, entry.label) }}</span>
+        <span class="summary-card__hint">não lidos</span>
       </RouterLink>
     </div>
   </AppLayout>

@@ -52,8 +52,12 @@
   margin-top: 0;
 }
 
+/* Flex, e não block, por causa do contador de não lidos: é o `margin-left: auto` de
+   .app-sidebar__badge que o empurra para a direita do rótulo. */
 .app-sidebar__link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--color-surface-raised);
@@ -71,10 +75,26 @@
   color: var(--color-on-accent);
 }
 
-.app-sidebar__note {
+/* Contador de não lidos ao lado do item de menu (ver
+   docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md). */
+.app-sidebar__badge {
+  margin-left: auto;
+  min-width: 1.5rem;
+  padding: 0 0.4em;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   font-size: var(--text-xs);
-  color: color-mix(in srgb, var(--color-surface-raised) 65%, transparent);
-  line-height: var(--leading-normal);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Sobre o item ativo o fundo já é --color-accent: o contador precisa inverter para continuar
+   legível. */
+.app-sidebar__link.router-link-active .app-sidebar__badge {
+  background: var(--color-on-accent);
+  color: var(--color-accent);
 }
 
 .app-sidebar__credit {
@@ -137,6 +157,21 @@
 
 .skip-link:focus-visible {
   top: var(--space-4);
+}
+
+/* Texto que só o leitor de tela recebe. Nunca `display: none` nem `visibility: hidden` — os
+   dois tiram o conteúdo da árvore de acessibilidade também, que é justamente o contrário do
+   que se quer aqui. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Botão — mesmas duas variantes do site, densidade menor. --color-accent (laranja-500)
@@ -311,6 +346,15 @@
   color: var(--color-text-muted);
 }
 
+/* "não lidos" — o que o número do card significa. Menor que o rótulo do recurso, porque é
+   qualificador e não título. */
+.summary-card__hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
 /* Filtro */
 .filter-bar {
   display: flex;
@@ -406,6 +450,23 @@
   text-decoration: none;
 }
 
+/* Linha não lida: peso de fonte MAIS um indicador visível (ver .unread-dot). Peso sozinho é
+   distinção fraca em tabela densa, e cor sozinha excluiria quem não a distingue. */
+.table tbody tr.table__row--unread td {
+  font-weight: var(--weight-semibold);
+  color: var(--color-heading);
+}
+
+.unread-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  vertical-align: baseline;
+}
+
 /* Paginação */
 .pagination {
   display: flex;
@@ -466,6 +527,22 @@
 .badge--discarded {
   background: var(--color-error-bg);
   color: var(--color-error);
+}
+
+/* Não lido — mesma família do status de atendimento na aparência, mas é outra informação
+   (ver docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md). */
+.badge--unread {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Faixa de estado do detalhe: os badges e o botão de desmarcar leitura na mesma linha. */
+.detail-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
 }
 
 /* Estado de publicação de documento de transparência (ver tela de transparência) */

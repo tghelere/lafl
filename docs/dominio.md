@@ -74,9 +74,15 @@ cadastrar toda semana, a página morre — como o blog do Wix morreu em 2020.
 **Todos os titulares são adultos.** Ver `@docs/estrutura-site.md` §2.1: nenhum formulário
 público coleta dado identificável de criança ou adolescente.
 
-Base comum a todos: `uuid`, `status` (enum: `new`, `in_progress`, `done`, `discarded`),
-`consent_terms_version`, `consented_at`, `ip_hash`, `handled_by`, `handled_at`,
-`internal_note` (enc), `created_at`, `expires_at`
+Base comum a todos: `uuid`, `status` (enum: `in_progress`, `done`, `archived`),
+`consent_terms_version`, `consented_at`, `ip_hash`, `read_at`, `read_by`, `handled_by`,
+`handled_at`, `internal_note` (enc), `created_at`, `expires_at`
+
+**Leitura e atendimento são eixos independentes.** `read_at`/`read_by` registram a primeira
+abertura do detalhe, compartilhada pela equipe inteira — não existe leitura por usuário. O
+status descreve o atendimento, e começa em `in_progress`. Não existe status `new`: "ninguém
+olhou isto ainda" é `read_at` nulo. Ver
+`docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md`.
 
 **`enrollment_interests`** — matrícula / lista de espera do CEI
 `guardian_name` (enc), `phone` (enc), `email` (enc), `child_age_range` (enum),

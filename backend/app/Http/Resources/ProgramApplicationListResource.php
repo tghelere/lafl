@@ -24,6 +24,7 @@ final class ProgramApplicationListResource extends JsonResource
             'uuid' => $this->uuid,
             'guardian_name' => FieldMasking::firstName($this->guardian_name),
             'phone' => FieldMasking::lastDigits($this->phone),
+            'is_read' => $this->isRead(),
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
             'handled_by' => $this->whenLoaded('handledBy', fn () => $this->handledBy?->name),

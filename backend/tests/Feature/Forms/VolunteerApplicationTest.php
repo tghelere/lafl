@@ -28,7 +28,7 @@ test('envio válido cria o registro e devolve só uuid e data', function (): voi
 
     $application = VolunteerApplication::first();
     expect($application->name)->toBe('Paula Lima')
-        ->and($application->status->value)->toBe('new')
+        ->and($application->status->value)->toBe('in_progress')
         ->and($application->expires_at->diffInDays(now(), true))->toBeGreaterThan(600);
 });
 

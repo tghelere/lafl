@@ -30,7 +30,7 @@ test('envio válido cria o registro e devolve só uuid e data', function (): voi
     $request = PickupRequest::first();
     expect($request->donor_name)->toBe('Carla Souza')
         ->and($request->address)->toBe('Rua das Flores, 123, Londrina/PR')
-        ->and($request->status->value)->toBe('new')
+        ->and($request->status->value)->toBe('in_progress')
         // Retenção geral de 6 meses (rede de segurança), não 12 — ver App\Models\PickupRequest.
         ->and($request->expires_at->diffInDays(now(), true))->toBeGreaterThan(150)
         ->and($request->expires_at->diffInDays(now(), true))->toBeLessThan(200);

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import { useAuthStore } from '@/stores/auth'
+import { useUnreadCountsStore } from '@/stores/unreadCounts'
 
 // Fonte única em shared/brand/ — ver LEIA-ME.md de cada pasta. Import direto (não cópia),
 // habilitado por vite.config.ts (server.fs.allow).
@@ -17,7 +18,32 @@ import softhingLogo from '../../../shared/brand/softhing/softhing-fundo-escuro.s
  */
 const authStore = useAuthStore()
 
+/**
+ * Contadores de não lidos ao lado de cada seção de formulário (ver
+ * docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md). A store é a mesma da tela
+ * Início — dois números para a mesma coisa na mesma tela seria pior que nenhum.
+ *
+ * `ensureLoaded`, e não `refresh`: a navegação lateral remonta a cada troca de tela, e uma
+ * chamada por navegação não traria informação nova nenhuma. Quem atualiza o número é quem muda
+ * a leitura (ver SubmissionDetailView.vue).
+ */
+const unreadCounts = useUnreadCountsStore()
+
+onMounted(() => {
+  void unreadCounts.ensureLoaded()
+})
+
 const access = computed(() => authStore.user?.access ?? {})
+
+/**
+ * Zero não vira badge: um "0" ao lado de cada item é ruído, e a ausência do número já diz que
+ * não há nada esperando. `null` é "ainda não carregou".
+ */
+function unreadOf(resource: string): number | null {
+  const count = unreadCounts.byResource[resource]
+
+  return count !== undefined && count > 0 ? count : null
+}
 
 function hasAccess(...resources: string[]): boolean {
   return resources.some((resource) => access.value[resource] === true)
@@ -77,12 +103,20 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           class="app-sidebar__link"
         >
           Avisos do contraturno
+          <span
+            v-if="unreadOf('program-applications')"
+            class="app-sidebar__badge"
+          >{{ unreadOf('program-applications') }} <span class="visually-hidden">não lidos</span></span>
         </RouterLink>
         <RouterLink
           :to="resourceRoute('partnership-inquiries')"
           class="app-sidebar__link"
         >
           Propostas de apoio
+          <span
+            v-if="unreadOf('partnership-inquiries')"
+            class="app-sidebar__badge"
+          >{{ unreadOf('partnership-inquiries') }} <span class="visually-hidden">não lidos</span></span>
         </RouterLink>
       </template>
 
@@ -95,12 +129,20 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           class="app-sidebar__link"
         >
           Voluntários
+          <span
+            v-if="unreadOf('volunteer-applications')"
+            class="app-sidebar__badge"
+          >{{ unreadOf('volunteer-applications') }} <span class="visually-hidden">não lidos</span></span>
         </RouterLink>
         <RouterLink
           :to="resourceRoute('contact-messages')"
           class="app-sidebar__link"
         >
           Mensagens de contato
+          <span
+            v-if="unreadOf('contact-messages')"
+            class="app-sidebar__badge"
+          >{{ unreadOf('contact-messages') }} <span class="visually-hidden">não lidos</span></span>
         </RouterLink>
       </template>
 
@@ -113,6 +155,10 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
           class="app-sidebar__link"
         >
           Pedidos de coleta
+          <span
+            v-if="unreadOf('pickup-requests')"
+            class="app-sidebar__badge"
+          >{{ unreadOf('pickup-requests') }} <span class="visually-hidden">não lidos</span></span>
         </RouterLink>
       </template>
 
@@ -152,10 +198,6 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
         </RouterLink>
       </template>
     </nav>
-
-    <p class="app-sidebar__note">
-      Todo acesso ao detalhe de um formulário é registrado.
-    </p>
 
     <p class="app-sidebar__credit">
       Desenvolvido por

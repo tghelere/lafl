@@ -43,9 +43,10 @@ use Illuminate\Support\Str;
  * - um documento de transparência propositalmente fora da primeira página da listagem
  *   administrativa, e acervo grande o bastante (21 documentos) para a listagem PÚBLICA também
  *   paginar — ela mostra 20 por página;
- * - formulários recebidos dos cinco tipos, com datas de chegada diferentes, mais uma mensagem
- *   de contato recebida num instante FIXO e conhecido (ver MARKER_SUBMISSION_*), que é como a
- *   bateria confere o "Recebido em" sem recalcular fuso em TypeScript.
+ * - formulários recebidos dos cinco tipos, com datas de chegada diferentes e os dois estados
+ *   de leitura na mesma listagem, mais uma mensagem de contato recebida num instante FIXO e
+ *   conhecido (ver MARKER_SUBMISSION_*), que é como a bateria confere o "Recebido em" sem
+ *   recalcular fuso em TypeScript.
  */
 class E2eSeeder extends Seeder
 {
@@ -80,6 +81,13 @@ class E2eSeeder extends Seeder
 
     /** O que a tela tem de mostrar para MARKER_SUBMISSION_RECEIVED_AT_UTC. */
     public const MARKER_SUBMISSION_RECEIVED_LABEL = '15/01/2026 22:30';
+
+    /**
+     * Quantos formulários NÃO LIDOS cada tipo recebe. Os testes de contador comparam variações
+     * (abriu um, caiu um), nunca o valor absoluto — a bateria roda num banco só e um teste que
+     * dependesse do total passaria a depender da ordem dos outros.
+     */
+    public const UNREAD_PER_TYPE = 2;
 
     public function run(): void
     {
@@ -204,17 +212,33 @@ class E2eSeeder extends Seeder
      */
     private function seedFormSubmissions(): void
     {
+        // Quem "leu" os registros já lidos. Uma conta de papel, não uma conta inventada: o
+        // nome dela aparece na tela de detalhe, e a bateria confere isso.
+        $reader = User::query()->where('email', 'direcao@e2e.local')->sole();
+
         foreach (FormSubmissionType::cases() as $type) {
             $modelClass = $type->modelClass();
 
-            foreach ([now(), now()->subHours(2), now()->subDay()] as $receivedAt) {
+            foreach ([now(), now()->subHours(2)] as $receivedAt) {
                 $modelClass::factory()->create(['created_at' => $receivedAt]);
             }
+
+            // Um lido por tipo: sem ele o filtro "Lidos" nasce sem nada para mostrar, e a
+            // listagem não teria as duas aparências (negrito e normal) lado a lado.
+            $modelClass::factory()->create([
+                'created_at' => now()->subDay(),
+                'read_at' => now()->subHours(20),
+                'read_by' => $reader->id,
+            ]);
         }
 
+        // Já lido, de propósito: é o registro que os testes de data abrem, e abrir um registro
+        // não lido mexeria nos contadores que outros testes observam.
         ContactMessage::factory()->create([
             'subject' => self::MARKER_SUBMISSION_SUBJECT,
             'created_at' => self::MARKER_SUBMISSION_RECEIVED_AT_UTC,
+            'read_at' => self::MARKER_SUBMISSION_RECEIVED_AT_UTC,
+            'read_by' => $reader->id,
         ]);
     }
 

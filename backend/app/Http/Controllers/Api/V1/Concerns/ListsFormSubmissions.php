@@ -6,9 +6,13 @@ namespace App\Http\Controllers\Api\V1\Concerns;
 
 use App\Enums\FormSubmissionStatus;
 use App\Http\Requests\Forms\IndexFormSubmissionsRequest;
+use App\Models\ContactMessage;
+use App\Models\PartnershipInquiry;
+use App\Models\PickupRequest;
+use App\Models\ProgramApplication;
+use App\Models\VolunteerApplication;
 use App\Support\InstitutionalTime;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Filtros e paginação das cinco listagens administrativas de formulário recebido (ver
@@ -22,7 +26,12 @@ use Illuminate\Database\Eloquent\Model;
 trait ListsFormSubmissions
 {
     /**
-     * @template TModel of Model
+     * O `TModel` é limitado às cinco entidades, e não a `Model`: sem isso o Larastan não
+     * enxerga os scopes `unread()`/`read()` que a trait dos models define (ver
+     * App\Models\Concerns\IsFormSubmission), e a alternativa seria repetir aqui o
+     * `whereNull('read_at')` que já mora lá.
+     *
+     * @template TModel of ProgramApplication|PickupRequest|VolunteerApplication|PartnershipInquiry|ContactMessage
      *
      * @param  Builder<TModel>  $query
      * @return Builder<TModel>
@@ -36,6 +45,15 @@ trait ListsFormSubmissions
         if ($status !== null) {
             $query->where('status', $status);
         }
+
+        // Leitura compartilhada pela equipe: "não lido" é `read_at` nulo, para todo mundo
+        // (ver docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md). Filtro
+        // independente do status — é exatamente por serem independentes que os dois existem.
+        match ($request->string('read')->value()) {
+            'unread' => $query->unread(),
+            'read' => $query->read(),
+            default => null,
+        };
 
         // Comparação contra o instante, não contra a data: `whereDate` compararia a data do
         // UTC gravado, e o dia de quem filtra é o dia em America/Sao_Paulo — três horas de

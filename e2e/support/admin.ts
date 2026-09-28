@@ -20,6 +20,28 @@ export function sidebar(page: Page) {
 }
 
 /**
+ * Os rótulos dos itens da navegação lateral, sem o contador de não lidos que alguns deles
+ * carregam (ver AppSidebar.vue). Remove o badge de uma cópia do nó em vez de recortar o texto
+ * com expressão regular — assim o teste não passa a depender do formato do contador.
+ *
+ * Leitura instantânea, sem espera embutida: o painel é uma SPA e o menu só existe depois de
+ * `/auth/user` responder. Use sempre dentro de `expect.poll(...)`, nunca solto — uma chamada
+ * direta pode pegar a tela antes de o menu montar e devolver lista vazia.
+ */
+export function sidebarLinkNames(page: Page): Promise<string[]> {
+  return sidebar(page)
+    .getByRole('link')
+    .evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const copy = node.cloneNode(true) as HTMLElement
+        copy.querySelector('.app-sidebar__badge')?.remove()
+
+        return (copy.textContent ?? '').trim()
+      }),
+    )
+}
+
+/**
  * A trilha de navegação da tela atual. Existe como localizador próprio porque vários nomes se
  * repetem entre ela e o menu lateral ("Usuários", "Páginas", "Transparência") — clicar sem
  * dizer em qual das duas dá conflito de seletor.
@@ -28,10 +50,16 @@ export function breadcrumb(page: Page) {
   return page.getByRole('navigation', { name: 'Trilha de navegação' })
 }
 
+/** O aviso que substitui os cards do Início para quem não enxerga nenhum formulário. */
+export const DASHBOARD_EMPTY_NOTICE = 'Não há formulários para o seu perfil no momento.'
+
 /**
- * Títulos dos cards de pendência do Início, na ordem em que a tela mostra. Lista vazia quer
- * dizer "nenhum formulário recebido é do seu perfil" — é o caso de quem só tem `comunicacao`
- * ou só `financeiro`, e a tela troca os cards por um aviso.
+ * Títulos dos cards do Início, na ordem em que a tela mostra. Lista vazia quer dizer "nenhum
+ * formulário recebido é do seu perfil" — é o caso de quem só tem `comunicacao` ou só
+ * `financeiro`, e a tela troca os cards pelo aviso acima.
+ *
+ * Cada card tem três linhas — contagem, título e o qualificador "não lidos" (ver
+ * DashboardView.vue) —, e o que interessa aqui é a do meio.
  */
 export async function dashboardCardTitles(page: Page): Promise<string[]> {
   await page.goto('/admin')
@@ -39,12 +67,14 @@ export async function dashboardCardTitles(page: Page): Promise<string[]> {
 
   const cards = page.getByRole('main').getByRole('link')
 
-  // Espera a lista estabilizar: ou há cards, ou apareceu o aviso de "nenhuma pendência".
+  // Espera a lista estabilizar: ou há cards, ou apareceu o aviso de "nenhum formulário".
   await expect
-    .poll(async () => (await cards.count()) > 0 || (await page.getByText('Não há pendências de formulário').isVisible()))
+    .poll(async () => (await cards.count()) > 0 || (await page.getByText(DASHBOARD_EMPTY_NOTICE).isVisible()))
     .toBe(true)
 
-  return (await cards.allInnerTexts()).map((text) => text.split('\n').at(-1)!.trim())
+  return cards.evaluateAll((nodes) =>
+    nodes.map((node) => node.querySelector('.summary-card__label')?.textContent?.trim() ?? ''),
+  )
 }
 
 /**

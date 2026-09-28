@@ -38,7 +38,7 @@ test('endereço nunca aparece na listagem, nem mascarado', function (): void {
 
 test('listagem filtra por status', function (): void {
     $user = userWithRole(Role::Direcao->value);
-    PickupRequest::factory()->create(['status' => FormSubmissionStatus::New]);
+    PickupRequest::factory()->create(['status' => FormSubmissionStatus::InProgress]);
     PickupRequest::factory()->done()->create();
 
     $response = $this->actingAs($user)->getJson('/api/v1/pickup-requests?status=done');

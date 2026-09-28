@@ -30,6 +30,7 @@ final class PickupRequestListResource extends JsonResource
             'items_description' => $this->items_description,
             'availability_window' => $this->availability_window,
             'scheduled_for' => $this->scheduled_for?->toIso8601String(),
+            'is_read' => $this->isRead(),
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
             'handled_by' => $this->whenLoaded('handledBy', fn () => $this->handledBy?->name),

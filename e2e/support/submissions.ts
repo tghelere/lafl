@@ -72,3 +72,27 @@ export async function filterByDateRange(page: Page, from: string, to: string): P
   await page.getByRole('button', { name: 'Filtrar' }).click()
   await expect(page).toHaveURL(new RegExp(`from=${from}`))
 }
+
+/**
+ * O valor de um campo da grade de detalhe, pelo rótulo. Pelo par <dt>/<dd> dentro do mesmo
+ * <div>, e não por busca de texto na página: "15/01/2026 22:30" aparece tanto em "Recebido em"
+ * quanto em "Lido por", e um `getByText` casaria com os dois.
+ */
+export function detailField(page: Page, label: string) {
+  return submissionDetailGrid(page)
+    .locator('div')
+    .filter({ has: page.getByRole('term').filter({ hasText: label }) })
+    .getByRole('definition')
+}
+
+export function submissionDetailGrid(page: Page) {
+  return page.locator('.detail-grid')
+}
+
+/**
+ * O selo de status de atendimento do detalhe. Pelo seletor da faixa de estado, não pelo texto:
+ * o rótulo do status também existe como <option> no formulário de atendimento logo abaixo.
+ */
+export function detailStatusBadge(page: Page) {
+  return page.locator('.detail-header .badge').first()
+}
