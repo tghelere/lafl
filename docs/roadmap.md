@@ -356,7 +356,9 @@
 ## Em andamento
 
 - [ ] Nenhum item em andamento no momento — próxima sessão começa do zero num item da lista
-      abaixo
+      abaixo. A sessão 25 fechou os três itens que tinha (data/hora, lido/não lido, auditoria)
+      e não deixou nada pela metade; o que ela decidiu não fazer está listado como pendência em
+      "Painel administrativo (Vue)".
 
 ## Pendente
 
@@ -518,6 +520,15 @@ uma camada de cache de HTML por cima.
       notificação para apontar para elas (faltava o prefixo `/admin`, ver
       `docs/tarefas/05-correcoes-de-codigo.md`) e vários comentários no backend que ainda
       diziam que a tela não existia.
+- [x] **Coluna "Recebido em", leitura compartilhada e tela de Auditoria** — sessão 25. As cinco
+      listagens mostram quando o registro chegou (dd/mm/aaaa HH:mm em `America/Sao_Paulo`,
+      formatado pela API em `App\Support\InstitutionalTime`; os filtros De/Até passaram a
+      comparar o instante, não `whereDate` sobre a coluna UTC). Leitura (`read_at`/`read_by`)
+      virou eixo próprio, compartilhado pela equipe, e o status `new` deixou de existir — ver
+      `docs/decisoes/0021-leitura-separada-do-status-de-atendimento.md`. A tela `/admin/auditoria`
+      (só leitura, só `super_admin`) e o "Histórico de acessos" do detalhe fecham a pendência de
+      `GET /api/v1/audit-logs` que `docs/estrutura-site.md` §4.5 previa desde o começo. Ver
+      `docs/relatorio-sessao-25.md`.
 - [x] Tela de "página não encontrada" (sessão 15) — rota coringa no vue-router e `:resource`
       fora do mapa de acesso levam à mesma tela (`NotFoundState.vue`), dentro do layout
       autenticado. Antes, URL desconhecida renderizava em branco e recurso inválido caía num
@@ -533,6 +544,17 @@ uma camada de cache de HTML por cima.
       teste automatizado do lado do front, só Pest no backend e verificação manual via
       `php artisan tinker` (sem navegador disponível na sessão). Vale considerar antes da
       próxima leva de telas, quando a superfície ficar grande demais para revisão visual pura.
+- [ ] **Ordenação pelo usuário nas listagens de formulário** — a sessão 25 fixou a ordem em
+      "mais recente primeiro" nas cinco, e deixou de fora clicar no cabeçalho para reordenar
+      (pedido explícito: "sem reordenação pelo usuário por enquanto"). A listagem de coletas
+      perdeu a ordenação por `scheduled_for` nessa troca; se a agenda do bazar sentir falta
+      dela, é aqui que a solução entra — como ordenação escolhida, não como padrão fixo.
+- [ ] **Auditoria de conta e de sessão não tem tela.** A tabela `activity_log` guarda também
+      login, logout, troca de senha e alteração de papel (logs `auth` e `users`), e a tela de
+      Auditoria da sessão 25 mostra só formulário, de propósito — misturar tudo daria uma tela
+      que não responde pergunta nenhuma. A segunda tela entra quando alguém precisar dela.
+- [ ] **Exportar a auditoria (CSV) não existe.** Só leitura na tela, paginada. Se a instituição
+      precisar prestar contas de acesso a um terceiro, isso vira pedido concreto.
 
 ### Autenticação — pendências pós-lançamento
 
