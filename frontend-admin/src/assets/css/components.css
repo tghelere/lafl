@@ -70,7 +70,10 @@
   color: var(--color-surface-raised);
 }
 
-.app-sidebar__link.router-link-active {
+/* Item aceso. A classe é decidida pela seção da rota (meta.section, ver src/router/meta.ts),
+   não pelo .router-link-active do vue-router: aquele compara a URL, e nas rotas filhas
+   (/admin/paginas/{uuid}, /admin/{recurso}/{uuid}) ele apagava o item do menu. */
+.app-sidebar__link--active {
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
@@ -92,7 +95,7 @@
 
 /* Sobre o item ativo o fundo já é --color-accent: o contador precisa inverter para continuar
    legível. */
-.app-sidebar__link.router-link-active .app-sidebar__badge {
+.app-sidebar__link--active .app-sidebar__badge {
   background: var(--color-on-accent);
   color: var(--color-accent);
 }

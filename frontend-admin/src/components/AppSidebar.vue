@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import type { RouteLocationRaw } from 'vue-router'
 
+import { SECTION, resolveRouteMetaText } from '@/router/meta'
 import { useAuthStore } from '@/stores/auth'
 import { useUnreadCountsStore } from '@/stores/unreadCounts'
 
@@ -33,41 +36,131 @@ onMounted(() => {
   void unreadCounts.ensureLoaded()
 })
 
-const access = computed(() => authStore.user?.access ?? {})
+const route = useRoute()
 
 /**
- * Zero não vira badge: um "0" ao lado de cada item é ruído, e a ausência do número já diz que
- * não há nada esperando. `null` é "ainda não carregou".
+ * A seção da tela atual vem de `meta.section` da rota (ver src/router/meta.ts), nunca de
+ * comparar a URL: `/admin/paginas/{uuid}` não é `/admin/paginas`, e era por isso que o item
+ * do menu apagava ao abrir o detalhe de um registro ou a edição de uma página.
  */
-function unreadOf(resource: string): number | null {
-  const count = unreadCounts.byResource[resource]
+const currentSection = computed(() => resolveRouteMetaText(route.meta.section, route))
 
-  return count !== undefined && count > 0 ? count : null
+const access = computed(() => authStore.user?.access ?? {})
+
+type NavItem = {
+  label: string
+  to: RouteLocationRaw
+  section: string
+  /** Recurso cujo contador de não lidos aparece ao lado do rótulo. */
+  unread?: string
+  /** Quando presente, o item só aparece para quem tem acesso a este recurso. */
+  requires?: string
 }
+
+type NavGroup = {
+  label: string
+  /**
+   * O bloco aparece se o usuário tem acesso a pelo menos um destes recursos — cobre sozinho
+   * tanto um papel só quanto a soma de dois papéis, sem checar papel nenhum diretamente.
+   * Vazio quer dizer "todo usuário autenticado vê".
+   */
+  requires: string[]
+  items: NavItem[]
+}
+
+function submissionsRoute(resource: string): RouteLocationRaw {
+  return { name: 'submissions.index', params: { resource } }
+}
+
+/**
+ * A seção de um item de formulário é o próprio slug do recurso — o mesmo valor que
+ * `meta.section` das rotas /admin/:resource devolve.
+ */
+function submissionItem(resource: string, label: string): NavItem {
+  return { label, to: submissionsRoute(resource), section: resource, unread: resource }
+}
+
+const GROUPS: NavGroup[] = [
+  {
+    label: 'Início',
+    requires: [],
+    items: [{ label: 'Pendências', to: { name: 'dashboard' }, section: SECTION.dashboard }],
+  },
+  {
+    label: 'Contraturno',
+    requires: ['program-applications', 'partnership-inquiries'],
+    items: [
+      submissionItem('program-applications', 'Avisos do contraturno'),
+      submissionItem('partnership-inquiries', 'Propostas de apoio'),
+    ],
+  },
+  {
+    label: 'Atendimento',
+    requires: ['volunteer-applications', 'contact-messages'],
+    items: [
+      submissionItem('volunteer-applications', 'Voluntários'),
+      submissionItem('contact-messages', 'Mensagens de contato'),
+    ],
+  },
+  {
+    label: 'Bazar',
+    requires: ['pickup-requests'],
+    items: [submissionItem('pickup-requests', 'Pedidos de coleta')],
+  },
+  {
+    label: 'Conteúdo',
+    requires: ['pages'],
+    items: [{ label: 'Páginas', to: { name: 'pages.index' }, section: SECTION.pages }],
+  },
+  {
+    label: 'Transparência',
+    requires: ['transparency-documents'],
+    items: [
+      { label: 'Documentos', to: { name: 'transparency.index' }, section: SECTION.transparency },
+    ],
+  },
+  {
+    label: 'Configurações',
+    requires: ['users', 'audit-logs'],
+    items: [
+      { label: 'Usuários', to: { name: 'users.index' }, section: SECTION.users, requires: 'users' },
+      { label: 'Auditoria', to: { name: 'audit.index' }, section: SECTION.audit, requires: 'audit-logs' },
+    ],
+  },
+]
 
 function hasAccess(...resources: string[]): boolean {
   return resources.some((resource) => access.value[resource] === true)
 }
 
-// Cada bloco aparece se o usuário tem acesso a pelo menos um dos recursos que ele lista —
-// cobre sozinho tanto um papel só quanto a soma de dois papéis, sem checar papel nenhum
-// diretamente.
-const showContraturno = computed(() => hasAccess('program-applications', 'partnership-inquiries'))
-const showAtendimento = computed(() => hasAccess('volunteer-applications', 'contact-messages'))
-const showBazar = computed(() => hasAccess('pickup-requests'))
-const showTransparencia = computed(() => hasAccess('transparency-documents'))
-const showConteudo = computed(() => hasAccess('pages'))
-const showConfiguracoes = computed(() => hasAccess('users', 'audit-logs'))
+const groups = computed(() =>
+  GROUPS.filter((group) => group.requires.length === 0 || hasAccess(...group.requires)).map(
+    (group) => ({
+      ...group,
+      items: group.items.filter((item) => !item.requires || hasAccess(item.requires)),
+    }),
+  ),
+)
 
-function resourceRoute(resource: string): { name: string; params: Record<string, string> } {
-  return { name: 'submissions.index', params: { resource } }
+/**
+ * Zero não vira badge: um "0" ao lado de cada item é ruído, e a ausência do número já diz que
+ * não há nada esperando. `null` é "ainda não carregou".
+ */
+function unreadOf(resource: string | undefined): number | null {
+  if (!resource) {
+    return null
+  }
+
+  const count = unreadCounts.byResource[resource]
+
+  return count !== undefined && count > 0 ? count : null
 }
 </script>
 
 <template>
   <aside class="app-sidebar">
     <RouterLink
-      to="/admin"
+      :to="{ name: 'dashboard' }"
       class="app-sidebar__brand"
       aria-label="Lar Anália Franco — página inicial do painel"
     >
@@ -84,125 +177,26 @@ function resourceRoute(resource: string): { name: string; params: Record<string,
       class="app-sidebar__nav"
       aria-label="Navegação principal"
     >
-      <p class="app-sidebar__section-label">
-        Início
-      </p>
-      <RouterLink
-        to="/admin"
-        class="app-sidebar__link"
+      <template
+        v-for="group in groups"
+        :key="group.label"
       >
-        Pendências
-      </RouterLink>
-
-      <template v-if="showContraturno">
         <p class="app-sidebar__section-label">
-          Contraturno
+          {{ group.label }}
         </p>
         <RouterLink
-          :to="resourceRoute('program-applications')"
+          v-for="item in group.items"
+          :key="item.label"
+          :to="item.to"
           class="app-sidebar__link"
+          :class="{ 'app-sidebar__link--active': currentSection === item.section }"
+          :aria-current="currentSection === item.section ? 'page' : undefined"
         >
-          Avisos do contraturno
+          {{ item.label }}
           <span
-            v-if="unreadOf('program-applications')"
+            v-if="unreadOf(item.unread)"
             class="app-sidebar__badge"
-          >{{ unreadOf('program-applications') }} <span class="visually-hidden">não lidos</span></span>
-        </RouterLink>
-        <RouterLink
-          :to="resourceRoute('partnership-inquiries')"
-          class="app-sidebar__link"
-        >
-          Propostas de apoio
-          <span
-            v-if="unreadOf('partnership-inquiries')"
-            class="app-sidebar__badge"
-          >{{ unreadOf('partnership-inquiries') }} <span class="visually-hidden">não lidos</span></span>
-        </RouterLink>
-      </template>
-
-      <template v-if="showAtendimento">
-        <p class="app-sidebar__section-label">
-          Atendimento
-        </p>
-        <RouterLink
-          :to="resourceRoute('volunteer-applications')"
-          class="app-sidebar__link"
-        >
-          Voluntários
-          <span
-            v-if="unreadOf('volunteer-applications')"
-            class="app-sidebar__badge"
-          >{{ unreadOf('volunteer-applications') }} <span class="visually-hidden">não lidos</span></span>
-        </RouterLink>
-        <RouterLink
-          :to="resourceRoute('contact-messages')"
-          class="app-sidebar__link"
-        >
-          Mensagens de contato
-          <span
-            v-if="unreadOf('contact-messages')"
-            class="app-sidebar__badge"
-          >{{ unreadOf('contact-messages') }} <span class="visually-hidden">não lidos</span></span>
-        </RouterLink>
-      </template>
-
-      <template v-if="showBazar">
-        <p class="app-sidebar__section-label">
-          Bazar
-        </p>
-        <RouterLink
-          :to="resourceRoute('pickup-requests')"
-          class="app-sidebar__link"
-        >
-          Pedidos de coleta
-          <span
-            v-if="unreadOf('pickup-requests')"
-            class="app-sidebar__badge"
-          >{{ unreadOf('pickup-requests') }} <span class="visually-hidden">não lidos</span></span>
-        </RouterLink>
-      </template>
-
-      <template v-if="showConteudo">
-        <p class="app-sidebar__section-label">
-          Conteúdo
-        </p>
-        <RouterLink
-          :to="{ name: 'pages.index' }"
-          class="app-sidebar__link"
-        >
-          Páginas
-        </RouterLink>
-      </template>
-
-      <template v-if="showTransparencia">
-        <p class="app-sidebar__section-label">
-          Transparência
-        </p>
-        <RouterLink
-          :to="{ name: 'transparency.index' }"
-          class="app-sidebar__link"
-        >
-          Documentos
-        </RouterLink>
-      </template>
-
-      <template v-if="showConfiguracoes">
-        <p class="app-sidebar__section-label">
-          Configurações
-        </p>
-        <RouterLink
-          v-if="hasAccess('users')"
-          :to="{ name: 'users.index' }"
-          class="app-sidebar__link"
-        >
-          Usuários
-        </RouterLink>
-        <RouterLink
-          v-if="hasAccess('audit-logs')"
-          :to="{ name: 'audit.index' }"
-          class="app-sidebar__link"
-        >
-          Auditoria
+          >{{ unreadOf(item.unread) }} <span class="visually-hidden">não lidos</span></span>
         </RouterLink>
       </template>
     </nav>
