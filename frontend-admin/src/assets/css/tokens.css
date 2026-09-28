@@ -1,10 +1,11 @@
 /* Tokens locais do painel — espaçamento, raio, sombra, layout e a escala tipográfica
    (tamanhos) densa própria do painel.
 
-   Cor e família de fonte vêm de shared/design-tokens/tokens.css, carregado antes deste
-   arquivo (ver src/main.ts) — mesma paleta e mesmas famílias do site público: é a mesma
-   instituição, inventar uma segunda linguagem visual para o painel seria retrabalho sem
-   motivo. Ver docs/decisoes/0009-direcao-visual.md para o histórico (paleta verde/ocre,
+   Cor vem de shared/design-tokens/tokens.css, carregado antes deste arquivo (ver
+   src/main.ts) — mesma paleta do site público: é a mesma instituição, inventar uma segunda
+   linguagem visual para o painel seria retrabalho sem motivo. A fonte de TÍTULO também vem de
+   lá; a de CORPO é a única exceção, sobreposta logo abaixo (Source Sans 3 em vez da Lora do
+   site). Ver docs/decisoes/0009-direcao-visual.md para o histórico (paleta verde/ocre,
    substituída nesta sessão) e ADR de substituição pendente de registro.
 
    Os tamanhos abaixo sobrescrevem, nome a nome, a escala base do arquivo compartilhado —
@@ -13,6 +14,13 @@
    redeclarados aqui por serem idênticos aos do site — herdam do arquivo compartilhado. */
 
 :root {
+  /* Fonte de corpo do painel — sobrepõe a --font-body do arquivo compartilhado (Lora, serifa),
+     que é a do SITE. O painel é tela de trabalho: base de 14px, tabela, número e formulário,
+     lidos de perto por horas. Serifa nesse tamanho suja a contagem de caracteres e o
+     alinhamento de coluna. --font-display (Poppins) NÃO é sobreposta: a fonte de título é de
+     marca e é a mesma nas duas faces do sistema. Ver src/assets/css/fonts.css. */
+  --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+
   --text-xs: 0.75rem; /* 12px — legenda, timestamp, badge */
   --text-sm: 0.8125rem; /* 13px — UI pequena, tabela */
   --text-base: 0.875rem; /* 14px — corpo de texto */

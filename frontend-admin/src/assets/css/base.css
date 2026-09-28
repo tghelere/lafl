@@ -29,9 +29,11 @@ svg {
   max-width: 100%;
 }
 
-/* Poppins só no h1 — título de tela (ver docs/decisoes/0009-direcao-visual.md e a nota em
-   tokens.css). h2/h3 em diante ficam em Lora, mais compatível com a densidade de uma
-   tela de trabalho do que com uma peça editorial. */
+/* Todo título em Poppins — o h1 da tela e os h2/h3/h4 de dentro dela (ver
+   docs/decisoes/0009-direcao-visual.md e a nota em tokens.css). Antes só o h1 usava a fonte de
+   título e os demais caíam na de corpo, que era a Lora; com a Lora fora do painel (ver
+   fonts.css), deixar os subtítulos na fonte de corpo apagaria a diferença entre título e texto
+   numa tela que é quase toda texto de interface. */
 h1 {
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
@@ -44,7 +46,7 @@ h1 {
 h2,
 h3,
 h4 {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-snug);
   color: var(--color-heading);
