@@ -1,3 +1,5 @@
+import { deflateSync } from 'node:zlib'
+
 import type { APIResponse } from '@playwright/test'
 
 import { AdminApi } from './api'
@@ -13,6 +15,58 @@ export const placeholderPdf = Buffer.from(
     '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << >> >>\nendobj\n' +
     'trailer\n<< /Size 4 /Root 1 0 R >>\n%%EOF\n',
 )
+
+/**
+ * PNG de cor sólida, gerado na hora — nenhuma foto no repositório (CLAUDE.md, regra 10). Só
+ * `node:zlib`: um PNG é a assinatura, o IHDR, os pixels comprimidos (cada linha precedida do
+ * byte de filtro 0) e o IEND, cada bloco com o seu CRC-32.
+ *
+ * Imagem de verdade, e não bytes quaisquer: a API confere o tipo pelo conteúdo e decodifica
+ * para gerar as derivadas.
+ */
+export function solidPng(width: number, height: number, [r, g, b]: [number, number, number]): Buffer {
+  const row = Buffer.alloc(1 + width * 3)
+  for (let x = 0; x < width; x++) {
+    row[1 + x * 3] = r
+    row[2 + x * 3] = g
+    row[3 + x * 3] = b
+  }
+
+  const ihdr = Buffer.alloc(13)
+  ihdr.writeUInt32BE(width, 0)
+  ihdr.writeUInt32BE(height, 4)
+  ihdr[8] = 8 // profundidade de bits
+  ihdr[9] = 2 // RGB
+
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    pngChunk('IHDR', ihdr),
+    pngChunk('IDAT', deflateSync(Buffer.concat(Array.from({ length: height }, () => row)))),
+    pngChunk('IEND', Buffer.alloc(0)),
+  ])
+}
+
+function pngChunk(type: string, data: Buffer): Buffer {
+  const length = Buffer.alloc(4)
+  length.writeUInt32BE(data.length)
+  const body = Buffer.concat([Buffer.from(type, 'ascii'), data])
+  const crc = Buffer.alloc(4)
+  crc.writeUInt32BE(crc32(body))
+
+  return Buffer.concat([length, body, crc])
+}
+
+function crc32(bytes: Buffer): number {
+  let crc = 0xffffffff
+  for (const byte of bytes) {
+    crc ^= byte
+    for (let bit = 0; bit < 8; bit++) {
+      crc = crc & 1 ? (crc >>> 1) ^ 0xedb88320 : crc >>> 1
+    }
+  }
+
+  return (crc ^ 0xffffffff) >>> 0
+}
 
 export type CreatedUser = { id: string; name: string; email: string; roles: string[] }
 
