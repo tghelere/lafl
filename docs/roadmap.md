@@ -393,10 +393,10 @@
 - [x] ~~Imagem dentro do texto das páginas pelo painel~~ — resolvido na sessão 27 sem trocar
       o `v-html` por blocos: o editor grava `<figure><img src="/midia/{uuid}">` e a API expande
       o `<img>` com `srcset` na leitura pública (ADR 0024).
-- [ ] As galerias fixas das páginas próprias de seção (`bazar/index.vue`,
-      `transparencia/index.vue` etc., ver docs/fotos.md) continuam vindo de
-      `frontend-site/public/fotos/`, fora do alcance do painel. Levá-las para a biblioteca exige
-      decidir, página a página, se a galeria vira conteúdo do CMS.
+- [x] ~~As galerias fixas das páginas de seção fora do painel~~ — resolvido na sessão 28: as
+      24 fotos de `public/fotos/` foram para a biblioteca (`midia:importar-fotos-iniciais`), e
+      cada página tem capa e galeria editáveis em "Imagens desta página" (ADR 0025). Em
+      `public/fotos/` ficou só o mapa de `/contato`, que não é foto.
 - [ ] `/bazar/novidades` (vitrine do bazar) — fora de escopo desta sessão, depende de
       `bazaar_showcase_items` e ainda tem `[VALIDAR]` pendente (preço, quem alimenta)
 - [ ] Seção de notícias (`/noticias`, `/noticias/:slug`) — depende de `posts`

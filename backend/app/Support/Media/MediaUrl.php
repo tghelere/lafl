@@ -31,4 +31,17 @@ final class MediaUrl
     {
         return '/midia/'.$uuid.'/'.$width.'.webp';
     }
+
+    /**
+     * `srcset` com as derivadas que existem AGORA (a lista muda quando o arquivo é trocado).
+     *
+     * @param  list<int>  $widths
+     */
+    public static function srcset(string $uuid, array $widths): string
+    {
+        return implode(', ', array_map(
+            static fn (int $width): string => self::derivative($uuid, $width).' '.$width.'w',
+            $widths,
+        ));
+    }
 }

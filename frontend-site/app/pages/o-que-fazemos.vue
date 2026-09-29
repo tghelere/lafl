@@ -4,17 +4,23 @@
 // app/config/navigation.ts (o mesmo texto do painel "O que fazemos" do header), para não
 // manter a mesma frase em dois lugares.
 import { navigation } from '~/config/navigation'
-import type { FotoSlug } from '~/data/fotos'
 
 const pillars = navigation.find((item) => item.to === '/o-que-fazemos')?.children ?? []
 
-// Uma foto por pilar, como cartão dos três — reaproveita fotos já usadas em outra página
-// (não há foto própria do contraturno no conjunto, o cartão dele fica sem imagem de
-// propósito, não é substituída por outra).
-const fotoPorPilar: Partial<Record<string, FotoSlug>> = {
-  '/educacao-infantil': 'horta-kids',
-  '/bazar': 'bazar-entrada',
-}
+// Uma foto por pilar: a capa da página de cada frente, escolhida no painel (ver App\Enums\
+// PageImageRole). Pilar sem capa fica sem imagem, de propósito — hoje é o contraturno, que
+// não tem foto própria —, em vez de ganhar uma foto de outra frente. As três páginas são
+// pedidas juntas, e uma falha da API tira só as fotos, não os cartões.
+const paginasDosPilares = await Promise.all(pillars.map((pillar) => usePublicPage(pillar.to.slice(1))))
+
+const capaPorPilar = computed(() =>
+  Object.fromEntries(
+    pillars.map((pillar, indice) => {
+      const envelope = paginasDosPilares[indice]?.data.value
+      return [pillar.to, envelope && 'data' in envelope ? envelope.data.images.cover : null]
+    }),
+  ),
+)
 
 usePageSeo({
   title: 'O Que Fazemos — Lar Anália Franco',
@@ -43,9 +49,9 @@ usePageSeo({
         :to="pillar.to"
         class="card pillars-grid__item"
       >
-        <AppFoto
-          v-if="fotoPorPilar[pillar.to]"
-          :slug="fotoPorPilar[pillar.to]!"
+        <AppImagem
+          v-if="capaPorPilar[pillar.to]"
+          :imagem="capaPorPilar[pillar.to]!"
           contexto="terco"
           :prioridade="index === 0"
         />
@@ -70,10 +76,9 @@ usePageSeo({
   text-decoration: none;
 }
 
-.pillars-grid__item picture {
+.pillars-grid__item img {
   margin-bottom: var(--space-3);
   border-radius: var(--radius-md);
-  overflow: hidden;
 }
 
 .pillars-grid__item h2 {

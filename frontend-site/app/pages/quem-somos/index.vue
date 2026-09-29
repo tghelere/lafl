@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Sobrepõe [...slug].vue para acomodar a foto da seção (ver docs/design/navegacao.md sobre
-// rota estática vencer catch-all) — mesmo padrão de página CMS de nível 1, só com uma
-// <AppFoto> a mais. Conteúdo e busca continuam vindo do CMS (slug "quem-somos").
+// rota estática vencer catch-all) — mesmo padrão de página CMS de nível 1, com a galeria da
+// página logo abaixo do título. Conteúdo, fotos e busca vêm do CMS (slug "quem-somos"). A
+// capa desta página não aparece aqui: é o destaque da página inicial.
 const { data, error } = await usePublicPage('quem-somos')
 
 if (error.value) {
@@ -31,7 +32,13 @@ usePageSeo({
 
     <article class="prose">
       <h1>{{ page.title }}</h1>
-      <AppFoto slug="equipe-formacao" contexto="metade" prioridade />
+      <AppImagem
+        v-for="(imagem, indice) in page.images.gallery"
+        :key="imagem.src"
+        :imagem="imagem"
+        contexto="metade"
+        :prioridade="indice === 0"
+      />
       <!-- Conteúdo vem do CMS, sanitizado no backend ao salvar contra uma allowlist
            explícita (App\Support\Html\ContentSanitizer, ver
            docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md) — é o que torna este

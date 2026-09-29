@@ -36,7 +36,7 @@ final class DeleteMedia
             throw ValidationException::withMessages([
                 'media' => [
                     (count($usages) === 1 ? 'Esta imagem está em uso na página ' : 'Esta imagem está em uso nas páginas ').
-                    "{$where}. Remova-a do conteúdo antes de excluir.",
+                    "{$where}. Tire-a da página antes de excluir.",
                 ],
             ]);
         }

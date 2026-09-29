@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// Sobrepõe [...slug].vue para acomodar as fotos da seção — mesmo padrão de quem-somos.vue.
+// Sobrepõe [...slug].vue para acomodar a galeria da seção — mesmo padrão de quem-somos.vue.
+// As fotos vêm da biblioteca do painel, na ordem da galeria da página (AppGaleria).
 const { data, error } = await usePublicPage('transparencia')
 
 if (error.value) {
@@ -36,30 +37,13 @@ usePageSeo({
       <div class="page-content" v-html="page.content" />
     </article>
 
-    <section class="foto-galeria" aria-label="Registro dos controles internos">
-      <h2>Controles internos, em registro</h2>
-      <div class="foto-galeria__grid">
-        <AppFoto slug="almoxarifado-alimentos" contexto="metade" prioridade />
-        <AppFoto slug="almoxarifado-limpeza" contexto="metade" />
-      </div>
-    </section>
+    <AppGaleria
+      :imagens="page.images.gallery"
+      titulo="Controles internos, em registro"
+      rotulo="Registro dos controles internos"
+      coluna-minima="14rem"
+      prioridade
+    />
   </template>
 </template>
 
-<style scoped>
-.foto-galeria {
-  margin-block: var(--space-8);
-}
-
-.foto-galeria__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--space-5);
-  margin-top: var(--space-5);
-}
-
-.foto-galeria__grid picture {
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-</style>

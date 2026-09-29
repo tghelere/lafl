@@ -95,10 +95,7 @@ final class ExpandContentImages
 
         preg_match('/\salt="([^"]*)"/', $tag, $alt);
 
-        $srcset = implode(', ', array_map(
-            static fn (int $width): string => MediaUrl::derivative($item->uuid, $width).' '.$width.'w',
-            $item->widths,
-        ));
+        $srcset = MediaUrl::srcset($item->uuid, $item->widths);
         $fallback = MediaUrl::derivative($item->uuid, MediaVariants::pick($item->widths, MediaVariants::DEFAULT_WIDTH));
 
         return sprintf(

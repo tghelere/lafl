@@ -31,7 +31,8 @@ Base de `pages`, mais `excerpt`, `category_id`, `author_id`. Também com histór
 **`media`** — biblioteca de imagens do conteúdo (implementada na sessão 27)
 `uuid`, `alt` (**obrigatório**, validado na API), `caption`, `depicts_assisted_minor`
 (declaração obrigatória, sem padrão), `version`, `mime`, `extension`, `size`, `width`,
-`height`, `widths` (derivadas webp geradas), `sha256`
+`height`, `widths` (derivadas webp geradas), `sha256`, `origin_key` (nulo, exceto nas fotos
+vindas do catálogo inicial — só para `midia:importar-fotos-iniciais` ser idempotente)
 
 Sem coluna de caminho: os arquivos ficam em `media/{uuid}/{versão}/`, fora do webroot. A
 original é recodificada no upload (todo metadado sai) e as derivadas webp são geradas na hora,
@@ -39,6 +40,14 @@ não em fila. `depicts_assisted_minor = true` torna a imagem impublicável e é 
 upload enquanto não existir registro de consentimento de imagem; `assisted_minor_id` entra
 junto com `consents`, na Fase 2, e `Media::isPublishable()` passa a consultá-lo. Ver
 `docs/decisoes/0024-biblioteca-de-midia.md`.
+
+**`page_images`** — capa e galeria de uma página (sessão 28)
+`page_id`, `media_id`, `role` (`cover` | `gallery`, enum `PageImageRole`), `position`
+
+Só a ligação: arquivo, texto alternativo e legenda são da imagem, em `media`. A galeria é o que
+a página mostra depois do texto; a capa (uma por página) representa a página em outro lugar do
+site e não aparece nela. Cascata dos dois lados. Imagem no meio do texto não tem linha aqui:
+vive no `content`. Ver `docs/decisoes/0025-imagens-da-pagina.md`.
 
 **`testimonials`** — depoimentos de famílias
 `uuid`, `author_name`, `relationship`, `content`, `authorized_at`, `is_published`

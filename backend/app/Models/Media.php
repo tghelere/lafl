@@ -7,6 +7,7 @@ namespace App\Models;
 use Database\Factories\MediaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
@@ -53,6 +54,17 @@ class Media extends Model
         static::creating(function (self $media): void {
             $media->uuid ??= (string) Str::uuid();
         });
+    }
+
+    /**
+     * Onde a imagem é capa ou galeria de página. O uso dentro do texto não passa por aqui (ver
+     * App\Actions\Media\FindMediaUsages).
+     *
+     * @return HasMany<PageImage, $this>
+     */
+    public function pageImages(): HasMany
+    {
+        return $this->hasMany(PageImage::class);
     }
 
     /**

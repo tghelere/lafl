@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Actions\Content;
 
 use App\Actions\Media\ForgetPagesUsingMedia;
+use App\Enums\PageImageRole;
 use App\Enums\PageStatus;
 use App\Enums\TransparencyDocumentType;
 use App\Models\Media;
 use App\Models\Page;
+use App\Models\PageImage;
 use App\Models\PageSlugHistory;
 use App\Models\TransparencyDocument;
 use App\Support\Cache\PublicPageCache;
@@ -42,7 +44,10 @@ use ValueError;
  * O HTML das páginas passa de novo pelo ContentSanitizer (regra do CLAUDE.md: todo caminho
  * de escrita passa pelo mesmo filtro). Um pacote é entrada externa como outra qualquer.
  *
- * Imagens (formato 2): identificadas pelo uuid, porque é ele que o conteúdo das páginas cita.
+ * Imagens (formato 2 em diante): identificadas pelo uuid, porque é ele que o conteúdo das
+ * páginas cita. A capa e a galeria de cada página (formato 3) viajam em `pages.json` pelo uuid
+ * da imagem e são regravadas junto com a página: a página criada ou substituída fica com
+ * exatamente a capa e a galeria do pacote.
  * Os arquivos chegam como saíram — já sem metadado e já com as derivadas —, conferidos pelo
  * SHA-256; não são reprocessados. Imagem marcada aqui como foto de assistido nunca é
  * sobrescrita pelo pacote.
@@ -90,6 +95,14 @@ final class ImportContentPackage
             // App\Actions\Media\UpdateMediaDetails).
             if ($existing !== null && $existing->depicts_assisted_minor) {
                 throw new InvalidArgumentException("A imagem {$label} foi marcada neste ambiente como foto de criança ou adolescente atendido; o pacote não pode substituí-la.");
+            }
+
+            // A mesma foto inicial com outro uuid: `midia:importar-fotos-iniciais` rodou aqui
+            // antes do pacote. Gravar criaria a segunda cópia (e a restrição única recusaria).
+            $originKey = $data['origin_key'] ?? null;
+            if (is_string($originKey)
+                && Media::query()->where('origin_key', $originKey)->where('uuid', '!=', $data['uuid'])->exists()) {
+                throw new InvalidArgumentException("A foto inicial \"{$originKey}\" já existe neste ambiente com outro uuid (midia:importar-fotos-iniciais rodou aqui?). Exclua a cópia local antes de importar.");
             }
 
             if ($existing === null) {
@@ -249,8 +262,9 @@ final class ImportContentPackage
 
         foreach ($pagePlan as [$data]) {
             preg_match_all(MediaUrl::CANONICAL_IN_HTML_PATTERN, (string) $data['content'], $matches);
+            $used = [...$matches[1], ...array_column($data['images'], 'media_uuid')];
 
-            foreach (array_unique($matches[1]) as $uuid) {
+            foreach (array_unique($used) as $uuid) {
                 if (in_array($uuid, $inPackage, true)) {
                     continue;
                 }
@@ -273,6 +287,7 @@ final class ImportContentPackage
 
         $media->forceFill([
             'uuid' => $data['uuid'],
+            'origin_key' => $data['origin_key'] ?? null,
             'alt' => $data['alt'],
             'caption' => $data['caption'] ?? null,
             'depicts_assisted_minor' => false,
@@ -319,11 +334,13 @@ final class ImportContentPackage
         $documents = $this->readRecords($dir.'/'.ContentPackage::DOCUMENTS, ContentPackage::DOCUMENTS);
 
         foreach ($pages as $i => $page) {
-            foreach (['uuid', 'slug', 'title', 'content', 'status', 'slug_history'] as $key) {
+            foreach (['uuid', 'slug', 'title', 'content', 'status', 'slug_history', 'images'] as $key) {
                 if (! array_key_exists($key, $page)) {
                     throw new InvalidArgumentException("pages.json[{$i}] sem o campo {$key}.");
                 }
             }
+
+            $this->assertValidPageImages($page);
 
             try {
                 PageStatus::from($page['status']);
@@ -495,6 +512,58 @@ final class ImportContentPackage
 
         foreach ($data['slug_history'] as $oldSlug) {
             PageSlugHistory::query()->firstOrCreate(['slug' => $oldSlug], ['page_id' => $page->id]);
+        }
+
+        // As imagens já foram gravadas (vêm antes das páginas na transação), e as que a página
+        // cita foram conferidas em assertPageImagesAvailable.
+        PageImage::query()->where('page_id', $page->id)->delete();
+
+        foreach ($data['images'] as $entry) {
+            $image = new PageImage;
+            $image->page_id = $page->id;
+            $image->media_id = Media::query()->where('uuid', $entry['media_uuid'])->valueOrFail('id');
+            $image->role = PageImageRole::from($entry['role']);
+            $image->position = $entry['position'];
+            $image->save();
+        }
+    }
+
+    /**
+     * Capa e galeria de uma página do pacote: uuid bem formado, papel conhecido, posição
+     * inteira, sem lugar repetido e no máximo uma capa. Conferido antes de qualquer escrita,
+     * como o resto do pacote.
+     *
+     * @param  array<string, mixed>  $page
+     */
+    private function assertValidPageImages(array $page): void
+    {
+        if (! is_array($page['images'])) {
+            throw new InvalidArgumentException("Imagens inválidas na página {$page['slug']}.");
+        }
+
+        $seen = [];
+
+        foreach ($page['images'] as $entry) {
+            $valid = is_array($entry)
+                && is_string($entry['media_uuid'] ?? null)
+                && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $entry['media_uuid']) === 1
+                && is_string($entry['role'] ?? null)
+                && PageImageRole::tryFrom($entry['role']) !== null
+                && is_int($entry['position'] ?? null)
+                && $entry['position'] >= 0;
+
+            if (! $valid) {
+                throw new InvalidArgumentException("Imagem de capa ou galeria inválida na página {$page['slug']}.");
+            }
+
+            $place = $entry['role'] === PageImageRole::Cover->value ? 'cover' : 'gallery:'.$entry['position'];
+            $again = $entry['role'].':'.$entry['media_uuid'];
+
+            if (isset($seen[$place]) || isset($seen[$again])) {
+                throw new InvalidArgumentException("Capa ou posição de galeria repetida na página {$page['slug']}.");
+            }
+
+            $seen[$place] = $seen[$again] = true;
         }
     }
 

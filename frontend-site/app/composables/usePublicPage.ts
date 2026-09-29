@@ -1,7 +1,29 @@
+/**
+ * Imagem da biblioteca pronta para um `<img>` (App\Actions\Media\BuildPublicPageImages). O
+ * `sizes` não vem da API: quanto da tela a imagem ocupa é decisão do layout (ver AppImagem.vue).
+ */
+export type PublicImage = {
+  src: string
+  srcset: string
+  width: number
+  height: number
+  alt: string
+  caption: string | null
+}
+
 export type PublicPage = {
   slug: string
   title: string
   content: string
+  /**
+   * Capa e galeria, editadas no painel ("Imagens desta página"). A capa não aparece na própria
+   * página: é o que as outras usam para representá-la (o cartão de "O que fazemos" e o
+   * destaque da página inicial).
+   */
+  images: {
+    cover: PublicImage | null
+    gallery: PublicImage[]
+  }
   meta_title: string | null
   meta_description: string | null
 }

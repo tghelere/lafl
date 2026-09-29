@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// Sobrepõe [...slug].vue para acomodar as fotos da seção — mesmo padrão de quem-somos.vue.
+// Sobrepõe [...slug].vue para acomodar a galeria da seção — mesmo padrão de quem-somos.vue.
+// As fotos vêm da biblioteca do painel, na ordem da galeria da página (AppGaleria).
 const { data, error } = await usePublicPage('educacao-infantil')
 
 if (error.value) {
@@ -36,32 +37,7 @@ usePageSeo({
       <div class="page-content" v-html="page.content" />
     </article>
 
-    <section class="foto-galeria" aria-label="Fotos da estrutura">
-      <h2>A estrutura, em fotos</h2>
-      <div class="foto-galeria__grid">
-        <AppFoto slug="horta-kids" contexto="metade" prioridade />
-        <AppFoto slug="sala-multiuso-conto" contexto="metade" />
-        <AppFoto slug="sala-multiuso-imaginacao" contexto="metade" />
-        <AppFoto slug="sala-multiuso-brinquedos" contexto="metade" />
-      </div>
-    </section>
+    <AppGaleria :imagens="page.images.gallery" titulo="A estrutura, em fotos" rotulo="Fotos da estrutura" prioridade />
   </template>
 </template>
 
-<style scoped>
-.foto-galeria {
-  margin-block: var(--space-8);
-}
-
-.foto-galeria__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: var(--space-5);
-  margin-top: var(--space-5);
-}
-
-.foto-galeria__grid picture {
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-</style>

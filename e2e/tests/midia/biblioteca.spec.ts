@@ -149,7 +149,7 @@ test.describe('comunicacao', () => {
       await confirmacao
 
       await expect(
-        direcao.getByText(`Esta imagem está em uso na página ${titulo} (/${slug}). Remova-a do conteúdo antes de excluir.`),
+        direcao.getByText(`Esta imagem está em uso na página ${titulo} (/${slug}). Tire-a da página antes de excluir.`),
       ).toBeVisible()
       await direcao.reload()
       await expect(direcao.getByRole('heading', { name: 'Editar imagem' })).toBeVisible()

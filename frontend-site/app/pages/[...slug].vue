@@ -79,5 +79,9 @@ usePageSeo({
            v-html seguro, não a confiança em quem escreve pelo painel. -->
       <div class="page-content" v-html="page.content" />
     </article>
+
+    <!-- A galeria que a equipe monta no painel ("Imagens desta página"). As páginas de seção
+         com layout próprio (bazar, educação infantil…) a mostram com título delas. -->
+    <AppGaleria :imagens="page.images.gallery" titulo="Fotos" rotulo="Fotos da página" />
   </template>
 </template>

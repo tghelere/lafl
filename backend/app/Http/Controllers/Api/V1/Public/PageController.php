@@ -68,6 +68,8 @@ final class PageController extends Controller
             ->setCache($hasMarkers
                 ? ['public' => true, 'max_age' => 0, 'must_revalidate' => true]
                 : ['public' => true, 'max_age' => 300])
-            ->setEtag(md5($result['updated_at'].'|'.$result['slug'].'|'.$result['content']));
+            // As imagens entram no ETag: trocar o arquivo de uma foto da galeria muda o `srcset`
+            // sem mudar o texto nem o updated_at da página.
+            ->setEtag(md5($result['updated_at'].'|'.$result['slug'].'|'.$result['content'].'|'.json_encode($result['images'])));
     }
 }

@@ -25,6 +25,9 @@ final class PageResource extends JsonResource
             'slug' => $this->slug,
             'title' => $this->title,
             'content' => $this->content,
+            // Capa e galeria (App\Actions\Media\BuildPublicPageImages). A capa não aparece na
+            // própria página: é o que as OUTRAS páginas do site usam para representá-la.
+            'images' => $this->images,
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
         ];

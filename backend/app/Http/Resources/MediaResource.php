@@ -25,11 +25,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 final class MediaResource extends JsonResource
 {
-    /** @var list<array{uuid: string, title: string, slug: string, status: string}>|null */
+    /** @var list<array{uuid: string, title: string, slug: string, status: string, places: list<string>}>|null */
     private ?array $usageList = null;
 
     /**
-     * @param  list<array{uuid: string, title: string, slug: string, status: string}>  $usages
+     * @param  list<array{uuid: string, title: string, slug: string, status: string, places: list<string>}>  $usages
      */
     public function withUsages(array $usages): self
     {

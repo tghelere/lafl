@@ -10,7 +10,8 @@ namespace App\Support\Content;
  * Um pacote é uma pasta:
  *
  *   manifest.json     versão do formato, origem, contagens e SHA-256 de tudo o mais
- *   pages.json        páginas do CMS (todos os status), com o histórico de slugs
+ *   pages.json        páginas do CMS (todos os status), com o histórico de slugs e a capa e a
+ *                     galeria (`images`, formato 3 em diante)
  *   documents.json    documentos de transparência (publicados e não publicados)
  *   media.json        imagens da biblioteca que podem ir para o site (formato 2 em diante)
  *   files/<caminho>   PDFs e imagens (original e derivadas), no mesmo caminho relativo que
@@ -26,9 +27,11 @@ final class ContentPackage
 {
     /**
      * Sobe quando o formato muda de um jeito que um importador antigo não entenderia. A 2
-     * acrescentou `media.json`: um pacote 1 levaria as páginas sem as imagens que elas usam.
+     * acrescentou `media.json`: um pacote 1 levaria as páginas sem as imagens que elas usam. A
+     * 3 acrescentou `images` a cada página (capa e galeria) e `origin_key` às imagens: um
+     * pacote 2 levaria as páginas de seção sem as fotos delas.
      */
-    public const FORMAT_VERSION = 2;
+    public const FORMAT_VERSION = 3;
 
     public const MANIFEST = 'manifest.json';
 

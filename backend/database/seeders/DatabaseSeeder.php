@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             DevSuperAdminSeeder::class,
             ContentPagesSeeder::class,
+            InitialPhotosSeeder::class,
             TransparencyDocumentsSeeder::class,
         ]);
     }

@@ -329,7 +329,7 @@ describe('exclusão', function (): void {
 
         test()->actingAs($direcao)->deleteJson("/api/v1/media/{$media->uuid}")
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['media' => 'Esta imagem está em uso na página Nossa história (/nossa-historia). Remova-a do conteúdo antes de excluir.']);
+            ->assertJsonValidationErrors(['media' => 'Esta imagem está em uso na página Nossa história (/nossa-historia). Tire-a da página antes de excluir.']);
 
         expect(Media::query()->whereKey($media->id)->exists())->toBeTrue();
     });

@@ -500,6 +500,11 @@ php8.5 artisan db:seed --class=Database\\Seeders\\RoleSeeder --force
 #    PRODUÇÃO NÃO USA ESTE PASSO: lá o conteúdo vem do pacote de homologação (§10.1).
 php8.5 artisan conteudo:importar-inicial
 
+# 2b. Fotos do site na biblioteca de imagens, na capa e na galeria das páginas do passo 2.
+#     Mesma regra: só cria o que falta, nunca duplica nem pisa no que a equipe mudou.
+#     PRODUÇÃO TAMBÉM NÃO USA ESTE PASSO: as fotos viajam no pacote (§10.1).
+php8.5 artisan midia:importar-fotos-iniciais
+
 # 3. Primeira conta capaz de entrar no painel. Pergunta nome e e-mail e imprime o link de
 #    definição de senha — nenhuma senha em argumento nem no histórico do shell.
 php8.5 artisan usuarios:criar-super-admin
@@ -578,9 +583,9 @@ A decisão está no ADR 0023.
 
 | Entra (pacote `conteudo:exportar`) | Não entra — de propósito |
 |---|---|
-| Páginas do CMS: publicadas, rascunhos e arquivadas, com o histórico de slugs (redirects 301) | **Usuários.** As contas de homologação são de teste; em produção cria-se a conta real com `usuarios:criar-super-admin`, e as demais pelo painel |
+| Páginas do CMS: publicadas, rascunhos e arquivadas, com o histórico de slugs (redirects 301) e a capa e a galeria de cada uma (formato 3, ADR 0025) | **Usuários.** As contas de homologação são de teste; em produção cria-se a conta real com `usuarios:criar-super-admin`, e as demais pelo painel |
 | Documentos de transparência (publicados e não), com os PDFs | **Formulários recebidos** (candidatura a programa, retirada, voluntariado, parcerias, contato). Em homologação são mensagens de teste, e o dado de quem preencheu não tem por que sair de lá |
-| Imagens da biblioteca que podem ir para o site, com original e derivadas (formato 2 do pacote) | **Imagem marcada como foto de criança ou adolescente atendido** — não pode ir para o site. A exportação **recusa** o pacote se alguma página ainda usar uma delas (ADR 0024) |
+| Imagens da biblioteca que podem ir para o site, com original e derivadas | **Imagem marcada como foto de criança ou adolescente atendido** — não pode ir para o site. A exportação **recusa** o pacote se alguma página ainda usar uma delas, no texto, na capa ou na galeria (ADR 0024 e 0025) |
 | | Log de auditoria, contador de downloads, itens na lixeira, sessões, filas |
 
 **Nunca restaurar o dump de homologação em produção.** Seria o caminho mais curto e traria
@@ -678,10 +683,12 @@ acrescentar uma camada de cache de HTML por cima**.
 > curto (1–5 min) somado a purge por URL no salvamento, o que exigiria o backend chamar a API
 > do CDN — dependência e credencial novas, a avaliar só se o tráfego justificar.
 
-Assets com hash no nome (`/_nuxt/*`, `/assets/*`) podem ser cacheados agressivamente. As fotos
-de `/fotos/**` já saem com `Cache-Control: public, max-age=2592000` **sem** `immutable`, de
-propósito: o nome do arquivo não tem hash, então trocar a foto mantendo o nome precisa poder
-ser visto antes de 30 dias.
+Assets com hash no nome (`/_nuxt/*`, `/assets/*`) podem ser cacheados agressivamente. O mapa de
+`/fotos/contato/` (única imagem que sobrou em `public/fotos/`) sai com `Cache-Control: public,
+max-age=2592000` **sem** `immutable`, de propósito: o nome do arquivo não tem hash, então
+trocá-lo mantendo o nome precisa poder ser visto antes de 30 dias. As fotos vêm da biblioteca,
+em `/midia/**`, com `max-age=600, must-revalidate` e ETag (ADR 0024): não cachear por mais
+tempo que isso, porque tirar do ar uma foto marcada como de assistido precisa valer em minutos.
 
 `/config.js` e `/index.html` do painel saem com `no-cache` — os dois não têm hash no nome e
 mudam a cada publicação; cacheados, o navegador continuaria carregando a configuração do

@@ -6,6 +6,7 @@ namespace App\Actions\Content;
 
 use App\Models\Media;
 use App\Models\Page;
+use App\Models\PageImage;
 use App\Models\TransparencyDocument;
 use App\Support\Content\ContentPackage;
 use App\Support\Media\MediaPaths;
@@ -36,7 +37,7 @@ final class ExportContentPackage
         $disk = Storage::disk('local');
 
         $pages = array_values(Page::query()
-            ->with('slugHistory')
+            ->with(['slugHistory', 'images.media'])
             ->orderBy('slug')
             ->get()
             ->map(fn (Page $page): array => [
@@ -51,6 +52,12 @@ final class ExportContentPackage
                 'created_at' => $page->created_at?->toIso8601String(),
                 'updated_at' => $page->updated_at?->toIso8601String(),
                 'slug_history' => $page->slugHistory->pluck('slug')->sort()->values()->all(),
+                // Capa e galeria pelo uuid da imagem, que é o que viaja em media.json.
+                'images' => $page->images->map(fn (PageImage $image): array => [
+                    'media_uuid' => $image->media->uuid,
+                    'role' => $image->role->value,
+                    'position' => $image->position,
+                ])->values()->all(),
             ])
             ->all());
 
@@ -136,8 +143,9 @@ final class ExportContentPackage
 
         foreach ($pages as $page) {
             preg_match_all(MediaUrl::CANONICAL_IN_HTML_PATTERN, (string) $page['content'], $matches);
+            $used = [...$matches[1], ...array_column($page['images'], 'media_uuid')];
 
-            foreach (array_unique($matches[1]) as $uuid) {
+            foreach (array_unique($used) as $uuid) {
                 if (! $publishable->has($uuid)) {
                     throw new RuntimeException(
                         "A página {$page['slug']} usa a imagem {$uuid}, que não existe mais ou foi marcada como foto de assistido. Remova-a da página antes de exportar.",
@@ -168,6 +176,7 @@ final class ExportContentPackage
 
             $media[] = [
                 'uuid' => $item->uuid,
+                'origin_key' => $item->origin_key,
                 'alt' => $item->alt,
                 'caption' => $item->caption,
                 'version' => $item->version,

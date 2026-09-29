@@ -69,6 +69,17 @@ class Page extends Model
     }
 
     /**
+     * Capa e galeria, em ordem de papel e posição. As imagens do meio do texto não estão aqui,
+     * porque vivem no próprio `content`.
+     *
+     * @return HasMany<PageImage, $this>
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(PageImage::class)->orderBy('role')->orderBy('position');
+    }
+
+    /**
      * Nenhum campo pessoal aqui — conteúdo institucional, log com valor é aceitável (ver
      * docs/protecao-de-dados.md, seção Auditoria, que restringe valor descriptografado, não
      * conteúdo público).

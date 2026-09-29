@@ -12,7 +12,19 @@ usePageSeo({
 // App\Services\InstitutionalFacts) — é por isso que a home não está em
 // nitro.prerender.routes. Falhando a chamada, as duas linhas simplesmente não aparecem: um
 // número errado na prestação de contas é pior que um número a menos.
-const { data: institutionFacts } = await useInstitutionFacts()
+//
+// O destaque da página é a capa de "Quem somos", escolhida no painel (ver App\Enums\
+// PageImageRole). Pedida junto com os números, em paralelo, para que uma API lenta custe uma
+// espera só, e não duas. Pelo mesmo motivo dos números, a falha dessa chamada não derruba a
+// home: a foto só não aparece.
+const [{ data: institutionFacts }, { data: quemSomos }] = await Promise.all([
+  useInstitutionFacts(),
+  usePublicPage('quem-somos'),
+])
+
+const destaque = computed(() =>
+  quemSomos.value && 'data' in quemSomos.value ? quemSomos.value.data.images.cover : null,
+)
 
 const marcos = computed(() => institutionFacts.value?.data.milestones ?? null)
 
@@ -67,8 +79,8 @@ const pillars = [
       </div>
     </section>
 
-    <section class="home__figure" aria-label="Fachada da sede">
-      <AppFoto slug="fachada-sede" contexto="cheia" prioridade />
+    <section v-if="destaque" class="home__figure" aria-label="Foto da sede">
+      <AppImagem :imagem="destaque" contexto="cheia" prioridade />
     </section>
 
     <section class="home__pillars" aria-label="Os três pilares da instituição">
