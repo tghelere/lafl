@@ -25,6 +25,13 @@ imagem ocupa.
 `nossa-historia.vue` tem layout próprio: a primeira foto da galeria vira o destaque (a placa de
 inauguração), e as outras seguem em pares de antes e depois.
 
+## Ampliação
+
+Toda imagem de conteúdo (galeria e figura do texto) é um link para a maior derivada e abre
+ampliada sobre a página, com legenda, crédito e navegação na mesma galeria. Sem JavaScript, o
+link abre a foto. O destaque da home, os cartões de "O que fazemos" e o mapa ficam de fora. Ver
+`docs/decisoes/0026-ampliacao-de-imagens.md`.
+
 ## Como trocar ou acrescentar uma foto
 
 Pelo painel, sem desenvolvedor: na edição da página, seção "Imagens desta página". Enviar põe a

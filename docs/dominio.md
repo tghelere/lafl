@@ -29,7 +29,8 @@ Base de `pages`, mais `excerpt`, `category_id`, `author_id`. Também com histór
 **`post_categories`** — `uuid`, `slug`, `name`
 
 **`media`** — biblioteca de imagens do conteúdo (implementada na sessão 27)
-`uuid`, `alt` (**obrigatório**, validado na API), `caption`, `depicts_assisted_minor`
+`uuid`, `alt` (**obrigatório**, validado na API), `caption`, `credit` (opcional, mostrado na
+ampliação do site, sessão 30), `depicts_assisted_minor`
 (declaração obrigatória, sem padrão), `version`, `mime`, `extension`, `size`, `width`,
 `height`, `widths` (derivadas webp geradas), `sha256`, `origin_key` (nulo, exceto nas fotos
 vindas do catálogo inicial — só para `midia:importar-fotos-iniciais` ser idempotente)
