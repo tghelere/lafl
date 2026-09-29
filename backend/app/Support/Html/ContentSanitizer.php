@@ -14,8 +14,16 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
  * quem visita — a sanitização é obrigatória e acontece no backend, nunca só no editor.
  *
  * O conjunto de tags é o que o editor do painel oferece (parágrafo, h2, h3, negrito,
- * itálico, link, lista com e sem ordem) mais `<br>` e `class` em `<a>`, que já existem no
- * conteúdo institucional publicado e seriam perdidos sem isto.
+ * itálico, link, lista com e sem ordem, imagem com legenda) mais `<br>` e `class` em `<a>`,
+ * que já existem no conteúdo institucional publicado e seriam perdidos sem isto.
+ *
+ * Imagem: `<figure>`, `<img src alt>` e `<figcaption>`, com `src` restrito à forma canônica da
+ * biblioteca (ver MediaSourceAttributeSanitizer). Largura, `srcset` e dimensões NÃO são
+ * gravados — quem os põe é a leitura pública (App\Actions\Media\ExpandContentImages), com as
+ * derivadas que existem no momento, para que a substituição do arquivo não exija editar
+ * página nenhuma. Que a imagem exista e possa ir ao site é conferido por
+ * App\Actions\Content\AssertContentImagesArePublishable, que consulta o banco — este filtro
+ * é só forma.
  */
 final class ContentSanitizer
 {
@@ -35,7 +43,7 @@ final class ContentSanitizer
         'div', 'span', 'section', 'article', 'main', 'header', 'footer', 'aside', 'nav',
         'h1', 'h4', 'h5', 'h6',
         'b', 'i', 'u', 's', 'small', 'sub', 'sup', 'mark', 'font', 'center',
-        'blockquote', 'pre', 'code', 'figure', 'figcaption',
+        'blockquote', 'pre', 'code',
         'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th', 'caption',
         'dl', 'dt', 'dd',
     ];
@@ -55,12 +63,20 @@ final class ContentSanitizer
             ->allowElement('li')
             ->allowElement('br')
             ->allowElement('a', ['href', 'target', 'rel', 'class'])
+            ->allowElement('figure')
+            ->allowElement('figcaption')
+            ->allowElement('img', ['src', 'alt'])
+            // Relativo é o ÚNICO formato de imagem aceito (`/midia/{uuid}`); esquema nenhum —
+            // nem http(s), nem data:. O allowlist fino de caminho é o sanitizador abaixo.
+            ->allowMediaSchemes([])
+            ->allowRelativeMedias()
             // Caminho relativo cobre link interno ("/transparencia"), que é a maioria do
             // conteúdo atual; mailto/tel são para contato institucional. `javascript:` e
             // `data:` ficam de fora — é o que impede href executável.
             ->allowLinkSchemes(['http', 'https', 'mailto', 'tel'])
             ->allowRelativeLinks()
-            ->withAttributeSanitizer(new LinkClassAttributeSanitizer);
+            ->withAttributeSanitizer(new LinkClassAttributeSanitizer)
+            ->withAttributeSanitizer(new MediaSourceAttributeSanitizer);
 
         foreach (self::BLOCKED_ELEMENTS as $element) {
             $config = $config->blockElement($element);
@@ -71,7 +87,19 @@ final class ContentSanitizer
 
     public function sanitize(string $html): string
     {
-        return $this->forceRelOnExternalLinks($this->sanitizer->sanitize($html));
+        return $this->forceRelOnExternalLinks($this->dropImagesWithoutSource($this->sanitizer->sanitize($html)));
+    }
+
+    /**
+     * `<img>` cujo `src` foi recusado sai inteiro: sem `src` ele é um quadro vazio no site. A
+     * legenda da `<figure>` fica, como texto — é conteúdo que alguém escreveu.
+     *
+     * Mesma garantia de forceRelOnExternalLinks: roda sobre a saída já sanitizada, em que `>`
+     * não aparece dentro de valor de atributo.
+     */
+    private function dropImagesWithoutSource(string $html): string
+    {
+        return (string) preg_replace('/<img\b(?![^>]*\ssrc=")[^>]*>/i', '', $html);
     }
 
     /**

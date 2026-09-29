@@ -19,6 +19,7 @@ final class SavePage
     public function __construct(
         private readonly ContentSanitizer $sanitizer,
         private readonly AssertContentMarkersAreKnown $assertKnownMarkers,
+        private readonly AssertContentImagesArePublishable $assertPublishableImages,
     ) {}
 
     /**
@@ -37,6 +38,7 @@ final class SavePage
         // desconhecido é recusado antes de gravar, nunca depois (ver
         // App\Actions\Content\AssertContentMarkersAreKnown).
         $this->assertKnownMarkers->handle($content);
+        $this->assertPublishableImages->handle($content);
 
         return DB::transaction(function () use ($data, $page, $content): Page {
             $page ??= new Page;

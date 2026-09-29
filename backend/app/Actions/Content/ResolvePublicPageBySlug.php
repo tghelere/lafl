@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Content;
 
+use App\Actions\Media\ExpandContentImages;
 use App\Models\Page;
 use App\Models\PageSlugHistory;
 use App\Support\Cache\PublicPageCache;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Cache;
 
 final class ResolvePublicPageBySlug
 {
+    public function __construct(private readonly ExpandContentImages $expandImages) {}
+
     /**
      * Devolve os campos públicos da página publicada no slug pedido, um array só com
      * `redirect_to` se o slug for histórico de uma página que hoje vive em outro lugar, ou
@@ -45,7 +48,11 @@ final class ResolvePublicPageBySlug
             return [
                 'slug' => $page->slug,
                 'title' => $page->title,
-                'content' => $page->content,
+                // Dentro do cache, de propósito: o `srcset` depende de consulta ao banco, e
+                // quem muda a imagem esquece este cache (App\Actions\Media\
+                // ForgetPagesUsingMedia). Os marcadores, ao contrário, são resolvidos DEPOIS do
+                // cache (ver ResolveContentMarkers) porque nada os invalida.
+                'content' => $this->expandImages->handle($page->content),
                 'meta_title' => $page->meta_title,
                 'meta_description' => $page->meta_description,
                 'updated_at' => $page->updated_at?->toIso8601String() ?? '',
