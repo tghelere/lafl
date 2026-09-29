@@ -31,7 +31,7 @@ export async function serverHtml(path: string): Promise<string> {
  */
 export async function serverPageContent(path: string): Promise<string> {
   const html = await serverHtml(path)
-  const match = html.match(/<div class="page-content">([\s\S]*?)<\/div><\/article>/)
+  const match = html.match(/<div class="page-content"[^>]*>([\s\S]*?)<\/div><\/article>/)
 
   expect(match, `não encontrei o conteúdo do CMS no HTML de ${path}`).not.toBeNull()
 
