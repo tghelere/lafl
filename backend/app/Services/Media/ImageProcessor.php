@@ -33,12 +33,13 @@ final class ImageProcessor
     public const WIDTHS = [400, 640, 960, 1280, 1920];
 
     /**
-     * Teto em pixels, conferido pelo cabeçalho ANTES de decodificar. Imagem decodificada ocupa
-     * ~4 bytes por pixel: 36 MP são ~144 MB, o que cabe no `memory_limit` de 256M do servidor
-     * (infra/provisionar.sh) com folga para as derivadas. Sem o teto, um PNG pequeno em bytes
-     * e enorme em pixels derrubaria o processo do PHP-FPM.
+     * Teto em pixels, conferido pelo cabeçalho ANTES de decodificar. Medido com o
+     * `memory_limit` de 256M do servidor (infra/provisionar.sh): 30 MP chegam a ~162 MB de pico
+     * no processamento, 36 MP a ~192 MB — esta última deixaria pouca folga para o resto da
+     * requisição. 30 MP cobrem o modo padrão das câmeras de celular. Sem o teto, um PNG pequeno
+     * em bytes e enorme em pixels derrubaria o processo do PHP-FPM.
      */
-    public const MAX_PIXELS = 36_000_000;
+    public const MAX_PIXELS = 30_000_000;
 
     private const JPEG_QUALITY = 90;
 
@@ -62,7 +63,7 @@ final class ImageProcessor
         }
 
         if ($info[0] * $info[1] > self::MAX_PIXELS) {
-            $this->fail('A imagem é grande demais (mais de 36 megapixels). Reduza as dimensões e envie de novo.');
+            $this->fail('A imagem é grande demais (mais de 30 megapixels). Reduza as dimensões e envie de novo.');
         }
 
         $type = $info[2];

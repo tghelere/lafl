@@ -147,7 +147,7 @@ describe('validação', function (): void {
 
         uploadMedia(userWithRole('comunicacao'), UploadedFile::fake()->createWithContent('grande.png', $png))
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['file' => 'A imagem é grande demais (mais de 36 megapixels). Reduza as dimensões e envie de novo.']);
+            ->assertJsonValidationErrors(['file' => 'A imagem é grande demais (mais de 30 megapixels). Reduza as dimensões e envie de novo.']);
     });
 
     test('exige texto alternativo de verdade — espaço não conta', function (): void {
