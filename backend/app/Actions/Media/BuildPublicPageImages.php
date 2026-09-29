@@ -22,7 +22,7 @@ use App\Support\Media\MediaVariants;
  *
  * Imagem impublicável (marcada como foto de assistido) não sai, e a galeria fecha o buraco.
  *
- * @phpstan-type PublicImage array{src: string, srcset: string, full: string, width: int, height: int, alt: string, caption: ?string}
+ * @phpstan-type PublicImage array{src: string, srcset: string, full: string, width: int, height: int, alt: string, caption: ?string, credit: ?string}
  */
 final class BuildPublicPageImages
 {
@@ -60,6 +60,7 @@ final class BuildPublicPageImages
             'height' => $media->height,
             'alt' => $media->alt,
             'caption' => $media->caption,
+            'credit' => $media->credit,
         ];
     }
 }

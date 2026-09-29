@@ -43,6 +43,7 @@ final class UpdateMediaDetails
         DB::transaction(function () use ($media, $details, $actor, &$changed): void {
             $media->alt = $details->alt;
             $media->caption = $details->caption;
+            $media->credit = $details->credit;
             $media->depicts_assisted_minor = $details->depictsAssistedMinor;
 
             $dirty = $media->getDirty();

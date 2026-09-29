@@ -40,6 +40,7 @@ const idBase = computed(() => `page-image-${props.role}-${props.media.id}`)
 const isEditing = ref(false)
 const alt = ref(props.media.alt)
 const caption = ref(props.media.caption ?? '')
+const credit = ref(props.media.credit ?? '')
 const replacement = ref<File | null>(null)
 const isBusy = ref(false)
 const errorMessage = ref<string | null>(null)
@@ -71,6 +72,7 @@ function applyError(error: unknown, fallback: string): void {
 function startEditing(): void {
   alt.value = props.media.alt
   caption.value = props.media.caption ?? ''
+  credit.value = props.media.credit ?? ''
   clearErrors()
   isEditing.value = true
 }
@@ -85,6 +87,7 @@ async function saveDetails(): Promise<void> {
     await updateMediaDetails(props.media.id, {
       alt: alt.value,
       caption: caption.value,
+      credit: credit.value,
       depicts_assisted_minor: props.media.depicts_assisted_minor,
     })
     isEditing.value = false
@@ -194,6 +197,12 @@ async function remove(): Promise<void> {
         Legenda: {{ media.caption }}
       </p>
       <p
+        v-if="media.credit"
+        class="page-image__caption"
+      >
+        Crédito: {{ media.credit }}
+      </p>
+      <p
         v-if="!media.publishable"
         class="page-image__warning"
       >
@@ -253,6 +262,21 @@ async function remove(): Promise<void> {
             v-if="fieldErrors.caption"
             class="field__error"
           >{{ fieldErrors.caption[0] }}</span>
+        </div>
+
+        <div class="field">
+          <label :for="`${idBase}-credit`">Crédito (opcional)</label>
+          <input
+            :id="`${idBase}-credit`"
+            v-model="credit"
+            type="text"
+            maxlength="255"
+          >
+          <span class="field__hint">Quem fotografou ou de onde veio a imagem. Aparece com a foto ampliada no site.</span>
+          <span
+            v-if="fieldErrors.credit"
+            class="field__error"
+          >{{ fieldErrors.credit[0] }}</span>
         </div>
         <div class="page-image__actions">
           <button

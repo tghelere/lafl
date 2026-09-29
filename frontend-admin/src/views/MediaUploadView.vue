@@ -30,6 +30,7 @@ const localPreview = ref<string | null>(null)
 const fileInputError = ref<string | null>(null)
 const alt = ref('')
 const caption = ref('')
+const credit = ref('')
 const depictsAssistedMinor = ref<boolean | null>(null)
 
 const isSaving = ref(false)
@@ -78,6 +79,7 @@ async function handleSubmit(): Promise<void> {
     const media = await uploadMedia(file.value, {
       alt: alt.value,
       caption: caption.value,
+      credit: credit.value,
       depicts_assisted_minor: depictsAssistedMinor.value,
     })
     void router.push({ name: 'media.edit', params: { uuid: media.id }, query: { created: '1' } })
@@ -177,6 +179,21 @@ async function handleSubmit(): Promise<void> {
           v-if="fieldErrors.caption"
           class="field__error"
         >{{ fieldErrors.caption[0] }}</span>
+      </div>
+
+      <div class="field">
+        <label for="media-credit">Crédito (opcional)</label>
+        <input
+          id="media-credit"
+          v-model="credit"
+          type="text"
+          maxlength="255"
+        >
+        <span class="field__hint">Quem fotografou ou de onde veio a imagem. Aparece com a foto ampliada no site.</span>
+        <span
+          v-if="fieldErrors.credit"
+          class="field__error"
+        >{{ fieldErrors.credit[0] }}</span>
       </div>
 
       <MediaDeclarationField

@@ -11,6 +11,8 @@ export type PublicImage = {
   height: number
   alt: string
   caption: string | null
+  /** Quem fotografou, ou de onde veio. Aparece na ampliação, junto da legenda. */
+  credit: string | null
 }
 
 export type PublicPage = {

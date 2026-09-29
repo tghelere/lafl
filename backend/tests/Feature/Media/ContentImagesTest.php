@@ -146,6 +146,21 @@ describe('na leitura pública', function (): void {
         );
     });
 
+    test('o crédito da biblioteca vai no link, escapado, e só quando existe', function (): void {
+        $user = userWithRole('direcao');
+        $media = libraryImage($user, 800, 500);
+        savePage($user, figureFor($media))->assertCreated();
+
+        expect(test()->getJson('/api/v1/public/pages/nossa-sede')->json('data.content'))->not->toContain('data-credito');
+
+        test()->actingAs($user)->putJson("/api/v1/media/{$media->uuid}", [
+            'alt' => $media->alt, 'depicts_assisted_minor' => false, 'credit' => 'Foto: "Ana" & <equipe>',
+        ])->assertOk()->assertJsonPath('data.credit', 'Foto: "Ana" & <equipe>');
+
+        expect(test()->getJson('/api/v1/public/pages/nossa-sede')->json('data.content'))
+            ->toContain('data-credito="Foto: &quot;Ana&quot; &amp; &lt;equipe&gt;"');
+    });
+
     test('substituir o arquivo muda o srcset do site sem editar a página', function (): void {
         $user = userWithRole('direcao');
         $media = libraryImage($user, 1600, 1000);

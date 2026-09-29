@@ -25,6 +25,7 @@ trait ValidatesMediaDetails
         return [
             'alt' => ['required', 'string', 'max:255'],
             'caption' => ['nullable', 'string', 'max:500'],
+            'credit' => ['nullable', 'string', 'max:255'],
             'depicts_assisted_minor' => ['required', 'boolean'],
         ];
     }
@@ -38,6 +39,7 @@ trait ValidatesMediaDetails
             'alt.required' => 'Descreva a imagem para quem não pode vê-la (texto alternativo).',
             'alt.max' => 'O texto alternativo pode ter até 255 caracteres.',
             'caption.max' => 'A legenda pode ter até 500 caracteres.',
+            'credit.max' => 'O crédito pode ter até 255 caracteres.',
             'depicts_assisted_minor.required' => 'Informe se a imagem mostra alguém que hoje ainda é criança ou adolescente e que é ou foi atendido pela instituição.',
             'depicts_assisted_minor.boolean' => 'Informe se a imagem mostra alguém que hoje ainda é criança ou adolescente e que é ou foi atendido pela instituição.',
         ];
@@ -49,6 +51,7 @@ trait ValidatesMediaDetails
             alt: trim($this->string('alt')->value()),
             caption: $this->filled('caption') ? trim($this->string('caption')->value()) : null,
             depictsAssistedMinor: $this->boolean('depicts_assisted_minor'),
+            credit: $this->filled('credit') ? trim($this->string('credit')->value()) : null,
         );
     }
 }

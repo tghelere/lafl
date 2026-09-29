@@ -49,6 +49,7 @@ final class MediaResource extends JsonResource
             'id' => $this->uuid,
             'alt' => $this->alt,
             'caption' => $this->caption,
+            'credit' => $this->credit,
             'depicts_assisted_minor' => $this->depicts_assisted_minor,
             'publishable' => $this->isPublishable(),
             'src' => $this->isPublishable() ? MediaUrl::canonical($this->uuid) : null,

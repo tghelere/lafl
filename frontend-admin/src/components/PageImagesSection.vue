@@ -37,6 +37,7 @@ const file = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const alt = ref('')
 const caption = ref('')
+const credit = ref('')
 const depictsAssistedMinor = ref<boolean | null>(null)
 const target = ref<'gallery' | 'cover'>('gallery')
 const isUploading = ref(false)
@@ -140,6 +141,7 @@ async function upload(): Promise<void> {
       {
         alt: alt.value,
         caption: caption.value,
+        credit: credit.value,
         depicts_assisted_minor: depictsAssistedMinor.value,
       },
       target.value,
@@ -149,6 +151,7 @@ async function upload(): Promise<void> {
     file.value = null
     alt.value = ''
     caption.value = ''
+    credit.value = ''
     depictsAssistedMinor.value = null
     target.value = 'gallery'
 
@@ -392,6 +395,21 @@ async function upload(): Promise<void> {
             v-if="fieldErrors.caption"
             class="field__error"
           >{{ fieldErrors.caption[0] }}</span>
+        </div>
+
+        <div class="field">
+          <label for="page-image-upload-credit">Crédito (opcional)</label>
+          <input
+            id="page-image-upload-credit"
+            v-model="credit"
+            type="text"
+            maxlength="255"
+          >
+          <span class="field__hint">Quem fotografou ou de onde veio a imagem. Aparece com a foto ampliada no site.</span>
+          <span
+            v-if="fieldErrors.credit"
+            class="field__error"
+          >{{ fieldErrors.credit[0] }}</span>
         </div>
 
         <MediaDeclarationField

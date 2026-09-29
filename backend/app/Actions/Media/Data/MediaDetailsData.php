@@ -10,5 +10,6 @@ final readonly class MediaDetailsData
         public string $alt,
         public ?string $caption,
         public bool $depictsAssistedMinor,
+        public ?string $credit = null,
     ) {}
 }

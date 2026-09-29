@@ -104,12 +104,18 @@ final class ExpandContentImages
         $fallback = MediaUrl::derivative($item->uuid, MediaVariants::pick($item->widths, MediaVariants::DEFAULT_WIDTH));
 
         $altText = $alt[1] ?? '';
+        // O crédito é da biblioteca, não do texto: vai num atributo do link, lido só pela
+        // ampliação, e escapado como qualquer atributo (não passou pelo sanitizador do conteúdo).
+        $credit = $item->credit !== null && $item->credit !== ''
+            ? ' data-credito="'.htmlspecialchars($item->credit, ENT_QUOTES | ENT_HTML5, 'UTF-8').'"'
+            : '';
 
         return sprintf(
-            '<a href="%s" data-ampliar aria-label="Ampliar imagem: %s">'.
+            '<a href="%s" data-ampliar%s aria-label="Ampliar imagem: %s">'.
             '<img src="%s" srcset="%s" sizes="%s" width="%d" height="%d" alt="%s" loading="lazy" decoding="async" />'.
             '</a>',
             MediaUrl::derivative($item->uuid, MediaVariants::largest($item->widths)),
+            $credit,
             $altText,
             $fallback,
             $srcset,

@@ -48,6 +48,7 @@ final class StoreMedia
         $media = new Media;
         $media->alt = $details->alt;
         $media->caption = $details->caption;
+        $media->credit = $details->credit;
         $media->depicts_assisted_minor = false;
         $media->version = 1;
         $this->fillFromImage($media, $image);

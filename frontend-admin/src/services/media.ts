@@ -27,6 +27,11 @@ export async function fetchMedia(uuid: string): Promise<Media> {
 export type MediaDetailsPayload = {
   alt: string
   caption: string
+  /**
+   * Obrigatório no tipo, e não opcional: a API grava o que vier, e um formulário que não
+   * mandasse o crédito o apagaria ao salvar outro campo.
+   */
+  credit: string
   /** `null` = a pessoa ainda não respondeu. A API exige a resposta; aqui ela vai como está. */
   depicts_assisted_minor: boolean | null
   /**
@@ -39,6 +44,7 @@ export type MediaDetailsPayload = {
 function appendDetails(formData: FormData, payload: MediaDetailsPayload): void {
   formData.append('alt', payload.alt)
   formData.append('caption', payload.caption)
+  formData.append('credit', payload.credit)
 
   if (payload.depicts_assisted_minor !== null) {
     formData.append('depicts_assisted_minor', payload.depicts_assisted_minor ? '1' : '0')
@@ -68,6 +74,7 @@ export async function updateMediaDetails(uuid: string, payload: MediaDetailsPayl
   const { data } = await httpClient.put<{ data: Media }>(`/api/v1/media/${uuid}`, {
     alt: payload.alt,
     caption: payload.caption || null,
+    credit: payload.credit || null,
     depicts_assisted_minor: payload.depicts_assisted_minor,
     confirm_marking: payload.confirm_marking,
   })

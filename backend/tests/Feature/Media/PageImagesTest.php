@@ -60,6 +60,7 @@ describe('site público', function (): void {
                 'height' => 1134,
                 'alt' => 'Entrada do bazar',
                 'caption' => 'A entrada',
+                'credit' => null,
             ]);
     });
 

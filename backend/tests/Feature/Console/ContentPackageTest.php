@@ -58,7 +58,7 @@ function seedEditedContent(): void
     // Capa e galeria (formato 3), com uma foto vinda do catálogo inicial (origin_key). A ordem
     // da galeria é o contrário da ordem de criação, para o teste pegar quem ordenasse por id.
     $garden = $store->handle(Images::jpeg(800, 600)->getRealPath(), new MediaDetailsData('Horta', 'A horta', false), null);
-    $garden->forceFill(['origin_key' => 'horta-kids'])->save();
+    $garden->forceFill(['origin_key' => 'horta-kids', 'credit' => 'Foto: equipe do Lar'])->save();
     $place = app(PlaceImageOnPage::class);
     $place->handle($withPhoto, $garden, PageImageRole::Gallery);
     $place->handle($withPhoto, $photo, PageImageRole::Gallery);
@@ -102,7 +102,7 @@ function contentSnapshot(): array
             'sha256' => hash('sha256', Storage::disk('local')->get($d->file_path)),
         ])->all(),
         'media' => Media::query()->where('depicts_assisted_minor', false)->orderBy('uuid')->get()->map(fn (Media $m): array => [
-            ...$m->only(['uuid', 'origin_key', 'alt', 'caption', 'version', 'mime', 'extension', 'size', 'width', 'height', 'widths', 'sha256']),
+            ...$m->only(['uuid', 'origin_key', 'alt', 'caption', 'credit', 'version', 'mime', 'extension', 'size', 'width', 'height', 'widths', 'sha256']),
             'created_at' => $m->created_at?->toIso8601String(),
             'updated_at' => $m->updated_at?->toIso8601String(),
             'files' => collect(Storage::disk('local')->allFiles(MediaPaths::root($m)))

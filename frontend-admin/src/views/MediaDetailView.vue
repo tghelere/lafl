@@ -32,6 +32,7 @@ const loadErrorMessage = ref<string | null>(null)
 
 const alt = ref('')
 const caption = ref('')
+const credit = ref('')
 const depictsAssistedMinor = ref<boolean | null>(null)
 
 const replacement = ref<File | null>(null)
@@ -54,6 +55,7 @@ function fill(media: Media): void {
   record.value = media
   alt.value = media.alt
   caption.value = media.caption ?? ''
+  credit.value = media.credit ?? ''
   depictsAssistedMinor.value = media.depicts_assisted_minor
 }
 
@@ -134,6 +136,7 @@ async function save(confirmMarking: boolean): Promise<void> {
       await updateMediaDetails(uuid.value, {
         alt: alt.value,
         caption: caption.value,
+        credit: credit.value,
         depicts_assisted_minor: depictsAssistedMinor.value,
         confirm_marking: confirmMarking || undefined,
       }),
@@ -345,6 +348,22 @@ function formatSize(bytes: number): string {
             v-if="fieldErrors.caption"
             class="field__error"
           >{{ fieldErrors.caption[0] }}</span>
+        </div>
+
+        <div class="field">
+          <label for="media-credit">Crédito (opcional)</label>
+          <input
+            id="media-credit"
+            v-model="credit"
+            type="text"
+            maxlength="255"
+            :disabled="!record.can.update"
+          >
+          <span class="field__hint">Quem fotografou ou de onde veio a imagem. Aparece com a foto ampliada no site.</span>
+          <span
+            v-if="fieldErrors.credit"
+            class="field__error"
+          >{{ fieldErrors.credit[0] }}</span>
         </div>
 
         <MediaDeclarationField

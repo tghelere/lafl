@@ -21,6 +21,7 @@ final class MediaAuditDescription
     private const FIELD_LABELS = [
         'alt' => 'texto alternativo',
         'caption' => 'legenda',
+        'credit' => 'crédito',
         'depicts_assisted_minor' => 'declaração',
     ];
 

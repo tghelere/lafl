@@ -12,6 +12,8 @@ export type Media = {
   id: string
   alt: string
   caption: string | null
+  /** Quem fotografou, ou de onde veio. Aparece na ampliação do site, junto da legenda. */
+  credit: string | null
   depicts_assisted_minor: boolean
   /** Pode ir para o site. Decidido pela API (App\Models\Media::isPublishable). */
   publishable: boolean

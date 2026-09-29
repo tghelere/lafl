@@ -179,6 +179,7 @@ final class ExportContentPackage
                 'origin_key' => $item->origin_key,
                 'alt' => $item->alt,
                 'caption' => $item->caption,
+                'credit' => $item->credit,
                 'version' => $item->version,
                 'mime' => $item->mime,
                 'extension' => $item->extension,

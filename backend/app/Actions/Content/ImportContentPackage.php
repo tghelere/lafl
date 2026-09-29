@@ -290,6 +290,7 @@ final class ImportContentPackage
             'origin_key' => $data['origin_key'] ?? null,
             'alt' => $data['alt'],
             'caption' => $data['caption'] ?? null,
+            'credit' => $data['credit'] ?? null,
             'depicts_assisted_minor' => false,
             'version' => $data['version'],
             'mime' => $data['mime'],
