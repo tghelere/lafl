@@ -29,6 +29,11 @@ export type MediaDetailsPayload = {
   caption: string
   /** `null` = a pessoa ainda não respondeu. A API exige a resposta; aqui ela vai como está. */
   depicts_assisted_minor: boolean | null
+  /**
+   * Só ao MARCAR a imagem: a API exige a confirmação explícita (UpdateMediaRequest), e a tela
+   * só a manda depois da frase digitada em MarkAssistedMinorDialog.vue.
+   */
+  confirm_marking?: boolean
 }
 
 function appendDetails(formData: FormData, payload: MediaDetailsPayload): void {
@@ -64,6 +69,7 @@ export async function updateMediaDetails(uuid: string, payload: MediaDetailsPayl
     alt: payload.alt,
     caption: payload.caption || null,
     depicts_assisted_minor: payload.depicts_assisted_minor,
+    confirm_marking: payload.confirm_marking,
   })
 
   return data.data

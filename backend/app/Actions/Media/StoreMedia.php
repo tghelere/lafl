@@ -34,8 +34,10 @@ final class StoreMedia
         if ($details->depictsAssistedMinor) {
             throw ValidationException::withMessages([
                 'depicts_assisted_minor' => [
-                    'Fotos de crianças e adolescentes atendidos ainda não podem ser cadastradas: '.
-                    'elas exigem consentimento de imagem do responsável, que o sistema ainda não registra.',
+                    'Fotos em que aparece alguém que hoje ainda é criança ou adolescente atendido pela instituição, '.
+                    'ou que já foi atendido, ainda não podem ser cadastradas: elas exigem consentimento de imagem '.
+                    'do responsável, que o sistema ainda não registra. Foto de acervo em que todas as pessoas '.
+                    'retratadas já são adultas responde "Não".',
                 ],
             ]);
         }

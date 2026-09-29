@@ -166,7 +166,7 @@ describe('na leitura pública', function (): void {
         savePage($user, '<p>Antes</p>'.figureFor($media).'<p>Depois</p>')->assertCreated();
         expect(test()->getJson('/api/v1/public/pages/nossa-sede')->json('data.content'))->toContain('<figure>');
 
-        test()->actingAs($user)->putJson("/api/v1/media/{$media->uuid}", ['alt' => 'x', 'depicts_assisted_minor' => true])->assertOk();
+        test()->actingAs($user)->putJson("/api/v1/media/{$media->uuid}", ['alt' => 'x', 'depicts_assisted_minor' => true, 'confirm_marking' => true])->assertOk();
 
         expect(test()->getJson('/api/v1/public/pages/nossa-sede')->json('data.content'))->toBe('<p>Antes</p><p>Depois</p>');
     });

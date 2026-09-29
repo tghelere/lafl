@@ -177,8 +177,47 @@ test.describe('comunicacao', () => {
     await page.getByRole('radio', { name: 'Sim, mostra' }).check()
     await page.getByRole('button', { name: 'Enviar', exact: true }).click()
 
-    await expect(page.getByText(/Fotos de crianças e adolescentes atendidos ainda não podem ser cadastradas/)).toBeVisible()
+    await expect(page.getByText(/hoje ainda é criança ou adolescente atendido pela instituição, ou que já foi atendido, ainda não podem ser cadastradas/)).toBeVisible()
     await expect(page).toHaveURL(/\/admin\/imagens\/nova$/)
+  })
+
+  test('marcar uma imagem como de criança atendida exige digitar a confirmação, e a tira do site', async ({ page }) => {
+    await uploadThroughPanel(page, `Pátio numa festa ${unique('e2e')}`, solidPng(700, 400, [120, 30, 150]))
+    const mediaId = new URL(page.url()).pathname.split('/').at(-1)!
+    const direcaoApi = await AdminApi.as('direcao')
+
+    try {
+      const endereco = `${SITE_URL}/midia/${mediaId}/400.webp`
+      expect((await page.request.get(endereco)).status()).toBe(200)
+
+      await page.getByRole('radio', { name: 'Sim, mostra' }).check()
+      await page.getByRole('button', { name: 'Salvar', exact: true }).click()
+
+      const dialogo = page.getByRole('dialog', { name: 'Marcar como foto de criança ou adolescente atendido' })
+      await expect(dialogo).toBeVisible()
+      await expect(dialogo.getByText('a marcação não pode ser desfeita')).toBeVisible()
+
+      const confirmar = dialogo.getByRole('button', { name: 'Marcar e tirar do site' })
+      await expect(confirmar).toBeDisabled()
+
+      // Cancelar não marca nada.
+      await dialogo.getByRole('button', { name: 'Cancelar' }).click()
+      await expect(dialogo).toBeHidden()
+      expect((await page.request.get(endereco)).status()).toBe(200)
+
+      await page.getByRole('button', { name: 'Salvar', exact: true }).click()
+      await dialogo.getByLabel('Para confirmar, digite tirar do site').fill('tirar')
+      await expect(confirmar).toBeDisabled()
+      await dialogo.getByLabel('Para confirmar, digite tirar do site').fill('tirar do site')
+      await confirmar.click()
+
+      await expect(page.getByText('Imagem marcada. Ela já não aparece no site.')).toBeVisible()
+      await expect(page.getByRole('radio', { name: 'Não' })).toBeDisabled()
+      expect((await page.request.get(endereco)).status()).toBe(404)
+    } finally {
+      await direcaoApi.delete(`/api/v1/media/${mediaId}`)
+      await direcaoApi.dispose()
+    }
   })
 
   test.describe('em 360px', () => {

@@ -164,13 +164,19 @@ describe('validação', function (): void {
             'alt' => 'Fachada',
         ], ['Accept' => 'application/json'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['depicts_assisted_minor' => 'Informe se a imagem mostra criança ou adolescente atendido pela instituição.']);
+            ->assertJsonValidationErrors(['depicts_assisted_minor' => 'Informe se a imagem mostra alguém que hoje ainda é criança ou adolescente e que é ou foi atendido pela instituição.']);
     });
 
     test('recusa foto declarada como de criança ou adolescente atendido, sem gravar nada', function (): void {
-        uploadMedia(userWithRole('direcao'), Images::jpeg(500, 400), ['depicts_assisted_minor' => '1'])
+        $response = uploadMedia(userWithRole('direcao'), Images::jpeg(500, 400), ['depicts_assisted_minor' => '1'])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['depicts_assisted_minor']);
+
+        // A recusa explica o critério: quem manda acervo antigo, de pessoas hoje adultas, sabe
+        // que a resposta dele é "Não".
+        expect($response->json('errors.depicts_assisted_minor.0'))
+            ->toContain('hoje ainda é criança ou adolescente')
+            ->toContain('já são adultas responde "Não"');
 
         expect(Media::query()->count())->toBe(0)
             ->and(Storage::disk('local')->allFiles())->toBe([]);
@@ -300,8 +306,20 @@ describe('edição dos dados', function (): void {
 
         test()->get("/api/v1/public/media/{$media->uuid}/640.webp")->assertOk();
 
+        // Sem a confirmação explícita, nada muda: a marcação não se desfaz.
         test()->actingAs($user)->putJson("/api/v1/media/{$media->uuid}", [
             'alt' => $media->alt, 'depicts_assisted_minor' => true,
+        ])->assertUnprocessable()->assertJsonValidationErrors([
+            'confirm_marking' => 'Confirme que a marcação tira a imagem do site em todas as páginas e não pode ser desfeita.',
+        ]);
+        test()->get("/api/v1/public/media/{$media->uuid}/640.webp")->assertOk();
+
+        test()->actingAs($user)->putJson("/api/v1/media/{$media->uuid}", [
+            'alt' => $media->alt, 'depicts_assisted_minor' => true, 'confirm_marking' => false,
+        ])->assertUnprocessable()->assertJsonValidationErrors(['confirm_marking']);
+
+        test()->actingAs($user)->putJson("/api/v1/media/{$media->uuid}", [
+            'alt' => $media->alt, 'depicts_assisted_minor' => true, 'confirm_marking' => true,
         ])->assertOk()->assertJsonPath('data.publishable', false)->assertJsonPath('data.src', null);
 
         test()->get("/api/v1/public/media/{$media->uuid}/640.webp")->assertNotFound();

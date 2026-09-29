@@ -103,6 +103,13 @@ trava que funciona hoje é uma declaração de quem sobe:**
 
 - `depicts_assisted_minor` é **obrigatória, sem valor padrão**. A tela oferece "Não" e "Sim,
   mostra", nenhuma marcada de início.
+- **O critério é a pessoa hoje, não a data da foto** (revisto na sessão 28). A pergunta é se a
+  imagem mostra alguém que *hoje ainda é criança ou adolescente e que é ou foi atendido* pela
+  instituição. Até a sessão 27 ela dizia só "criança ou adolescente atendido", e recusaria o
+  acervo de 1963 inteiro, cujas crianças hoje passam dos 60 anos. Acervo em que todos os
+  retratados já são adultos responde "Não". Foto recente de atendidos continua "Sim", e
+  recusada. Na dúvida sobre a idade de alguém hoje, "Sim". A tela mostra esses três casos, e a
+  recusa da API também explica o do acervo.
 - **"Sim" é recusado no upload (422).** Sem consentimento registrado, a foto não tem finalidade
   possível no site, e guardá-la seria tratamento de dado de menor sem base, justamente o que a
   Fase 2 bloqueada existe para organizar.
@@ -110,11 +117,20 @@ trava que funciona hoje é uma declaração de quem sobe:**
   responde 404, a figura some do HTML público com a legenda, e salvar uma página que ainda a use
   é recusado. **A marcação não se desfaz**, nem pelo painel nem por pacote de conteúdo: só um
   consentimento registrado poderia liberar a imagem.
+- **Marcar exige confirmação forte** (sessão 28). A tela abre um diálogo com as consequências e
+  as páginas onde a imagem está, e só libera o botão com a frase "tirar do site" digitada. A API
+  recusa a marcação sem `confirm_marking` aceito (UpdateMediaRequest), para que um valor trocado
+  no corpo da requisição não marque nada por engano.
 - A imagem marcada **não viaja** no pacote de conteúdo.
 
 Quando `consents` existir, `Media::isPublishable()` passa a consultar o consentimento de imagem
 vigente, e só ele muda. O upload com "sim" deixa de ser recusado quando houver como vincular a
 foto ao assistido e ao consentimento.
+
+**Interpretação a confirmar com a instituição:** o pedido falava em "criança ou adolescente
+atendido hoje". A regra adotada alcança também quem **já foi** atendido e ainda é menor, porque
+continua hipervulnerável, e o CLAUDE.md manda escolher o mais restritivo na dúvida. Se a
+instituição entender que só o atendido atual conta, a mudança é só de texto.
 
 **Dúvida registrada, não resolvida aqui:** a declaração depende de quem sobe responder com
 verdade, e nenhuma trava técnica reconhece uma criança numa foto. A mitigação é de processo:

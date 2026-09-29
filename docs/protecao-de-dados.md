@@ -201,6 +201,18 @@ no upload.** A declaração é obrigatória, e marcar depois tira a imagem do si
 volta. A declaração depende de quem sobe responder com verdade: é um controle de processo, e
 a orientação à equipe fica com a instituição.
 
+**O critério é a pessoa hoje, não a data da foto** (sessão 28): a pergunta é se a imagem mostra
+alguém que **hoje ainda é criança ou adolescente e que é ou foi atendido** pela instituição.
+Foto recente de atendidos: sim, e é recusada. Acervo histórico em que todas as pessoas
+retratadas já são adultas (as fotos de 1963, por exemplo): não. Na dúvida sobre a idade de
+alguém hoje: sim. Quem já saiu do Lar e ainda é menor continua alcançado, por ser o mais
+restritivo. O adulto retratado no acervo continua titular de dado pessoal (a própria imagem),
+mas não é mais o titular hipervulnerável que esta trava protege: publicar acervo histórico é
+decisão da instituição, fora do alcance desta trava.
+
+Marcar uma imagem já cadastrada exige confirmação forte: a tela pede a frase "tirar do site"
+digitada, e a API recusa a marcação sem `confirm_marking`.
+
 ## Transferência internacional
 
 **O servidor fica nos Estados Unidos** (Hostinger; `whois` do IP devolve `country: US`). Não foi

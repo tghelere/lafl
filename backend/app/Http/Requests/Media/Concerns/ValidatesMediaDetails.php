@@ -13,6 +13,11 @@ trait ValidatesMediaDetails
      * pode ser só espaço. `depicts_assisted_minor` também é obrigatório, sem padrão: é uma
      * declaração, e quem sobe a imagem precisa responder.
      *
+     * O critério da declaração (sessão 28): a imagem mostra alguém que HOJE ainda é criança ou
+     * adolescente e que é ou foi atendido pela instituição. Foto de acervo em que todas as
+     * pessoas retratadas já são adultas responde "não"; foto recente de atendidos responde
+     * "sim". Ver docs/decisoes/0024-biblioteca-de-midia.md, item 5.
+     *
      * @return array<string, list<string>>
      */
     protected function detailRules(): array
@@ -33,8 +38,8 @@ trait ValidatesMediaDetails
             'alt.required' => 'Descreva a imagem para quem não pode vê-la (texto alternativo).',
             'alt.max' => 'O texto alternativo pode ter até 255 caracteres.',
             'caption.max' => 'A legenda pode ter até 500 caracteres.',
-            'depicts_assisted_minor.required' => 'Informe se a imagem mostra criança ou adolescente atendido pela instituição.',
-            'depicts_assisted_minor.boolean' => 'Informe se a imagem mostra criança ou adolescente atendido pela instituição.',
+            'depicts_assisted_minor.required' => 'Informe se a imagem mostra alguém que hoje ainda é criança ou adolescente e que é ou foi atendido pela instituição.',
+            'depicts_assisted_minor.boolean' => 'Informe se a imagem mostra alguém que hoje ainda é criança ou adolescente e que é ou foi atendido pela instituição.',
         ];
     }
 

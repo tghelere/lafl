@@ -9,6 +9,7 @@ import AppIcon from '@/components/AppIcon.vue'
 import AppLayout from '@/components/AppLayout.vue'
 import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
+import MarkAssistedMinorDialog from '@/components/MarkAssistedMinorDialog.vue'
 import MediaDeclarationField from '@/components/MediaDeclarationField.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageHeader from '@/components/PageHeader.vue'
@@ -108,17 +109,23 @@ async function load(): Promise<void> {
 // parâmetro, e não só na montagem (armadilha registrada no CLAUDE.md).
 watch(uuid, () => void load(), { immediate: true })
 
-async function handleSave(): Promise<void> {
-  if (depictsAssistedMinor.value === true && record.value?.depicts_assisted_minor === false) {
-    const confirmed = window.confirm(
-      'Marcar esta imagem como foto de criança ou adolescente atendido a tira do site imediatamente, em todas as páginas. A marcação não pode ser desfeita. Continuar?',
-    )
+const markDialog = ref<InstanceType<typeof MarkAssistedMinorDialog> | null>(null)
 
-    if (!confirmed) {
-      return
-    }
+/**
+ * Marcar como foto de assistido passa antes pela confirmação forte (a frase digitada); só
+ * depois dela o pedido sai, com `confirm_marking`. Qualquer outra alteração salva direto.
+ */
+function handleSave(): void {
+  if (depictsAssistedMinor.value === true && record.value?.depicts_assisted_minor === false) {
+    markDialog.value?.open()
+
+    return
   }
 
+  void save(false)
+}
+
+async function save(confirmMarking: boolean): Promise<void> {
   isSaving.value = true
   clearMessages()
 
@@ -128,9 +135,12 @@ async function handleSave(): Promise<void> {
         alt: alt.value,
         caption: caption.value,
         depicts_assisted_minor: depictsAssistedMinor.value,
+        confirm_marking: confirmMarking || undefined,
       }),
     )
-    notice.value = 'Dados da imagem salvos.'
+    notice.value = confirmMarking
+      ? 'Imagem marcada. Ela já não aparece no site.'
+      : 'Dados da imagem salvos.'
   } catch (error) {
     applyError(error, 'Não foi possível salvar. Tente novamente.')
   } finally {
@@ -408,6 +418,12 @@ function formatSize(bytes: number): string {
           {{ isDeleting ? 'Excluindo…' : 'Excluir imagem' }}
         </button>
       </div>
+
+      <MarkAssistedMinorDialog
+        ref="markDialog"
+        :usages="record.usages ?? []"
+        @confirm="save(true)"
+      />
     </template>
   </AppLayout>
 </template>
