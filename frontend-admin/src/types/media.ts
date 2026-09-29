@@ -4,6 +4,8 @@ export type MediaUsage = {
   title: string
   slug: string
   status: string
+  /** Onde, nessa página: no texto, na capa ou na galeria (App\Actions\Media\FindMediaUsages). */
+  places: Array<'content' | 'cover' | 'gallery'>
 }
 
 export type Media = {
@@ -37,4 +39,12 @@ export type MediaListResponse = {
     last_page: number
     total: number
   }
+}
+
+/** Espelha App\Http\Controllers\Api\V1\PageImageController::index. */
+export type PageImages = {
+  cover: Media | null
+  gallery: Media[]
+  /** As do meio do texto, na ordem do conteúdo SALVO. */
+  content: Media[]
 }

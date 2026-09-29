@@ -1368,6 +1368,107 @@ body.has-open-drawer {
   left: var(--space-3);
 }
 
+/* "Imagens desta página" — ver src/components/PageImagesSection.vue. Um cartão abaixo do
+   formulário da página, porque tem salvamento próprio. Cada imagem é uma linha com miniatura
+   e ações; abaixo de 36rem a miniatura sobe e ocupa a largura. */
+.page-images {
+  margin-top: var(--space-5);
+}
+
+.page-images__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.page-images__group {
+  margin: var(--space-5) 0 var(--space-1);
+  font-size: var(--text-base);
+}
+
+.page-images__list {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page-images__empty {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.page-images__upload {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.page-image {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 36rem) {
+  .page-image {
+    grid-template-columns: 9rem minmax(0, 1fr);
+  }
+}
+
+.page-image__thumb {
+  width: 100%;
+  max-height: 12rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  object-fit: contain;
+}
+
+.page-image__body {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.page-image__body p {
+  margin: 0;
+}
+
+.page-image__alt {
+  font-size: var(--text-sm);
+}
+
+.page-image__caption,
+.page-image__warning {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.page-image__warning {
+  color: var(--color-error);
+}
+
+.page-image__actions,
+.page-image__replace-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.page-image__replace label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.page-image__replace-row input[type='file'] {
+  min-width: 0;
+  max-width: 100%;
+}
+
 /* Biblioteca vazia: um convite, não uma mensagem de estado — quem chega aqui pela primeira
    vez precisa do botão, e a busca (escondida neste estado) não teria o que procurar. */
 .media-empty {

@@ -11,6 +11,7 @@ use App\Models\Page;
 use App\Models\PageImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Spatie\Activitylog\Models\Activity;
 use Tests\Support\Images;
 
 /**
@@ -83,6 +84,22 @@ describe('site público', function (): void {
             ->and(array_column($images['gallery'], 'alt'))->toBe(['Placa do bazar']);
     });
 
+    test('corrigir o texto alternativo na biblioteca muda a galeria no site na hora', function (): void {
+        pageWithImages();
+        $this->getJson('/api/v1/public/pages/bazar')->assertOk();
+        $placa = Media::query()->where('alt', 'Placa do bazar')->firstOrFail();
+
+        $this->actingAs(userWithRole('comunicacao'))->putJson("/api/v1/media/{$placa->uuid}", [
+            'alt' => 'Placa do bazar, vista da calçada',
+            'caption' => 'Nova legenda',
+            'depicts_assisted_minor' => false,
+        ])->assertOk();
+
+        $first = $this->getJson('/api/v1/public/pages/bazar')->json('data.images.gallery.0');
+        expect($first['alt'])->toBe('Placa do bazar, vista da calçada')
+            ->and($first['caption'])->toBe('Nova legenda');
+    });
+
     test('trocar o arquivo muda o srcset e o ETag da página, sem editar a página', function (): void {
         pageWithImages();
         $first = $this->getJson('/api/v1/public/pages/bazar');
@@ -143,4 +160,107 @@ describe('na biblioteca', function (): void {
         expect(fn () => app(PlaceImageOnPage::class)->handle($page, $marked, PageImageRole::Gallery))
             ->toThrow(ValidationException::class);
     });
+});
+
+describe('Imagens desta página (painel)', function (): void {
+    test('lista capa, galeria em ordem e as imagens do texto salvo', function (): void {
+        $page = pageWithImages();
+        $inText = storedImage('Foto no meio do texto');
+        $page->content = '<p>a</p><figure><img src="/midia/'.$inText->uuid.'" alt="Outro texto" /></figure>';
+        $page->save();
+
+        $data = $this->actingAs(userWithRole('comunicacao'))
+            ->getJson("/api/v1/pages/{$page->uuid}/images")
+            ->assertOk()
+            ->json('data');
+
+        expect($data['cover']['alt'])->toBe('Entrada do bazar')
+            ->and(array_column($data['gallery'], 'alt'))->toBe(['Placa do bazar', 'Entrada do bazar'])
+            ->and(array_column($data['content'], 'alt'))->toBe(['Foto no meio do texto'])
+            ->and($data['gallery'][1]['usages'][0]['places'])->toBe(['cover', 'gallery']);
+    });
+
+    test('enviar põe a foto na biblioteca e no fim da galeria, e o site mostra', function (): void {
+        $page = pageWithImages();
+
+        $response = $this->actingAs(userWithRole('comunicacao'))->post("/api/v1/pages/{$page->uuid}/images", [
+            'file' => Images::jpeg(900, 600),
+            'alt' => 'Nova foto da loja',
+            'caption' => 'Recém-chegada',
+            'depicts_assisted_minor' => '0',
+        ], ['Accept' => 'application/json']);
+
+        $response->assertCreated();
+        $media = Media::query()->where('uuid', $response->json('data.id'))->firstOrFail();
+
+        expect(PageImage::query()->where('media_id', $media->id)->value('position'))->toBe(2)
+            ->and(Activity::query()->where('event', 'uploaded')->where('subject_id', $media->id)->exists())->toBeTrue()
+            ->and(Activity::query()->where('event', 'placed')->where('subject_id', $media->id)->exists())->toBeTrue();
+
+        $gallery = $this->getJson('/api/v1/public/pages/bazar')->json('data.images.gallery');
+        expect(array_column($gallery, 'alt'))->toBe(['Placa do bazar', 'Entrada do bazar', 'Nova foto da loja'])
+            ->and($gallery[2]['caption'])->toBe('Recém-chegada');
+    });
+
+    test('enviar recusa foto declarada de criança atendida, e nada fica gravado', function (): void {
+        $page = pageWithImages();
+        $before = Media::query()->count();
+
+        $this->actingAs(userWithRole('comunicacao'))->post("/api/v1/pages/{$page->uuid}/images", [
+            'file' => Images::jpeg(900, 600),
+            'alt' => 'Crianças no pátio',
+            'depicts_assisted_minor' => '1',
+        ], ['Accept' => 'application/json'])->assertUnprocessable()->assertJsonValidationErrors(['depicts_assisted_minor']);
+
+        expect(Media::query()->count())->toBe($before)
+            ->and(PageImage::query()->where('page_id', $page->id)->count())->toBe(3);
+    });
+
+    test('tirar da galeria fecha o buraco e deixa a imagem na biblioteca', function (): void {
+        $page = pageWithImages();
+        $placa = Media::query()->where('alt', 'Placa do bazar')->firstOrFail();
+
+        $this->actingAs(userWithRole('comunicacao'))
+            ->deleteJson("/api/v1/pages/{$page->uuid}/images/{$placa->uuid}?role=gallery")
+            ->assertNoContent();
+
+        $gallery = PageImage::query()->where('page_id', $page->id)->where('role', 'gallery')->get();
+        expect($gallery->pluck('position')->all())->toBe([0])
+            ->and(Media::query()->whereKey($placa->id)->exists())->toBeTrue()
+            ->and(array_column($this->getJson('/api/v1/public/pages/bazar')->json('data.images.gallery'), 'alt'))->toBe(['Entrada do bazar']);
+    });
+
+    test('tirar da capa não mexe na galeria', function (): void {
+        $page = pageWithImages();
+        $entrance = Media::query()->where('alt', 'Entrada do bazar')->firstOrFail();
+
+        $this->actingAs(userWithRole('comunicacao'))
+            ->deleteJson("/api/v1/pages/{$page->uuid}/images/{$entrance->uuid}?role=cover")
+            ->assertNoContent();
+
+        $images = $this->getJson('/api/v1/public/pages/bazar')->json('data.images');
+        expect($images['cover'])->toBeNull()->and($images['gallery'])->toHaveCount(2);
+    });
+
+    test('tirar imagem que não está lá é recusado com mensagem', function (): void {
+        $page = pageWithImages();
+        $other = storedImage('Outra');
+
+        $this->actingAs(userWithRole('comunicacao'))
+            ->deleteJson("/api/v1/pages/{$page->uuid}/images/{$other->uuid}?role=gallery")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['media' => 'Esta imagem não está na galeria desta página.']);
+    });
+
+    test('quem não edita páginas não vê, não envia e não tira', function (string $role): void {
+        $page = pageWithImages();
+        $placa = Media::query()->where('alt', 'Placa do bazar')->firstOrFail();
+        $user = userWithRole($role);
+
+        $this->actingAs($user)->getJson("/api/v1/pages/{$page->uuid}/images")->assertForbidden();
+        $this->actingAs($user)->post("/api/v1/pages/{$page->uuid}/images", [
+            'file' => Images::jpeg(300, 200), 'alt' => 'x', 'depicts_assisted_minor' => '0',
+        ], ['Accept' => 'application/json'])->assertForbidden();
+        $this->actingAs($user)->deleteJson("/api/v1/pages/{$page->uuid}/images/{$placa->uuid}?role=gallery")->assertForbidden();
+    })->with(['financeiro', 'bazar', 'atendimento']);
 });

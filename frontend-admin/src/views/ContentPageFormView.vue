@@ -11,6 +11,7 @@ import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import PageImagesSection from '@/components/PageImagesSection.vue'
 import RichTextEditor from '@/components/RichTextEditor.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { siteUrl } from '@/config'
@@ -390,6 +391,12 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
           </button>
         </div>
       </form>
+
+      <!-- Fora do <form>: as imagens têm salvamento próprio, e cada ação já vai ao ar. -->
+      <PageImagesSection
+        :page-uuid="record.id"
+        :refresh-key="record.updated_at"
+      />
     </template>
   </AppLayout>
 </template>

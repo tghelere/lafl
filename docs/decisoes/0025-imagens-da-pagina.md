@@ -42,6 +42,11 @@ dentro do cache de 10 minutos, como a expansão do texto, e esquecido pelo mesmo
 passou a incluir as imagens: trocar o arquivo muda o `srcset` sem mudar o texto nem o
 `updated_at`.
 
+Corrigir o texto alternativo ou a legenda na biblioteca também esquece o cache das páginas que
+usam a imagem. Antes desta decisão, só a marcação de assistido fazia isso, e bastava, porque o
+texto do conteúdo é cópia. Com a capa e a galeria lendo o texto da biblioteca, o site ficaria
+até dez minutos com o texto velho. O e2e de "Imagens desta página" pegou isso.
+
 O `sizes` fica no site (`AppImagem.vue`, por contexto), porque é o layout que sabe quanto da tela
 a imagem ocupa. A chave do cache subiu para `public-page:v2:` para que a entrada da versão
 anterior, sem `images`, não fosse servida depois do deploy.

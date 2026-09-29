@@ -40,7 +40,8 @@ function appendDetails(formData: FormData, payload: MediaDetailsPayload): void {
   }
 }
 
-export async function uploadMedia(file: File | null, payload: MediaDetailsPayload): Promise<Media> {
+/** O corpo multipart de um envio — o mesmo na biblioteca e em "Imagens desta página". */
+export function uploadFormData(file: File | null, payload: MediaDetailsPayload): FormData {
   const formData = new FormData()
 
   if (file) {
@@ -49,7 +50,11 @@ export async function uploadMedia(file: File | null, payload: MediaDetailsPayloa
 
   appendDetails(formData, payload)
 
-  const { data } = await httpClient.post<{ data: Media }>('/api/v1/media', formData)
+  return formData
+}
+
+export async function uploadMedia(file: File | null, payload: MediaDetailsPayload): Promise<Media> {
+  const { data } = await httpClient.post<{ data: Media }>('/api/v1/media', uploadFormData(file, payload))
 
   return data.data
 }

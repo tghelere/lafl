@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\FormAuditController;
 use App\Http\Controllers\Api\V1\MediaController;
 use App\Http\Controllers\Api\V1\PageController;
+use App\Http\Controllers\Api\V1\PageImageController;
 use App\Http\Controllers\Api\V1\PartnershipInquiryController;
 use App\Http\Controllers\Api\V1\PickupRequestController;
 use App\Http\Controllers\Api\V1\ProgramApplicationController;
@@ -109,6 +110,13 @@ Route::prefix('public')->name('public.')->group(function (): void {
 
 Route::middleware($authenticated)->group(function (): void {
     Route::apiResource('pages', PageController::class)->parameters(['pages' => 'page']);
+
+    // "Imagens desta página": capa, galeria e as do texto, pela porta da página (ver
+    // docs/decisoes/0025-imagens-da-pagina.md). Enviar põe no fim da galeria; o DELETE tira da
+    // capa ou da galeria (`role`) e deixa a imagem na biblioteca.
+    Route::get('/pages/{page}/images', [PageImageController::class, 'index'])->name('pages.images.index');
+    Route::post('/pages/{page}/images', [PageImageController::class, 'store'])->name('pages.images.store');
+    Route::delete('/pages/{page}/images/{media}', [PageImageController::class, 'destroy'])->name('pages.images.destroy');
 
     // Marcadores que o editor de páginas oferece, com o valor de agora (ver
     // App\Enums\ContentMarker). Sem paginação: é um enum de cinco casos, mesmo caso de

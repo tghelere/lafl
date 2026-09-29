@@ -38,9 +38,9 @@ final class UpdateMediaDetails
             ]);
         }
 
-        $becameUnpublishable = ! $media->depicts_assisted_minor && $details->depictsAssistedMinor;
+        $changed = false;
 
-        DB::transaction(function () use ($media, $details, $actor): void {
+        DB::transaction(function () use ($media, $details, $actor, &$changed): void {
             $media->alt = $details->alt;
             $media->caption = $details->caption;
             $media->depicts_assisted_minor = $details->depictsAssistedMinor;
@@ -53,6 +53,7 @@ final class UpdateMediaDetails
 
             $old = array_intersect_key($media->getOriginal(), $dirty);
             $media->save();
+            $changed = true;
 
             activity('media')
                 ->causedBy($actor)
@@ -62,7 +63,10 @@ final class UpdateMediaDetails
                 ->log('Dados da imagem alterados');
         });
 
-        if ($becameUnpublishable) {
+        // Qualquer mudança, não só a marcação: a capa e a galeria mostram o texto alternativo e a
+        // legenda DA BIBLIOTECA (ADR 0025), e o site ficaria até dez minutos com o texto velho.
+        // A marcação continua sendo o caso que não pode esperar: tira a imagem do ar na hora.
+        if ($changed) {
             $this->forgetPages->handle($media);
         }
 

@@ -192,7 +192,7 @@ test.describe('comunicacao', () => {
 
       try {
         await page.goto('/admin/imagens')
-        await expect(page.getByRole('heading', { name: 'Imagens' })).toBeVisible()
+        await expect(page.getByRole('heading', { name: 'Imagens', exact: true })).toBeVisible()
         await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 
         await openContentPageByTitle(page, titulo)

@@ -197,6 +197,12 @@ async function handleDelete(): Promise<void> {
   }
 }
 
+const PLACE_LABELS: Record<string, string> = { content: 'no texto', cover: 'capa', gallery: 'galeria' }
+
+function placesLabel(places: string[]): string {
+  return places.map((place) => PLACE_LABELS[place] ?? place).join(', ')
+}
+
 function formatSize(bytes: number): string {
   return bytes >= 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`
 }
@@ -279,7 +285,7 @@ function formatSize(bytes: number): string {
               <RouterLink :to="{ name: 'pages.edit', params: { uuid: usage.uuid } }">
                 {{ usage.title }}
               </RouterLink>
-              <span class="field__hint">/{{ usage.slug }}</span>
+              <span class="field__hint">/{{ usage.slug }} · {{ placesLabel(usage.places) }}</span>
             </li>
           </ul>
           <p
