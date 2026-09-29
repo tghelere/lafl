@@ -14,8 +14,9 @@
 // Acessibilidade, além do que o <dialog> modal já dá (fundo inerte, Esc):
 // - o foco fica preso aqui dentro: Tab e Shift+Tab circulam entre os controles, sem depender
 //   do navegador (no Firefox, o Tab no último controle pode ir para a barra de endereço);
-// - ao fechar, por qualquer caminho, o foco volta ao link da imagem de ORIGEM, a que foi
-//   clicada, para quem usa teclado continuar de onde estava;
+// - ao fechar, por qualquer caminho, o foco volta ao link da imagem que estava ABERTA no
+//   momento do fechamento, e não à que foi clicada: quem navegou até a terceira foto e fechou
+//   continua na terceira, para quem usa teclado seguir de onde parou;
 // - o botão de navegação que desliga na ponta não leva o foco embora: ele passa ao outro;
 // - cada troca é anunciada ("Imagem 2 de 4: …") numa região aria-live, porque a imagem nova
 //   não recebe foco.
@@ -37,7 +38,6 @@ const dialogo = ref<HTMLDialogElement | null>(null)
 const fechador = ref<HTMLButtonElement | null>(null)
 const anterior = ref<HTMLButtonElement | null>(null)
 const proxima = ref<HTMLButtonElement | null>(null)
-let origem: HTMLAnchorElement | null = null
 const palco = ref<HTMLElement | null>(null)
 const itens = ref<Item[]>([])
 const indice = ref(0)
@@ -137,7 +137,6 @@ async function abrir(link: HTMLAnchorElement): Promise<boolean> {
 
   itens.value = lidos
   indice.value = posicao
-  origem = link
   espaco.value = { largura: 0, altura: 0, densidade: 1 }
   document.documentElement.classList.add('ampliacao-aberta')
   // Desenhar o conteúdo ANTES de abrir: o showModal() põe o foco no primeiro controle que
@@ -156,9 +155,10 @@ function fechar(): void {
 
 function aoFechar(): void {
   document.documentElement.classList.remove('ampliacao-aberta')
+  // Lido ANTES de esvaziar a lista: é o link da imagem aberta agora que recebe o foco.
+  const aberta = atual.value?.link
   itens.value = []
-  origem?.focus()
-  origem = null
+  aberta?.focus()
 }
 
 async function irPara(novo: number): Promise<void> {

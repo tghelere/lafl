@@ -40,7 +40,7 @@ documentação com este relatório. ADR 0026.
 - **Foco preso explícito:** Tab e Shift+Tab circulam dentro do diálogo. No Firefox, o Tab no
   último controle podia escapar para a barra de endereço, e o `<dialog>` sozinho não impede.
 - **Foco devolvido ao link de origem**, a imagem clicada, por qualquer caminho de fechar e mesmo
-  depois de navegar.
+  depois de navegar. *(Revisto na sessão 31: agora volta à imagem aberta no fechamento.)*
 - **Na ponta,** o botão com foco desliga e o foco passa ao outro sentido, em vez de cair no
   `<body>`.
 - **Anúncio `aria-live`** a cada troca ("Imagem 2 de 3: …"). A legenda e o crédito descrevem o
@@ -67,7 +67,8 @@ segue o completo pelo `aria-label`.
    tamanho exibido. Numa tela de alta densidade, isso já leva a derivada maior, porque a conta
    é em pixels do aparelho.
 3. **Foco devolvido à imagem de ORIGEM**, como pedido, e não à última vista. Depois de navegar
-   até a terceira foto, o foco volta à primeira.
+   até a terceira foto, o foco volta à primeira. *(Revisto na sessão 31: era a leitura errada do
+   que se queria. Agora o foco fica na terceira.)*
 4. **Sem `viewport-fit=cover`.** Os insets de área segura valem 0 hoje, e o navegador já mantém
    tudo na área segura. Ligar o `cover` exigiria revisar o site inteiro.
 5. **As pontas não dão a volta.** Na última foto, "Próxima" desliga, em vez de voltar à

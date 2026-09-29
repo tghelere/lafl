@@ -46,7 +46,9 @@ O `showModal()` dá o fundo inerte, o Esc e a camada acima de tudo. O resto é p
 
 - **foco preso explícito:** Tab e Shift+Tab circulam dentro, porque no Firefox o Tab podia
   escapar para a barra de endereço;
-- **foco devolvido ao link de origem** ao fechar, mesmo depois de navegar;
+- **foco devolvido ao link da imagem aberta no momento do fechamento**, e não ao da que foi
+  clicada (revisto na sessão 31; a sessão 30 devolvia à de origem). Quem navegou até a terceira
+  foto e fechou continua na terceira, que é onde a atenção dele estava;
 - **anúncio `aria-live`** a cada troca;
 - **deslize** por eventos de ponteiro: horizontal, com pelo menos 50px, e sem contar como
   clique fora.

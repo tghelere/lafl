@@ -236,7 +236,7 @@ test.describe('acessibilidade — 1280px, só teclado', () => {
     return page.evaluate(() => document.querySelector('dialog.ampliacao')?.contains(document.activeElement) ?? false)
   }
 
-  test('abre com Enter, prende o foco, anuncia a troca e devolve o foco à imagem de origem', async ({ page }) => {
+  test('abre com Enter, prende o foco, anuncia a troca e devolve o foco à imagem aberta ao fechar', async ({ page }) => {
     await gotoSite(page, `/${slug}`)
     const origem = `Ampliar imagem: ${galeria[0].alt}`
     await focusByTab(page, origem)
@@ -261,13 +261,15 @@ test.describe('acessibilidade — 1280px, só teclado', () => {
     await expect(dialogo.getByText(`Imagem 3 de 3: ${galeria[2].alt}`)).toBeAttached()
     await expect(dialogo.getByRole('button', { name: 'Imagem anterior' })).toBeFocused()
 
-    // Fechar depois de navegar: o foco volta à imagem clicada, não à última vista.
+    // Fechar depois de navegar: o foco volta à imagem aberta no momento (a terceira), e não à
+    // clicada (a primeira). Quem navegou até ali continua ali.
     await page.keyboard.press('Escape')
     await expect(dialogo).toBeHidden()
-    await expect(page.getByRole('link', { name: origem })).toBeFocused()
+    await expect(page.getByRole('link', { name: `Ampliar imagem: ${galeria[2].alt}` })).toBeFocused()
+    await expect(page.getByRole('link', { name: origem })).not.toBeFocused()
   })
 
-  test('o foco volta à origem também pelo botão Fechar e pelo clique fora', async ({ page }) => {
+  test('o foco volta à imagem aberta também pelo botão Fechar e pelo clique fora', async ({ page }) => {
     await gotoSite(page, `/${slug}`)
     const origem = page.getByRole('link', { name: `Ampliar imagem: ${noTexto.alt}` })
 
@@ -280,6 +282,23 @@ test.describe('acessibilidade — 1280px, só teclado', () => {
     await page.mouse.click(4, 4)
     await expect(ampliacao(page)).toBeHidden()
     await expect(origem).toBeFocused()
+  })
+
+  test('navegar e fechar pelo botão ou pelo clique fora também deixa o foco na imagem aberta', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    const primeira = page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` })
+    const segunda = page.getByRole('link', { name: `Ampliar imagem: ${galeria[1].alt}` })
+
+    await primeira.click()
+    await ampliacao(page).getByRole('button', { name: 'Próxima imagem' }).click()
+    await ampliacao(page).getByRole('button', { name: 'Fechar' }).click()
+    await expect(segunda).toBeFocused()
+
+    await primeira.click()
+    await ampliacao(page).getByRole('button', { name: 'Próxima imagem' }).click()
+    await page.mouse.click(4, 4)
+    await expect(ampliacao(page)).toBeHidden()
+    await expect(segunda).toBeFocused()
   })
 
   test('rótulos em pt-BR e a legenda descrevendo o diálogo', async ({ page }) => {
