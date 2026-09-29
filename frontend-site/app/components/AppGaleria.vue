@@ -25,10 +25,16 @@ withDefaults(
     <div class="foto-galeria__grid" :style="{ '--coluna-minima': colunaMinima }">
       <template v-for="(imagem, indice) in imagens" :key="imagem.src">
         <figure v-if="imagem.caption" class="foto-galeria__figura">
-          <AppImagem :imagem="imagem" contexto="metade" :prioridade="prioridade && indice === 0" />
+          <AppImagem :imagem="imagem" contexto="metade" grupo="galeria" :prioridade="prioridade && indice === 0" />
           <figcaption>{{ imagem.caption }}</figcaption>
         </figure>
-        <AppImagem v-else :imagem="imagem" contexto="metade" :prioridade="prioridade && indice === 0" />
+        <AppImagem
+          v-else
+          :imagem="imagem"
+          contexto="metade"
+          grupo="galeria"
+          :prioridade="prioridade && indice === 0"
+        />
       </template>
     </div>
   </section>
@@ -46,7 +52,8 @@ withDefaults(
   margin-top: var(--space-5);
 }
 
-.foto-galeria__grid img {
+/* :deep — a raiz do AppImagem ampliável é o <a>, e o <img> dentro dele não leva o escopo. */
+.foto-galeria__grid :deep(img) {
   border-radius: var(--radius-md);
 }
 

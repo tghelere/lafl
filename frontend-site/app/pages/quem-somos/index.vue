@@ -37,13 +37,14 @@ usePageSeo({
         :key="imagem.src"
         :imagem="imagem"
         contexto="metade"
+        grupo="galeria"
         :prioridade="indice === 0"
       />
       <!-- Conteúdo vem do CMS, sanitizado no backend ao salvar contra uma allowlist
            explícita (App\Support\Html\ContentSanitizer, ver
            docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md) — é o que torna este
            v-html seguro, não a confiança em quem escreve pelo painel. -->
-      <div class="page-content" v-html="page.content" />
+      <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
     </article>
   </template>
 </template>

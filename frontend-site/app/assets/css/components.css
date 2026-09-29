@@ -248,6 +248,21 @@
   color: var(--color-text-muted);
 }
 
+/* Imagem de conteúdo que abre ampliada (sessão 30): um link para a maior derivada, que a
+   ampliação intercepta (AppAmpliacao.vue). */
+.midia-ampliavel,
+.page-content a[data-ampliar] {
+  display: block;
+  border-radius: var(--radius-md);
+  cursor: zoom-in;
+}
+
+/* O contorno é o global (base.css); aqui só o raio acompanha o da imagem. */
+.midia-ampliavel:focus-visible,
+.page-content a[data-ampliar]:focus-visible {
+  border-radius: var(--radius-md);
+}
+
 /* Cabeçalho do site */
 /* Header — docs/design/navegacao.md §4-8. Medidas em px literais (não na escala de
    --space ou --text): são valores exatos do spec, testados contra o checklist de aceitação

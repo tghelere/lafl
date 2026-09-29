@@ -55,6 +55,7 @@ describe('site público', function (): void {
             ->and($images['cover'])->toBe([
                 'src' => "/midia/{$entrance->uuid}/640.webp",
                 'srcset' => "/midia/{$entrance->uuid}/400.webp 400w, /midia/{$entrance->uuid}/640.webp 640w",
+                'full' => "/midia/{$entrance->uuid}/640.webp",
                 'width' => 640,
                 'height' => 1134,
                 'alt' => 'Entrada do bazar',

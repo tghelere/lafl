@@ -32,7 +32,7 @@ usePageSeo({
       <h1>{{ page.title }}</h1>
       <!-- Mesma observação de [...slug].vue: conteúdo do CMS, sanitizado no backend ao
            salvar (ver docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md). -->
-      <div class="page-content" v-html="page.content" />
+      <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
     </article>
   </template>
 </template>

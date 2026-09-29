@@ -22,7 +22,7 @@ use App\Support\Media\MediaVariants;
  *
  * Imagem impublicável (marcada como foto de assistido) não sai, e a galeria fecha o buraco.
  *
- * @phpstan-type PublicImage array{src: string, srcset: string, width: int, height: int, alt: string, caption: ?string}
+ * @phpstan-type PublicImage array{src: string, srcset: string, full: string, width: int, height: int, alt: string, caption: ?string}
  */
 final class BuildPublicPageImages
 {
@@ -53,6 +53,9 @@ final class BuildPublicPageImages
         return [
             'src' => MediaUrl::derivative($media->uuid, MediaVariants::pick($media->widths, MediaVariants::DEFAULT_WIDTH)),
             'srcset' => MediaUrl::srcset($media->uuid, $media->widths),
+            // A maior derivada: o destino do link da imagem, que abre a ampliação no site e,
+            // sem JavaScript, a própria foto grande.
+            'full' => MediaUrl::derivative($media->uuid, MediaVariants::largest($media->widths)),
             'width' => $media->width,
             'height' => $media->height,
             'alt' => $media->alt,

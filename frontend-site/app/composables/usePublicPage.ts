@@ -5,6 +5,8 @@
 export type PublicImage = {
   src: string
   srcset: string
+  /** A maior derivada: destino do link de ampliação (e, sem JavaScript, a foto que abre). */
+  full: string
   width: number
   height: number
   alt: string

@@ -19,6 +19,11 @@ use Illuminate\Support\Collection;
  * endpoint administrativo devolve a forma gravada, crua: se o painel recebesse o `srcset`,
  * o primeiro salvamento o gravaria, e a substituição do arquivo deixaria de refletir.
  *
+ * A imagem sai dentro de um link para a MAIOR derivada (sessão 30, ampliação). É a base
+ * progressiva da ampliação do site: sem JavaScript, o clique abre a foto grande; com ele, o site
+ * intercepta o link e abre a ampliação por cima da página (frontend-site/app/components/
+ * AppAmpliacao.vue). `data-ampliar` marca o link para isso, e o nome do link diz o que ele faz.
+ *
  * Imagem que não existe mais, ou que deixou de ser publicável, sai da saída — a `<figure>`
  * inteira, com a legenda, que sem a imagem descreveria o nada. É a segunda barreira: a
  * primeira é a recusa ao salvar (AssertContentImagesArePublishable), e esta cobre o que muda
@@ -98,14 +103,20 @@ final class ExpandContentImages
         $srcset = MediaUrl::srcset($item->uuid, $item->widths);
         $fallback = MediaUrl::derivative($item->uuid, MediaVariants::pick($item->widths, MediaVariants::DEFAULT_WIDTH));
 
+        $altText = $alt[1] ?? '';
+
         return sprintf(
-            '<img src="%s" srcset="%s" sizes="%s" width="%d" height="%d" alt="%s" loading="lazy" decoding="async" />',
+            '<a href="%s" data-ampliar aria-label="Ampliar imagem: %s">'.
+            '<img src="%s" srcset="%s" sizes="%s" width="%d" height="%d" alt="%s" loading="lazy" decoding="async" />'.
+            '</a>',
+            MediaUrl::derivative($item->uuid, MediaVariants::largest($item->widths)),
+            $altText,
             $fallback,
             $srcset,
             self::SIZES,
             $item->width,
             $item->height,
-            $alt[1] ?? '',
+            $altText,
         );
     }
 }

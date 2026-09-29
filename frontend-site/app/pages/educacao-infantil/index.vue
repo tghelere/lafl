@@ -34,7 +34,7 @@ usePageSeo({
            explícita (App\Support\Html\ContentSanitizer, ver
            docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md) — é o que torna este
            v-html seguro, não a confiança em quem escreve pelo painel. -->
-      <div class="page-content" v-html="page.content" />
+      <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
     </article>
 
     <AppGaleria :imagens="page.images.gallery" titulo="A estrutura, em fotos" rotulo="Fotos da estrutura" prioridade />

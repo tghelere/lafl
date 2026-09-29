@@ -136,11 +136,13 @@ describe('na leitura pública', function (): void {
         $content = test()->getJson('/api/v1/public/pages/nossa-sede')->assertOk()->json('data.content');
         $u = $media->uuid;
 
+        // Dentro de um link para a maior derivada: a base progressiva da ampliação.
         expect($content)->toBe(
-            '<figure><img src="/midia/'.$u.'/960.webp" '.
+            '<figure><a href="/midia/'.$u.'/1280.webp" data-ampliar aria-label="Ampliar imagem: Fachada da sede">'.
+            '<img src="/midia/'.$u.'/960.webp" '.
             'srcset="/midia/'.$u.'/400.webp 400w, /midia/'.$u.'/640.webp 640w, /midia/'.$u.'/960.webp 960w, /midia/'.$u.'/1280.webp 1280w" '.
             'sizes="(min-width: 48rem) 42rem, calc(100vw - 2rem)" width="1600" height="1000" alt="Fachada da sede" loading="lazy" decoding="async" />'.
-            '<figcaption>A sede em 2026</figcaption></figure>',
+            '</a><figcaption>A sede em 2026</figcaption></figure>',
         );
     });
 

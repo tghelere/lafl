@@ -139,3 +139,64 @@ export async function currentUserId(api: AdminApi): Promise<string> {
 
   return body.data.id
 }
+
+export type GalleryPhoto = {
+  alt: string
+  caption?: string
+  width: number
+  height: number
+  color: [number, number, number]
+}
+
+export type PageWithPhotos = {
+  page: CreatedPage
+  /** Uuids na ordem: galeria primeiro, depois a imagem do texto (se houver). */
+  mediaIds: string[]
+}
+
+/**
+ * Página publicada com galeria e, se pedido, uma figura no meio do texto — o cenário da
+ * ampliação. As fotos entram pela rota de "Imagens desta página" (galeria) e pela biblioteca
+ * (texto), como o painel faria. `removePageWithPhotos` desfaz tudo.
+ */
+export async function createPageWithPhotos(
+  api: AdminApi,
+  data: { slug: string; title: string; gallery: GalleryPhoto[]; inText?: GalleryPhoto },
+): Promise<PageWithPhotos> {
+  const mediaIds: string[] = []
+  let content = '<p>Texto antes da imagem.</p>'
+
+  if (data.inText) {
+    const response = ok(await api.upload('/api/v1/media', photoFields(data.inText)), 'POST /api/v1/media')
+    const id = ((await response.json()) as { data: { id: string } }).data.id
+    const caption = data.inText.caption ? `<figcaption>${data.inText.caption}</figcaption>` : ''
+    content += `<figure><img src="/midia/${id}" alt="${data.inText.alt}" />${caption}</figure><p>Texto depois.</p>`
+    mediaIds.push(id)
+  }
+
+  const page = await createPage(api, { slug: data.slug, title: data.title, content })
+
+  for (const photo of data.gallery) {
+    const response = ok(await api.upload(`/api/v1/pages/${page.id}/images`, photoFields(photo)), 'POST /pages/{page}/images')
+    mediaIds.splice(mediaIds.length - (data.inText ? 1 : 0), 0, ((await response.json()) as { data: { id: string } }).data.id)
+  }
+
+  return { page, mediaIds }
+}
+
+export async function removePageWithPhotos(api: AdminApi, created: PageWithPhotos): Promise<void> {
+  await deletePage(api, created.page.id)
+
+  for (const id of created.mediaIds) {
+    await api.delete(`/api/v1/media/${id}`)
+  }
+}
+
+function photoFields(photo: GalleryPhoto): Record<string, string | { name: string; mimeType: string; buffer: Buffer }> {
+  return {
+    file: { name: 'foto.png', mimeType: 'image/png', buffer: solidPng(photo.width, photo.height, photo.color) },
+    alt: photo.alt,
+    ...(photo.caption ? { caption: photo.caption } : {}),
+    depicts_assisted_minor: '0',
+  }
+}

@@ -70,6 +70,11 @@ export class AdminApi {
     return this.send('delete', url)
   }
 
+  /** POST multipart (envio de arquivo), com o mesmo cabeçalho de CSRF. */
+  upload(url: string, multipart: Record<string, string | { name: string; mimeType: string; buffer: Buffer }>): Promise<APIResponse> {
+    return this.context.post(url, { headers: { 'X-XSRF-TOKEN': this.xsrfToken }, multipart })
+  }
+
   async dispose(): Promise<void> {
     await this.context.dispose()
   }

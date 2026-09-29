@@ -13,6 +13,16 @@ final class MediaVariants
     public const DEFAULT_WIDTH = 960;
 
     /**
+     * A maior derivada — o destino do link de ampliação das imagens de conteúdo.
+     *
+     * @param  list<int>  $widths
+     */
+    public static function largest(array $widths): int
+    {
+        return self::pick($widths, PHP_INT_MAX);
+    }
+
+    /**
      * A derivada que atende a largura pedida: a maior que não passa dela, ou a menor que
      * existe. É o que mantém todo endereço de largura válido depois de uma substituição por
      * imagem menor — `/midia/{uuid}/1920.webp` indexado ou em cache continua respondendo, com a

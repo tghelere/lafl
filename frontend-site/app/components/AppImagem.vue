@@ -5,6 +5,12 @@
 //
 // Substitui o AppFoto, que montava o caminho de arquivos fixos em public/fotos/. Não há
 // <picture> com fallback em JPEG: as derivadas são só webp, que todo navegador atual lê.
+//
+// `grupo`: a imagem é de CONTEÚDO e abre ampliada (sessão 30). Vira um link para a maior
+// derivada, que funciona sem JavaScript, e a ampliação (AppAmpliacao.vue) intercepta o
+// clique e navega entre as imagens do mesmo grupo. Sem `grupo`, a imagem não é ampliável: é o
+// caso do destaque da página inicial e dos cartões de "O que fazemos", que são capa.
+
 import type { PublicImage } from '~/composables/usePublicPage'
 
 const props = withDefaults(
@@ -14,6 +20,8 @@ const props = withDefaults(
     contexto: 'cheia' | 'metade' | 'terco' | 'quarto'
     /** Primeira imagem visível da página: carrega imediata e com prioridade alta. */
     prioridade?: boolean
+    /** Grupo de ampliação (ex.: "galeria"). Presente = a imagem abre ampliada. */
+    grupo?: string
   }>(),
   { prioridade: false },
 )
@@ -27,7 +35,28 @@ const SIZES: Record<typeof props.contexto, string> = {
 </script>
 
 <template>
+  <a
+    v-if="grupo"
+    :href="imagem.full"
+    class="midia-ampliavel"
+    data-ampliar
+    :data-grupo="grupo"
+    :aria-label="`Ampliar imagem: ${imagem.alt}`"
+  >
+    <img
+      :src="imagem.src"
+      :srcset="imagem.srcset"
+      :sizes="SIZES[contexto]"
+      :width="imagem.width"
+      :height="imagem.height"
+      :alt="imagem.alt"
+      :loading="prioridade ? undefined : 'lazy'"
+      :fetchpriority="prioridade ? 'high' : undefined"
+      decoding="async"
+    />
+  </a>
   <img
+    v-else
     :src="imagem.src"
     :srcset="imagem.srcset"
     :sizes="SIZES[contexto]"

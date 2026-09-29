@@ -54,7 +54,7 @@ usePageSeo({
            dos fundadores, já no texto alternativo) — destaque próprio, não ilustração
            solta entre parágrafos. -->
       <figure v-if="destaque" class="placa-destaque">
-        <AppImagem :imagem="destaque" contexto="metade" prioridade />
+        <AppImagem :imagem="destaque" contexto="metade" grupo="galeria" prioridade />
         <figcaption v-if="destaque.caption">{{ destaque.caption }}</figcaption>
       </figure>
 
@@ -62,7 +62,7 @@ usePageSeo({
            explícita (App\Support\Html\ContentSanitizer, ver
            docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md) — é o que torna este
            v-html seguro, não a confiança em quem escreve pelo painel. -->
-      <div class="page-content" v-html="page.content" />
+      <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
     </article>
 
     <section v-if="pares.length > 0" class="registro-epoca" aria-label="Fachada e pátio em registro de época">
@@ -74,7 +74,7 @@ usePageSeo({
 
       <div v-for="(par, indice) in pares" :key="indice" class="registro-epoca__par">
         <figure v-for="imagem in par" :key="imagem.src">
-          <AppImagem :imagem="imagem" contexto="metade" />
+          <AppImagem :imagem="imagem" contexto="metade" grupo="galeria" />
           <figcaption v-if="imagem.caption">{{ imagem.caption }}</figcaption>
         </figure>
       </div>
@@ -88,7 +88,7 @@ usePageSeo({
   margin: var(--space-6) 0;
 }
 
-.placa-destaque img {
+.placa-destaque :deep(img) {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
 }
@@ -110,7 +110,7 @@ usePageSeo({
   margin-top: var(--space-5);
 }
 
-.registro-epoca__par img {
+.registro-epoca__par :deep(img) {
   border-radius: var(--radius-md);
 }
 
