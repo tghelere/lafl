@@ -141,9 +141,12 @@ instituição com quem responde pela LGPD, não do sistema.
 
 A mesma matriz de `pages`: `comunicacao` e `direcao` enviam, substituem e editam; só `direcao`
 exclui. Upload, substituição, edição e exclusão vão para o `activity_log` (`log_name` `media`),
-cada um com evento próprio (`uploaded`, `replaced`, `updated`, `deleted`) e com quem fez. A tela
-"Auditoria" do painel ainda mostra só formulários recebidos. Os registros de mídia estão no
-banco, mas não na tela (pendência no roadmap).
+cada um com evento próprio (`uploaded`, `replaced`, `updated`, `deleted`) e com quem fez. Desde
+a sessão 29, a tela "Auditoria" tem a aba "Imagens" (`/admin/auditoria/imagens`), só leitura e
+só `super_admin`, com esses eventos e os que vieram depois: `imported`, `placed`,
+`removed_from_page`, `moved` e `marked`, a marcação, que antes era um `updated` e continua
+reconhecida assim nos registros antigos. A linha de uma imagem excluída mantém o nome que a
+imagem tinha, lido do registro da exclusão.
 
 ### 7. Exclusão bloqueada enquanto em uso
 

@@ -1712,3 +1712,34 @@ body.has-open-drawer {
   flex-wrap: wrap;
   gap: var(--space-3);
 }
+
+/* Abas da tela de Auditoria (src/components/AuditTabs.vue): links, um por rota. Altura mínima
+   de alvo de toque em toda largura, porque são poucas e ficam no topo. */
+.audit-tabs {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.audit-tabs__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4);
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.audit-tabs__link:hover {
+  color: var(--color-text);
+}
+
+.audit-tabs__link--active {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}

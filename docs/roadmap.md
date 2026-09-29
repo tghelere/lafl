@@ -371,9 +371,8 @@
       Declaração obrigatória de foto de assistido, recusada enquanto não houver `consents`.
 - [ ] `pages.og_image_id` — agora possível (`media` existe); não entrou na sessão 27 para não
       misturar escopo. Precisa escolher imagem publicável e cair no padrão do site sem ela.
-- [ ] Tela "Auditoria" do painel mostra só formulários recebidos; os eventos de mídia
-      (`uploaded`, `replaced`, `updated`, `deleted`, `log_name` `media`) estão no banco mas
-      não na tela.
+- [x] ~~Eventos de mídia fora da tela "Auditoria"~~ — sessão 29: aba "Imagens" em
+      `/admin/auditoria/imagens`, com todos os eventos de `log_name` `media` (ADR 0024, item 6).
 - [ ] `testimonials`, `partners`, `institution_stats`
 - [ ] `settings` — quando existir, substitui só `frontend-site/app/config/institution.ts`
       (endereço, telefone e WhatsApp da sede e do bazar, hoje fonte única de AppFooter.vue,

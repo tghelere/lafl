@@ -1,5 +1,5 @@
 import { httpClient } from '@/services/http'
-import type { AuditListResponse } from '@/types/audit'
+import type { AuditListResponse, MediaAuditListResponse } from '@/types/audit'
 
 export type AuditListParams = {
   /** Valor de App\Enums\FormSubmissionType (ex.: "contact_message"). */
@@ -16,6 +16,21 @@ export type AuditListParams = {
 
 export async function fetchAuditLog(params: AuditListParams): Promise<AuditListResponse> {
   const { data } = await httpClient.get<AuditListResponse>('/api/v1/audit-logs', { params })
+
+  return data
+}
+
+export type MediaAuditListParams = {
+  /** Valor de App\Enums\MediaAuditEvent (ex.: "marked"). */
+  event?: string
+  user?: string
+  from?: string
+  to?: string
+  page?: number
+}
+
+export async function fetchMediaAuditLog(params: MediaAuditListParams): Promise<MediaAuditListResponse> {
+  const { data } = await httpClient.get<MediaAuditListResponse>('/api/v1/audit-logs/media', { params })
 
   return data
 }

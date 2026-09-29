@@ -58,9 +58,13 @@ final class UpdateMediaDetails
             activity('media')
                 ->causedBy($actor)
                 ->performedOn($media)
-                ->event('updated')
+                // A marcação é um ato próprio na Auditoria, não mais uma "alteração de dados":
+                // tira a imagem do site e não se desfaz.
+                ->event(($dirty['depicts_assisted_minor'] ?? false) === true ? 'marked' : 'updated')
                 ->withProperties(['old' => $old, 'attributes' => $dirty])
-                ->log('Dados da imagem alterados');
+                ->log(($dirty['depicts_assisted_minor'] ?? false) === true
+                    ? 'Imagem marcada como foto de criança ou adolescente atendido'
+                    : 'Dados da imagem alterados');
         });
 
         // Qualquer mudança, não só a marcação: a capa e a galeria mostram o texto alternativo e a

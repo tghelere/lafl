@@ -160,6 +160,8 @@ Route::middleware($authenticated)->group(function (): void {
     // App\Policies\ActivityPolicy). Serve à tela "Auditoria" e, com `?record={uuid}`, à seção
     // "Histórico de acessos" do detalhe de um registro.
     Route::get('/audit-logs', [FormAuditController::class, 'index'])->name('audit-logs.index');
+    // A aba "Imagens" da mesma tela: envio, troca, exclusão, marcação e a posição nas páginas.
+    Route::get('/audit-logs/media', [FormAuditController::class, 'media'])->name('audit-logs.media');
 
     // Leitura administrativa dos cinco formulários recebidos (ver docs/estrutura-site.md
     // §4.5): listagem, detalhe, mudança de status com anotação e o desfazer da leitura — nada

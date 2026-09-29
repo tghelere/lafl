@@ -30,3 +30,27 @@ export type AuditListResponse = {
 }
 
 export type AuditFilterOption = { value: string; label: string }
+
+/** Uma linha da aba "Imagens" (App\Http\Resources\MediaAuditEntryResource). */
+export type MediaAuditEntry = {
+  occurred_at: string | null
+  occurred_at_label: string | null
+  /** `null` quando não houve autor autenticado (a importação das fotos iniciais, por comando). */
+  user: string | null
+  event: string | null
+  action_label: string
+  /** Já em português, montado pela API. */
+  detail: string | null
+  /** `null` quando a imagem já foi excluída: a linha fica, sem link. */
+  media_uuid: string | null
+  media_alt: string | null
+}
+
+export type MediaAuditListResponse = {
+  data: MediaAuditEntry[]
+  meta: {
+    current_page: number
+    last_page: number
+    total: number
+  }
+}

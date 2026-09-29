@@ -11,34 +11,32 @@ import ErrorState from '@/components/ErrorState.vue'
 import LoadingState from '@/components/LoadingState.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
-import { FORM_TYPE_OPTIONS } from '@/config/formTypes'
-import { fetchAuditLog } from '@/services/auditLogs'
+import { MEDIA_AUDIT_EVENT_OPTIONS } from '@/config/mediaAuditEvents'
+import { fetchMediaAuditLog } from '@/services/auditLogs'
 import { fetchUserList } from '@/services/users'
-import type { AuditEntry } from '@/types/audit'
+import type { MediaAuditEntry } from '@/types/audit'
 import type { UserAccount } from '@/types/users'
 
 /**
- * Auditoria dos formulários recebidos — só leitura, só super_admin (ver
- * App\Policies\ActivityPolicy; a tela é guardada por `resource="audit-logs"`, o mesmo mapa de
- * acesso calculado por Policy que o resto do painel usa).
+ * Auditoria da biblioteca de imagens — a segunda aba da tela de Auditoria (a primeira é a dos
+ * formulários, AuditLogView.vue). Só leitura e só super_admin, pela mesma Policy
+ * (App\Policies\ActivityPolicy). Envio, importação, troca de arquivo, texto, marcação,
+ * exclusão e o que acontece com a imagem nas páginas.
  *
- * Nenhuma ação: não há botão nenhum além dos filtros e da paginação. Um log de auditoria que se
- * pode alterar pela tela não serve de log.
+ * Tela própria, e não um filtro da de formulários: cada aba responde a uma pergunta, e as
+ * colunas são outras (não há IP nem tipo de formulário aqui).
  */
 const route = useRoute()
 const router = useRouter()
 
-const entries = ref<AuditEntry[]>([])
+const entries = ref<MediaAuditEntry[]>([])
 const currentPage = ref(1)
 const lastPage = ref(1)
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
-
-// Contas para o filtro por usuário. Vem de /api/v1/users, que é super_admin também — quem abre
-// esta tela sempre pode listá-las.
 const users = ref<UserAccount[]>([])
 
-const typeFilter = ref('')
+const eventFilter = ref('')
 const userFilter = ref('')
 const fromFilter = ref('')
 const toFilter = ref('')
@@ -48,8 +46,8 @@ async function load(): Promise<void> {
   errorMessage.value = null
 
   try {
-    const response = await fetchAuditLog({
-      type: typeFilter.value || undefined,
+    const response = await fetchMediaAuditLog({
+      event: eventFilter.value || undefined,
       user: userFilter.value || undefined,
       from: fromFilter.value || undefined,
       to: toFilter.value || undefined,
@@ -59,7 +57,7 @@ async function load(): Promise<void> {
     currentPage.value = response.meta.current_page
     lastPage.value = response.meta.last_page
   } catch {
-    errorMessage.value = 'Não foi possível carregar a auditoria. Tente novamente.'
+    errorMessage.value = 'Não foi possível carregar a auditoria de imagens. Tente novamente.'
   } finally {
     isLoading.value = false
   }
@@ -68,7 +66,7 @@ async function load(): Promise<void> {
 function applyFilters(): void {
   void router.push({
     query: {
-      ...(typeFilter.value ? { type: typeFilter.value } : {}),
+      ...(eventFilter.value ? { event: eventFilter.value } : {}),
       ...(userFilter.value ? { user: userFilter.value } : {}),
       ...(fromFilter.value ? { from: fromFilter.value } : {}),
       ...(toFilter.value ? { to: toFilter.value } : {}),
@@ -84,26 +82,22 @@ function goToPage(page: number): void {
   void router.push({ query: { ...route.query, page: String(page) } })
 }
 
-/** Chave estável de linha sem id sequencial no payload: o instante mais o que aconteceu. */
-function entryKey(entry: AuditEntry, index: number): string {
-  return `${entry.occurred_at ?? ''}-${entry.event ?? ''}-${entry.record_uuid ?? ''}-${index}`
+function entryKey(entry: MediaAuditEntry, index: number): string {
+  return `${entry.occurred_at ?? ''}-${entry.event ?? ''}-${entry.media_uuid ?? ''}-${index}`
 }
 
 onMounted(async () => {
   try {
     users.value = (await fetchUserList({ page: 1 })).data
   } catch {
-    // O filtro por usuário fica sem opções; a listagem continua utilizável. Não vale trocar a
-    // tela inteira por um erro por causa de um <select>.
+    // Sem opções no filtro por usuário; a listagem continua utilizável.
   }
 })
 
-// A query é a fonte de verdade do filtro atual, como nas outras listagens do painel — o link é
-// compartilhável e o botão voltar do navegador funciona.
 watch(
   () => route.fullPath,
   () => {
-    typeFilter.value = String(route.query.type ?? '')
+    eventFilter.value = String(route.query.event ?? '')
     userFilter.value = String(route.query.user ?? '')
     fromFilter.value = String(route.query.from ?? '')
     toFilter.value = String(route.query.to ?? '')
@@ -119,7 +113,8 @@ watch(
     <AuditTabs />
 
     <p class="page-intro">
-      Registro de acessos e alterações nos formulários recebidos. Somente leitura.
+      Envio, troca, texto, marcação e exclusão de imagens, e o que acontece com elas nas páginas.
+      Somente leitura.
     </p>
 
     <form
@@ -127,9 +122,9 @@ watch(
       @submit.prevent="applyFilters"
     >
       <div class="filter-bar__field">
-        <label for="filter-user">Usuário</label>
+        <label for="media-audit-user">Usuário</label>
         <select
-          id="filter-user"
+          id="media-audit-user"
           v-model="userFilter"
         >
           <option value="">
@@ -146,16 +141,16 @@ watch(
       </div>
 
       <div class="filter-bar__field">
-        <label for="filter-type">Tipo de formulário</label>
+        <label for="media-audit-event">Acontecimento</label>
         <select
-          id="filter-type"
-          v-model="typeFilter"
+          id="media-audit-event"
+          v-model="eventFilter"
         >
           <option value="">
             Todos
           </option>
           <option
-            v-for="option in FORM_TYPE_OPTIONS"
+            v-for="option in MEDIA_AUDIT_EVENT_OPTIONS"
             :key="option.value"
             :value="option.value"
           >
@@ -165,18 +160,18 @@ watch(
       </div>
 
       <div class="filter-bar__field">
-        <label for="filter-from">De</label>
+        <label for="media-audit-from">De</label>
         <input
-          id="filter-from"
+          id="media-audit-from"
           v-model="fromFilter"
           type="date"
         >
       </div>
 
       <div class="filter-bar__field">
-        <label for="filter-to">Até</label>
+        <label for="media-audit-to">Até</label>
         <input
-          id="filter-to"
+          id="media-audit-to"
           v-model="toFilter"
           type="date"
         >
@@ -206,7 +201,7 @@ watch(
     />
     <EmptyState
       v-else-if="entries.length === 0"
-      message="Nenhum registro de auditoria para este recorte."
+      message="Nenhum registro de auditoria de imagens para este recorte."
     />
     <template v-else>
       <div class="table-wrapper">
@@ -216,9 +211,8 @@ watch(
               <th>Data e hora</th>
               <th>Usuário</th>
               <th>Ação</th>
-              <th>Tipo de formulário</th>
-              <th>Registro</th>
-              <th>IP</th>
+              <th>Imagem</th>
+              <th>Detalhe</th>
             </tr>
           </thead>
           <tbody>
@@ -229,34 +223,27 @@ watch(
               <td data-label="Data e hora">
                 {{ entry.occurred_at_label ?? '—' }}
               </td>
-              <!-- Sem autor: o formulário foi recebido pelo site, não por alguém do painel. -->
+              <!-- Sem autor: a importação das fotos iniciais, feita por comando. -->
               <td data-label="Usuário">
-                {{ entry.user ?? '—' }}
+                {{ entry.user ?? 'Sistema' }}
               </td>
               <td data-label="Ação">
                 {{ entry.action_label }}
               </td>
-              <td data-label="Tipo de formulário">
-                {{ entry.form_type_label ?? '—' }}
-              </td>
-              <td data-label="Registro">
+              <td data-label="Imagem">
                 <RouterLink
-                  v-if="entry.record_uuid && entry.record_resource"
-                  :to="{
-                    name: 'submissions.show',
-                    params: { resource: entry.record_resource, uuid: entry.record_uuid },
-                  }"
+                  v-if="entry.media_uuid"
+                  :to="{ name: 'media.edit', params: { uuid: entry.media_uuid } }"
                 >
-                  Abrir registro
+                  {{ entry.media_alt ?? 'Abrir imagem' }}
                 </RouterLink>
-                <!-- Registro já expurgado por retenção: a entrada do log permanece, o
-                     formulário não. -->
+                <!-- Excluída: a linha fica, sem link. -->
                 <template v-else>
-                  —
+                  {{ entry.media_alt ? `${entry.media_alt} (excluída)` : '—' }}
                 </template>
               </td>
-              <td data-label="IP">
-                {{ entry.ip ?? '—' }}
+              <td data-label="Detalhe">
+                {{ entry.detail ?? '—' }}
               </td>
             </tr>
           </tbody>

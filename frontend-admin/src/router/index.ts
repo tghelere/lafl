@@ -168,6 +168,12 @@ const router = createRouter({
       component: () => import('@/views/AuditLogView.vue'),
       meta: { title: 'Auditoria', section: SECTION.audit },
     },
+    {
+      path: '/admin/auditoria/imagens',
+      name: 'audit.media',
+      component: () => import('@/views/MediaAuditLogView.vue'),
+      meta: { title: 'Auditoria de imagens', section: SECTION.audit },
+    },
     // Coringa — precisa ser a última entrada: qualquer URL que não bata com nenhuma rota
     // acima cai aqui em vez de deixar o vue-router não renderizar nada (ver
     // frontend-admin/src/views/NotFoundView.vue).
