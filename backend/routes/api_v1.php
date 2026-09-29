@@ -87,6 +87,11 @@ Route::prefix('public')->name('public.')->group(function (): void {
         ->where(['uuid' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', 'variant' => '[0-9]{2,4}\.webp'])
         ->name('media.file');
 
+    // Endereço antigo das fotos fixas do site — só 301 para /midia/ (ver o docblock).
+    Route::get('/legacy-photos/{section}/{file}', [PublicMediaController::class, 'legacy'])
+        ->where(['section' => '[a-z-]+', 'file' => '[a-z0-9-]+-[0-9]{2,4}\.(webp|jpg)'])
+        ->name('media.legacy');
+
     // Endereço antigo — só 301 para o de cima (ver o docblock do controller).
     Route::get('/transparency-documents/{uuid}/download', [PublicTransparencyDocumentController::class, 'download'])
         ->where('uuid', '[0-9a-fA-F-]{36}')

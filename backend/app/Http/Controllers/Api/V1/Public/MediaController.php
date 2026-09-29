@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Public;
 
+use App\Actions\Media\ResolveLegacyPhotoUrl;
 use App\Http\Controllers\Controller;
 use App\Models\Media;
 use App\Support\Media\MediaFileResponse;
@@ -32,5 +33,22 @@ final class MediaController extends Controller
         }
 
         return MediaFileResponse::make($request, $media, $variant, public: true);
+    }
+
+    /**
+     * Endereço antigo de foto do site (`/fotos/{secao}/{chave}-{largura}.{webp,jpg}`, arquivos
+     * fixos até a sessão 28). Só 301 para o endereço de agora, para não perder o que foi
+     * indexado. Quem chama é a rota do Nitro em frontend-site/server/routes/fotos/, que repassa o
+     * 301 ao visitante.
+     */
+    public function legacy(string $section, string $file, ResolveLegacyPhotoUrl $action): Response
+    {
+        $location = $action->handle($section, $file);
+
+        if ($location === null) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+
+        return redirect()->away($location, Response::HTTP_MOVED_PERMANENTLY);
     }
 }

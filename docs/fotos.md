@@ -60,5 +60,12 @@ redimensionada), e a biblioteca, que gera derivadas por largura, não serve para
 de enquadramento e a precisão dos pinos estão no comentário do componente. Atribuição
 "© OpenStreetMap contributors" na legenda da página, não nos pixels.
 
-Cache: `/fotos/**` sai com `Cache-Control: public, max-age=2592000`, sem `immutable`, porque o
-nome do arquivo não tem hash (`nuxt.config.ts`).
+Cache: `/fotos/contato/**` sai com `Cache-Control: public, max-age=2592000`, sem `immutable`,
+porque o nome do arquivo não tem hash (`nuxt.config.ts`).
+
+## Endereços antigos
+
+Os outros endereços de `/fotos/` que existiram até a sessão 28
+(`/fotos/{secao}/{chave}-{largura}.{webp,jpg}`) respondem 301 para a mesma foto em `/midia/`
+(ADR 0025). A lista dos 144 está em `backend/tests/Fixtures/legacy-photo-paths.txt`, e a seção
+antiga de cada foto, em `section` no catálogo `InitialPhotos`.

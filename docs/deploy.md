@@ -683,7 +683,9 @@ acrescentar uma camada de cache de HTML por cima**.
 > curto (1–5 min) somado a purge por URL no salvamento, o que exigiria o backend chamar a API
 > do CDN — dependência e credencial novas, a avaliar só se o tráfego justificar.
 
-Assets com hash no nome (`/_nuxt/*`, `/assets/*`) podem ser cacheados agressivamente. O mapa de
+Assets com hash no nome (`/_nuxt/*`, `/assets/*`) podem ser cacheados agressivamente. O resto de
+`/fotos/` responde 301 para `/midia/` (endereços antigos, ADR 0025) e não deve ganhar regra de
+cache própria na CDN além do que o 301 já diz. O mapa de
 `/fotos/contato/` (única imagem que sobrou em `public/fotos/`) sai com `Cache-Control: public,
 max-age=2592000` **sem** `immutable`, de propósito: o nome do arquivo não tem hash, então
 trocá-lo mantendo o nome precisa poder ser visto antes de 30 dias. As fotos vêm da biblioteca,

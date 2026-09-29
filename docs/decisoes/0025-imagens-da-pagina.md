@@ -114,9 +114,14 @@ oferece o padrão. Mudar isso seria outra decisão.
 
 ## Consequências
 
-- Os endereços antigos `/fotos/{secao}/{slug}-{largura}.{webp,jpg}` deixam de existir (404). Uma
-  imagem que um buscador tenha indexado por esse endereço sai do índice até ser encontrada de
-  novo em `/midia/`.
+- **Os endereços antigos** `/fotos/{secao}/{chave}-{largura}.{webp,jpg}` respondem **301** para
+  `/midia/{uuid}/{largura}.webp` (sessão 29), para não perder imagem indexada. A API resolve
+  (`ResolveLegacyPhotoUrl`, pela seção e pela chave do catálogo, que é o `origin_key`), e a rota
+  `frontend-site/server/routes/fotos/` só repassa o 301, o mesmo desenho do PDF de
+  transparência. Só a combinação exata de seção e chave que existia é reconhecida, e foto
+  excluída ou marcada como de assistido dá 404. O `.jpg` antigo vai para o `.webp`, e a largura
+  cai na maior derivada que couber. O mapa de `/contato` continua arquivo estático, servido antes
+  de qualquer rota. Os 144 endereços que existiam são conferidos em Pest e em e2e.
 - **A capa é escolhida pelo painel** (sessão 29): trocar por imagem da biblioteca (o seletor do
   editor, em modo de escolha, sem o passo de descrever), enviar uma foto nova direto para a capa,
   ou tirar a capa. A tela diz onde o site mostra a capa daquela página. Esse mapa fica na API

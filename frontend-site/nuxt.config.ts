@@ -57,8 +57,11 @@ export default defineNuxtConfig({
   // conteúdo no nome — trocar o arquivo mantendo o mesmo nome não muda a URL. Por isso
   // Cache-Control de 30 dias, sem `immutable` (immutable diz ao navegador "nunca revalide
   // isto", o que impediria ver uma foto trocada antes de 30 dias mesmo com refresh).
+  //
+  // Só a pasta do mapa: o resto de /fotos/ é a rota de 301 dos endereços antigos
+  // (server/routes/fotos/), e um 404 ou 503 dela não pode sair com cache de 30 dias.
   routeRules: {
-    '/fotos/**': {
+    '/fotos/contato/**': {
       headers: { 'cache-control': 'public, max-age=2592000' },
     },
   },
