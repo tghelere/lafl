@@ -41,6 +41,7 @@ const SIZES: Record<typeof props.contexto, string> = {
     class="midia-ampliavel"
     data-ampliar
     :data-grupo="grupo"
+    :data-credito="imagem.credit || undefined"
     :aria-label="`Ampliar imagem: ${imagem.alt}`"
   >
     <img

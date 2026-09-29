@@ -13,6 +13,9 @@
     </main>
 
     <AppFooter />
+
+    <!-- Uma instância para o site todo: abre sobre a página ao clicar numa imagem de conteúdo. -->
+    <AppAmpliacao />
   </div>
 </template>
 

@@ -20,7 +20,7 @@ const slug = `ampliacao-${suffix}`.toLowerCase()
 const titulo = `Página com fotos ${suffix}`
 const galeria = [
   { alt: `Pátio visto de cima ${suffix}`, width: 1600, height: 1000, color: [200, 60, 60] as [number, number, number] },
-  { alt: `Horta das crianças ${suffix}`, caption: 'Canteiros de pneu, em 2025', width: 1000, height: 1400, color: [60, 160, 60] as [number, number, number] },
+  { alt: `Horta das crianças ${suffix}`, caption: 'Canteiros de pneu, em 2025', credit: 'Foto: equipe do Lar', width: 1000, height: 1400, color: [60, 160, 60] as [number, number, number] },
   { alt: `Fachada ao entardecer ${suffix}`, width: 900, height: 600, color: [60, 60, 200] as [number, number, number] },
 ]
 const noTexto = { alt: `Recepção da sede ${suffix}`, caption: 'A recepção depois da reforma', width: 1300, height: 800, color: [180, 140, 40] as [number, number, number] }
@@ -102,5 +102,118 @@ test.describe('teclado', () => {
 
     expect(alcancou, 'a imagem não foi alcançada por Tab').toBe(true)
     expect(await alvo.evaluate((node) => getComputedStyle(node).outlineStyle)).toBe('solid')
+  })
+})
+
+function ampliacao(page: Page) {
+  return page.getByRole('dialog', { name: 'Imagem ampliada' })
+}
+
+/**
+ * Confere a regra da derivada contra o tamanho REAL do palco nesta janela: a escolhida é a
+ * maior cuja largura não passa do tamanho em que a imagem aparece (em pixels do aparelho).
+ */
+async function expectLargestThatFits(page: Page, widths: number[], ratio: number): Promise<void> {
+  const imagem = ampliacao(page).locator('img')
+  await expect(imagem).toBeVisible()
+
+  const { largura, altura, densidade } = await page.locator('.ampliacao__palco').evaluate((node) => {
+    const caixa = node.getBoundingClientRect()
+    return { largura: caixa.width, altura: caixa.height, densidade: window.devicePixelRatio }
+  })
+  const alvo = Math.min(largura, altura * ratio) * densidade
+  const cabem = widths.filter((w) => w <= alvo)
+  const esperada = cabem.length > 0 ? Math.max(...cabem) : Math.min(...widths)
+
+  await expect(imagem).toHaveAttribute('data-largura', String(esperada))
+  await expect.poll(() => imagem.evaluate((node) => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth)).toBe(esperada)
+}
+
+test.describe('ampliação — 1280px', () => {
+  test.use({ viewport: { width: 1280, height: 800 } })
+
+  test('abre sobre a página na maior derivada que cabe, com posição, legenda e crédito', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` }).click()
+
+    const dialogo = ampliacao(page)
+    await expect(dialogo).toBeVisible()
+    // A página continua por trás: a URL não mudou.
+    await expect(page).toHaveURL(new RegExp(`/${slug}$`))
+    await expect(dialogo.getByText('1 de 3')).toBeVisible()
+    await expect(dialogo.locator('img')).toHaveAttribute('alt', galeria[0].alt)
+    await expectLargestThatFits(page, [400, 640, 960, 1280], 1600 / 1000)
+    await expect(dialogo.locator('.ampliacao__legenda')).toHaveCount(0)
+
+    // Próxima pelo botão: a segunda tem legenda e crédito, embaixo da imagem.
+    await dialogo.getByRole('button', { name: 'Próxima imagem' }).click()
+    await expect(dialogo.getByText('2 de 3')).toBeVisible()
+    await expect(dialogo.locator('.ampliacao__legenda')).toContainText('Canteiros de pneu, em 2025')
+    await expect(dialogo.locator('.ampliacao__legenda')).toContainText('Foto: equipe do Lar')
+    await expectLargestThatFits(page, [400, 640, 960], 1000 / 1400)
+  })
+
+  test('setas do teclado e do botão navegam, e as pontas não passam', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` }).click()
+    const dialogo = ampliacao(page)
+
+    await expect(dialogo.getByRole('button', { name: 'Imagem anterior' })).toBeDisabled()
+    await page.keyboard.press('ArrowRight')
+    await page.keyboard.press('ArrowRight')
+    await expect(dialogo.getByText('3 de 3')).toBeVisible()
+    await expect(dialogo.getByRole('button', { name: 'Próxima imagem' })).toBeDisabled()
+    await page.keyboard.press('ArrowRight')
+    await expect(dialogo.getByText('3 de 3')).toBeVisible()
+
+    await page.keyboard.press('ArrowLeft')
+    await expect(dialogo.getByText('2 de 3')).toBeVisible()
+    await dialogo.getByRole('button', { name: 'Imagem anterior' }).click()
+    await expect(dialogo.locator('img')).toHaveAttribute('alt', galeria[0].alt)
+  })
+
+  test('deslizar para o lado troca de imagem, e não fecha', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` }).click()
+    const caixa = (await page.locator('.ampliacao__palco').boundingBox())!
+    const meio = { x: caixa.x + caixa.width / 2, y: caixa.y + caixa.height / 2 }
+
+    await page.mouse.move(meio.x + 150, meio.y)
+    await page.mouse.down()
+    await page.mouse.move(meio.x - 150, meio.y + 10, { steps: 5 })
+    await page.mouse.up()
+
+    await expect(ampliacao(page).getByText('2 de 3')).toBeVisible()
+    await expect(ampliacao(page)).toBeVisible()
+  })
+
+  test('fecha pelo botão, pelo Esc e pelo clique fora', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    const abrir = page.getByRole('link', { name: `Ampliar imagem: ${galeria[2].alt}` })
+
+    await abrir.click()
+    await ampliacao(page).getByRole('button', { name: 'Fechar' }).click()
+    await expect(ampliacao(page)).toBeHidden()
+
+    await abrir.click()
+    await page.keyboard.press('Escape')
+    await expect(ampliacao(page)).toBeHidden()
+
+    await abrir.click()
+    await expect(ampliacao(page)).toBeVisible()
+    // Canto da janela: fora do diálogo, no fundo escurecido.
+    await page.mouse.click(4, 4)
+    await expect(ampliacao(page)).toBeHidden()
+  })
+
+  test('a figura do texto abre sozinha, com a legenda do texto e sem posição', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    await page.getByRole('link', { name: `Ampliar imagem: ${noTexto.alt}` }).click()
+
+    const dialogo = ampliacao(page)
+    await expect(dialogo.locator('img')).toHaveAttribute('alt', noTexto.alt)
+    await expect(dialogo.locator('.ampliacao__legenda')).toHaveText('A recepção depois da reforma')
+    await expect(dialogo.getByText(/de \d+$/)).toHaveCount(0)
+    await expect(dialogo.getByRole('button', { name: 'Próxima imagem' })).toHaveCount(0)
   })
 })

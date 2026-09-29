@@ -143,6 +143,7 @@ export async function currentUserId(api: AdminApi): Promise<string> {
 export type GalleryPhoto = {
   alt: string
   caption?: string
+  credit?: string
   width: number
   height: number
   color: [number, number, number]
@@ -197,6 +198,7 @@ function photoFields(photo: GalleryPhoto): Record<string, string | { name: strin
     file: { name: 'foto.png', mimeType: 'image/png', buffer: solidPng(photo.width, photo.height, photo.color) },
     alt: photo.alt,
     ...(photo.caption ? { caption: photo.caption } : {}),
+    ...(photo.credit ? { credit: photo.credit } : {}),
     depicts_assisted_minor: '0',
   }
 }

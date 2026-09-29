@@ -148,3 +148,9 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Com a ampliação aberta (AppAmpliacao.vue), a página por trás não rola: o <dialog> modal já a
+   deixa inerte, mas a roda do mouse e o toque ainda a moveriam. */
+html.ampliacao-aberta {
+  overflow: hidden;
+}
