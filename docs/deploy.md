@@ -497,6 +497,7 @@ php8.5 artisan db:seed --class=Database\\Seeders\\RoleSeeder --force
 
 # 2. Conteúdo institucional inicial. Só CRIA o que não existe; rodar de novo depois de a
 #    instituição editar as páginas não sobrescreve nada (ver ImportInitialPages).
+#    PRODUÇÃO NÃO USA ESTE PASSO: lá o conteúdo vem do pacote de homologação (§10.1).
 php8.5 artisan conteudo:importar-inicial
 
 # 3. Primeira conta capaz de entrar no painel. Pergunta nome e e-mail e imprime o link de
@@ -559,9 +560,86 @@ lançamento for decidido. Quando for:
    artefato é o mesmo, byte a byte.
 8. **Marcar a versão:** `git tag v1.0.0 && git push origin v1.0.0` — a partir daí, tag publica
    em produção sozinha.
-9. Rodar o §9 neste ambiente (papéis, conteúdo inicial, super admin) e conferir que
-   `NUXT_PUBLIC_ENVIRONMENT` está **vazia** em `shared/site.env`: preenchida, o site de
-   produção sai da busca, de que a captação da instituição depende.
+9. Levar o conteúdo e abrir o painel: **§10.1, na ordem que está lá** — não o §9 inteiro.
+   Confira também que `NUXT_PUBLIC_ENVIRONMENT` está **vazia** em `shared/site.env`:
+   preenchida, o site de produção sai da busca, de que a captação da instituição depende.
+
+### 10.1 Como o conteúdo de homologação chega a produção
+
+**O que acontece sozinho quando o ambiente é criado (e o que não).** `criar-ambiente.sh` cria
+o banco **vazio** (`createdb`) e `shared/storage/` **vazio** (`install -d`, sem copiar nada);
+`publicar.sh` só roda `migrate --force`, nunca `db:seed`, e liga `backend/storage` ao
+`shared/storage` do ambiente. Resultado: produção nasce sem página, sem documento e sem PDF.
+Nada do que a instituição editou na homologação atravessa sozinho — e o §9 sozinho traria
+o texto do repositório (`InitialPages.php`), que é **anterior** às edições feitas pelo painel.
+A decisão está no ADR 0023.
+
+**O que entra e o que NÃO entra.**
+
+| Entra (pacote `conteudo:exportar`) | Não entra — de propósito |
+|---|---|
+| Páginas do CMS: publicadas, rascunhos e arquivadas, com o histórico de slugs (redirects 301) | **Usuários.** As contas de homologação são de teste; em produção cria-se a conta real com `usuarios:criar-super-admin`, e as demais pelo painel |
+| Documentos de transparência (publicados e não), com os PDFs | **Formulários recebidos** (candidatura a programa, retirada, voluntariado, parcerias, contato). Em homologação são mensagens de teste, e o dado de quem preencheu não tem por que sair de lá |
+| | Log de auditoria, contador de downloads, itens na lixeira, sessões, filas |
+
+**Nunca restaurar o dump de homologação em produção.** Seria o caminho mais curto e traria
+tudo o que a tabela acima deixa de fora, mais as chaves de cifra erradas (cada ambiente tem as
+suas). O pacote existe para que não seja preciso.
+
+**Passo a passo.** Homologação e produção estão na mesma VPS, então o pacote passa de uma
+pasta para a outra. Como `deploy`:
+
+1. **Congelar o texto.** Combinar com a instituição que ninguém edita em homologação a partir
+   daqui, e que a versão aprovada é a que está no ar lá. Edição feita depois do export não vai.
+2. **Criar e publicar produção** — itens 1 a 7 do §10 (ambiente, `.env`, ligar a publicação,
+   primeira release por promoção).
+3. **Papéis em produção:**
+   ```bash
+   cd /var/www/laf/production/current/backend
+   php8.5 artisan db:seed --class=Database\\Seeders\\RoleSeeder --force
+   ```
+   **Não** rodar `conteudo:importar-inicial` em produção: ele criaria as páginas com o texto do
+   repositório, e o passo 6 então as pularia (sem `--substituir`) e o site subiria com o texto
+   antigo.
+4. **Exportar de homologação:**
+   ```bash
+   cd /var/www/laf/staging/current/backend
+   php8.5 artisan conteudo:exportar /var/tmp/laf-pacote
+   # imprime .../conteudo-AAAAMMDD-HHMMSS — anote o caminho
+   ```
+   O comando falha se algum documento aponta para um PDF que não está no disco.
+5. **Levar para produção** (mesma máquina):
+   ```bash
+   cp -a /var/tmp/laf-pacote/conteudo-AAAAMMDD-HHMMSS /var/tmp/laf-pacote-producao
+   ```
+   Se um dia os ambientes estiverem em máquinas diferentes, `tar` + `scp`: o pacote é uma pasta
+   comum. Não há dado pessoal nele, mas é conteúdo ainda não publicado (rascunhos) — apagar ao
+   final (passo 9).
+6. **Simular, depois importar** em produção:
+   ```bash
+   cd /var/www/laf/production/current/backend
+   php8.5 artisan conteudo:importar /var/tmp/laf-pacote-producao --simular
+   php8.5 artisan conteudo:importar /var/tmp/laf-pacote-producao
+   ```
+   O comando confere o SHA-256 de cada arquivo e o formato antes de escrever, e grava tudo
+   numa transação. Sem `--substituir` ele **nunca sobrescreve nem apaga**; se a saída listar
+   algo como "já existia — mantido" num ambiente que devia estar vazio, pare e descubra por
+   quê. `--substituir` (pede confirmação; `--force` a dispensa) só serve para um ambiente que
+   já tinha conteúdo e deve ser sobrescrito — e nunca apaga o que o pacote não traz.
+7. **Criar a primeira conta real:** `php8.5 artisan usuarios:criar-super-admin` (§9, passo 3).
+8. **Conferir no ar:** a contagem que o comando imprimiu bate com a do export, uma página
+   publicada abre no site e um rascunho só aparece no painel, um PDF baixa pelo link público, `curl -sI https://api.DOMINIO/up` → 200 e
+   `robots.txt` **sem** `Disallow: /`.
+9. **Limpar:** `rm -rf /var/tmp/laf-pacote /var/tmp/laf-pacote-producao`. Guardar uma cópia do
+   pacote em `/var/backups/laf/production/` vale a pena: é o retrato do que foi ao ar.
+10. **Só então** marcar a versão (item 8 do §10) — a partir da tag, publicar em produção
+    passa a ser automático.
+
+**Depois do lançamento**, produção é a única fonte do conteúdo: quem edita é a instituição,
+pelo painel. Homologação vai divergir de produção, e isso é esperado. Repetir o pacote sobre
+produção só com `--substituir` e sabendo que sobrescreve o que a instituição editou lá.
+Para trazer o conteúdo de produção para homologação (por exemplo, para testar com texto real),
+o caminho é o inverso — exportar de produção, importar em homologação com `--substituir`.
 
 ## 11. Homologação não é indexável
 
