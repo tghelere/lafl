@@ -86,7 +86,7 @@ test.describe('comunicacao', () => {
       await page.keyboard.press('ControlOrMeta+End')
       await page.getByRole('toolbar', { name: 'Formatação do conteúdo' }).getByRole('button', { name: 'Imagem', exact: true }).click()
 
-      const seletor = page.locator('dialog.media-picker')
+      const seletor = page.locator('dialog.media-picker[open]')
       await expect(seletor.getByRole('heading', { name: 'Inserir imagem' })).toBeVisible()
       await seletor.getByLabel('Buscar na biblioteca').fill(alt)
       await seletor.getByRole('button', { name: 'Buscar' }).click()
@@ -241,7 +241,7 @@ test.describe('comunicacao', () => {
         expect((await botao.boundingBox())!.height).toBeGreaterThanOrEqual(44)
         await botao.click()
 
-        const seletor = page.locator('dialog.media-picker')
+        const seletor = page.locator('dialog.media-picker[open]')
         await expect(seletor).toBeVisible()
         const caixa = (await seletor.boundingBox())!
         expect(caixa.x).toBeGreaterThanOrEqual(0)

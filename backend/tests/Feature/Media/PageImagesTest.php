@@ -264,3 +264,79 @@ describe('Imagens desta página (painel)', function (): void {
         $this->actingAs($user)->deleteJson("/api/v1/pages/{$page->uuid}/images/{$placa->uuid}?role=gallery")->assertForbidden();
     })->with(['financeiro', 'bazar', 'atendimento']);
 });
+
+describe('escolher a capa', function (): void {
+    test('troca a capa por imagem da biblioteca; a anterior continua na galeria e na biblioteca', function (): void {
+        $page = pageWithImages();
+        $new = storedImage('Fachada do bazar à tarde', 900, 600);
+        $entrance = Media::query()->where('alt', 'Entrada do bazar')->firstOrFail();
+
+        $this->actingAs(userWithRole('comunicacao'))
+            ->putJson("/api/v1/pages/{$page->uuid}/images/cover", ['media' => $new->uuid])
+            ->assertNoContent();
+
+        $images = $this->getJson('/api/v1/public/pages/bazar')->json('data.images');
+        expect($images['cover']['alt'])->toBe('Fachada do bazar à tarde')
+            ->and(array_column($images['gallery'], 'alt'))->toBe(['Placa do bazar', 'Entrada do bazar']);
+
+        $log = Activity::query()->where('event', 'placed')->where('subject_id', $new->id)->firstOrFail();
+        expect($log->properties['role'])->toBe('cover')
+            ->and($log->properties['replaced'])->toBe($entrance->uuid);
+    });
+
+    test('capa de imagem marcada como de assistido é recusada', function (): void {
+        $page = pageWithImages();
+        $marked = Media::factory()->depictingAssistedMinor()->create();
+
+        $this->actingAs(userWithRole('comunicacao'))
+            ->putJson("/api/v1/pages/{$page->uuid}/images/cover", ['media' => $marked->uuid])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['media']);
+    });
+
+    test('imagem inexistente é recusada com mensagem', function (): void {
+        $page = pageWithImages();
+
+        $this->actingAs(userWithRole('comunicacao'))
+            ->putJson("/api/v1/pages/{$page->uuid}/images/cover", ['media' => '0a1b2c3d-0000-4000-8000-000000000009'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['media' => 'Esta imagem não existe mais na biblioteca.']);
+    });
+
+    test('enviar com role=cover põe a foto nova na capa, não na galeria', function (): void {
+        $page = pageWithImages();
+
+        $response = $this->actingAs(userWithRole('comunicacao'))->post("/api/v1/pages/{$page->uuid}/images", [
+            'file' => Images::jpeg(900, 600),
+            'alt' => 'Capa nova do bazar',
+            'depicts_assisted_minor' => '0',
+            'role' => 'cover',
+        ], ['Accept' => 'application/json']);
+        $response->assertCreated();
+
+        $images = $this->getJson('/api/v1/public/pages/bazar')->json('data.images');
+        expect($images['cover']['alt'])->toBe('Capa nova do bazar')
+            ->and($images['gallery'])->toHaveCount(2);
+    });
+
+    test('a lista do painel diz onde o site mostra a capa', function (string $slug, array $expected): void {
+        $page = pageWithImages($slug);
+
+        expect($this->actingAs(userWithRole('comunicacao'))
+            ->getJson("/api/v1/pages/{$page->uuid}/images")
+            ->json('data.cover_shown_on'))->toBe($expected);
+    })->with([
+        'quem somos' => ['quem-somos', ['o destaque da página inicial']],
+        'bazar' => ['bazar', ['o cartão de Bazar beneficente em "O que fazemos"']],
+        'página sem uso da capa' => ['governanca', []],
+    ]);
+
+    test('quem não edita a página não troca a capa', function (): void {
+        $page = pageWithImages();
+        $new = storedImage('Outra');
+
+        $this->actingAs(userWithRole('financeiro'))
+            ->putJson("/api/v1/pages/{$page->uuid}/images/cover", ['media' => $new->uuid])
+            ->assertForbidden();
+    });
+});

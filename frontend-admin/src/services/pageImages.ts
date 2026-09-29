@@ -13,11 +13,24 @@ export async function fetchPageImages(pageUuid: string): Promise<PageImages> {
   return data.data
 }
 
-/** A foto vai para a biblioteca e para o fim da galeria da página. */
-export async function uploadImageToPage(pageUuid: string, file: File | null, payload: MediaDetailsPayload): Promise<Media> {
-  const { data } = await httpClient.post<{ data: Media }>(`/api/v1/pages/${pageUuid}/images`, uploadFormData(file, payload))
+/** A foto vai para a biblioteca e para o fim da galeria, ou para a capa, no lugar da atual. */
+export async function uploadImageToPage(
+  pageUuid: string,
+  file: File | null,
+  payload: MediaDetailsPayload,
+  role: 'gallery' | 'cover',
+): Promise<Media> {
+  const formData = uploadFormData(file, payload)
+  formData.append('role', role)
+
+  const { data } = await httpClient.post<{ data: Media }>(`/api/v1/pages/${pageUuid}/images`, formData)
 
   return data.data
+}
+
+/** Troca a capa por uma imagem que já está na biblioteca. */
+export async function setPageCover(pageUuid: string, mediaUuid: string): Promise<void> {
+  await httpClient.put(`/api/v1/pages/${pageUuid}/images/cover`, { media: mediaUuid })
 }
 
 /** Tira da capa ou da galeria. A imagem continua na biblioteca. */

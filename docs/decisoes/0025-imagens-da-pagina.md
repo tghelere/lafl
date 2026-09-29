@@ -117,6 +117,9 @@ oferece o padrão. Mudar isso seria outra decisão.
 - Os endereços antigos `/fotos/{secao}/{slug}-{largura}.{webp,jpg}` deixam de existir (404). Uma
   imagem que um buscador tenha indexado por esse endereço sai do índice até ser encontrada de
   novo em `/midia/`.
-- A capa não tem tela para ser **escolhida**: hoje ela é definida pelo catálogo inicial e muda
-  quando o arquivo é substituído. Escolher outra imagem como capa pelo painel é pendência.
+- **A capa é escolhida pelo painel** (sessão 29): trocar por imagem da biblioteca (o seletor do
+  editor, em modo de escolha, sem o passo de descrever), enviar uma foto nova direto para a capa,
+  ou tirar a capa. A tela diz onde o site mostra a capa daquela página. Esse mapa fica na API
+  (`App\Support\Content\CoverPlacements`), e não no painel, pela regra 1 do CLAUDE.md, e
+  precisa acompanhar `index.vue` e `o-que-fazemos.vue` quando o site mudar onde usa capa.
 - A ordem da galeria só muda tirando e enviando de novo. Reordenar é pendência.

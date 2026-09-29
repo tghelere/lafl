@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ImagePlus } from 'lucide-vue-next'
+import { ImagePlus, Images } from 'lucide-vue-next'
 import { reactive, ref, watch } from 'vue'
 
 import AppIcon from '@/components/AppIcon.vue'
 import MediaDeclarationField from '@/components/MediaDeclarationField.vue'
+import MediaPickerDialog from '@/components/MediaPickerDialog.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageImageItem from '@/components/PageImageItem.vue'
-import { fetchPageImages, uploadImageToPage } from '@/services/pageImages'
-import type { PageImages } from '@/types/media'
+import { fetchPageImages, setPageCover, uploadImageToPage } from '@/services/pageImages'
+import type { Media, PageImages } from '@/types/media'
 
 /**
  * "Imagens desta página": a porta da página para a mesma biblioteca de /admin/imagens (ver
@@ -37,6 +38,7 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const alt = ref('')
 const caption = ref('')
 const depictsAssistedMinor = ref<boolean | null>(null)
+const target = ref<'gallery' | 'cover'>('gallery')
 const isUploading = ref(false)
 const uploadErrorMessage = ref<string | null>(null)
 const fieldErrors = reactive<Record<string, string[]>>({})
@@ -61,6 +63,26 @@ watch(() => [props.pageUuid, props.refreshKey], () => void load(), { immediate: 
 function onChanged(message: string): void {
   notice.value = message
   void load()
+}
+
+const pickerOpen = ref(false)
+const coverErrorMessage = ref<string | null>(null)
+
+async function chooseCover(media: Media): Promise<void> {
+  coverErrorMessage.value = null
+  notice.value = null
+
+  try {
+    await setPageCover(props.pageUuid, media.id)
+    onChanged('Capa trocada. O site já mostra a nova.')
+  } catch (error) {
+    const body = axios.isAxiosError(error) ? (error.response?.data as { errors?: Record<string, string[]> }) : null
+    coverErrorMessage.value =
+      body?.errors?.media?.[0] ??
+      (axios.isAxiosError(error) && error.response?.status === 403
+        ? 'Você não tem permissão para trocar a capa desta página.'
+        : 'Não foi possível trocar a capa. Tente novamente.')
+  }
 }
 
 function clearUploadErrors(): void {
@@ -92,22 +114,33 @@ async function upload(): Promise<void> {
   clearUploadErrors()
 
   try {
-    await uploadImageToPage(props.pageUuid, file.value, {
-      alt: alt.value,
-      caption: caption.value,
-      depicts_assisted_minor: depictsAssistedMinor.value,
-    })
+    await uploadImageToPage(
+      props.pageUuid,
+      file.value,
+      {
+        alt: alt.value,
+        caption: caption.value,
+        depicts_assisted_minor: depictsAssistedMinor.value,
+      },
+      target.value,
+    )
+    const sentTo = target.value
 
     file.value = null
     alt.value = ''
     caption.value = ''
     depictsAssistedMinor.value = null
+    target.value = 'gallery'
 
     if (fileInput.value) {
       fileInput.value.value = ''
     }
 
-    onChanged('Imagem enviada e posta no fim da galeria. Ela já aparece no site.')
+    onChanged(
+      sentTo === 'cover'
+        ? 'Imagem enviada e posta na capa. Ela já aparece no site.'
+        : 'Imagem enviada e posta no fim da galeria. Ela já aparece no site.',
+    )
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 422) {
       const body = error.response.data as { errors?: Record<string, string[]> }
@@ -197,9 +230,27 @@ async function upload(): Promise<void> {
         Capa
       </h3>
       <p class="field__hint">
-        Não aparece nesta página: representa a página em outros lugares do site. O cartão de
-        “O que fazemos” usa a capa de cada frente, e o destaque da página inicial é a capa de
-        “Quem somos”.
+        Não aparece nesta página: representa a página em outros lugares do site.
+      </p>
+      <p
+        v-if="images.cover_shown_on.length > 0"
+        class="page-images__shown-on"
+      >
+        A capa desta página aparece em {{ images.cover_shown_on.join(' e em ') }}. Trocar ou
+        tirar a capa muda isso na hora.
+      </p>
+      <p
+        v-else
+        class="field__hint"
+      >
+        Hoje nenhum lugar do site mostra a capa desta página.
+      </p>
+      <p
+        v-if="coverErrorMessage"
+        class="field__error"
+        role="alert"
+      >
+        {{ coverErrorMessage }}
       </p>
       <ul
         v-if="images.cover"
@@ -219,6 +270,21 @@ async function upload(): Promise<void> {
       >
         Esta página não tem capa.
       </p>
+      <button
+        type="button"
+        class="btn btn--secondary page-images__choose-cover"
+        @click="pickerOpen = true"
+      >
+        <AppIcon :icon="Images" />
+        {{ images.cover ? 'Trocar a capa por imagem da biblioteca' : 'Escolher a capa na biblioteca' }}
+      </button>
+      <MediaPickerDialog
+        :open="pickerOpen"
+        :editing="null"
+        purpose="cover"
+        @pick="chooseCover"
+        @close="pickerOpen = false"
+      />
 
       <template v-if="images.content.length > 0">
         <h3 class="page-images__group">
@@ -244,7 +310,7 @@ async function upload(): Promise<void> {
         @submit.prevent="upload"
       >
         <h3 class="page-images__group">
-          Enviar imagem para a galeria
+          Enviar imagem
         </h3>
 
         <p
@@ -304,13 +370,37 @@ async function upload(): Promise<void> {
           :error="fieldErrors.depicts_assisted_minor?.[0]"
         />
 
+        <fieldset class="field media-declaration">
+          <legend class="field__legend">
+            Para onde vai
+          </legend>
+          <label class="media-declaration__option">
+            <input
+              v-model="target"
+              type="radio"
+              name="page-image-target"
+              value="gallery"
+            >
+            Fim da galeria
+          </label>
+          <label class="media-declaration__option">
+            <input
+              v-model="target"
+              type="radio"
+              name="page-image-target"
+              value="cover"
+            >
+            Capa, no lugar da atual
+          </label>
+        </fieldset>
+
         <button
           type="submit"
           class="btn btn--primary"
           :disabled="isUploading"
         >
           <AppIcon :icon="ImagePlus" />
-          {{ isUploading ? 'Enviando…' : 'Enviar para a galeria' }}
+          {{ isUploading ? 'Enviando…' : target === 'cover' ? 'Enviar para a capa' : 'Enviar para a galeria' }}
         </button>
       </form>
     </template>

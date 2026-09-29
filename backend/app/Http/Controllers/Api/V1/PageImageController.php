@@ -6,14 +6,17 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Content\PageImages\ListPageImages;
 use App\Actions\Content\PageImages\RemoveImageFromPage;
+use App\Actions\Content\PageImages\SetPageCover;
 use App\Actions\Content\PageImages\UploadImageToPage;
 use App\Actions\Media\FindMediaUsages;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Content\PageImages\RemovePageImageRequest;
+use App\Http\Requests\Content\PageImages\SetPageCoverRequest;
 use App\Http\Requests\Content\PageImages\StorePageImageRequest;
 use App\Http\Resources\MediaResource;
 use App\Models\Media;
 use App\Models\Page;
+use App\Support\Content\CoverPlacements;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
@@ -40,14 +43,24 @@ final class PageImageController extends Controller
             'cover' => $images['cover'] !== null ? $present($images['cover']) : null,
             'gallery' => array_map($present, $images['gallery']),
             'content' => array_map($present, $images['content']),
+            // Onde o site mostra a capa desta página: a capa não aparece nela.
+            'cover_shown_on' => CoverPlacements::for($page->slug),
         ]]);
     }
 
     public function store(StorePageImageRequest $request, Page $page, UploadImageToPage $action): MediaResource
     {
-        $media = $action->handle($page, $request->uploadedPath(), $request->toDetailsDto(), $request->user());
+        $media = $action->handle($page, $request->uploadedPath(), $request->toDetailsDto(), $request->role(), $request->user());
 
         return new MediaResource($media);
+    }
+
+    /** Troca a capa por uma imagem que já está na biblioteca. */
+    public function setCover(SetPageCoverRequest $request, Page $page, SetPageCover $action): Response
+    {
+        $action->handle($page, $request->media(), $request->user());
+
+        return response()->noContent();
     }
 
     public function destroy(RemovePageImageRequest $request, Page $page, Media $media, RemoveImageFromPage $action): Response

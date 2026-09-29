@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { ArrowLeft, Check, ExternalLink, Search, X } from 'lucide-vue-next'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AppIcon from '@/components/AppIcon.vue'
@@ -13,6 +13,10 @@ import type { Media } from '@/types/media'
 /**
  * Escolher uma imagem da biblioteca para o texto, e dar a ela texto alternativo e legenda.
  *
+ * `purpose="cover"`: escolher a capa de uma página ("Imagens desta página"). Não tem o passo
+ * de descrever, porque a capa usa o texto alternativo e a legenda da própria biblioteca (ADR
+ * 0025). Clicar na imagem já é a escolha, e o diálogo emite `pick`.
+ *
  * `<dialog>` nativo com `showModal()`: o navegador já prende o foco dentro, torna o resto da
  * página inerte, fecha no Esc e devolve o foco a quem abriu — nada disso reimplementado aqui.
  *
@@ -22,17 +26,25 @@ import type { Media } from '@/types/media'
  * A grade pede à API só o que pode ir para o site (`publishable`) — é conveniência: quem recusa
  * imagem impublicável no conteúdo é a API, ao salvar a página.
  */
-const props = defineProps<{
-  open: boolean
-  editing: MediaFigureAttrs | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    editing: MediaFigureAttrs | null
+    purpose?: 'text' | 'cover'
+  }>(),
+  { purpose: 'text' },
+)
 
 const emit = defineEmits<{
   close: []
   confirm: [attrs: MediaFigureAttrs]
+  pick: [media: Media]
 }>()
 
 const router = useRouter()
+// Um prefixo por instância: a tela de edição de página tem dois seletores (o do editor e o da
+// capa), e `id` repetido faz o `<label for>` de um apontar para o campo do outro.
+const uid = useId()
 const dialog = ref<HTMLDialogElement | null>(null)
 const altInput = ref<HTMLInputElement | null>(null)
 
@@ -70,6 +82,13 @@ async function load(page = 1): Promise<void> {
 }
 
 function choose(item: Media): void {
+  if (props.purpose === 'cover') {
+    emit('pick', item)
+    dialog.value?.close()
+
+    return
+  }
+
   chosen.value = { uuid: item.id, preview: item.preview_url }
   alt.value = item.alt
   caption.value = item.caption ?? ''
@@ -120,15 +139,15 @@ watch(
   <dialog
     ref="dialog"
     class="media-picker"
-    aria-labelledby="media-picker-title"
+    :aria-labelledby="`${uid}-title`"
     @close="emit('close')"
   >
     <header class="media-picker__header">
       <h2
-        id="media-picker-title"
+        :id="`${uid}-title`"
         class="media-picker__title"
       >
-        {{ editing ? 'Editar imagem' : step === 'choose' ? 'Inserir imagem' : 'Descrever a imagem' }}
+        {{ purpose === 'cover' ? 'Escolher a capa' : editing ? 'Editar imagem' : step === 'choose' ? 'Inserir imagem' : 'Descrever a imagem' }}
       </h2>
       <button
         type="button"
@@ -147,9 +166,9 @@ watch(
         @submit.prevent="load(1)"
       >
         <div class="filter-bar__field">
-          <label for="media-picker-search">Buscar na biblioteca</label>
+          <label :for="`${uid}-search`">Buscar na biblioteca</label>
           <input
-            id="media-picker-search"
+            :id="`${uid}-search`"
             v-model="search"
             type="search"
             placeholder="Texto alternativo ou legenda"
@@ -164,7 +183,17 @@ watch(
         </button>
       </form>
 
-      <p class="field__hint">
+      <p
+        v-if="purpose === 'cover'"
+        class="field__hint"
+      >
+        Só aparecem as imagens que podem ir para o site. Para uma foto nova, feche e use
+        “Enviar imagem”, escolhendo a capa como destino.
+      </p>
+      <p
+        v-else
+        class="field__hint"
+      >
         Não achou? <a
           :href="uploadHref"
           target="_blank"
@@ -236,9 +265,9 @@ watch(
       >
 
       <div class="field">
-        <label for="media-picker-alt">Texto alternativo</label>
+        <label :for="`${uid}-alt`">Texto alternativo</label>
         <input
-          id="media-picker-alt"
+          :id="`${uid}-alt`"
           ref="altInput"
           v-model="alt"
           type="text"
@@ -249,9 +278,9 @@ watch(
       </div>
 
       <div class="field">
-        <label for="media-picker-caption">Legenda (opcional)</label>
+        <label :for="`${uid}-caption`">Legenda (opcional)</label>
         <input
-          id="media-picker-caption"
+          :id="`${uid}-caption`"
           v-model="caption"
           type="text"
           maxlength="500"

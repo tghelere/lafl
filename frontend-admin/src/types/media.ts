@@ -47,4 +47,6 @@ export type PageImages = {
   gallery: Media[]
   /** As do meio do texto, na ordem do conteúdo SALVO. */
   content: Media[]
+  /** Onde o site mostra a capa desta página (App\Support\Content\CoverPlacements). Vazio = em lugar nenhum. */
+  cover_shown_on: string[]
 }

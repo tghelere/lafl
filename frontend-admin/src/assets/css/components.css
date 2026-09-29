@@ -1393,6 +1393,18 @@ body.has-open-drawer {
   list-style: none;
 }
 
+.page-images__shown-on {
+  margin: var(--space-2) 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+}
+
+.page-images__choose-cover {
+  margin-top: var(--space-3);
+}
+
 .page-images__empty {
   color: var(--color-text-muted);
   font-size: var(--text-sm);

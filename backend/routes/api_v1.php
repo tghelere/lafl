@@ -112,10 +112,12 @@ Route::middleware($authenticated)->group(function (): void {
     Route::apiResource('pages', PageController::class)->parameters(['pages' => 'page']);
 
     // "Imagens desta página": capa, galeria e as do texto, pela porta da página (ver
-    // docs/decisoes/0025-imagens-da-pagina.md). Enviar põe no fim da galeria; o DELETE tira da
-    // capa ou da galeria (`role`) e deixa a imagem na biblioteca.
+    // docs/decisoes/0025-imagens-da-pagina.md). Enviar põe no fim da galeria ou na capa
+    // (`role`); o PUT de /cover troca a capa por imagem da biblioteca; o DELETE tira da capa ou
+    // da galeria (`role`) e deixa a imagem na biblioteca.
     Route::get('/pages/{page}/images', [PageImageController::class, 'index'])->name('pages.images.index');
     Route::post('/pages/{page}/images', [PageImageController::class, 'store'])->name('pages.images.store');
+    Route::put('/pages/{page}/images/cover', [PageImageController::class, 'setCover'])->name('pages.images.cover');
     Route::delete('/pages/{page}/images/{media}', [PageImageController::class, 'destroy'])->name('pages.images.destroy');
 
     // Marcadores que o editor de páginas oferece, com o valor de agora (ver

@@ -43,7 +43,7 @@ test.describe('comunicacao', () => {
       await expect(secao.getByText('A galeria está vazia.')).toBeVisible()
 
       // 1. Enviar para a galeria, pela própria página.
-      await secao.getByLabel('Arquivo (JPEG, PNG ou WebP, até 10 MB)').setInputFiles({
+      await secao.getByLabel('Arquivo (JPEG, PNG ou WebP, até 10 MB)', { exact: true }).setInputFiles({
         name: 'foto.png',
         mimeType: 'image/png',
         buffer: solidPng(800, 500, [30, 140, 60]),
