@@ -293,3 +293,54 @@ test.describe('acessibilidade — 1280px, só teclado', () => {
     }
   })
 })
+
+test.describe('celular — 360px', () => {
+  test.use({ viewport: { width: 360, height: 740 } })
+
+  test('usa a tela toda, com controles de 44px, e a imagem cabe sem rolagem lateral', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[1].alt}` }).click()
+
+    const dialogo = ampliacao(page)
+    await expect(dialogo).toBeVisible()
+    const caixa = (await dialogo.boundingBox())!
+    expect(caixa).toEqual({ x: 0, y: 0, width: 360, height: 740 })
+
+    for (const nome of ['Fechar', 'Imagem anterior', 'Próxima imagem']) {
+      const botao = (await dialogo.getByRole('button', { name: nome }).boundingBox())!
+      expect(botao.height, nome).toBeGreaterThanOrEqual(44)
+      expect(botao.width, nome).toBeGreaterThanOrEqual(44)
+      expect(botao.x + botao.width, nome).toBeLessThanOrEqual(360)
+    }
+
+    const imagem = (await dialogo.locator('img').boundingBox())!
+    expect(imagem.x).toBeGreaterThanOrEqual(0)
+    expect(imagem.x + imagem.width).toBeLessThanOrEqual(360)
+    await expect(dialogo.locator('.ampliacao__legenda')).toBeInViewport()
+    await expectLargestThatFits(page, [400, 640, 960], 1000 / 1400)
+    expect(await dialogo.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true)
+  })
+
+  test('deslize de dedo navega, e o teclado continua funcionando', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` }).click()
+    const dialogo = ampliacao(page)
+    await expect(dialogo.getByText('1 de 3', { exact: true })).toBeVisible()
+
+    // Deslize de toque para a esquerda: eventos de ponteiro do tipo "touch", como num celular.
+    await page.locator('.ampliacao__palco').evaluate((palco) => {
+      const caixa = palco.getBoundingClientRect()
+      const y = caixa.top + caixa.height / 2
+      const toque = (tipo: string, x: number) =>
+        palco.dispatchEvent(new PointerEvent(tipo, { bubbles: true, clientX: x, clientY: y, pointerType: 'touch', isPrimary: true }))
+      toque('pointerdown', caixa.right - 30)
+      toque('pointerup', caixa.left + 30)
+    })
+    await expect(dialogo.getByText('2 de 3', { exact: true })).toBeVisible()
+
+    await page.keyboard.press('ArrowLeft')
+    await expect(dialogo.getByText('1 de 3', { exact: true })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` })).toBeFocused()
+  })
+})

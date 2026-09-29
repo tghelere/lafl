@@ -330,19 +330,23 @@ onBeforeUnmount(() => {
           type="button"
           class="ampliacao__botao"
           :disabled="indice === 0"
+          aria-label="Imagem anterior"
           @click="irPara(indice - 1)"
         >
           <ChevronLeft :size="22" aria-hidden="true" />
-          Imagem anterior
+          <span class="ampliacao__rotulo-longo">Imagem anterior</span>
+          <span class="ampliacao__rotulo-curto">Anterior</span>
         </button>
         <button
           ref="proxima"
           type="button"
           class="ampliacao__botao"
           :disabled="indice === itens.length - 1"
+          aria-label="Próxima imagem"
           @click="irPara(indice + 1)"
         >
-          Próxima imagem
+          <span class="ampliacao__rotulo-longo">Próxima imagem</span>
+          <span class="ampliacao__rotulo-curto">Próxima</span>
           <ChevronRight :size="22" aria-hidden="true" />
         </button>
       </div>
@@ -450,9 +454,51 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 
+/* O rótulo curto só no celular, onde "Imagem anterior" quebraria em duas linhas. O nome
+   acessível é o aria-label do botão, que contém o texto visível dos dois tamanhos. */
+.ampliacao__rotulo-curto {
+  display: none;
+}
+
 .ampliacao__credito {
   margin-top: var(--space-1);
   opacity: 0.75;
   font-size: var(--text-xs);
+}
+
+/* Celular: a tela toda, sem borda nem raio. O espaço interno respeita as áreas seguras
+   (entalhe, barra de gestos) com env(safe-area-inset-*). Hoje o site não usa
+   `viewport-fit=cover`, então o navegador já mantém a página dentro da área segura e esses
+   valores são 0; o max() deixa isto certo no dia em que o site passar a usar. */
+@media (max-width: 47.99rem) {
+  .ampliacao {
+    width: 100vw;
+    height: 100dvh;
+    margin: 0;
+    padding:
+      max(var(--space-3), env(safe-area-inset-top))
+      max(var(--space-3), env(safe-area-inset-right))
+      max(var(--space-3), env(safe-area-inset-bottom))
+      max(var(--space-3), env(safe-area-inset-left));
+    border-radius: 0;
+  }
+
+  .ampliacao__navegacao {
+    gap: var(--space-2);
+  }
+
+  .ampliacao__navegacao .ampliacao__botao {
+    flex: 1;
+    justify-content: center;
+    padding: 0 var(--space-2);
+  }
+
+  .ampliacao__rotulo-longo {
+    display: none;
+  }
+
+  .ampliacao__rotulo-curto {
+    display: inline;
+  }
 }
 </style>
