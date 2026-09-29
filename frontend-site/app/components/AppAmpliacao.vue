@@ -10,6 +10,15 @@
 //
 // Grupo: as imagens com o mesmo `data-grupo` (galeria) ou dentro do mesmo
 // `[data-grupo-ampliacao]` (texto da página) navegam entre si, na ordem em que aparecem.
+//
+// Acessibilidade, além do que o <dialog> modal já dá (fundo inerte, Esc):
+// - o foco fica preso aqui dentro: Tab e Shift+Tab circulam entre os controles, sem depender
+//   do navegador (no Firefox, o Tab no último controle pode ir para a barra de endereço);
+// - ao fechar, por qualquer caminho, o foco volta ao link da imagem de ORIGEM, a que foi
+//   clicada, para quem usa teclado continuar de onde estava;
+// - o botão de navegação que desliga na ponta não leva o foco embora: ele passa ao outro;
+// - cada troca é anunciada ("Imagem 2 de 4: …") numa região aria-live, porque a imagem nova
+//   não recebe foco.
 import { ChevronLeft, ChevronRight, X } from '@lucide/vue'
 
 type Fonte = { url: string; largura: number }
@@ -25,6 +34,10 @@ type Item = {
 }
 
 const dialogo = ref<HTMLDialogElement | null>(null)
+const fechador = ref<HTMLButtonElement | null>(null)
+const anterior = ref<HTMLButtonElement | null>(null)
+const proxima = ref<HTMLButtonElement | null>(null)
+let origem: HTMLAnchorElement | null = null
 const palco = ref<HTMLElement | null>(null)
 const itens = ref<Item[]>([])
 const indice = ref(0)
@@ -32,6 +45,16 @@ const espaco = ref({ largura: 0, altura: 0, densidade: 1 })
 
 const atual = computed(() => itens.value[indice.value] ?? null)
 const variasImagens = computed(() => itens.value.length > 1)
+
+const anuncio = computed(() => {
+  const item = atual.value
+
+  if (!item) {
+    return ''
+  }
+
+  return variasImagens.value ? `Imagem ${indice.value + 1} de ${itens.value.length}: ${item.alt}` : item.alt
+})
 
 /**
  * A maior derivada que cabe na tela: a imagem aparece do tamanho que o palco permite (sem
@@ -114,10 +137,14 @@ async function abrir(link: HTMLAnchorElement): Promise<boolean> {
 
   itens.value = lidos
   indice.value = posicao
+  origem = link
   espaco.value = { largura: 0, altura: 0, densidade: 1 }
   document.documentElement.classList.add('ampliacao-aberta')
-  dialogo.value.showModal()
+  // Desenhar o conteúdo ANTES de abrir: o showModal() põe o foco no primeiro controle que
+  // existir, e sem o conteúdo desenhado o foco cairia no próprio diálogo, fora dos botões.
   await nextTick()
+  dialogo.value.showModal()
+  fechador.value?.focus()
   medir()
 
   return true
@@ -130,11 +157,49 @@ function fechar(): void {
 function aoFechar(): void {
   document.documentElement.classList.remove('ampliacao-aberta')
   itens.value = []
+  origem?.focus()
+  origem = null
 }
 
-function irPara(novo: number): void {
-  if (novo >= 0 && novo < itens.value.length) {
-    indice.value = novo
+async function irPara(novo: number): Promise<void> {
+  if (novo < 0 || novo >= itens.value.length) {
+    return
+  }
+
+  indice.value = novo
+  await nextTick()
+
+  // Na ponta, o botão com foco desliga; o foco passa ao outro sentido, e não para o <body>.
+  const focado = document.activeElement
+
+  if (focado === proxima.value && proxima.value?.disabled) {
+    anterior.value?.focus()
+  } else if (focado === anterior.value && anterior.value?.disabled) {
+    proxima.value?.focus()
+  }
+}
+
+function controles(): HTMLElement[] {
+  return Array.from(dialogo.value?.querySelectorAll<HTMLElement>('button:not([disabled])') ?? [])
+}
+
+function prenderFoco(evento: KeyboardEvent): void {
+  const lista = controles()
+
+  if (lista.length === 0) {
+    return
+  }
+
+  const primeiro = lista[0]!
+  const ultimo = lista[lista.length - 1]!
+  const dentro = lista.includes(document.activeElement as HTMLElement)
+
+  if (evento.shiftKey && (document.activeElement === primeiro || !dentro)) {
+    evento.preventDefault()
+    ultimo.focus()
+  } else if (!evento.shiftKey && (document.activeElement === ultimo || !dentro)) {
+    evento.preventDefault()
+    primeiro.focus()
   }
 }
 
@@ -172,12 +237,14 @@ function aoClicarNoDialogo(evento: MouseEvent): void {
 }
 
 function aoTeclar(evento: KeyboardEvent): void {
-  if (evento.key === 'ArrowLeft') {
+  if (evento.key === 'Tab') {
+    prenderFoco(evento)
+  } else if (evento.key === 'ArrowLeft') {
     evento.preventDefault()
-    irPara(indice.value - 1)
+    void irPara(indice.value - 1)
   } else if (evento.key === 'ArrowRight') {
     evento.preventDefault()
-    irPara(indice.value + 1)
+    void irPara(indice.value + 1)
   }
 }
 
@@ -202,7 +269,7 @@ function aoSoltar(evento: PointerEvent): void {
 
   if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
     arrastou = true
-    irPara(indice.value + (dx < 0 ? 1 : -1))
+    void irPara(indice.value + (dx < 0 ? 1 : -1))
   }
 }
 
@@ -222,14 +289,17 @@ onBeforeUnmount(() => {
     ref="dialogo"
     class="ampliacao"
     aria-label="Imagem ampliada"
+    :aria-describedby="atual?.legenda || atual?.credito ? 'ampliacao-legenda' : undefined"
     @close="aoFechar"
     @click="aoClicarNoDialogo"
     @keydown="aoTeclar"
   >
     <template v-if="atual">
+      <p class="visually-hidden" aria-live="polite">{{ anuncio }}</p>
+
       <div class="ampliacao__barra">
-        <p v-if="variasImagens" class="ampliacao__posicao">{{ indice + 1 }} de {{ itens.length }}</p>
-        <button type="button" class="ampliacao__botao ampliacao__fechar" @click="fechar">
+        <p v-if="variasImagens" class="ampliacao__posicao" aria-hidden="true">{{ indice + 1 }} de {{ itens.length }}</p>
+        <button ref="fechador" type="button" class="ampliacao__botao ampliacao__fechar" @click="fechar">
           <X :size="22" aria-hidden="true" />
           Fechar
         </button>
@@ -256,6 +326,7 @@ onBeforeUnmount(() => {
 
       <div v-if="variasImagens" class="ampliacao__navegacao">
         <button
+          ref="anterior"
           type="button"
           class="ampliacao__botao"
           :disabled="indice === 0"
@@ -265,6 +336,7 @@ onBeforeUnmount(() => {
           Imagem anterior
         </button>
         <button
+          ref="proxima"
           type="button"
           class="ampliacao__botao"
           :disabled="indice === itens.length - 1"
@@ -275,7 +347,7 @@ onBeforeUnmount(() => {
         </button>
       </div>
 
-      <div v-if="atual.legenda || atual.credito" class="ampliacao__legenda">
+      <div v-if="atual.legenda || atual.credito" id="ampliacao-legenda" class="ampliacao__legenda">
         <p v-if="atual.legenda">{{ atual.legenda }}</p>
         <p v-if="atual.credito" class="ampliacao__credito">{{ atual.credito }}</p>
       </div>

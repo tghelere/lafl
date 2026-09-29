@@ -140,14 +140,14 @@ test.describe('ampliação — 1280px', () => {
     await expect(dialogo).toBeVisible()
     // A página continua por trás: a URL não mudou.
     await expect(page).toHaveURL(new RegExp(`/${slug}$`))
-    await expect(dialogo.getByText('1 de 3')).toBeVisible()
+    await expect(dialogo.getByText('1 de 3', { exact: true })).toBeVisible()
     await expect(dialogo.locator('img')).toHaveAttribute('alt', galeria[0].alt)
     await expectLargestThatFits(page, [400, 640, 960, 1280], 1600 / 1000)
     await expect(dialogo.locator('.ampliacao__legenda')).toHaveCount(0)
 
     // Próxima pelo botão: a segunda tem legenda e crédito, embaixo da imagem.
     await dialogo.getByRole('button', { name: 'Próxima imagem' }).click()
-    await expect(dialogo.getByText('2 de 3')).toBeVisible()
+    await expect(dialogo.getByText('2 de 3', { exact: true })).toBeVisible()
     await expect(dialogo.locator('.ampliacao__legenda')).toContainText('Canteiros de pneu, em 2025')
     await expect(dialogo.locator('.ampliacao__legenda')).toContainText('Foto: equipe do Lar')
     await expectLargestThatFits(page, [400, 640, 960], 1000 / 1400)
@@ -161,13 +161,13 @@ test.describe('ampliação — 1280px', () => {
     await expect(dialogo.getByRole('button', { name: 'Imagem anterior' })).toBeDisabled()
     await page.keyboard.press('ArrowRight')
     await page.keyboard.press('ArrowRight')
-    await expect(dialogo.getByText('3 de 3')).toBeVisible()
+    await expect(dialogo.getByText('3 de 3', { exact: true })).toBeVisible()
     await expect(dialogo.getByRole('button', { name: 'Próxima imagem' })).toBeDisabled()
     await page.keyboard.press('ArrowRight')
-    await expect(dialogo.getByText('3 de 3')).toBeVisible()
+    await expect(dialogo.getByText('3 de 3', { exact: true })).toBeVisible()
 
     await page.keyboard.press('ArrowLeft')
-    await expect(dialogo.getByText('2 de 3')).toBeVisible()
+    await expect(dialogo.getByText('2 de 3', { exact: true })).toBeVisible()
     await dialogo.getByRole('button', { name: 'Imagem anterior' }).click()
     await expect(dialogo.locator('img')).toHaveAttribute('alt', galeria[0].alt)
   })
@@ -183,7 +183,7 @@ test.describe('ampliação — 1280px', () => {
     await page.mouse.move(meio.x - 150, meio.y + 10, { steps: 5 })
     await page.mouse.up()
 
-    await expect(ampliacao(page).getByText('2 de 3')).toBeVisible()
+    await expect(ampliacao(page).getByText('2 de 3', { exact: true })).toBeVisible()
     await expect(ampliacao(page)).toBeVisible()
   })
 
@@ -215,5 +215,81 @@ test.describe('ampliação — 1280px', () => {
     await expect(dialogo.locator('.ampliacao__legenda')).toHaveText('A recepção depois da reforma')
     await expect(dialogo.getByText(/de \d+$/)).toHaveCount(0)
     await expect(dialogo.getByRole('button', { name: 'Próxima imagem' })).toHaveCount(0)
+  })
+})
+
+test.describe('acessibilidade — 1280px, só teclado', () => {
+  test.use({ viewport: { width: 1280, height: 800 } })
+
+  async function focusByTab(page: Page, name: string): Promise<void> {
+    const alvo = page.getByRole('link', { name })
+    for (let i = 0; i < 80; i++) {
+      await page.keyboard.press('Tab')
+      if (await alvo.evaluate((node) => node === document.activeElement)) {
+        return
+      }
+    }
+    throw new Error(`"${name}" não foi alcançado por Tab`)
+  }
+
+  async function focusIsInsideDialog(page: Page): Promise<boolean> {
+    return page.evaluate(() => document.querySelector('dialog.ampliacao')?.contains(document.activeElement) ?? false)
+  }
+
+  test('abre com Enter, prende o foco, anuncia a troca e devolve o foco à imagem de origem', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    const origem = `Ampliar imagem: ${galeria[0].alt}`
+    await focusByTab(page, origem)
+    await page.keyboard.press('Enter')
+
+    const dialogo = ampliacao(page)
+    await expect(dialogo).toBeVisible()
+    await expect(dialogo.getByRole('button', { name: 'Fechar' })).toBeFocused()
+    await expect(dialogo.getByText(`Imagem 1 de 3: ${galeria[0].alt}`)).toBeAttached()
+
+    // Tab e Shift+Tab muitas vezes: o foco nunca sai do diálogo.
+    for (const tecla of ['Tab', 'Tab', 'Tab', 'Tab', 'Shift+Tab', 'Shift+Tab', 'Shift+Tab']) {
+      await page.keyboard.press(tecla)
+      expect(await focusIsInsideDialog(page), `o foco saiu do diálogo depois de ${tecla}`).toBe(true)
+    }
+
+    // Enter em "Próxima imagem" até a ponta: o botão desliga e o foco passa a "Imagem anterior".
+    await dialogo.getByRole('button', { name: 'Próxima imagem' }).focus()
+    await page.keyboard.press('Enter')
+    await expect(dialogo.getByText(`Imagem 2 de 3: ${galeria[1].alt}`)).toBeAttached()
+    await page.keyboard.press('Enter')
+    await expect(dialogo.getByText(`Imagem 3 de 3: ${galeria[2].alt}`)).toBeAttached()
+    await expect(dialogo.getByRole('button', { name: 'Imagem anterior' })).toBeFocused()
+
+    // Fechar depois de navegar: o foco volta à imagem clicada, não à última vista.
+    await page.keyboard.press('Escape')
+    await expect(dialogo).toBeHidden()
+    await expect(page.getByRole('link', { name: origem })).toBeFocused()
+  })
+
+  test('o foco volta à origem também pelo botão Fechar e pelo clique fora', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    const origem = page.getByRole('link', { name: `Ampliar imagem: ${noTexto.alt}` })
+
+    await origem.click()
+    await ampliacao(page).getByRole('button', { name: 'Fechar' }).click()
+    await expect(origem).toBeFocused()
+
+    await origem.click()
+    await expect(ampliacao(page)).toBeVisible()
+    await page.mouse.click(4, 4)
+    await expect(ampliacao(page)).toBeHidden()
+    await expect(origem).toBeFocused()
+  })
+
+  test('rótulos em pt-BR e a legenda descrevendo o diálogo', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[1].alt}` }).click()
+
+    const dialogo = ampliacao(page)
+    await expect(dialogo).toHaveAttribute('aria-describedby', 'ampliacao-legenda')
+    for (const nome of ['Fechar', 'Imagem anterior', 'Próxima imagem']) {
+      await expect(dialogo.getByRole('button', { name: nome })).toBeVisible()
+    }
   })
 })
