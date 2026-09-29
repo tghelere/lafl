@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Enums\FormSubmissionType;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\TransparencyDocument;
 use App\Models\User;
@@ -46,6 +47,7 @@ final class UserResource extends JsonResource
     {
         $map = [
             'pages' => $user->can('viewAny', Page::class),
+            'media' => $user->can('viewAny', Media::class),
             'transparency-documents' => $user->can('viewAny', TransparencyDocument::class),
             'users' => $user->can('viewAny', User::class),
             // Alimenta o item "Auditoria" do menu e a seção "Histórico de acessos" do detalhe de

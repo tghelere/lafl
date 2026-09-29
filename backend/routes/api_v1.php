@@ -7,12 +7,14 @@ use App\Http\Controllers\Api\V1\ContactMessageController;
 use App\Http\Controllers\Api\V1\ContentMarkerController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\FormAuditController;
+use App\Http\Controllers\Api\V1\MediaController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\PartnershipInquiryController;
 use App\Http\Controllers\Api\V1\PickupRequestController;
 use App\Http\Controllers\Api\V1\ProgramApplicationController;
 use App\Http\Controllers\Api\V1\Public\ContactMessageController as PublicContactMessageController;
 use App\Http\Controllers\Api\V1\Public\InstitutionFactsController as PublicInstitutionFactsController;
+use App\Http\Controllers\Api\V1\Public\MediaController as PublicMediaController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
 use App\Http\Controllers\Api\V1\Public\PartnershipInquiryController as PublicPartnershipInquiryController;
 use App\Http\Controllers\Api\V1\Public\PickupRequestController as PublicPickupRequestController;
@@ -78,6 +80,12 @@ Route::prefix('public')->name('public.')->group(function (): void {
         ->where(['year' => '[0-9]{4}', 'slug' => '[a-z0-9-]+'])
         ->name('transparency-documents.file');
 
+    // Imagem da biblioteca para o site — espelha /midia/{uuid}[/{largura}.webp], servida pelo
+    // proxy do Nitro (ver App\Support\Media\MediaUrl). Só derivada webp; a original não sai.
+    Route::get('/media/{uuid}/{variant?}', [PublicMediaController::class, 'file'])
+        ->where(['uuid' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', 'variant' => '[0-9]{2,4}\.webp'])
+        ->name('media.file');
+
     // Endereço antigo — só 301 para o de cima (ver o docblock do controller).
     Route::get('/transparency-documents/{uuid}/download', [PublicTransparencyDocumentController::class, 'download'])
         ->where('uuid', '[0-9a-fA-F-]{36}')
@@ -109,6 +117,16 @@ Route::middleware($authenticated)->group(function (): void {
         ->name('content-markers.index');
     Route::apiResource('transparency-documents', TransparencyDocumentController::class)
         ->parameters(['transparency-documents' => 'transparencyDocument']);
+
+    // Biblioteca de imagens do conteúdo (ver docs/decisoes/0024-biblioteca-de-midia.md).
+    // Substituir o arquivo é rota própria, em POST (multipart só é lido pelo PHP em POST), e
+    // não um campo opcional do update: trocar a imagem e corrigir o texto alternativo são
+    // atos diferentes, com eventos de auditoria diferentes.
+    Route::apiResource('media', MediaController::class)->parameters(['media' => 'media']);
+    Route::post('/media/{media}/file', [MediaController::class, 'replaceFile'])->name('media.replace-file');
+    Route::get('/media/{media}/file/{variant}', [MediaController::class, 'file'])
+        ->where('variant', 'original|[0-9]{2,4}\.webp')
+        ->name('media.file');
 
     // Gestão de usuários — só super_admin (ver App\Policies\UserPolicy). Sem destroy: contas
     // só desativam, nunca se apagam (ver docs/levantamento-painel.md, item 2).
