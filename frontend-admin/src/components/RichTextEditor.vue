@@ -2,13 +2,17 @@
 import Link from '@tiptap/extension-link'
 import StarterKit from '@tiptap/starter-kit'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
-import { onBeforeUnmount, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
+
+import { MediaFigure, type MediaFigureAttrs } from '@/components/editor/mediaFigure'
+import MediaPickerDialog from '@/components/MediaPickerDialog.vue'
 
 /**
  * Editor de conteúdo das páginas do site. A barra oferece exatamente o que a allowlist do
  * backend aceita (App\Support\Html\ContentSanitizer, ver
  * docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md): parágrafo, h2, h3, negrito,
- * itálico, link, lista com e sem ordem.
+ * itálico, link, lista com e sem ordem, e imagem da biblioteca com legenda (ver
+ * src/components/editor/mediaFigure.ts).
  *
  * Oferecer formatação além disso seria pior que não oferecer: o editor mostraria a
  * formatação aplicada e o backend a removeria ao salvar, sem a pessoa entender por quê. Quem
@@ -50,6 +54,7 @@ const editor = useEditor({
       // decide o `rel` final é o backend (externo recebe rel de segurança, interno não).
       HTMLAttributes: { target: null, rel: null },
     }),
+    MediaFigure,
   ],
   editorProps: {
     attributes: {
@@ -77,6 +82,36 @@ watch(
 onBeforeUnmount(() => {
   editor.value?.destroy()
 })
+
+const pickerOpen = ref(false)
+const editingFigure = ref<MediaFigureAttrs | null>(null)
+
+/**
+ * Com uma figura selecionada, o botão edita o alternativo e a legenda dela; sem, insere uma
+ * imagem nova onde está o cursor.
+ */
+function openImagePicker(): void {
+  if (!editor.value) {
+    return
+  }
+
+  editingFigure.value = editor.value.isActive('mediaFigure')
+    ? (editor.value.getAttributes('mediaFigure') as MediaFigureAttrs)
+    : null
+  pickerOpen.value = true
+}
+
+function applyImage(attrs: MediaFigureAttrs): void {
+  if (!editor.value) {
+    return
+  }
+
+  if (editingFigure.value) {
+    editor.value.chain().focus().updateAttributes('mediaFigure', { alt: attrs.alt, caption: attrs.caption }).run()
+  } else {
+    editor.value.chain().focus().insertContent({ type: 'mediaFigure', attrs }).run()
+  }
+}
 
 function toggleLink(): void {
   if (!editor.value) {
@@ -194,11 +229,32 @@ function toggleLink(): void {
       >
         Lista numerada
       </button>
+
+      <span
+        class="rich-text__separator"
+        aria-hidden="true"
+      />
+
+      <button
+        type="button"
+        class="rich-text__button"
+        :class="{ 'rich-text__button--active': editor.isActive('mediaFigure') }"
+        @click="openImagePicker"
+      >
+        {{ editor.isActive('mediaFigure') ? 'Editar imagem' : 'Imagem' }}
+      </button>
     </div>
 
     <EditorContent
       :editor="editor"
       class="rich-text__content"
+    />
+
+    <MediaPickerDialog
+      :open="pickerOpen"
+      :editing="editingFigure"
+      @confirm="applyImage"
+      @close="pickerOpen = false"
     />
   </div>
 </template>
