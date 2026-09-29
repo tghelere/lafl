@@ -21,6 +21,7 @@ const router = useRouter()
 const items = ref<Media[]>([])
 const currentPage = ref(1)
 const lastPage = ref(1)
+const total = ref(0)
 const isLoading = ref(true)
 const errorMessage = ref<string | null>(null)
 const search = ref('')
@@ -39,6 +40,7 @@ async function load(): Promise<void> {
     items.value = response.data
     currentPage.value = response.meta.current_page
     lastPage.value = response.meta.last_page
+    total.value = response.meta.total
   } catch (error) {
     errorMessage.value =
       axios.isAxiosError(error) && error.response?.status === 403
@@ -49,8 +51,12 @@ async function load(): Promise<void> {
   }
 }
 
-const emptyMessage = computed(() =>
-  search.value ? 'Nenhuma imagem encontrada para essa busca.' : 'Nenhuma imagem na biblioteca ainda.',
+// Três estados diferentes, que a tela não pode confundir: a biblioteca vazia (convite a enviar
+// a primeira), a busca sem resultado (mensagem curta) e a falha de verdade (ErrorState). Vazio
+// é resposta 200 com lista vazia; só erro de rede ou de servidor vira mensagem de erro.
+const hasActiveSearch = computed(() => String(route.query.search ?? '') !== '')
+const libraryIsEmpty = computed(
+  () => !isLoading.value && !errorMessage.value && total.value === 0 && !hasActiveSearch.value,
 )
 
 function applySearch(): void {
@@ -97,6 +103,7 @@ watch(
     </NoticeBanner>
 
     <form
+      v-if="!libraryIsEmpty"
       class="filter-bar"
       role="search"
       @submit.prevent="applySearch"
@@ -133,9 +140,33 @@ watch(
       v-else-if="errorMessage"
       :message="errorMessage"
     />
+    <section
+      v-else-if="libraryIsEmpty"
+      class="media-empty"
+      aria-labelledby="media-empty-title"
+    >
+      <h2
+        id="media-empty-title"
+        class="media-empty__title"
+      >
+        A biblioteca ainda não tem imagens
+      </h2>
+      <p class="media-empty__text">
+        As imagens enviadas aqui podem ser usadas nas páginas do site. Cada uma ganha versões
+        em vários tamanhos, e os metadados do arquivo (como a localização da câmera) são
+        removidos no envio.
+      </p>
+      <RouterLink
+        :to="{ name: 'media.create' }"
+        class="btn btn--primary"
+      >
+        <AppIcon :icon="ImagePlus" />
+        Enviar a primeira imagem
+      </RouterLink>
+    </section>
     <EmptyState
       v-else-if="items.length === 0"
-      :message="emptyMessage"
+      message="Nenhuma imagem encontrada para essa busca."
     />
     <template v-else>
       <ul

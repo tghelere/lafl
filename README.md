@@ -60,6 +60,21 @@ Ainda faltam gerar `FIELD_ENCRYPTION_KEY` e `BLIND_INDEX_KEY` em `backend/.env` 
 Mailpit (e-mails capturados em dev): http://localhost:8025
 Documentação OpenAPI (Scramble): http://localhost:8000/docs/api
 
+### Depois de puxar código novo
+
+```bash
+docker compose exec app php artisan migrate      # aplica só o que falta, sem apagar dado
+docker compose exec app php artisan migrate:status
+```
+
+Nada roda isso sozinho no banco de desenvolvimento. Pest e a bateria de e2e recriam os
+próprios bancos do zero a cada execução, então ficam verdes mesmo com o banco de
+desenvolvimento para trás, e o sintoma só aparece no navegador. Foi o que aconteceu na sessão
+28: `/admin/imagens` dizia "Não foi possível carregar as imagens" porque a tabela `media` não
+existia, e a API respondia 500 (`relation "media" does not exist` em
+`backend/storage/logs/laravel.log`). Em produção, `publicar.sh` já roda `migrate --force` a
+cada publicação (ver `docs/deploy.md`).
+
 ### Fila e agendador
 
 O compose sobe dois containers além da API: `queue` (`php artisan queue:work`) e `scheduler`
