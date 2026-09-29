@@ -60,6 +60,12 @@ final class MediaResource extends JsonResource
             'widths' => $this->widths,
             'version' => $this->version,
             'usages' => $this->when($this->usageList !== null, fn (): ?array => $this->usageList),
+            // Só para o painel esconder o botão que não vai funcionar — quem barra é a Policy,
+            // na rota (CLAUDE.md, regra 1).
+            'can' => [
+                'update' => $request->user()?->can('update', $this->resource) ?? false,
+                'delete' => $request->user()?->can('delete', $this->resource) ?? false,
+            ],
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

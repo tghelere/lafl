@@ -37,10 +37,10 @@ test.describe('financeiro', () => {
 test.describe('comunicacao', () => {
   test.use({ storageState: storageStatePath('comunicacao') })
 
-  test('vê no menu apenas Páginas, além do Início', async ({ page }) => {
+  test('vê no menu apenas Páginas e Imagens, além do Início', async ({ page }) => {
     await page.goto('/admin')
 
-    await expect.poll(() => sidebarLinkNames(page)).toEqual(['Pendências', 'Páginas'])
+    await expect.poll(() => sidebarLinkNames(page)).toEqual(['Pendências', 'Páginas', 'Imagens'])
     await expect(sidebar(page)).toContainText('Conteúdo')
     await expect(sidebar(page)).not.toContainText('Transparência')
   })

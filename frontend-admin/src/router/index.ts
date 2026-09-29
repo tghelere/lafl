@@ -120,6 +120,26 @@ const router = createRouter({
       component: () => import('@/views/ContentPageFormView.vue'),
       meta: { title: 'Editar página', section: SECTION.pages },
     },
+    // Biblioteca de imagens do conteúdo — mesmo raciocínio de transparência: rotas próprias,
+    // registradas antes das genéricas só por organização.
+    {
+      path: '/admin/imagens',
+      name: 'media.index',
+      component: () => import('@/views/MediaListView.vue'),
+      meta: { title: 'Imagens', section: SECTION.media },
+    },
+    {
+      path: '/admin/imagens/nova',
+      name: 'media.create',
+      component: () => import('@/views/MediaUploadView.vue'),
+      meta: { title: 'Enviar imagem', section: SECTION.media },
+    },
+    {
+      path: '/admin/imagens/:uuid',
+      name: 'media.edit',
+      component: () => import('@/views/MediaDetailView.vue'),
+      meta: { title: 'Editar imagem', section: SECTION.media },
+    },
     // Gestão de usuários — mesmo raciocínio de transparência: rotas próprias, registradas
     // antes das genéricas só por organização.
     {

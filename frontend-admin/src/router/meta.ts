@@ -42,6 +42,7 @@ declare module 'vue-router' {
 export const SECTION = {
   dashboard: 'dashboard',
   pages: 'pages',
+  media: 'media',
   transparency: 'transparency',
   users: 'users',
   audit: 'audit',
