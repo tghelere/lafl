@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Content\PageImages\ListPageImages;
+use App\Actions\Content\PageImages\MoveGalleryImage;
 use App\Actions\Content\PageImages\RemoveImageFromPage;
 use App\Actions\Content\PageImages\SetPageCover;
 use App\Actions\Content\PageImages\UploadImageToPage;
 use App\Actions\Media\FindMediaUsages;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Content\PageImages\MoveGalleryImageRequest;
 use App\Http\Requests\Content\PageImages\RemovePageImageRequest;
 use App\Http\Requests\Content\PageImages\SetPageCoverRequest;
 use App\Http\Requests\Content\PageImages\StorePageImageRequest;
@@ -61,6 +63,12 @@ final class PageImageController extends Controller
         $action->handle($page, $request->media(), $request->user());
 
         return response()->noContent();
+    }
+
+    /** Uma posição para cima ou para baixo na galeria. Devolve a posição nova, para a tela anunciar. */
+    public function move(MoveGalleryImageRequest $request, Page $page, Media $media, MoveGalleryImage $action): JsonResponse
+    {
+        return response()->json(['data' => $action->handle($page, $media, $request->direction(), $request->user())]);
     }
 
     public function destroy(RemovePageImageRequest $request, Page $page, Media $media, RemoveImageFromPage $action): Response

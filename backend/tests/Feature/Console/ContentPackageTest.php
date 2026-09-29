@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\Content\PageImages\MoveGalleryImage;
 use App\Actions\Content\PageImages\PlaceImageOnPage;
 use App\Actions\Media\Data\MediaDetailsData;
 use App\Actions\Media\StoreMedia;
@@ -363,6 +364,20 @@ describe('imagens', function (): void {
         $images = $this->getJson('/api/v1/public/pages/com-foto')->json('data.images');
         expect(array_column($images['gallery'], 'alt'))->toBe(['Horta', 'Fachada'])
             ->and($images['cover']['alt'])->toBe('Horta');
+    });
+
+    test('a ordem mudada pelo painel é a que viaja', function (): void {
+        seedEditedContent();
+        $page = Page::query()->where('slug', 'com-foto')->firstOrFail();
+        $photo = Media::query()->where('alt', 'Fachada')->firstOrFail();
+        app(MoveGalleryImage::class)->handle($page, $photo, 'up', null);
+
+        $package = exportPackage();
+        wipeContent();
+        $this->artisan('conteudo:importar', ['pacote' => $package])->assertSuccessful();
+
+        expect(array_column($this->getJson('/api/v1/public/pages/com-foto')->json('data.images.gallery'), 'alt'))
+            ->toBe(['Fachada', 'Horta']);
     });
 
     test('exportar recusa galeria com imagem marcada como de assistido', function (): void {

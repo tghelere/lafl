@@ -118,6 +118,7 @@ Route::middleware($authenticated)->group(function (): void {
     Route::get('/pages/{page}/images', [PageImageController::class, 'index'])->name('pages.images.index');
     Route::post('/pages/{page}/images', [PageImageController::class, 'store'])->name('pages.images.store');
     Route::put('/pages/{page}/images/cover', [PageImageController::class, 'setCover'])->name('pages.images.cover');
+    Route::post('/pages/{page}/images/{media}/move', [PageImageController::class, 'move'])->name('pages.images.move');
     Route::delete('/pages/{page}/images/{media}', [PageImageController::class, 'destroy'])->name('pages.images.destroy');
 
     // Marcadores que o editor de páginas oferece, com o valor de agora (ver

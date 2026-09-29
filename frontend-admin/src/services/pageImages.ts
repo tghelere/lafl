@@ -28,6 +28,20 @@ export async function uploadImageToPage(
   return data.data
 }
 
+/** Uma posição para cima ou para baixo na galeria. Devolve a posição nova (a partir de 1) e o total. */
+export async function moveGalleryImage(
+  pageUuid: string,
+  mediaUuid: string,
+  direction: 'up' | 'down',
+): Promise<{ position: number; count: number }> {
+  const { data } = await httpClient.post<{ data: { position: number; count: number } }>(
+    `/api/v1/pages/${pageUuid}/images/${mediaUuid}/move`,
+    { direction },
+  )
+
+  return data.data
+}
+
 /** Troca a capa por uma imagem que já está na biblioteca. */
 export async function setPageCover(pageUuid: string, mediaUuid: string): Promise<void> {
   await httpClient.put(`/api/v1/pages/${pageUuid}/images/cover`, { media: mediaUuid })

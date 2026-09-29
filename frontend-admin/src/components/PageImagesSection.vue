@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { ImagePlus, Images } from 'lucide-vue-next'
-import { reactive, ref, watch } from 'vue'
+import { nextTick, reactive, ref, watch } from 'vue'
 
 import AppIcon from '@/components/AppIcon.vue'
 import MediaDeclarationField from '@/components/MediaDeclarationField.vue'
@@ -63,6 +63,26 @@ watch(() => [props.pageUuid, props.refreshKey], () => void load(), { immediate: 
 function onChanged(message: string): void {
   notice.value = message
   void load()
+}
+
+// Anúncio para leitor de tela: o NoticeBanner é `role="note"`, que não é lido quando muda.
+const announcement = ref('')
+
+/**
+ * Depois de mover, o foco volta ao mesmo botão da mesma foto, agora no lugar novo, para quem
+ * usa o teclado continuar apertando. Se a foto chegou à ponta e o botão ficou desligado, o foco
+ * vai para o outro sentido.
+ */
+async function onMoved(media: Media, message: string, direction: 'up' | 'down'): Promise<void> {
+  notice.value = null
+  announcement.value = message
+  await load()
+  await nextTick()
+
+  const base = `page-image-gallery-${media.id}`
+  const same = document.getElementById(`${base}-${direction}`) as HTMLButtonElement | null
+  const other = document.getElementById(`${base}-${direction === 'up' ? 'down' : 'up'}`) as HTMLButtonElement | null
+  ;(same && !same.disabled ? same : other)?.focus()
 }
 
 const pickerOpen = ref(false)
@@ -183,6 +203,12 @@ async function upload(): Promise<void> {
     >
       {{ notice }}
     </NoticeBanner>
+    <p
+      class="visually-hidden"
+      aria-live="polite"
+    >
+      {{ announcement }}
+    </p>
 
     <p
       v-if="isLoading"
@@ -211,12 +237,15 @@ async function upload(): Promise<void> {
         aria-label="Galeria"
       >
         <PageImageItem
-          v-for="media in images.gallery"
+          v-for="(media, index) in images.gallery"
           :key="`gallery-${media.id}`"
           :media="media"
           role="gallery"
           :page-uuid="pageUuid"
+          :position="index + 1"
+          :count="images.gallery.length"
           @changed="onChanged"
+          @moved="(message, direction) => onMoved(media, message, direction)"
         />
       </ul>
       <p

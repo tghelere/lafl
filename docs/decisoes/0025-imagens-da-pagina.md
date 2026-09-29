@@ -122,4 +122,8 @@ oferece o padrão. Mudar isso seria outra decisão.
   ou tirar a capa. A tela diz onde o site mostra a capa daquela página. Esse mapa fica na API
   (`App\Support\Content\CoverPlacements`), e não no painel, pela regra 1 do CLAUDE.md, e
   precisa acompanhar `index.vue` e `o-que-fazemos.vue` quando o site mudar onde usa capa.
-- A ordem da galeria só muda tirando e enviando de novo. Reordenar é pendência.
+- **A galeria se reordena pelo painel** (sessão 29): "Mover para cima" e "Mover para baixo" em
+  cada foto, trocando com a vizinha. A troca passa por uma posição temporária por causa da
+  restrição única, com a linha da página travada. Pelo teclado, o foco volta ao mesmo botão da
+  mesma foto depois do movimento (ou ao outro sentido, se ela chegou à ponta), e a posição nova
+  é anunciada numa região `aria-live`. A ordem é a `position` que o pacote de conteúdo já leva.

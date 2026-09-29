@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ExternalLink, Pencil, Replace, Save, X } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, ExternalLink, Pencil, Replace, Save, X } from 'lucide-vue-next'
 import { computed, reactive, ref } from 'vue'
 
 import AppIcon from '@/components/AppIcon.vue'
 import { replaceMediaFile, updateMediaDetails } from '@/services/media'
-import { removeImageFromPage } from '@/services/pageImages'
+import { moveGalleryImage, removeImageFromPage } from '@/services/pageImages'
 import type { Media } from '@/types/media'
 
 /**
@@ -21,11 +21,16 @@ const props = defineProps<{
   media: Media
   role: 'cover' | 'gallery' | 'content'
   pageUuid: string
+  /** Só na galeria: a posição (a partir de 1) e o total, para desligar "subir" na primeira e "descer" na última. */
+  position?: number
+  count?: number
 }>()
 
 const emit = defineEmits<{
   /** Algo mudou; a seção recarrega a lista e mostra a mensagem. */
   changed: [message: string]
+  /** A foto trocou de lugar; a seção recarrega, anuncia a posição nova e devolve o foco ao botão. */
+  moved: [announcement: string, direction: 'up' | 'down']
 }>()
 
 const MAX_FILE_BYTES = 10240 * 1024
@@ -123,6 +128,25 @@ async function replace(): Promise<void> {
     emit('changed', 'Arquivo substituído. O site já mostra o novo em todo lugar onde a imagem aparece.')
   } catch (error) {
     applyError(error, 'Não foi possível substituir o arquivo. Tente novamente.')
+  } finally {
+    isBusy.value = false
+  }
+}
+
+async function move(direction: 'up' | 'down'): Promise<void> {
+  isBusy.value = true
+  clearErrors()
+
+  try {
+    const result = await moveGalleryImage(props.pageUuid, props.media.id, direction)
+    emit('moved', `Imagem movida para a posição ${result.position} de ${result.count}.`, direction)
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 422) {
+      const body = error.response.data as { errors?: Record<string, string[]> }
+      errorMessage.value = body.errors?.direction?.[0] ?? body.errors?.media?.[0] ?? 'Não foi possível mover a imagem.'
+    } else {
+      applyError(error, 'Não foi possível mover a imagem. Tente novamente.')
+    }
   } finally {
     isBusy.value = false
   }
@@ -251,7 +275,37 @@ async function remove(): Promise<void> {
       </form>
 
       <div
-        v-else
+        v-if="role === 'gallery' && position !== undefined && count !== undefined && count > 1"
+        class="page-image__actions"
+        role="group"
+        :aria-label="`Ordem na galeria: posição ${position} de ${count}`"
+      >
+        <button
+          :id="`${idBase}-up`"
+          type="button"
+          class="btn btn--secondary"
+          :disabled="position <= 1 || isBusy"
+          :aria-label="`Mover para cima: ${media.alt}`"
+          @click="move('up')"
+        >
+          <AppIcon :icon="ArrowUp" />
+          Mover para cima
+        </button>
+        <button
+          :id="`${idBase}-down`"
+          type="button"
+          class="btn btn--secondary"
+          :disabled="position >= count || isBusy"
+          :aria-label="`Mover para baixo: ${media.alt}`"
+          @click="move('down')"
+        >
+          <AppIcon :icon="ArrowDown" />
+          Mover para baixo
+        </button>
+      </div>
+
+      <div
+        v-if="!isEditing"
         class="page-image__actions"
       >
         <button

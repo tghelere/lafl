@@ -340,3 +340,61 @@ describe('escolher a capa', function (): void {
             ->assertForbidden();
     });
 });
+
+describe('reordenar a galeria', function (): void {
+    function galleryOrder(): array
+    {
+        return array_column(test()->getJson('/api/v1/public/pages/bazar')->json('data.images.gallery'), 'alt');
+    }
+
+    test('mover para baixo e para cima troca com a vizinha, e o site acompanha', function (): void {
+        $page = pageWithImages();
+        app(PlaceImageOnPage::class)->handle($page, storedImage('Salão do bazar'), PageImageRole::Gallery);
+        $placa = Media::query()->where('alt', 'Placa do bazar')->firstOrFail();
+        $salao = Media::query()->where('alt', 'Salão do bazar')->firstOrFail();
+        $user = userWithRole('comunicacao');
+
+        expect(galleryOrder())->toBe(['Placa do bazar', 'Entrada do bazar', 'Salão do bazar']);
+
+        $this->actingAs($user)
+            ->postJson("/api/v1/pages/{$page->uuid}/images/{$placa->uuid}/move", ['direction' => 'down'])
+            ->assertOk()
+            ->assertJsonPath('data', ['position' => 2, 'count' => 3]);
+        expect(galleryOrder())->toBe(['Entrada do bazar', 'Placa do bazar', 'Salão do bazar']);
+
+        $this->actingAs($user)
+            ->postJson("/api/v1/pages/{$page->uuid}/images/{$salao->uuid}/move", ['direction' => 'up'])
+            ->assertOk()
+            ->assertJsonPath('data.position', 2);
+        expect(galleryOrder())->toBe(['Entrada do bazar', 'Salão do bazar', 'Placa do bazar'])
+            ->and(PageImage::query()->where('page_id', $page->id)->where('role', 'gallery')->orderBy('position')->pluck('position')->all())
+            ->toBe([0, 1, 2])
+            ->and(Activity::query()->where('event', 'moved')->count())->toBe(2);
+    });
+
+    test('a primeira não sobe e a última não desce, com a mensagem da API', function (): void {
+        $page = pageWithImages();
+        $placa = Media::query()->where('alt', 'Placa do bazar')->firstOrFail();
+        $entrance = Media::query()->where('alt', 'Entrada do bazar')->firstOrFail();
+        $user = userWithRole('comunicacao');
+
+        $this->actingAs($user)->postJson("/api/v1/pages/{$page->uuid}/images/{$placa->uuid}/move", ['direction' => 'up'])
+            ->assertUnprocessable()->assertJsonValidationErrors(['direction' => 'Esta imagem já é a primeira da galeria.']);
+        $this->actingAs($user)->postJson("/api/v1/pages/{$page->uuid}/images/{$entrance->uuid}/move", ['direction' => 'down'])
+            ->assertUnprocessable()->assertJsonValidationErrors(['direction' => 'Esta imagem já é a última da galeria.']);
+    });
+
+    test('a capa não se move, e direção inválida é recusada', function (): void {
+        $page = pageWithImages();
+        $other = storedImage('Fora da galeria');
+        $placa = Media::query()->where('alt', 'Placa do bazar')->firstOrFail();
+        $user = userWithRole('comunicacao');
+
+        $this->actingAs($user)->postJson("/api/v1/pages/{$page->uuid}/images/{$other->uuid}/move", ['direction' => 'up'])
+            ->assertUnprocessable()->assertJsonValidationErrors(['media']);
+        $this->actingAs($user)->postJson("/api/v1/pages/{$page->uuid}/images/{$placa->uuid}/move", ['direction' => 'left'])
+            ->assertUnprocessable()->assertJsonValidationErrors(['direction']);
+        $this->actingAs(userWithRole('financeiro'))->postJson("/api/v1/pages/{$page->uuid}/images/{$placa->uuid}/move", ['direction' => 'down'])
+            ->assertForbidden();
+    });
+});
