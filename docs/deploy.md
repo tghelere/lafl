@@ -580,6 +580,7 @@ A decisão está no ADR 0023.
 |---|---|
 | Páginas do CMS: publicadas, rascunhos e arquivadas, com o histórico de slugs (redirects 301) | **Usuários.** As contas de homologação são de teste; em produção cria-se a conta real com `usuarios:criar-super-admin`, e as demais pelo painel |
 | Documentos de transparência (publicados e não), com os PDFs | **Formulários recebidos** (candidatura a programa, retirada, voluntariado, parcerias, contato). Em homologação são mensagens de teste, e o dado de quem preencheu não tem por que sair de lá |
+| Imagens da biblioteca que podem ir para o site, com original e derivadas (formato 2 do pacote) | **Imagem marcada como foto de criança ou adolescente atendido** — não pode ir para o site. A exportação **recusa** o pacote se alguma página ainda usar uma delas (ADR 0024) |
 | | Log de auditoria, contador de downloads, itens na lixeira, sessões, filas |
 
 **Nunca restaurar o dump de homologação em produção.** Seria o caminho mais curto e traria
@@ -733,5 +734,8 @@ sudo systemctl start laf-queue@<amb> laf-scheduler@<amb>
 Falta cobrir, além do banco:
 
 - **`backend/storage/app`** (em `shared/storage/app`): onde ficam os PDFs de transparência
-  enviados pelo painel. Não está no pacote nem no repositório; só existe no servidor.
+  e as imagens da biblioteca (`private/media/`) enviados pelo painel. Não está no pacote de
+  deploy nem no repositório; só existe no servidor. O pacote de conteúdo (§10.1) leva uma
+  cópia do que é publicável e serve como retrato, mas não é backup, porque não inclui imagem
+  marcada nem documento na lixeira.
 - **As três chaves**: em cofre de senhas, fora do servidor e **fora do backup do banco**.

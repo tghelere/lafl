@@ -1,5 +1,12 @@
 # Fotos do site — pipeline implementado
 
+> **Duas origens de imagem, desde a sessão 27.** Este documento trata das fotos **fixas** do
+> site: arquivos em `frontend-site/public/fotos/`, preparados à mão e usados pelas páginas
+> próprias de seção via `AppFoto`. Imagem **dentro do texto de uma página do CMS** vem da
+> biblioteca do painel (`/admin/imagens`): upload, derivadas e remoção de EXIF são feitos pela
+> API, e ela é servida em `/midia/{uuid}`. Ver `docs/decisoes/0024-biblioteca-de-midia.md`. A
+> escala de larguras (1920–400) é a mesma nas duas.
+
 Estado atual (pós sessão de imagens/WhatsApp/mapa). Ver
 `frontend-site/app/components/AppFoto.vue` e `frontend-site/app/data/fotos.ts`.
 

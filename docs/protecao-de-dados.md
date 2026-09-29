@@ -187,10 +187,19 @@ sobre todo registro, e um banner destacado em toda tela deixa de ser lido.
 1. Validar MIME real, não extensão
 2. **Remover EXIF integralmente** — metadado de geolocalização em foto de criança é o
    vazamento mais comum em site institucional
-3. Converter para WebP, gerar thumbnails em fila
+3. Converter para WebP e gerar as larguras responsivas
 4. Armazenar fora do webroot
 5. Servir por rota autenticada com Policy; foto de assistido nunca tem URL pública direta
 6. Foto no site público: apenas com consentimento vigente e **sem nome completo associado**
+
+Implementado na biblioteca de mídia (sessão 27, `docs/decisoes/0024-biblioteca-de-midia.md`).
+O EXIF sai por **recodificação**: a original é decodificada em pixels e gravada de novo, sem
+nenhum bloco do arquivo enviado. As derivadas são geradas na hora do upload, não em fila, e o
+nome do arquivo enviado não é guardado (costuma trazer nome de pessoa). **Enquanto não existir
+registro de consentimento, foto declarada como de criança ou adolescente atendido é recusada
+no upload.** A declaração é obrigatória, e marcar depois tira a imagem do site na hora, sem
+volta. A declaração depende de quem sobe responder com verdade: é um controle de processo, e
+a orientação à equipe fica com a instituição.
 
 ## Transferência internacional
 

@@ -138,7 +138,8 @@ Resistir ao impulso de indexar tudo: cada índice encarece escrita.
 - Redis para cache e filas
 - `Cache-Control` e ETag em endpoints públicos
 - Filas para e-mail, thumbnails, relatórios
-- Imagens convertidas para WebP no upload, thumbnails em fila
+- Imagens convertidas para WebP no upload, com as larguras responsivas geradas na hora (não
+  em fila — medido e decidido em `docs/decisoes/0024-biblioteca-de-midia.md`)
 - OPcache ligado, php-fpm dimensionado
 - `pg_stat_statements` habilitado; Telescope em dev
 - gzip/Brotli no nginx (Brotli para estáticos, gzip para JSON)

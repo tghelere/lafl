@@ -28,13 +28,17 @@ Base de `pages`, mais `excerpt`, `category_id`, `author_id`. Também com histór
 
 **`post_categories`** — `uuid`, `slug`, `name`
 
-**`media`** — imagens e arquivos
-`uuid`, `path`, `alt` (**obrigatório**, validado na API), `mime`, `size`, `width`, `height`,
-`assisted_minor_id` (nullable), `is_public`
+**`media`** — biblioteca de imagens do conteúdo (implementada na sessão 27)
+`uuid`, `alt` (**obrigatório**, validado na API), `caption`, `depicts_assisted_minor`
+(declaração obrigatória, sem padrão), `version`, `mime`, `extension`, `size`, `width`,
+`height`, `widths` (derivadas webp geradas), `sha256`
 
-EXIF removido no upload, conversão para WebP em fila. Se `assisted_minor_id` estiver
-preenchido, `is_public` só pode ser `true` com consentimento de imagem vigente — a coluna já
-nasce agora, mesmo sem a entidade de assistidos, com o gate bloqueando por padrão.
+Sem coluna de caminho: os arquivos ficam em `media/{uuid}/{versão}/`, fora do webroot. A
+original é recodificada no upload (todo metadado sai) e as derivadas webp são geradas na hora,
+não em fila. `depicts_assisted_minor = true` torna a imagem impublicável e é recusado no
+upload enquanto não existir registro de consentimento de imagem; `assisted_minor_id` entra
+junto com `consents`, na Fase 2, e `Media::isPublishable()` passa a consultá-lo. Ver
+`docs/decisoes/0024-biblioteca-de-midia.md`.
 
 **`testimonials`** — depoimentos de famílias
 `uuid`, `author_name`, `relationship`, `content`, `authorized_at`, `is_published`

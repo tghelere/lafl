@@ -365,9 +365,15 @@
 ### Backend — entidades da Fase 1 restantes
 
 - [ ] `posts`, `post_categories` (notícias)
-- [ ] `media` + pipeline (MIME real, remoção de EXIF, conversão WebP, thumbnails em fila,
-      armazenamento fora do webroot) — inclui a coluna `og_image_id` em `pages`, adiada nesta
-      sessão porque `media` ainda não existe (ver decisão abaixo)
+- [x] `media` + pipeline — feito na sessão 27 (`docs/decisoes/0024-biblioteca-de-midia.md`):
+      MIME real, EXIF removido por recodificação, derivadas webp **no upload** (não em fila —
+      decisão e medição no ADR), fora do webroot, servida pelo site em `/midia/{uuid}`.
+      Declaração obrigatória de foto de assistido, recusada enquanto não houver `consents`.
+- [ ] `pages.og_image_id` — agora possível (`media` existe); não entrou na sessão 27 para não
+      misturar escopo. Precisa escolher imagem publicável e cair no padrão do site sem ela.
+- [ ] Tela "Auditoria" do painel mostra só formulários recebidos; os eventos de mídia
+      (`uploaded`, `replaced`, `updated`, `deleted`, `log_name` `media`) estão no banco mas
+      não na tela.
 - [ ] `testimonials`, `partners`, `institution_stats`
 - [ ] `settings` — quando existir, substitui só `frontend-site/app/config/institution.ts`
       (endereço, telefone e WhatsApp da sede e do bazar, hoje fonte única de AppFooter.vue,
@@ -384,13 +390,13 @@
 
 ### Site público (Nuxt)
 
-- [ ] O conteúdo do CMS é renderizado via `v-html` (`app/pages/[...slug].vue`), o que impede
-      posicionar imagem dentro do texto pelo painel administrativo — o editor produz HTML puro,
-      sem espaço para um componente Vue no meio. Hoje isso é contornado com página própria por
-      seção sobrepondo a rota genérica (`bazar/index.vue`, `transparencia/index.vue`, etc. — ver
-      docs/fotos.md), que anexa a galeria de fotos depois do conteúdo em vez de intercalar. Se a
-      instituição quiser controlar posicionamento de imagem pelo próprio admin, será preciso
-      trocar por renderização em blocos.
+- [x] ~~Imagem dentro do texto das páginas pelo painel~~ — resolvido na sessão 27 sem trocar
+      o `v-html` por blocos: o editor grava `<figure><img src="/midia/{uuid}">` e a API expande
+      o `<img>` com `srcset` na leitura pública (ADR 0024).
+- [ ] As galerias fixas das páginas próprias de seção (`bazar/index.vue`,
+      `transparencia/index.vue` etc., ver docs/fotos.md) continuam vindo de
+      `frontend-site/public/fotos/`, fora do alcance do painel. Levá-las para a biblioteca exige
+      decidir, página a página, se a galeria vira conteúdo do CMS.
 - [ ] `/bazar/novidades` (vitrine do bazar) — fora de escopo desta sessão, depende de
       `bazaar_showcase_items` e ainda tem `[VALIDAR]` pendente (preço, quem alimenta)
 - [ ] Seção de notícias (`/noticias`, `/noticias/:slug`) — depende de `posts`
@@ -509,8 +515,8 @@ uma camada de cache de HTML por cima.
       update (`UpdatePageRequest::prepareForValidation` + `PagePolicy::managePublication`), de
       modo que o recorte vale mesmo para chamada direta à API. Renomear slug é a mais delicada
       das quatro: quebra link já divulgado e mexe na lista de prerender do Nuxt.
-- [ ] `posts` e mídia seguem sem entidade e sem tela (ver "Backend — entidades da Fase 1
-      restantes").
+- [ ] `posts` segue sem entidade e sem tela (ver "Backend — entidades da Fase 1 restantes").
+      Mídia tem tela desde a sessão 27 (`/admin/imagens`).
 - [x] Tela de gestão de usuários — feita (`UserListView.vue`/`UserFormView.vue`), junto das
       telas de conta (`/definir-senha`, `/conta`).
 - [x] Telas de listagem e detalhe dos cinco formulários recebidos — feitas
