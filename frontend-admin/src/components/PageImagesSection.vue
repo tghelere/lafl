@@ -265,8 +265,8 @@ async function upload(): Promise<void> {
         v-if="images.cover_shown_on.length > 0"
         class="page-images__shown-on"
       >
-        A capa desta página aparece em {{ images.cover_shown_on.join(' e em ') }}. Trocar ou
-        tirar a capa muda isso na hora.
+        A capa desta página aparece {{ images.cover_shown_on.join(' e ') }}. Trocar ou tirar a
+        capa muda isso na hora.
       </p>
       <p
         v-else

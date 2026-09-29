@@ -51,7 +51,7 @@ test.describe('comunicacao', () => {
       const secao = page.locator('section.page-images')
 
       // O acoplamento com a home está escrito na tela de quem edita.
-      await expect(secao.getByText('A capa desta página aparece em o destaque da página inicial.')).toBeVisible()
+      await expect(secao.getByText('A capa desta página aparece no destaque da página inicial.')).toBeVisible()
       await expect(secao.getByText('Esta página não tem capa.')).toBeVisible()
 
       // 1. Enviar uma foto nova direto para a capa.

@@ -644,6 +644,13 @@ body.has-open-drawer {
   white-space: nowrap;
 }
 
+/* Coluna de texto livre (o texto alternativo e o detalhe na auditoria de imagens): quebra
+   linha em vez de empurrar as outras colunas para fora da tela. */
+.table td.table__cell--wrap {
+  min-width: 14rem;
+  white-space: normal;
+}
+
 .table th {
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);

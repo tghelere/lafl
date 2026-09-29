@@ -326,8 +326,8 @@ describe('escolher a capa', function (): void {
             ->getJson("/api/v1/pages/{$page->uuid}/images")
             ->json('data.cover_shown_on'))->toBe($expected);
     })->with([
-        'quem somos' => ['quem-somos', ['o destaque da página inicial']],
-        'bazar' => ['bazar', ['o cartão de Bazar beneficente em "O que fazemos"']],
+        'quem somos' => ['quem-somos', ['no destaque da página inicial']],
+        'bazar' => ['bazar', ['no cartão de Bazar beneficente, em "O que fazemos"']],
         'página sem uso da capa' => ['governanca', []],
     ]);
 

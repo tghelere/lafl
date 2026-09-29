@@ -230,7 +230,10 @@ watch(
               <td data-label="Ação">
                 {{ entry.action_label }}
               </td>
-              <td data-label="Imagem">
+              <td
+                data-label="Imagem"
+                class="table__cell--wrap"
+              >
                 <RouterLink
                   v-if="entry.media_uuid"
                   :to="{ name: 'media.edit', params: { uuid: entry.media_uuid } }"
@@ -242,7 +245,10 @@ watch(
                   {{ entry.media_alt ? `${entry.media_alt} (excluída)` : '—' }}
                 </template>
               </td>
-              <td data-label="Detalhe">
+              <td
+                data-label="Detalhe"
+                class="table__cell--wrap"
+              >
                 {{ entry.detail ?? '—' }}
               </td>
             </tr>
