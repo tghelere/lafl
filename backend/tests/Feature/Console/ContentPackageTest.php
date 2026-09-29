@@ -2,14 +2,19 @@
 
 declare(strict_types=1);
 
+use App\Actions\Media\Data\MediaDetailsData;
+use App\Actions\Media\StoreMedia;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\PageSlugHistory;
 use App\Models\TransparencyDocument;
 use App\Support\Cache\PublicPageCache;
+use App\Support\Media\MediaPaths;
 use Database\Seeders\ContentPagesSeeder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\Images;
 
 beforeEach(function (): void {
     Storage::fake('local');
@@ -34,6 +39,17 @@ function seedEditedContent(): void
 
     $renamed = Page::factory()->published()->create(['slug' => 'nome-novo', 'content' => '<h2>Olá</h2><p>Ação — ç</p>']);
     PageSlugHistory::query()->create(['page_id' => $renamed->id, 'slug' => 'nome-velho']);
+
+    // Uma imagem de verdade (original + derivadas no disco), usada numa página publicada, e
+    // uma marcada como de assistido — que não pode viajar.
+    $store = app(StoreMedia::class);
+    $photo = $store->handle(Images::jpeg(1000, 600)->getRealPath(), new MediaDetailsData('Fachada', 'A sede', false), null);
+    $flagged = $store->handle(Images::jpeg(500, 400)->getRealPath(), new MediaDetailsData('Pátio', null, false), null);
+    $flagged->forceFill(['depicts_assisted_minor' => true])->save();
+    Page::factory()->published()->create([
+        'slug' => 'com-foto',
+        'content' => '<p>a</p><figure><img src="/midia/'.$photo->uuid.'" alt="Fachada" /><figcaption>A sede</figcaption></figure>',
+    ]);
 
     foreach ([['prestacao-2025', true], ['ata-em-revisao', false]] as [$slug, $published]) {
         $path = "transparency-documents/{$slug}.pdf";
@@ -70,6 +86,15 @@ function contentSnapshot(): array
             'updated_at' => $d->updated_at?->toIso8601String(),
             'sha256' => hash('sha256', Storage::disk('local')->get($d->file_path)),
         ])->all(),
+        'media' => Media::query()->where('depicts_assisted_minor', false)->orderBy('uuid')->get()->map(fn (Media $m): array => [
+            ...$m->only(['uuid', 'alt', 'caption', 'version', 'mime', 'extension', 'size', 'width', 'height', 'widths', 'sha256']),
+            'created_at' => $m->created_at?->toIso8601String(),
+            'updated_at' => $m->updated_at?->toIso8601String(),
+            'files' => collect(Storage::disk('local')->allFiles(MediaPaths::root($m)))
+                ->sort()->values()
+                ->mapWithKeys(fn (string $path): array => [$path => hash('sha256', (string) Storage::disk('local')->get($path))])
+                ->all(),
+        ])->all(),
     ];
 }
 
@@ -77,6 +102,7 @@ function wipeContent(): void
 {
     Page::query()->withTrashed()->forceDelete();
     TransparencyDocument::query()->withTrashed()->forceDelete();
+    Media::query()->delete();
     Storage::fake('local');
 }
 
@@ -111,7 +137,14 @@ test('o pacote não leva usuário, formulário, auditoria, lixeira nem contador 
 
     $package = exportPackage();
 
-    expect(scandir($package))->toEqualCanonicalizing(['.', '..', 'manifest.json', 'pages.json', 'documents.json', 'files']);
+    expect(scandir($package))->toEqualCanonicalizing(['.', '..', 'manifest.json', 'pages.json', 'documents.json', 'media.json', 'files']);
+
+    // A imagem marcada como de assistido não viaja — nem registro, nem arquivo.
+    $media = collect(json_decode(file_get_contents($package.'/media.json'), true));
+    expect($media->pluck('alt')->all())->toBe(['Fachada'])
+        ->and(json_encode($media->all()))->not->toContain('depicts_assisted_minor');
+    $flagged = Media::query()->where('depicts_assisted_minor', true)->firstOrFail();
+    expect(is_dir($package.'/files/media/'.$flagged->uuid))->toBeFalse();
 
     $slugs = collect(json_decode(file_get_contents($package.'/pages.json'), true))->pluck('slug');
     expect($slugs)->not->toContain('apagada');
@@ -204,7 +237,7 @@ test('pacote com json alterado ou de outra versão é recusado', function (): vo
     file_put_contents($package.'/manifest.json', json_encode($manifest));
     $this->artisan('conteudo:importar', ['pacote' => $package])->expectsOutputToContain('Versão de formato')->assertFailed();
 
-    $manifest['format_version'] = 1;
+    $manifest['format_version'] = 2;
     file_put_contents($package.'/manifest.json', json_encode($manifest));
     file_put_contents($package.'/pages.json', '[]');
     $this->artisan('conteudo:importar', ['pacote' => $package])->expectsOutputToContain('não confere com o manifesto')->assertFailed();
@@ -268,4 +301,86 @@ test('o cache público da página é invalidado na importação', function (): v
     $this->artisan('conteudo:importar', ['pacote' => $package])->assertSuccessful();
 
     expect(Cache::has($key))->toBeFalse();
+});
+
+describe('imagens', function (): void {
+    /**
+     * Reescreve um dos JSONs do pacote e acerta o checksum no manifesto — o cenário de quem
+     * montou ou editou o pacote à mão, que só as conferências de conteúdo podem pegar.
+     *
+     * @param  callable(array<int, array<string, mixed>>): array<int, array<string, mixed>>  $change
+     */
+    function rewritePackageJson(string $package, string $name, callable $change): void
+    {
+        $json = json_encode($change(json_decode(file_get_contents("{$package}/{$name}"), true)), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        file_put_contents("{$package}/{$name}", $json);
+
+        $manifest = json_decode(file_get_contents($package.'/manifest.json'), true);
+        $manifest['checksums'][$name] = hash('sha256', (string) $json);
+        file_put_contents($package.'/manifest.json', json_encode($manifest));
+    }
+
+    test('a página chega com a imagem, e o site a serve do outro lado', function (): void {
+        seedEditedContent();
+        $photo = Media::query()->where('alt', 'Fachada')->firstOrFail();
+        $package = exportPackage();
+        wipeContent();
+
+        $this->artisan('conteudo:importar', ['pacote' => $package])->assertSuccessful();
+
+        $this->get("/api/v1/public/media/{$photo->uuid}/640.webp")->assertOk()->assertHeader('Content-Type', 'image/webp');
+        expect($this->getJson('/api/v1/public/pages/com-foto')->json('data.content'))
+            ->toContain('srcset="/midia/'.$photo->uuid.'/400.webp 400w');
+    });
+
+    test('exportar recusa página que usa imagem marcada como de assistido', function (): void {
+        seedEditedContent();
+        Media::query()->where('alt', 'Fachada')->update(['depicts_assisted_minor' => true]);
+
+        $this->artisan('conteudo:exportar', ['destino' => $this->packagesDir])
+            ->expectsOutputToContain('Remova-a da página antes de exportar')
+            ->assertFailed();
+    });
+
+    test('importar recusa página cuja imagem não está no pacote nem neste ambiente', function (): void {
+        seedEditedContent();
+        $package = exportPackage();
+        wipeContent();
+
+        rewritePackageJson($package, 'media.json', fn (array $media): array => []);
+
+        $this->artisan('conteudo:importar', ['pacote' => $package])
+            ->expectsOutputToContain('não está no pacote nem pode ser usada neste ambiente')
+            ->assertFailed();
+
+        expect(Page::query()->count())->toBe(0);
+    });
+
+    test('imagem marcada aqui como de assistido não é substituída, nem com --substituir', function (): void {
+        seedEditedContent();
+        $package = exportPackage();
+        Media::query()->where('alt', 'Fachada')->update(['depicts_assisted_minor' => true]);
+
+        $this->artisan('conteudo:importar', ['pacote' => $package, '--substituir' => true, '--force' => true])
+            ->expectsOutputToContain('não pode substituí-la')
+            ->assertFailed();
+
+        expect(Media::query()->where('alt', 'Fachada')->value('depicts_assisted_minor'))->toBeTrue();
+    });
+
+    test('arquivo de imagem apontando para a pasta de outra imagem é recusado', function (): void {
+        seedEditedContent();
+        $package = exportPackage();
+        wipeContent();
+
+        rewritePackageJson($package, 'media.json', function (array $media): array {
+            $media[0]['files'][0]['path'] = 'media/00000000-0000-4000-8000-000000000000/1/original.jpg';
+
+            return $media;
+        });
+
+        $this->artisan('conteudo:importar', ['pacote' => $package])
+            ->expectsOutputToContain('Caminho de arquivo inválido na imagem')
+            ->assertFailed();
+    });
 });

@@ -49,7 +49,7 @@ final class ImportContent extends Command
             $this->components->warn('Simulação: nada foi escrito.');
         }
 
-        foreach (['pages' => 'Página', 'documents' => 'Documento'] as $key => $label) {
+        foreach (['media' => 'Imagem', 'pages' => 'Página', 'documents' => 'Documento'] as $key => $label) {
             foreach ($result[$key]['created'] as $slug) {
                 $this->components->twoColumnDetail("{$label} {$slug}", '<fg=green>criado</>');
             }
@@ -63,17 +63,20 @@ final class ImportContent extends Command
             }
         }
 
-        $skipped = count($result['pages']['skipped']) + count($result['documents']['skipped']);
+        $skipped = count($result['pages']['skipped']) + count($result['documents']['skipped']) + count($result['media']['skipped']);
 
         $this->newLine();
         $this->components->info(sprintf(
-            'Páginas: %d criada(s), %d substituída(s), %d mantida(s). Documentos: %d, %d, %d.',
+            'Páginas: %d criada(s), %d substituída(s), %d mantida(s). Documentos: %d, %d, %d. Imagens: %d, %d, %d.',
             count($result['pages']['created']),
             count($result['pages']['replaced']),
             count($result['pages']['skipped']),
             count($result['documents']['created']),
             count($result['documents']['replaced']),
             count($result['documents']['skipped']),
+            count($result['media']['created']),
+            count($result['media']['replaced']),
+            count($result['media']['skipped']),
         ));
 
         if ($skipped > 0) {

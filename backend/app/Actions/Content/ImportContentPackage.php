@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Actions\Content;
 
+use App\Actions\Media\ForgetPagesUsingMedia;
 use App\Enums\PageStatus;
 use App\Enums\TransparencyDocumentType;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\PageSlugHistory;
 use App\Models\TransparencyDocument;
 use App\Support\Cache\PublicPageCache;
 use App\Support\Content\ContentPackage;
 use App\Support\Html\ContentSanitizer;
+use App\Support\Media\MediaPaths;
+use App\Support\Media\MediaUrl;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -33,19 +37,28 @@ use ValueError;
  * Tudo é conferido ANTES da primeira escrita: versão do formato, SHA-256 de cada arquivo,
  * enum, caminho de arquivo, colisão de uuid/slug entre itens diferentes. Pacote adulterado ou
  * incompleto não chega a tocar o banco. Depois disso o banco é escrito numa transação só, e
- * os PDFs gravados por esta execução são removidos se a transação falhar.
+ * os arquivos gravados por esta execução são removidos se a transação falhar.
  *
  * O HTML das páginas passa de novo pelo ContentSanitizer (regra do CLAUDE.md: todo caminho
  * de escrita passa pelo mesmo filtro). Um pacote é entrada externa como outra qualquer.
+ *
+ * Imagens (formato 2): identificadas pelo uuid, porque é ele que o conteúdo das páginas cita.
+ * Os arquivos chegam como saíram — já sem metadado e já com as derivadas —, conferidos pelo
+ * SHA-256; não são reprocessados. Imagem marcada aqui como foto de assistido nunca é
+ * sobrescrita pelo pacote.
  */
 final class ImportContentPackage
 {
-    public function __construct(private readonly ContentSanitizer $sanitizer) {}
+    public function __construct(
+        private readonly ContentSanitizer $sanitizer,
+        private readonly ForgetPagesUsingMedia $forgetPages,
+    ) {}
 
     /**
      * @return array{
      *     pages: array{created: list<string>, replaced: list<string>, skipped: list<string>},
      *     documents: array{created: list<string>, replaced: list<string>, skipped: list<string>},
+     *     media: array{created: list<string>, replaced: list<string>, skipped: list<string>},
      *     dry_run: bool
      * }
      *
@@ -55,15 +68,40 @@ final class ImportContentPackage
     {
         $packageDir = rtrim($packageDir, '/');
 
-        [$pages, $documents] = $this->readAndVerify($packageDir);
+        [$pages, $documents, $media] = $this->readAndVerify($packageDir);
 
         $result = [
             'pages' => ['created' => [], 'replaced' => [], 'skipped' => []],
             'documents' => ['created' => [], 'replaced' => [], 'skipped' => []],
+            'media' => ['created' => [], 'replaced' => [], 'skipped' => []],
             'dry_run' => $dryRun,
         ];
 
         $disk = Storage::disk('local');
+
+        // Imagens primeiro: as páginas dependem delas.
+        $mediaPlan = [];
+        foreach ($media as $data) {
+            $existing = Media::query()->where('uuid', $data['uuid'])->first();
+            $label = "{$data['uuid']} ({$data['alt']})";
+
+            // Nem com --substituir: o pacote traria a imagem como publicável, e desmarcar a
+            // declaração de assistido é o que o sistema não permite por caminho nenhum (ver
+            // App\Actions\Media\UpdateMediaDetails).
+            if ($existing !== null && $existing->depicts_assisted_minor) {
+                throw new InvalidArgumentException("A imagem {$label} foi marcada neste ambiente como foto de criança ou adolescente atendido; o pacote não pode substituí-la.");
+            }
+
+            if ($existing === null) {
+                $mediaPlan[] = [$data, null];
+                $result['media']['created'][] = $label;
+            } elseif ($replace) {
+                $mediaPlan[] = [$data, $existing];
+                $result['media']['replaced'][] = $label;
+            } else {
+                $result['media']['skipped'][] = $label;
+            }
+        }
 
         // Fase 1: decidir, sem escrever. Cada item vira "criar", "substituir" ou "pular".
         $pagePlan = [];
@@ -118,15 +156,33 @@ final class ImportContentPackage
             }
         }
 
+        $this->assertPageImagesAvailable($pagePlan, $media);
+
         if ($dryRun) {
             return $result;
         }
 
-        // Fase 2: escrever. PDFs primeiro (inofensivos se a transação cair, e removidos se
+        // Fase 2: escrever. Arquivos primeiro (inofensivos se a transação cair, e removidos se
         // for o caso), banco numa transação.
         $written = [];
+        $staleMediaDirs = [];
 
         try {
+            foreach ($mediaPlan as [$data, $existing]) {
+                foreach ($data['files'] as $file) {
+                    if ($disk->exists($file['path']) && hash('sha256', (string) $disk->get($file['path'])) === $file['sha256']) {
+                        continue;
+                    }
+
+                    $disk->put($file['path'], (string) file_get_contents($packageDir.'/'.ContentPackage::FILES_DIR.'/'.$file['path']));
+                    $written[] = $file['path'];
+                }
+
+                if ($existing !== null && $existing->version !== $data['version']) {
+                    $staleMediaDirs[] = MediaPaths::directory($existing);
+                }
+            }
+
             foreach ($documentPlan as [$data]) {
                 $target = $data['file_path'];
 
@@ -138,7 +194,11 @@ final class ImportContentPackage
                 $written[] = $target;
             }
 
-            DB::transaction(function () use ($pagePlan, $documentPlan): void {
+            DB::transaction(function () use ($mediaPlan, $pagePlan, $documentPlan): void {
+                foreach ($mediaPlan as [$data, $existing]) {
+                    $this->writeMedia($data, $existing);
+                }
+
                 foreach ($pagePlan as [$data, $existing]) {
                     $this->writePage($data, $existing);
                 }
@@ -155,15 +215,85 @@ final class ImportContentPackage
             throw $e;
         }
 
+        // Só depois do commit: a versão anterior da imagem substituída é o que estava no ar até
+        // aqui.
+        foreach ($staleMediaDirs as $dir) {
+            $disk->deleteDirectory($dir);
+        }
+
         foreach ($pagePlan as [$data]) {
             Cache::forget(PublicPageCache::key($data['slug']));
+        }
+
+        // Página que NÃO foi reescrita mas usa imagem substituída tem o srcset velho em cache.
+        foreach ($mediaPlan as [$data, $existing]) {
+            if ($existing !== null) {
+                $this->forgetPages->handle($existing);
+            }
         }
 
         return $result;
     }
 
     /**
-     * @return array{0: list<array<string, mixed>>, 1: list<array<string, mixed>>}
+     * Toda imagem que uma página a gravar usa precisa estar no pacote ou já existir aqui e poder
+     * ir para o site — senão a página chegaria apontando para o nada (a mesma regra que
+     * AssertContentImagesArePublishable aplica ao salvar pelo painel).
+     *
+     * @param  list<array{0: array<string, mixed>, 1: Page|null}>  $pagePlan
+     * @param  list<array<string, mixed>>  $media
+     */
+    private function assertPageImagesAvailable(array $pagePlan, array $media): void
+    {
+        $inPackage = array_column($media, 'uuid');
+
+        foreach ($pagePlan as [$data]) {
+            preg_match_all(MediaUrl::CANONICAL_IN_HTML_PATTERN, (string) $data['content'], $matches);
+
+            foreach (array_unique($matches[1]) as $uuid) {
+                if (in_array($uuid, $inPackage, true)) {
+                    continue;
+                }
+
+                $local = Media::query()->where('uuid', $uuid)->first();
+
+                if ($local === null || ! $local->isPublishable()) {
+                    throw new InvalidArgumentException("A página {$data['slug']} usa a imagem {$uuid}, que não está no pacote nem pode ser usada neste ambiente.");
+                }
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function writeMedia(array $data, ?Media $existing): void
+    {
+        $media = $existing ?? new Media;
+
+        $media->forceFill([
+            'uuid' => $data['uuid'],
+            'alt' => $data['alt'],
+            'caption' => $data['caption'] ?? null,
+            'depicts_assisted_minor' => false,
+            'version' => $data['version'],
+            'mime' => $data['mime'],
+            'extension' => $data['extension'],
+            'size' => $data['size'],
+            'width' => $data['width'],
+            'height' => $data['height'],
+            'widths' => $data['widths'],
+            'sha256' => $data['sha256'],
+        ]);
+
+        $media->timestamps = false;
+        $media->created_at = $this->date($data['created_at'] ?? null) ?? now();
+        $media->updated_at = $this->date($data['updated_at'] ?? null) ?? now();
+        $media->save();
+    }
+
+    /**
+     * @return array{0: list<array<string, mixed>>, 1: list<array<string, mixed>>, 2: list<array<string, mixed>>}
      */
     private function readAndVerify(string $dir): array
     {
@@ -177,7 +307,7 @@ final class ImportContentPackage
             ));
         }
 
-        foreach ([ContentPackage::PAGES, ContentPackage::DOCUMENTS] as $name) {
+        foreach ([ContentPackage::PAGES, ContentPackage::DOCUMENTS, ContentPackage::MEDIA] as $name) {
             $raw = @file_get_contents($dir.'/'.$name);
 
             if ($raw === false || hash('sha256', $raw) !== ($manifest['checksums'][$name] ?? null)) {
@@ -228,7 +358,36 @@ final class ImportContentPackage
             }
         }
 
-        return [$pages, $documents];
+        $media = $this->readRecords($dir.'/'.ContentPackage::MEDIA, ContentPackage::MEDIA);
+
+        foreach ($media as $i => $item) {
+            foreach (['uuid', 'alt', 'version', 'mime', 'extension', 'size', 'width', 'height', 'widths', 'sha256', 'files'] as $key) {
+                if (! array_key_exists($key, $item)) {
+                    throw new InvalidArgumentException("media.json[{$i}] sem o campo {$key}.");
+                }
+            }
+
+            if (! in_array($item['extension'], ['jpg', 'png', 'webp'], true) || ! is_array($item['files']) || $item['files'] === []) {
+                throw new InvalidArgumentException("Imagem {$item['uuid']} com formato inválido no pacote.");
+            }
+
+            foreach ($item['files'] as $file) {
+                // Todo arquivo da imagem mora na pasta DELA, na versão que o registro declara —
+                // o caminho vem de um arquivo que pode ter sido montado à mão.
+                if (! is_array($file) || preg_match(ContentPackage::MEDIA_FILE_PATTERN, (string) ($file['path'] ?? ''), $match) !== 1
+                    || $match[1] !== $item['uuid'] || (int) $match[2] !== $item['version']) {
+                    throw new InvalidArgumentException("Caminho de arquivo inválido na imagem {$item['uuid']}.");
+                }
+
+                $path = $dir.'/'.ContentPackage::FILES_DIR.'/'.$file['path'];
+
+                if (! is_file($path) || hash_file('sha256', $path) !== ($file['sha256'] ?? null)) {
+                    throw new InvalidArgumentException("Um arquivo da imagem {$item['uuid']} está ausente ou não confere com o SHA-256 do pacote.");
+                }
+            }
+        }
+
+        return [$pages, $documents, $media];
     }
 
     /**

@@ -29,9 +29,10 @@ final class ExportContent extends Command
         }
 
         $this->components->info(sprintf(
-            '%d página(s), %d documento(s), %d arquivo(s) exportados.',
+            '%d página(s), %d documento(s), %d imagem(ns), %d arquivo(s) exportados.',
             $result['pages'],
             $result['documents'],
+            $result['media'],
             $result['files'],
         ));
         $this->line('  '.$result['path']);
