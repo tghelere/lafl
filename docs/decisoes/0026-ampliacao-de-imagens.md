@@ -77,5 +77,8 @@ pacote e aparece na ampliação, embaixo da legenda.
   para `public-page:v3:`.
 - Os seletores com escopo que miravam `img` no `AppImagem` precisaram de `:deep(img)`, porque a
   raiz do componente ampliável é o `<a>`.
-- A ampliação baixa só a derivada escolhida. Não há pré-carga da vizinha: a troca de imagem pode
-  levar um instante numa conexão lenta.
+- **Pré-carga da vizinha** (sessão 31): quando a imagem atual termina de carregar, a anterior e
+  a próxima são pedidas em baixa prioridade, na mesma derivada que a abertura escolheria
+  (`escolherFonte`, a mesma função). Esperar a atual é o que impede a pré-carga de disputar a
+  conexão com ela. Só as duas vizinhas, e não o grupo inteiro, para não gastar dados de quem abre
+  uma foto e fecha. Imagem sozinha (a figura do texto) não pede nada.

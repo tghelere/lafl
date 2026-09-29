@@ -363,3 +363,107 @@ test.describe('celular — 360px', () => {
     await expect(page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` })).toBeFocused()
   })
 })
+
+test.describe('pré-carga da vizinha — 1280px', () => {
+  test.use({ viewport: { width: 1280, height: 800 } })
+
+  /** A derivada que a abertura escolheria para uma foto, contra o palco real desta janela. */
+  async function derivadaEscolhida(page: Page, widths: number[], ratio: number): Promise<number> {
+    const palco = await page.locator('.ampliacao__palco').evaluate((node) => {
+      const caixa = node.getBoundingClientRect()
+      return { largura: caixa.width, altura: caixa.height, densidade: window.devicePixelRatio }
+    })
+    const alvo = Math.min(palco.largura, palco.altura * ratio) * palco.densidade
+    const cabem = widths.filter((w) => w <= alvo)
+
+    return cabem.length > 0 ? Math.max(...cabem) : Math.min(...widths)
+  }
+
+  /**
+   * Segura por 1,5 s todo pedido da vizinha e anota os endereços. Se a pré-carga bloqueasse a
+   * imagem atual, ela só apareceria depois disso; e o que a pré-carga pede fica registrado.
+   * Armado ANTES de abrir a ampliação e uma vez só: abrir para medir já pré-carregaria a vizinha,
+   * e a segunda abertura serviria do cache do navegador.
+   */
+  async function segurarVizinha(page: Page, mediaId: string) {
+    const pedidos: string[] = []
+    await page.route(`**/midia/${mediaId}/*.webp`, async (rota) => {
+      pedidos.push(rota.request().url())
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await rota.continue()
+    })
+
+    return {
+      pedidos,
+      /** Pedidos da vizinha na derivada dada. */
+      de: (largura: number) => pedidos.filter((url) => url.endsWith(`/${largura}.webp`)),
+    }
+  }
+
+  async function atualCarregada(page: Page): Promise<boolean> {
+    return page
+      .locator('.ampliacao__imagem')
+      .evaluate((node) => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth > 0)
+  }
+
+  test('pede a próxima na derivada que seria escolhida, sem bloquear a atual', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    const vizinha = await segurarVizinha(page, criada.mediaIds[1]!)
+    const miniatura = await page.getByRole('link', { name: `Ampliar imagem: ${galeria[1].alt}` }).locator('img').evaluate((n) => (n as HTMLImageElement).currentSrc)
+
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` }).click()
+
+    // A imagem atual aparece e carrega sem esperar a vizinha, que continua segura.
+    await expect(ampliacao(page).locator('img')).toBeVisible()
+    await expect.poll(() => atualCarregada(page)).toBe(true)
+
+    const esperada = await derivadaEscolhida(page, [400, 640, 960], 1000 / 1400)
+    // Premissa: a miniatura da página NÃO é a derivada que a ampliação escolhe para a segunda
+    // foto. Senão o navegador serviria do cache e nenhum pedido apareceria.
+    expect(miniatura, 'a miniatura já é a derivada escolhida; o teste precisa de outra foto').not.toContain(`/${esperada}.webp`)
+
+    // A vizinha é pedida, uma vez, na derivada certa, antes de qualquer navegação.
+    await expect.poll(() => vizinha.de(esperada).length).toBe(1)
+
+    // Ir para ela mostra a mesma derivada, sem novo pedido.
+    await page.keyboard.press('ArrowRight')
+    await expect(ampliacao(page).locator('img')).toHaveAttribute('alt', galeria[1].alt)
+    await expect(ampliacao(page).locator('img')).toHaveAttribute('data-largura', String(esperada))
+    await expect.poll(() => atualCarregada(page)).toBe(true)
+    expect(vizinha.de(esperada)).toHaveLength(1)
+  })
+
+  test('pede também a anterior, na derivada certa', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    const vizinha = await segurarVizinha(page, criada.mediaIds[1]!)
+
+    // Abre a última: a anterior é a segunda, a mesma foto do teste acima.
+    await page.getByRole('link', { name: `Ampliar imagem: ${galeria[2].alt}` }).click()
+    await expect.poll(() => atualCarregada(page)).toBe(true)
+
+    const esperada = await derivadaEscolhida(page, [400, 640, 960], 1000 / 1400)
+    await expect.poll(() => vizinha.de(esperada).length).toBe(1)
+
+    await page.keyboard.press('ArrowLeft')
+    await expect(ampliacao(page).locator('img')).toHaveAttribute('alt', galeria[1].alt)
+    await expect(ampliacao(page).locator('img')).toHaveAttribute('data-largura', String(esperada))
+    expect(vizinha.de(esperada)).toHaveLength(1)
+  })
+
+  test('com uma imagem só (a figura do texto), não há vizinha para pedir', async ({ page }) => {
+    await gotoSite(page, `/${slug}`)
+    const pedidos: string[] = []
+    page.on('request', (pedido) => {
+      if (pedido.url().includes('/midia/')) {
+        pedidos.push(pedido.url())
+      }
+    })
+
+    await page.getByRole('link', { name: `Ampliar imagem: ${noTexto.alt}` }).click()
+    await expect.poll(() => atualCarregada(page)).toBe(true)
+    await page.waitForTimeout(500)
+
+    // Nada de outra foto: só a própria imagem do texto pode ter sido pedida.
+    expect(pedidos.filter((url) => !url.includes(`/midia/${criada.mediaIds[3]}/`))).toEqual([])
+  })
+})

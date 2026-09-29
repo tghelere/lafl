@@ -20,6 +20,10 @@
 // - o botão de navegação que desliga na ponta não leva o foco embora: ele passa ao outro;
 // - cada troca é anunciada ("Imagem 2 de 4: …") numa região aria-live, porque a imagem nova
 //   não recebe foco.
+//
+// Pré-carga: quando a imagem ATUAL termina de carregar, as vizinhas (anterior e próxima) são
+// pedidas em baixa prioridade, na mesma derivada que seria escolhida ao abri-las. Esperar a atual
+// é o que garante que a pré-carga nunca compita com ela pela conexão.
 import { ChevronLeft, ChevronRight, X } from '@lucide/vue'
 
 type Fonte = { url: string; largura: number }
@@ -60,12 +64,12 @@ const anuncio = computed(() => {
  * A maior derivada que cabe na tela: a imagem aparece do tamanho que o palco permite (sem
  * passar da proporção), e a derivada escolhida é a maior cuja largura não passa desse tamanho
  * em pixels do aparelho. Nenhuma coube (tela menor que a menor derivada): a menor.
+ *
+ * Serve à imagem atual e às vizinhas: a pré-carga pede exatamente o que a abertura escolheria.
  */
-const escolhida = computed<Fonte | null>(() => {
-  const item = atual.value
-
+function escolherFonte(item: Item): Fonte | null {
   // Antes de medir o palco não há tamanho: esperar, em vez de baixar a menor e trocar em seguida.
-  if (!item || item.fontes.length === 0 || espaco.value.largura === 0) {
+  if (item.fontes.length === 0 || espaco.value.largura === 0) {
     return null
   }
 
@@ -76,6 +80,40 @@ const escolhida = computed<Fonte | null>(() => {
   const cabem = item.fontes.filter((fonte) => fonte.largura <= alvo)
 
   return cabem.length > 0 ? cabem[cabem.length - 1]! : item.fontes[0]!
+}
+
+const escolhida = computed<Fonte | null>(() => (atual.value ? escolherFonte(atual.value) : null))
+
+const atualCarregada = ref(false)
+const jaPedidas = new Set<string>()
+
+// A imagem nova (outra derivada, outra foto) ainda não carregou: a pré-carga espera de novo.
+watch(
+  () => escolhida.value?.url,
+  () => {
+    atualCarregada.value = false
+  },
+)
+
+watch([atualCarregada, indice, espaco], () => {
+  if (!atualCarregada.value) {
+    return
+  }
+
+  for (const vizinho of [itens.value[indice.value - 1], itens.value[indice.value + 1]]) {
+    const fonte = vizinho ? escolherFonte(vizinho) : null
+
+    if (!fonte || jaPedidas.has(fonte.url)) {
+      continue
+    }
+
+    jaPedidas.add(fonte.url)
+
+    const pedido = new Image()
+    pedido.fetchPriority = 'low'
+    pedido.decoding = 'async'
+    pedido.src = fonte.url
+  }
 })
 
 function lerFontes(img: HTMLImageElement, link: HTMLAnchorElement): Fonte[] {
@@ -158,6 +196,8 @@ function aoFechar(): void {
   // Lido ANTES de esvaziar a lista: é o link da imagem aberta agora que recebe o foco.
   const aberta = atual.value?.link
   itens.value = []
+  jaPedidas.clear()
+  atualCarregada.value = false
   aberta?.focus()
 }
 
@@ -317,6 +357,7 @@ onBeforeUnmount(() => {
           class="ampliacao__imagem"
           :src="escolhida.url"
           :data-largura="escolhida.largura"
+          @load="atualCarregada = true"
           :width="atual.largura"
           :height="atual.altura"
           :alt="atual.alt"
