@@ -19,6 +19,11 @@ use App\Enums\PageStatus;
  * conteúdo é editado pelo painel, e o texto de partida precisa continuar disponível num
  * pacote de deploy que não carrega ferramenta de desenvolvimento nenhuma.
  *
+ * **Só semente.** Depois do lançamento o banco de produção é a fonte de verdade do conteúdo, e
+ * este arquivo vai divergir do que está no ar — de propósito, não é dívida a quitar (ver
+ * docs/decisoes/0023-banco-e-a-fonte-de-verdade-do-conteudo.md). O conteúdo chega a um
+ * ambiente novo por `conteudo:exportar` / `conteudo:importar`, não por aqui.
+ *
  * Só fatos confirmados em docs/contexto.md entram aqui — os três pilares, CEI Anália Franco,
  * o bazar desde 1968, endereço, CNPJ. Nenhum dado marcado `[CONFIRMAR]` ou `[LACUNA]`: onde
  * falta o dado, o texto diz explicitamente que está pendente de confirmação com a
