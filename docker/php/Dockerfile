@@ -7,8 +7,9 @@ RUN apk add --no-cache \
         oniguruma-dev \
         libpng-dev \
         libwebp-dev \
+        libjpeg-turbo-dev \
         $PHPIZE_DEPS \
-    && docker-php-ext-configure gd --with-webp \
+    && docker-php-ext-configure gd --with-webp --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
         pdo_pgsql \
         pgsql \

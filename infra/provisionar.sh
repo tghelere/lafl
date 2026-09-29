@@ -198,6 +198,17 @@ if [[ ${#faltando[@]} -gt 0 ]]; then
   exit 1
 fi
 
+# GD carregado não basta: a biblioteca de imagens aceita JPEG, PNG e WebP
+# (App\Services\Media\ImageProcessor), e um GD compilado sem um deles só falha quando alguém
+# envia aquele formato. Aconteceu no container de desenvolvimento (sessão 28), sem JPEG.
+passo 'Conferindo os formatos do GD'
+if "php${VERSAO_PHP}" -r 'exit(function_exists("imagecreatefromjpeg") && function_exists("imagecreatefrompng") && function_exists("imagecreatefromwebp") && function_exists("imagewebp") ? 0 : 1);'; then
+  ok 'gd lê JPEG, PNG e WebP e grava WebP'
+else
+  erro 'o gd deste PHP não tem suporte a JPEG, PNG e WebP'
+  exit 1
+fi
+
 # Configuração de servidor, separada do php.ini da distro para sobreviver a upgrade de
 # pacote. Upload de 20M por causa dos PDFs de transparência enviados pelo painel.
 cat > "/etc/php/${VERSAO_PHP}/fpm/conf.d/99-laf.ini" <<'INI'
