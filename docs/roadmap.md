@@ -522,6 +522,10 @@ uma camada de cache de HTML por cima.
       foto", em diálogo; vocabulário revisto para quem nunca usou CMS; a tela diz o que salva
       na hora (fotos) e o que exige Salvar (texto). Ver
       `docs/decisoes/0027-enviar-fotos-sem-sair-da-pagina.md` e `docs/relatorio-sessao-32.md`.
+- [ ] **Fotos do local em homologação** — sessão 33. `midia:importar` (só imagens e capa/galeria,
+      páginas pelo slug, texto intocado) e `backend/scripts/midia/levar-fotos.sh` prontos e
+      testados; **a execução em homologação ficou pendente** (SSH remoto barrado na sessão). Ver
+      `docs/deploy.md` §10.2 e `docs/relatorio-sessao-33.md`.
 - [ ] Colar foto do computador (Ctrl+V) no texto ainda não envia — mesmo caminho da soltura,
       pelo `handlePaste` do editor (ADR 0027, consequências).
 - [ ] Conferência manual de soltar foto de uma pasta do sistema no editor, em Firefox e Chrome
