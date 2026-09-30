@@ -281,9 +281,10 @@ function toggleLink(): void {
         type="button"
         class="rich-text__button"
         :class="{ 'rich-text__button--active': editor.isActive('mediaFigure') }"
+        title="Enviar ou escolher uma foto — ou arraste a foto do computador para o texto"
         @click="openImagePicker"
       >
-        {{ editor.isActive('mediaFigure') ? 'Editar imagem' : 'Imagem' }}
+        {{ editor.isActive('mediaFigure') ? 'Editar foto' : 'Foto' }}
       </button>
     </div>
 

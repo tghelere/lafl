@@ -84,19 +84,19 @@ test.describe('comunicacao', () => {
       await openContentPageByTitle(page, titulo)
       await editor(page).click()
       await page.keyboard.press('ControlOrMeta+End')
-      await page.getByRole('toolbar', { name: 'Formatação do conteúdo' }).getByRole('button', { name: 'Imagem', exact: true }).click()
+      await page.getByRole('toolbar', { name: 'Formatação do conteúdo' }).getByRole('button', { name: 'Foto', exact: true }).click()
 
       const seletor = page.locator('dialog.media-picker[open]')
       await expect(seletor.getByRole('heading', { name: 'Pôr uma foto no texto' })).toBeVisible()
       await seletor.getByRole('tab', { name: 'Escolher entre as já enviadas' }).click()
-      await seletor.getByLabel('Buscar na biblioteca').fill(alt)
+      await seletor.getByLabel('Buscar pela descrição ou legenda').fill(alt)
       await seletor.getByRole('button', { name: 'Buscar' }).click()
       await seletor.getByRole('button', { name: alt }).click()
 
       // O alternativo vem da biblioteca, pronto para ajustar a este texto.
-      await expect(seletor.getByLabel('Texto alternativo')).toHaveValue(alt)
+      await expect(seletor.getByLabel('Descrição da foto')).toHaveValue(alt)
       await seletor.getByLabel('Legenda (opcional)').fill(legenda)
-      await seletor.getByRole('button', { name: 'Inserir no texto' }).click()
+      await seletor.getByRole('button', { name: 'Pôr no texto' }).click()
       await expect(seletor).toBeHidden()
 
       await imageLoaded(editor(page).locator('figure img'))
@@ -237,7 +237,7 @@ test.describe('comunicacao', () => {
 
         await openContentPageByTitle(page, titulo)
         const barra = page.getByRole('toolbar', { name: 'Formatação do conteúdo' })
-        const botao = barra.getByRole('button', { name: 'Imagem', exact: true })
+        const botao = barra.getByRole('button', { name: 'Foto', exact: true })
         await botao.scrollIntoViewIfNeeded()
         expect((await botao.boundingBox())!.height).toBeGreaterThanOrEqual(44)
         await botao.click()

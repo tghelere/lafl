@@ -42,7 +42,7 @@ test.describe('comunicacao', () => {
       await openContentPageByTitle(page, titulo)
       await editor(page).click()
       await page.keyboard.press('ControlOrMeta+End')
-      await page.getByRole('toolbar', { name: 'Formatação do conteúdo' }).getByRole('button', { name: 'Imagem', exact: true }).click()
+      await page.getByRole('toolbar', { name: 'Formatação do conteúdo' }).getByRole('button', { name: 'Foto', exact: true }).click()
 
       const seletor = page.locator('dialog.media-picker[open]')
       await expect(seletor.getByRole('tab', { name: 'Enviar do computador' })).toHaveAttribute('aria-selected', 'true')
@@ -97,7 +97,7 @@ test.describe('comunicacao', () => {
     try {
       await openContentPageByTitle(page, titulo)
       const secao = page.locator('section.page-images')
-      await secao.getByRole('button', { name: 'Escolher a capa na biblioteca' }).click()
+      await secao.getByRole('button', { name: 'Escolher a foto que representa a página' }).click()
 
       const seletor = page.locator('dialog.media-picker[open]')
       await expect(seletor.getByRole('heading', { name: 'Foto que representa esta página' })).toBeVisible()
@@ -112,8 +112,8 @@ test.describe('comunicacao', () => {
       await expect(seletor).toBeHidden()
 
       await expect(secao.getByText(/Foto enviada e posta no lugar da anterior/)).toBeVisible()
-      await imageLoaded(secao.getByRole('list', { name: 'Capa' }).locator('img'))
-      await expect(secao.getByRole('list', { name: 'Capa' })).toContainText(descricao)
+      await imageLoaded(secao.getByRole('list', { name: 'Foto que representa esta página' }).locator('img'))
+      await expect(secao.getByRole('list', { name: 'Foto que representa esta página' })).toContainText(descricao)
     } finally {
       const resposta = await direcaoApi.get('/api/v1/media', { search: descricao })
       await deletePage(direcaoApi, pagina.id)

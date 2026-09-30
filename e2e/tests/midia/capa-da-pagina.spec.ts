@@ -38,13 +38,13 @@ test.describe('comunicacao', () => {
       const secao = page.locator('section.page-images')
 
       // O acoplamento com a home está escrito na tela de quem edita.
-      await expect(secao.getByText('A capa desta página aparece no destaque da página inicial.')).toBeVisible()
-      await expect(secao.getByText('Esta página não tem capa.')).toBeVisible()
+      await expect(secao.getByText('Onde ela aparece: no destaque da página inicial.')).toBeVisible()
+      await expect(secao.getByText('Nenhuma foto escolhida.')).toBeVisible()
 
       // 1. Enviar uma foto nova direto para a capa.
       await addPhotoFromSection(page, { alt: altEnviada, destination: 'cover', color: [200, 90, 40], width: 900, height: 600 })
-      await expect(secao.getByText('Imagem enviada e posta na capa. Ela já aparece no site.')).toBeVisible()
-      await imageLoaded(secao.getByRole('list', { name: 'Capa' }).locator('img'))
+      await expect(secao.getByText('Foto enviada e posta para representar a página. O site já mostra a nova.')).toBeVisible()
+      await imageLoaded(secao.getByRole('list', { name: 'Foto que representa esta página' }).locator('img'))
 
       await gotoSite(page, '/')
       await imageLoaded(destaque.locator('img'))
@@ -55,25 +55,25 @@ test.describe('comunicacao', () => {
       await addPhotoFromSection(page, { alt: altBiblioteca, destination: 'gallery', color: [40, 90, 200], width: 900, height: 600 })
       await expect(secao.getByText(/posta no fim da galeria/)).toBeVisible()
 
-      await secao.getByRole('button', { name: 'Trocar a capa por imagem da biblioteca' }).click()
+      await secao.getByRole('button', { name: 'Trocar a foto que representa a página' }).click()
       const seletor = page.locator('dialog.media-picker[open]')
       await expect(seletor.getByRole('heading', { name: 'Foto que representa esta página' })).toBeVisible()
       await seletor.getByRole('tab', { name: 'Escolher entre as já enviadas' }).click()
-      await seletor.getByLabel('Buscar na biblioteca').fill(altBiblioteca)
+      await seletor.getByLabel('Buscar pela descrição ou legenda').fill(altBiblioteca)
       await seletor.getByRole('button', { name: 'Buscar' }).click()
       await seletor.getByRole('button', { name: altBiblioteca }).click()
       await expect(seletor).toBeHidden()
-      await expect(secao.getByText('Capa trocada. O site já mostra a nova.')).toBeVisible()
-      await expect(secao.getByRole('list', { name: 'Capa' })).toContainText(altBiblioteca)
+      await expect(secao.getByText('Foto trocada. O site já mostra a nova.')).toBeVisible()
+      await expect(secao.getByRole('list', { name: 'Foto que representa esta página' })).toContainText(altBiblioteca)
 
       await gotoSite(page, '/')
       await expect(destaque.locator('img')).toHaveAttribute('alt', altBiblioteca)
 
       // 3. Tirar a capa: a home fica sem o destaque.
       await openContentPageByTitle(page, 'Quem Somos')
-      const capa = secao.getByRole('list', { name: 'Capa' })
-      await capa.getByRole('button', { name: 'Tirar da capa' }).click()
-      await expect(secao.getByText('Esta página não tem capa.')).toBeVisible()
+      const capa = secao.getByRole('list', { name: 'Foto que representa esta página' })
+      await capa.getByRole('button', { name: 'Deixar de usar esta foto' }).click()
+      await expect(secao.getByText('Nenhuma foto escolhida.')).toBeVisible()
 
       await gotoSite(page, '/')
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
@@ -82,12 +82,12 @@ test.describe('comunicacao', () => {
       // A foto da galeria sai também, para "Quem Somos" terminar como começou.
       await openContentPageByTitle(page, 'Quem Somos')
       await secao
-        .getByRole('list', { name: 'Galeria' })
+        .getByRole('list', { name: 'Galeria de fotos' })
         .getByRole('listitem')
         .filter({ hasText: altBiblioteca })
         .getByRole('button', { name: 'Tirar da galeria' })
         .click()
-      await expect(secao.getByText('A galeria está vazia.')).toBeVisible()
+      await expect(secao.getByText('Nenhuma foto na galeria ainda.')).toBeVisible()
     } finally {
       for (const alt of [altEnviada, altBiblioteca]) {
         const resposta = await direcaoApi.get('/api/v1/media', { search: alt })

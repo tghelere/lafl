@@ -40,16 +40,16 @@ test.describe('comunicacao', () => {
     try {
       await openContentPageByTitle(page, titulo)
       const secao = page.locator('section.page-images')
-      await expect(secao.getByRole('heading', { name: 'Imagens desta página' })).toBeVisible()
-      await expect(secao.getByText('A galeria está vazia.')).toBeVisible()
+      await expect(secao.getByRole('heading', { name: 'Fotos desta página' })).toBeVisible()
+      await expect(secao.getByText('Nenhuma foto na galeria ainda.')).toBeVisible()
 
       // 1. Enviar para a galeria, pela própria página.
       // A primeira coisa da seção é o botão de adicionar, antes das listas.
       await expect(secao.getByRole('button').first()).toHaveText('Adicionar foto')
       await addPhotoFromSection(page, { alt, caption: 'Setembro de 2026', color: [30, 140, 60] })
 
-      await expect(secao.getByText(/Imagem enviada e posta no fim da galeria/)).toBeVisible()
-      const galeria = secao.getByRole('list', { name: 'Galeria' })
+      await expect(secao.getByText(/Foto enviada e posta no fim da galeria/)).toBeVisible()
+      const galeria = secao.getByRole('list', { name: 'Galeria de fotos' })
       const item = galeria.getByRole('listitem').filter({ hasText: alt })
       await imageLoaded(item.locator('img'))
 
@@ -66,10 +66,10 @@ test.describe('comunicacao', () => {
 
       // 2. Corrigir o texto alternativo no mesmo lugar.
       await openContentPageByTitle(page, titulo)
-      await item.getByRole('button', { name: 'Editar texto' }).click()
-      await item.getByLabel('Texto alternativo').fill(altCorrigido)
-      await item.getByRole('button', { name: 'Salvar texto' }).click()
-      await expect(secao.getByText('Texto da imagem salvo.')).toBeVisible()
+      await item.getByRole('button', { name: 'Editar descrição e legenda' }).click()
+      await item.getByLabel('Descrição da foto').fill(altCorrigido)
+      await item.getByRole('button', { name: 'Salvar descrição' }).click()
+      await expect(secao.getByText('Descrição salva. O site já mostra a nova.')).toBeVisible()
 
       await gotoSite(page, `/${slug}`)
       await expect(noSite).toHaveAttribute('alt', altCorrigido)
@@ -77,13 +77,13 @@ test.describe('comunicacao', () => {
       // 3. Substituir o arquivo por um maior: o site ganha a largura nova sem editar a página.
       await openContentPageByTitle(page, titulo)
       const itemCorrigido = galeria.getByRole('listitem').filter({ hasText: altCorrigido })
-      await itemCorrigido.getByLabel('Substituir arquivo (JPEG, PNG ou WebP, até 10 MB)').setInputFiles({
+      await itemCorrigido.getByLabel('Trocar por outro arquivo').setInputFiles({
         name: 'maior.png',
         mimeType: 'image/png',
         buffer: solidPng(1300, 800, [200, 120, 20]),
       })
-      await itemCorrigido.getByRole('button', { name: 'Substituir', exact: true }).click()
-      await expect(secao.getByText(/Arquivo substituído/)).toBeVisible()
+      await itemCorrigido.getByRole('button', { name: 'Trocar arquivo', exact: true }).click()
+      await expect(secao.getByText(/Arquivo trocado/)).toBeVisible()
 
       await gotoSite(page, `/${slug}`)
       await imageLoaded(noSite)
@@ -93,7 +93,7 @@ test.describe('comunicacao', () => {
       // 4. Tirar da galeria: some do site e continua na biblioteca.
       await openContentPageByTitle(page, titulo)
       await galeria.getByRole('listitem').filter({ hasText: altCorrigido }).getByRole('button', { name: 'Tirar da galeria' }).click()
-      await expect(secao.getByText('A galeria está vazia.')).toBeVisible()
+      await expect(secao.getByText('Nenhuma foto na galeria ainda.')).toBeVisible()
 
       await gotoSite(page, `/${slug}`)
       await expect(page.getByRole('heading', { name: titulo })).toBeVisible()

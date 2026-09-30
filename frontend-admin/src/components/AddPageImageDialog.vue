@@ -92,19 +92,19 @@ function ignoreStrayFileDrop(event: DragEvent): void {
     </header>
 
     <p class="field__hint">
-      Para pôr uma foto no meio do texto, use o botão “Imagem” do editor, ou arraste a foto para
-      o ponto do texto onde ela deve ficar.
+      Para pôr uma foto no meio do texto, use o botão “Foto” do editor, ou arraste a foto para o
+      ponto do texto onde ela deve ficar.
     </p>
 
     <ImageUploadForm
       :key="formKey"
       :upload="upload"
-      :submit-label="target === 'cover' ? 'Enviar para a capa' : 'Enviar para a galeria'"
+      :submit-label="target === 'cover' ? 'Enviar e usar para representar a página' : 'Enviar para a galeria'"
       @uploaded="handleUploaded"
     >
       <fieldset class="field media-declaration">
         <legend class="field__legend">
-          Para onde vai
+          Onde ela vai aparecer
         </legend>
         <label class="media-declaration__option">
           <input
@@ -113,7 +113,7 @@ function ignoreStrayFileDrop(event: DragEvent): void {
             :name="`${uid}-target`"
             value="gallery"
           >
-          Fim da galeria
+          Na galeria de fotos, no fim desta página
         </label>
         <label class="media-declaration__option">
           <input
@@ -122,7 +122,7 @@ function ignoreStrayFileDrop(event: DragEvent): void {
             :name="`${uid}-target`"
             value="cover"
           >
-          Capa, no lugar da atual
+          Como a foto que representa esta página em outros lugares do site (no lugar da atual)
         </label>
       </fieldset>
     </ImageUploadForm>

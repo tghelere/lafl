@@ -48,7 +48,7 @@ const fieldErrors = reactive<Record<string, string[]>>({})
 
 const otherPages = computed(() => (props.media.usages ?? []).filter((usage) => usage.uuid !== props.pageUuid))
 
-const removeLabel = computed(() => (props.role === 'cover' ? 'Tirar da capa' : 'Tirar da galeria'))
+const removeLabel = computed(() => (props.role === 'cover' ? 'Deixar de usar esta foto' : 'Tirar da galeria'))
 
 function clearErrors(): void {
   errorMessage.value = null
@@ -91,7 +91,7 @@ async function saveDetails(): Promise<void> {
       depicts_assisted_minor: props.media.depicts_assisted_minor,
     })
     isEditing.value = false
-    emit('changed', 'Texto da imagem salvo.')
+    emit('changed', 'Descrição salva. O site já mostra a nova.')
   } catch (error) {
     applyError(error, 'Não foi possível salvar. Tente novamente.')
   } finally {
@@ -128,9 +128,9 @@ async function replace(): Promise<void> {
   try {
     await replaceMediaFile(props.media.id, replacement.value)
     replacement.value = null
-    emit('changed', 'Arquivo substituído. O site já mostra o novo em todo lugar onde a imagem aparece.')
+    emit('changed', 'Arquivo trocado. O site já mostra o novo em todo lugar onde a foto aparece.')
   } catch (error) {
-    applyError(error, 'Não foi possível substituir o arquivo. Tente novamente.')
+    applyError(error, 'Não foi possível trocar o arquivo. Tente novamente.')
   } finally {
     isBusy.value = false
   }
@@ -142,13 +142,13 @@ async function move(direction: 'up' | 'down'): Promise<void> {
 
   try {
     const result = await moveGalleryImage(props.pageUuid, props.media.id, direction)
-    emit('moved', `Imagem movida para a posição ${result.position} de ${result.count}.`, direction)
+    emit('moved', `Foto movida para a posição ${result.position} de ${result.count}.`, direction)
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 422) {
       const body = error.response.data as { errors?: Record<string, string[]> }
-      errorMessage.value = body.errors?.direction?.[0] ?? body.errors?.media?.[0] ?? 'Não foi possível mover a imagem.'
+      errorMessage.value = body.errors?.direction?.[0] ?? body.errors?.media?.[0] ?? 'Não foi possível mover a foto.'
     } else {
-      applyError(error, 'Não foi possível mover a imagem. Tente novamente.')
+      applyError(error, 'Não foi possível mover a foto. Tente novamente.')
     }
   } finally {
     isBusy.value = false
@@ -165,9 +165,14 @@ async function remove(): Promise<void> {
 
   try {
     await removeImageFromPage(props.pageUuid, props.media.id, props.role)
-    emit('changed', props.role === 'cover' ? 'Imagem tirada da capa.' : 'Imagem tirada da galeria. Ela continua na biblioteca.')
+    emit(
+      'changed',
+      props.role === 'cover'
+        ? 'A página ficou sem foto que a represente. A foto continua guardada em Imagens.'
+        : 'Foto tirada da galeria. Ela continua guardada em Imagens.',
+    )
   } catch (error) {
-    applyError(error, 'Não foi possível tirar a imagem. Tente novamente.')
+    applyError(error, 'Não foi possível tirar a foto. Tente novamente.')
   } finally {
     isBusy.value = false
   }
@@ -188,7 +193,7 @@ async function remove(): Promise<void> {
 
     <div class="page-image__body">
       <p class="page-image__alt">
-        {{ media.alt }}
+        Descrição: {{ media.alt }}
       </p>
       <p
         v-if="media.caption"
@@ -212,15 +217,15 @@ async function remove(): Promise<void> {
         v-if="otherPages.length > 0"
         class="field__hint"
       >
-        Também usada em: {{ otherPages.map((usage) => usage.title).join(', ') }}. O que mudar aqui
-        vale lá também.
+        Esta mesma foto também está em: {{ otherPages.map((usage) => usage.title).join(', ') }}. O que
+        mudar aqui muda lá também.
       </p>
       <p
         v-if="role === 'content'"
         class="field__hint"
       >
-        O texto alternativo e a legenda desta imagem ficam no texto da página: selecione-a no
-        editor acima e use o botão “Imagem”.
+        A descrição e a legenda desta foto ficam no texto da página: clique na foto no editor
+        acima e use o botão “Editar foto”.
       </p>
 
       <p
@@ -237,7 +242,7 @@ async function remove(): Promise<void> {
         @submit.prevent="saveDetails"
       >
         <div class="field">
-          <label :for="`${idBase}-alt`">Texto alternativo</label>
+          <label :for="`${idBase}-alt`">Descrição da foto</label>
           <input
             :id="`${idBase}-alt`"
             v-model="alt"
@@ -245,6 +250,7 @@ async function remove(): Promise<void> {
             maxlength="255"
             required
           >
+          <span class="field__hint">O que aparece na foto, para quem não pode vê-la. É lida em voz alta para quem não enxerga a tela.</span>
           <span
             v-if="fieldErrors.alt"
             class="field__error"
@@ -258,6 +264,7 @@ async function remove(): Promise<void> {
             type="text"
             maxlength="500"
           >
+          <span class="field__hint">Aparece escrita embaixo da foto, no site.</span>
           <span
             v-if="fieldErrors.caption"
             class="field__error"
@@ -272,7 +279,7 @@ async function remove(): Promise<void> {
             type="text"
             maxlength="255"
           >
-          <span class="field__hint">Quem fotografou ou de onde veio a imagem. Aparece com a foto ampliada no site.</span>
+          <span class="field__hint">Quem tirou a foto ou de onde ela veio. Aparece quando alguém amplia a foto no site.</span>
           <span
             v-if="fieldErrors.credit"
             class="field__error"
@@ -285,7 +292,7 @@ async function remove(): Promise<void> {
             :disabled="isBusy"
           >
             <AppIcon :icon="Save" />
-            Salvar texto
+            Salvar descrição
           </button>
           <button
             type="button"
@@ -339,7 +346,7 @@ async function remove(): Promise<void> {
           @click="startEditing"
         >
           <AppIcon :icon="Pencil" />
-          Editar texto
+          Editar descrição e legenda
         </button>
         <button
           v-if="role !== 'content'"
@@ -356,12 +363,16 @@ async function remove(): Promise<void> {
           class="btn btn--secondary"
         >
           <AppIcon :icon="ExternalLink" />
-          Abrir na biblioteca
+          Abrir em Imagens
         </RouterLink>
       </div>
 
       <div class="page-image__replace">
-        <label :for="`${idBase}-file`">Substituir arquivo (JPEG, PNG ou WebP, até 10 MB)</label>
+        <label :for="`${idBase}-file`">Trocar por outro arquivo</label>
+        <span class="field__hint">
+          Para pôr uma versão melhor da mesma foto: a descrição continua, e a troca vale em todo
+          lugar onde ela aparece. JPEG, PNG ou WebP, até 10 MB.
+        </span>
         <div class="page-image__replace-row">
           <input
             :id="`${idBase}-file`"
@@ -376,7 +387,7 @@ async function remove(): Promise<void> {
             @click="replace"
           >
             <AppIcon :icon="Replace" />
-            Substituir
+            Trocar arquivo
           </button>
         </div>
         <span

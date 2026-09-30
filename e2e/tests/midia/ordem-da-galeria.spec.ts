@@ -16,7 +16,7 @@ import { storageStatePath } from '../../support/users'
 async function sendToGallery(page: Page, alt: string, cor: [number, number, number]): Promise<void> {
   const secao = page.locator('section.page-images')
   await addPhotoFromSection(page, { alt, color: cor, width: 500, height: 300 })
-  await expect(secao.getByRole('list', { name: 'Galeria' })).toContainText(alt)
+  await expect(secao.getByRole('list', { name: 'Galeria de fotos' })).toContainText(alt)
 }
 
 async function siteOrder(page: Page, slug: string): Promise<string[]> {
@@ -56,11 +56,11 @@ test.describe('comunicacao', () => {
       // Enter duas vezes no mesmo botão: a primeira foto desce até o fim.
       await secao.getByRole('button', { name: `Mover para baixo: ${a}` }).focus()
       await page.keyboard.press('Enter')
-      await expect(secao.getByText(/^\s*Imagem movida para a posição 2 de 3\.\s*$/)).toBeAttached()
+      await expect(secao.getByText(/^\s*Foto movida para a posição 2 de 3\.\s*$/)).toBeAttached()
       await expect(secao.getByRole('button', { name: `Mover para baixo: ${a}` })).toBeFocused()
 
       await page.keyboard.press('Enter')
-      await expect(secao.getByText(/^\s*Imagem movida para a posição 3 de 3\.\s*$/)).toBeAttached()
+      await expect(secao.getByText(/^\s*Foto movida para a posição 3 de 3\.\s*$/)).toBeAttached()
       // Chegou ao fim: "descer" desligou, e o foco foi para "subir", da mesma foto.
       await expect(secao.getByRole('button', { name: `Mover para cima: ${a}` })).toBeFocused()
 
@@ -71,7 +71,7 @@ test.describe('comunicacao', () => {
       await openContentPageByTitle(page, titulo)
       await secao.getByRole('button', { name: `Mover para cima: ${a}` }).focus()
       await page.keyboard.press('Enter')
-      await expect(secao.getByText(/^\s*Imagem movida para a posição 2 de 3\.\s*$/)).toBeAttached()
+      await expect(secao.getByText(/^\s*Foto movida para a posição 2 de 3\.\s*$/)).toBeAttached()
       expect(await siteOrder(page, slug)).toEqual([b, a, c])
     } finally {
       await deletePage(direcaoApi, pagina.id)

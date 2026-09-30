@@ -5,17 +5,17 @@ import { solidPng } from './fixtures'
 export type Destination = 'gallery' | 'cover'
 
 const DESTINATION_LABEL: Record<Destination, string> = {
-  gallery: 'Fim da galeria',
-  cover: 'Capa, no lugar da atual',
+  gallery: 'Na galeria de fotos, no fim desta página',
+  cover: 'Como a foto que representa esta página em outros lugares do site (no lugar da atual)',
 }
 
-/** A seção "Imagens desta página" da tela de edição. */
+/** A seção "Fotos desta página" da tela de edição. */
 export function pageImagesSection(page: Page) {
   return page.locator('section.page-images')
 }
 
 /**
- * "Adicionar foto" de "Imagens desta página": abre o diálogo, escolhe o arquivo, descreve,
+ * "Adicionar foto" de "Fotos desta página": abre o diálogo, escolhe o arquivo, descreve,
  * responde "Não" à declaração, escolhe o destino e envia. Espera o diálogo fechar.
  */
 export async function addPhotoFromSection(
@@ -38,6 +38,6 @@ export async function addPhotoFromSection(
 
   await dialog.getByRole('radio', { name: 'Não' }).check()
   await dialog.getByRole('radio', { name: DESTINATION_LABEL[photo.destination ?? 'gallery'] }).check()
-  await dialog.getByRole('button', { name: /^Enviar para a/ }).click()
+  await dialog.getByRole('button', { name: /^Enviar/ }).click()
   await expect(dialog).toBeHidden()
 }

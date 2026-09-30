@@ -84,10 +84,10 @@ const title = computed(() => {
   }
 
   if (props.editing) {
-    return 'Editar imagem'
+    return 'Descrição da foto no texto'
   }
 
-  return step.value === 'choose' ? 'Pôr uma foto no texto' : 'Descrever a imagem'
+  return step.value === 'choose' ? 'Pôr uma foto no texto' : 'Descrever a foto'
 })
 
 function uploadForPurpose(file: File, payload: MediaDetailsPayload): Promise<Media> {
@@ -157,8 +157,8 @@ async function load(page = 1): Promise<void> {
   } catch (error) {
     errorMessage.value =
       axios.isAxiosError(error) && error.response?.status === 403
-        ? 'Você não tem permissão para ver a biblioteca de imagens.'
-        : 'Não foi possível carregar as imagens. Tente novamente.'
+        ? 'Você não tem permissão para ver as fotos já enviadas.'
+        : 'Não foi possível carregar as fotos. Tente novamente.'
   } finally {
     isLoading.value = false
   }
@@ -298,12 +298,11 @@ watch(
           @submit.prevent="load(1)"
         >
           <div class="filter-bar__field">
-            <label :for="`${uid}-search`">Buscar na biblioteca</label>
+            <label :for="`${uid}-search`">Buscar pela descrição ou legenda</label>
             <input
               :id="`${uid}-search`"
               v-model="search"
               type="search"
-              placeholder="Texto alternativo ou legenda"
             >
           </div>
           <button
@@ -338,7 +337,7 @@ watch(
           v-else-if="items.length === 0"
           class="state-message"
         >
-          Nenhuma imagem encontrada.
+          Nenhuma foto encontrada.
         </p>
         <template v-else>
           <ul class="media-grid media-picker__grid">
@@ -386,7 +385,7 @@ watch(
       >
 
       <div class="field">
-        <label :for="`${uid}-alt`">Texto alternativo</label>
+        <label :for="`${uid}-alt`">Descrição da foto</label>
         <input
           :id="`${uid}-alt`"
           ref="altInput"
@@ -395,7 +394,10 @@ watch(
           maxlength="255"
           required
         >
-        <span class="field__hint">O que a imagem mostra, neste texto, para quem não pode vê-la.</span>
+        <span class="field__hint">
+          O que a foto mostra, para quem não pode vê-la. Vem preenchida com a descrição guardada em
+          Imagens; mudar aqui vale só para este texto.
+        </span>
       </div>
 
       <div class="field">
@@ -406,6 +408,7 @@ watch(
           type="text"
           maxlength="500"
         >
+        <span class="field__hint">Aparece escrita embaixo da foto, no site.</span>
       </div>
 
       <div class="media-picker__actions">
@@ -416,7 +419,7 @@ watch(
           @click="step = 'choose'"
         >
           <AppIcon :icon="ArrowLeft" />
-          Escolher outra
+          Escolher outra foto
         </button>
         <button
           type="submit"
@@ -424,7 +427,7 @@ watch(
           :disabled="alt.trim() === ''"
         >
           <AppIcon :icon="Check" />
-          {{ editing ? 'Aplicar' : 'Inserir no texto' }}
+          {{ editing ? 'Aplicar' : 'Pôr no texto' }}
         </button>
       </div>
     </form>

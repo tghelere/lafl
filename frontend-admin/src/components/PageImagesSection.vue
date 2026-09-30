@@ -42,8 +42,8 @@ async function load(): Promise<void> {
   } catch (error) {
     loadErrorMessage.value =
       axios.isAxiosError(error) && error.response?.status === 403
-        ? 'Você não tem permissão para mexer nas imagens desta página.'
-        : 'Não foi possível carregar as imagens desta página. Tente novamente.'
+        ? 'Você não tem permissão para mexer nas fotos desta página.'
+        : 'Não foi possível carregar as fotos desta página. Tente novamente.'
   } finally {
     isLoading.value = false
   }
@@ -85,14 +85,14 @@ async function chooseCover(media: Media): Promise<void> {
 
   try {
     await setPageCover(props.pageUuid, media.id)
-    onChanged('Capa trocada. O site já mostra a nova.')
+    onChanged('Foto trocada. O site já mostra a nova.')
   } catch (error) {
     const body = axios.isAxiosError(error) ? (error.response?.data as { errors?: Record<string, string[]> }) : null
     coverErrorMessage.value =
       body?.errors?.media?.[0] ??
       (axios.isAxiosError(error) && error.response?.status === 403
-        ? 'Você não tem permissão para trocar a capa desta página.'
-        : 'Não foi possível trocar a capa. Tente novamente.')
+        ? 'Você não tem permissão para trocar esta foto.'
+        : 'Não foi possível trocar a foto. Tente novamente.')
   }
 }
 
@@ -101,8 +101,8 @@ const addOpen = ref(false)
 function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
   onChanged(
     target === 'cover'
-      ? 'Imagem enviada e posta na capa. Ela já aparece no site.'
-      : 'Imagem enviada e posta no fim da galeria. Ela já aparece no site.',
+      ? 'Foto enviada e posta para representar a página. O site já mostra a nova.'
+      : 'Foto enviada e posta no fim da galeria. Ela já aparece no site.',
   )
 }
 </script>
@@ -116,7 +116,7 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
       id="page-images-title"
       class="page-images__title"
     >
-      Imagens desta página
+      Fotos desta página
     </h2>
     <p class="field__hint">
       Cada mudança aqui vai para o site na hora, sem precisar salvar a página. As imagens são as
@@ -144,7 +144,7 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
         @click="pickerOpen = true"
       >
         <AppIcon :icon="Images" />
-        {{ images.cover ? 'Trocar a capa por imagem da biblioteca' : 'Escolher a capa na biblioteca' }}
+        {{ images.cover ? 'Trocar a foto que representa a página' : 'Escolher a foto que representa a página' }}
       </button>
     </div>
     <AddPageImageDialog
@@ -180,7 +180,7 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
       v-if="isLoading"
       class="field__hint"
     >
-      Carregando imagens…
+      Carregando fotos…
     </p>
     <p
       v-else-if="loadErrorMessage"
@@ -192,15 +192,15 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
 
     <template v-else-if="images">
       <h3 class="page-images__group">
-        Galeria
+        Galeria de fotos
       </h3>
       <p class="field__hint">
-        Aparece depois do texto, nesta ordem.
+        Aparecem no fim desta página, depois do texto, nesta ordem.
       </p>
       <ul
         v-if="images.gallery.length > 0"
         class="page-images__list"
-        aria-label="Galeria"
+        aria-label="Galeria de fotos"
       >
         <PageImageItem
           v-for="(media, index) in images.gallery"
@@ -218,27 +218,26 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
         v-else
         class="page-images__empty"
       >
-        A galeria está vazia.
+        Nenhuma foto na galeria ainda.
       </p>
 
       <h3 class="page-images__group">
-        Capa
+        Foto que representa esta página em outros lugares do site
       </h3>
-      <p class="field__hint">
-        Não aparece nesta página: representa a página em outros lugares do site.
-      </p>
+      <!-- O lugar vem pronto da API (App\Support\Content\CoverPlacements). -->
       <p
         v-if="images.cover_shown_on.length > 0"
         class="page-images__shown-on"
       >
-        A capa desta página aparece {{ images.cover_shown_on.join(' e ') }}. Trocar ou tirar a
-        capa muda isso na hora.
+        Onde ela aparece: {{ images.cover_shown_on.join(' e ') }}. Nesta própria página ela não
+        aparece. Trocar ou tirar a foto muda isso na hora.
       </p>
       <p
         v-else
         class="field__hint"
       >
-        Hoje nenhum lugar do site mostra a capa desta página.
+        Hoje nenhum lugar do site mostra esta foto — nem esta própria página. Ela fica guardada
+        para quando algum lugar passar a mostrar.
       </p>
       <p
         v-if="coverErrorMessage"
@@ -250,7 +249,7 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
       <ul
         v-if="images.cover"
         class="page-images__list"
-        aria-label="Capa"
+        aria-label="Foto que representa esta página"
       >
         <PageImageItem
           :media="images.cover"
@@ -263,16 +262,20 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
         v-else
         class="page-images__empty"
       >
-        Esta página não tem capa.
+        Nenhuma foto escolhida.
       </p>
 
       <template v-if="images.content.length > 0">
         <h3 class="page-images__group">
-          No meio do texto
+          Fotos dentro do texto — para mover, use o editor acima
         </h3>
+        <p class="field__hint">
+          No editor, arraste a foto para outro ponto do texto, ou clique nela e apague para tirar.
+          Mudanças no texto só vão para o site quando você clicar em Salvar.
+        </p>
         <ul
           class="page-images__list"
-          aria-label="No meio do texto"
+          aria-label="Fotos dentro do texto"
         >
           <PageImageItem
             v-for="media in images.content"
