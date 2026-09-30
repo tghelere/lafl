@@ -516,6 +516,17 @@ uma camada de cache de HTML por cima.
       das quatro: quebra link já divulgado e mexe na lista de prerender do Nuxt.
 - [ ] `posts` segue sem entidade e sem tela (ver "Backend — entidades da Fase 1 restantes").
       Mídia tem tela desde a sessão 27 (`/admin/imagens`).
+- [x] **Enviar foto sem sair da página** — sessão 32. O seletor do editor e o da capa ganharam
+      "Enviar do computador" (aba padrão, com arrastar e soltar); soltar a foto no corpo do
+      texto abre o envio e a insere onde caiu; "Fotos desta página" começa por "Adicionar
+      foto", em diálogo; vocabulário revisto para quem nunca usou CMS; a tela diz o que salva
+      na hora (fotos) e o que exige Salvar (texto). Ver
+      `docs/decisoes/0027-enviar-fotos-sem-sair-da-pagina.md` e `docs/relatorio-sessao-32.md`.
+- [ ] Colar foto do computador (Ctrl+V) no texto ainda não envia — mesmo caminho da soltura,
+      pelo `handlePaste` do editor (ADR 0027, consequências).
+- [ ] Conferência manual de soltar foto de uma pasta do sistema no editor, em Firefox e Chrome
+      — o e2e despacha o `drop` à mão, porque o Playwright não arrasta arquivo de fora do
+      navegador.
 - [x] Tela de gestão de usuários — feita (`UserListView.vue`/`UserFormView.vue`), junto das
       telas de conta (`/definir-senha`, `/conta`).
 - [x] Telas de listagem e detalhe dos cinco formulários recebidos — feitas
