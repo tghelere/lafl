@@ -1,4 +1,4 @@
-import { type Page, expect } from '@playwright/test'
+import { type Locator, type Page, expect } from '@playwright/test'
 
 /**
  * A área editável do RichTextEditor, pelo seu nome acessível.
@@ -40,6 +40,36 @@ export async function pasteHtmlIntoEditor(page: Page, html: string): Promise<voi
     transfer.setData('text/html', payload)
     element.dispatchEvent(new ClipboardEvent('paste', { clipboardData: transfer, bubbles: true, cancelable: true }))
   }, html)
+}
+
+/**
+ * Solta um arquivo sobre `alvo`, na borda esquerda da sua primeira linha, como quem arrasta
+ * uma foto da pasta do computador para o texto.
+ *
+ * O arrasto é despachado à mão, como a colagem acima: o Playwright não arrasta arquivo de fora
+ * do navegador. O caminho no editor é o mesmo — o ProseMirror recebe `dragover` e `drop` com
+ * um DataTransfer que traz o arquivo e as coordenadas de onde ele caiu.
+ */
+export async function dropFileOnto(target: Locator, file: { name: string; mimeType: string; buffer: Buffer }): Promise<void> {
+  const box = await target.boundingBox()
+
+  if (!box) {
+    throw new Error('o alvo do arrasto não está visível')
+  }
+
+  await target.page().evaluate(
+    ({ name, mimeType, base64, x, y }) => {
+      const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
+      const transfer = new DataTransfer()
+      transfer.items.add(new File([bytes], name, { type: mimeType }))
+      const element = document.elementFromPoint(x, y)!
+
+      for (const type of ['dragenter', 'dragover', 'drop']) {
+        element.dispatchEvent(new DragEvent(type, { dataTransfer: transfer, clientX: x, clientY: y, bubbles: true, cancelable: true }))
+      }
+    },
+    { name: file.name, mimeType: file.mimeType, base64: file.buffer.toString('base64'), x: box.x + 1, y: box.y + Math.min(8, box.height / 2) },
+  )
 }
 
 export async function saveContentPage(page: Page): Promise<void> {

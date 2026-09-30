@@ -42,8 +42,10 @@ const props = withDefaults(
     purpose?: 'text' | 'cover'
     /** Obrigatório com `purpose="cover"`: o envio vai para a capa desta página. */
     pageUuid?: string
+    /** Foto solta no corpo do texto: o diálogo abre no envio, já com ela escolhida. */
+    initialFile?: File | null
   }>(),
-  { purpose: 'text', pageUuid: undefined },
+  { purpose: 'text', pageUuid: undefined, initialFile: null },
 )
 
 const emit = defineEmits<{
@@ -278,6 +280,7 @@ watch(
         <ImageUploadForm
           :key="uploadKey"
           :upload="uploadForPurpose"
+          :initial-file="initialFile"
           :submit-label="purpose === 'cover' ? 'Enviar e usar nesta página' : 'Enviar e pôr no texto'"
           @uploaded="handleUploaded"
         />

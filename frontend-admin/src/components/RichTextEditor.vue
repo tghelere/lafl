@@ -57,6 +57,19 @@ const editor = useEditor({
     MediaFigure,
   ],
   editorProps: {
+    handleDrop: (view, event, _slice, moved) => {
+      // `moved`: arrasto interno (uma figura mudando de lugar), que o ProseMirror já resolve.
+      const file = moved ? null : (event.dataTransfer?.files?.[0] ?? null)
+
+      if (!file) {
+        return false
+      }
+
+      event.preventDefault()
+      openUploadForDrop(file, view.posAtCoords({ left: event.clientX, top: event.clientY })?.pos ?? null)
+
+      return true
+    },
     attributes: {
       class: 'rich-text__surface',
       ...(props.ariaLabel ? { 'aria-label': props.ariaLabel } : {}),
@@ -85,6 +98,25 @@ onBeforeUnmount(() => {
 
 const pickerOpen = ref(false)
 const editingFigure = ref<MediaFigureAttrs | null>(null)
+/** A foto solta no corpo do texto, e onde ela foi solta. `null` = o diálogo abriu pelo botão. */
+const droppedFile = ref<File | null>(null)
+const dropPosition = ref<number | null>(null)
+
+/**
+ * Arrastar uma foto do computador e soltar no corpo do texto: abre o mesmo diálogo de envio do
+ * botão "Imagem", já com a foto escolhida — a mesma validação e a mesma declaração obrigatória,
+ * porque o envio é o mesmo. A foto entra onde foi solta (onde o cursor de arrasto aparece), e
+ * não onde estava o cursor de digitação.
+ *
+ * Um arquivo por vez: de vários soltos juntos, só o primeiro é usado. Um arquivo que não é
+ * foto também abre o diálogo, com a explicação, em vez de sumir em silêncio.
+ */
+function openUploadForDrop(file: File, position: number | null): void {
+  editingFigure.value = null
+  droppedFile.value = file
+  dropPosition.value = position
+  pickerOpen.value = true
+}
 
 /**
  * Com uma figura selecionada, o botão edita o alternativo e a legenda dela; sem, insere uma
@@ -98,6 +130,8 @@ function openImagePicker(): void {
   editingFigure.value = editor.value.isActive('mediaFigure')
     ? (editor.value.getAttributes('mediaFigure') as MediaFigureAttrs)
     : null
+  droppedFile.value = null
+  dropPosition.value = null
   pickerOpen.value = true
 }
 
@@ -108,9 +142,17 @@ function applyImage(attrs: MediaFigureAttrs): void {
 
   if (editingFigure.value) {
     editor.value.chain().focus().updateAttributes('mediaFigure', { alt: attrs.alt, caption: attrs.caption }).run()
+  } else if (dropPosition.value !== null) {
+    editor.value.chain().focus().insertContentAt(dropPosition.value, { type: 'mediaFigure', attrs }).run()
   } else {
     editor.value.chain().focus().insertContent({ type: 'mediaFigure', attrs }).run()
   }
+}
+
+function closePicker(): void {
+  pickerOpen.value = false
+  droppedFile.value = null
+  dropPosition.value = null
 }
 
 function toggleLink(): void {
@@ -253,8 +295,9 @@ function toggleLink(): void {
     <MediaPickerDialog
       :open="pickerOpen"
       :editing="editingFigure"
+      :initial-file="droppedFile"
       @confirm="applyImage"
-      @close="pickerOpen = false"
+      @close="closePicker"
     />
   </div>
 </template>
