@@ -87,7 +87,8 @@ test.describe('comunicacao', () => {
       await page.getByRole('toolbar', { name: 'Formatação do conteúdo' }).getByRole('button', { name: 'Imagem', exact: true }).click()
 
       const seletor = page.locator('dialog.media-picker[open]')
-      await expect(seletor.getByRole('heading', { name: 'Inserir imagem' })).toBeVisible()
+      await expect(seletor.getByRole('heading', { name: 'Pôr uma foto no texto' })).toBeVisible()
+      await seletor.getByRole('tab', { name: 'Escolher entre as já enviadas' }).click()
       await seletor.getByLabel('Buscar na biblioteca').fill(alt)
       await seletor.getByRole('button', { name: 'Buscar' }).click()
       await seletor.getByRole('button', { name: alt }).click()

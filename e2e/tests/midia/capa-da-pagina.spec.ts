@@ -70,7 +70,8 @@ test.describe('comunicacao', () => {
 
       await secao.getByRole('button', { name: 'Trocar a capa por imagem da biblioteca' }).click()
       const seletor = page.locator('dialog.media-picker[open]')
-      await expect(seletor.getByRole('heading', { name: 'Escolher a capa' })).toBeVisible()
+      await expect(seletor.getByRole('heading', { name: 'Foto que representa esta página' })).toBeVisible()
+      await seletor.getByRole('tab', { name: 'Escolher entre as já enviadas' }).click()
       await seletor.getByLabel('Buscar na biblioteca').fill(altBiblioteca)
       await seletor.getByRole('button', { name: 'Buscar' }).click()
       await seletor.getByRole('button', { name: altBiblioteca }).click()

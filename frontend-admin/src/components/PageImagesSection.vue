@@ -314,7 +314,9 @@ async function upload(): Promise<void> {
         :open="pickerOpen"
         :editing="null"
         purpose="cover"
+        :page-uuid="pageUuid"
         @pick="chooseCover"
+        @uploaded="onChanged('Foto enviada e posta no lugar da anterior. O site já mostra a nova.')"
         @close="pickerOpen = false"
       />
 

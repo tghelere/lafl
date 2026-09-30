@@ -1750,3 +1750,110 @@ body.has-open-drawer {
   color: var(--color-text);
   font-weight: var(--weight-semibold);
 }
+
+/* Abas do seletor de imagem (MediaPickerDialog.vue): enviar do computador ou escolher entre as
+   já enviadas. Mesmo desenho das abas da Auditoria, mas é `tablist` de verdade — painéis no
+   mesmo diálogo, não rotas. */
+.media-picker__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.media-picker__tab {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4);
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.media-picker__tab:hover {
+  color: var(--color-text);
+}
+
+.media-picker__tab--active {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
+/* Envio de foto dentro dos diálogos (ImageUploadForm.vue). A área de soltar é o <label> do
+   campo de arquivo, grande o bastante para ser alvo fácil de arrastar e de tocar. */
+.image-upload__drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-6) var(--space-4);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.image-upload__drop:hover,
+.image-upload__drop--active {
+  border-color: var(--color-accent);
+}
+
+/* O campo de arquivo é visualmente escondido; o foco dele aparece na área inteira. */
+.image-upload__drop:has(+ input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.image-upload__drop-icon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-accent);
+}
+
+.image-upload__drop-title {
+  font-weight: var(--weight-semibold);
+  color: var(--color-heading);
+}
+
+.image-upload__drop-text {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.image-upload__chosen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.image-upload__preview {
+  display: block;
+  max-width: 100%;
+  max-height: 14rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  object-fit: contain;
+}
+
+/* O campo de arquivo escondido fica ancorado no formulário. Solto, a altura de controle que a
+   regra geral de <input> impõe o empurrava para baixo do diálogo e criava rolagem à toa. */
+.image-upload {
+  position: relative;
+}
+
+.image-upload input[type='file'].visually-hidden {
+  top: 0;
+  left: 0;
+  height: 1px;
+  min-height: 0;
+}

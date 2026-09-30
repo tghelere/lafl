@@ -1,21 +1,30 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ArrowLeft, Check, ExternalLink, Search, X } from 'lucide-vue-next'
+import { ArrowLeft, Check, Search, X } from 'lucide-vue-next'
 import { computed, nextTick, ref, useId, watch } from 'vue'
-import { useRouter } from 'vue-router'
 
 import AppIcon from '@/components/AppIcon.vue'
 import type { MediaFigureAttrs } from '@/components/editor/mediaFigure'
+import ImageUploadForm from '@/components/ImageUploadForm.vue'
 import PaginationControls from '@/components/PaginationControls.vue'
-import { fetchMediaList, mediaPreviewUrl } from '@/services/media'
+import { fetchMediaList, type MediaDetailsPayload, mediaPreviewUrl, uploadMedia } from '@/services/media'
+import { uploadImageToPage } from '@/services/pageImages'
 import type { Media } from '@/types/media'
 
 /**
- * Escolher uma imagem da biblioteca para o texto, e dar a ela texto alternativo e legenda.
+ * Pôr uma foto no texto: enviada do computador ali mesmo, ou escolhida entre as que já estão na
+ * biblioteca (e então descrita para este texto). As duas abas existem para quem tem a foto no
+ * computador não precisar sair da página que está editando — o caminho antigo era abrir a
+ * biblioteca numa aba nova, enviar, voltar e buscar.
+ *
+ * Enviar começa selecionado: é o caso de quem chega aqui pela primeira vez com uma foto nova.
+ * O envio vai para a biblioteca e a foto entra no texto com a descrição digitada no envio; a
+ * página em si só muda no site quando alguém clica em Salvar.
  *
  * `purpose="cover"`: escolher a capa de uma página ("Imagens desta página"). Não tem o passo
  * de descrever, porque a capa usa o texto alternativo e a legenda da própria biblioteca (ADR
- * 0025). Clicar na imagem já é a escolha, e o diálogo emite `pick`.
+ * 0025). Clicar na imagem já é a escolha, e o diálogo emite `pick`; enviar do computador põe a
+ * foto direto na capa (`uploaded`), pela mesma rota de "Imagens desta página".
  *
  * `<dialog>` nativo com `showModal()`: o navegador já prende o foco dentro, torna o resto da
  * página inerte, fecha no Esc e devolve o foco a quem abriu — nada disso reimplementado aqui.
@@ -31,17 +40,20 @@ const props = withDefaults(
     open: boolean
     editing: MediaFigureAttrs | null
     purpose?: 'text' | 'cover'
+    /** Obrigatório com `purpose="cover"`: o envio vai para a capa desta página. */
+    pageUuid?: string
   }>(),
-  { purpose: 'text' },
+  { purpose: 'text', pageUuid: undefined },
 )
 
 const emit = defineEmits<{
   close: []
   confirm: [attrs: MediaFigureAttrs]
   pick: [media: Media]
+  /** Só na capa: a foto foi enviada e já está na capa. */
+  uploaded: [media: Media]
 }>()
 
-const router = useRouter()
 // Um prefixo por instância: a tela de edição de página tem dois seletores (o do editor e o da
 // capa), e `id` repetido faz o `<label for>` de um apontar para o campo do outro.
 const uid = useId()
@@ -49,6 +61,10 @@ const dialog = ref<HTMLDialogElement | null>(null)
 const altInput = ref<HTMLInputElement | null>(null)
 
 const step = ref<'choose' | 'describe'>('choose')
+const source = ref<'upload' | 'library'>('upload')
+// Muda a cada abertura: o formulário de envio renasce vazio, sem a foto da vez anterior.
+const uploadKey = ref(0)
+const libraryLoaded = ref(false)
 const items = ref<Media[]>([])
 const search = ref('')
 const currentPage = ref(1)
@@ -60,7 +76,71 @@ const chosen = ref<{ uuid: string; preview: string } | null>(null)
 const alt = ref('')
 const caption = ref('')
 
-const uploadHref = computed(() => router.resolve({ name: 'media.create' }).href)
+const title = computed(() => {
+  if (props.purpose === 'cover') {
+    return 'Foto que representa esta página'
+  }
+
+  if (props.editing) {
+    return 'Editar imagem'
+  }
+
+  return step.value === 'choose' ? 'Pôr uma foto no texto' : 'Descrever a imagem'
+})
+
+function uploadForPurpose(file: File, payload: MediaDetailsPayload): Promise<Media> {
+  if (props.purpose === 'cover' && props.pageUuid) {
+    return uploadImageToPage(props.pageUuid, file, payload, 'cover')
+  }
+
+  return uploadMedia(file, payload)
+}
+
+function handleUploaded(media: Media, details: { alt: string; caption: string }): void {
+  if (props.purpose === 'cover') {
+    emit('uploaded', media)
+  } else {
+    emit('confirm', { uuid: media.id, alt: details.alt, caption: details.caption })
+  }
+
+  dialog.value?.close()
+}
+
+/**
+ * Uma foto solta fora da área de envio, mas dentro do diálogo, seria aberta pelo navegador no
+ * lugar do painel — e o texto que a pessoa estava escrevendo iria junto. Só arquivos: arrastar
+ * texto para um campo continua funcionando.
+ */
+function ignoreStrayFileDrop(event: DragEvent): void {
+  if (event.dataTransfer?.types.includes('Files')) {
+    event.preventDefault()
+  }
+}
+
+const tabs = [
+  { key: 'upload', label: 'Enviar do computador' },
+  { key: 'library', label: 'Escolher entre as já enviadas' },
+] as const
+
+function selectSource(key: 'upload' | 'library'): void {
+  source.value = key
+
+  if (key === 'library' && !libraryLoaded.value) {
+    void load()
+  }
+}
+
+/** Setas trocam de aba, como em qualquer lista de abas (padrão `tablist` do ARIA). */
+function onTabKeydown(event: KeyboardEvent): void {
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+    return
+  }
+
+  event.preventDefault()
+  const next = source.value === 'upload' ? 'library' : 'upload'
+  selectSource(next)
+  void nextTick(() => document.getElementById(`${uid}-tab-${next}`)?.focus())
+}
 
 async function load(page = 1): Promise<void> {
   isLoading.value = true
@@ -69,6 +149,7 @@ async function load(page = 1): Promise<void> {
   try {
     const response = await fetchMediaList({ search: search.value || undefined, page, per_page: 12, publishable: true })
     items.value = response.data
+    libraryLoaded.value = true
     currentPage.value = response.meta.current_page
     lastPage.value = response.meta.last_page
   } catch (error) {
@@ -122,8 +203,11 @@ watch(
     } else {
       chosen.value = null
       search.value = ''
+      items.value = []
+      libraryLoaded.value = false
       step.value = 'choose'
-      void load()
+      source.value = 'upload'
+      uploadKey.value++
     }
 
     dialog.value?.showModal()
@@ -141,13 +225,15 @@ watch(
     class="media-picker"
     :aria-labelledby="`${uid}-title`"
     @close="emit('close')"
+    @dragover="ignoreStrayFileDrop"
+    @drop="ignoreStrayFileDrop"
   >
     <header class="media-picker__header">
       <h2
         :id="`${uid}-title`"
         class="media-picker__title"
       >
-        {{ purpose === 'cover' ? 'Escolher a capa' : editing ? 'Editar imagem' : step === 'choose' ? 'Inserir imagem' : 'Descrever a imagem' }}
+        {{ title }}
       </h2>
       <button
         type="button"
@@ -160,96 +246,128 @@ watch(
     </header>
 
     <template v-if="step === 'choose'">
-      <form
-        class="filter-bar"
-        role="search"
-        @submit.prevent="load(1)"
+      <div
+        class="media-picker__tabs"
+        role="tablist"
+        aria-label="De onde vem a foto"
       >
-        <div class="filter-bar__field">
-          <label :for="`${uid}-search`">Buscar na biblioteca</label>
-          <input
-            :id="`${uid}-search`"
-            v-model="search"
-            type="search"
-            placeholder="Texto alternativo ou legenda"
-          >
-        </div>
         <button
-          type="submit"
-          class="btn btn--primary"
+          v-for="tab in tabs"
+          :id="`${uid}-tab-${tab.key}`"
+          :key="tab.key"
+          type="button"
+          role="tab"
+          class="media-picker__tab"
+          :class="{ 'media-picker__tab--active': source === tab.key }"
+          :aria-selected="source === tab.key"
+          :aria-controls="`${uid}-panel-${tab.key}`"
+          :tabindex="source === tab.key ? 0 : -1"
+          @click="selectSource(tab.key)"
+          @keydown="onTabKeydown"
         >
-          <AppIcon :icon="Search" />
-          Buscar
+          {{ tab.label }}
         </button>
-      </form>
+      </div>
 
-      <p
-        v-if="purpose === 'cover'"
-        class="field__hint"
+      <div
+        v-if="source === 'upload'"
+        :id="`${uid}-panel-upload`"
+        role="tabpanel"
+        :aria-labelledby="`${uid}-tab-upload`"
       >
-        Só aparecem as imagens que podem ir para o site. Para uma foto nova, feche e use
-        “Enviar imagem”, escolhendo a capa como destino.
-      </p>
-      <p
-        v-else
-        class="field__hint"
-      >
-        Não achou? <a
-          :href="uploadHref"
-          target="_blank"
-          rel="noopener"
-        >Envie a imagem numa aba nova <AppIcon :icon="ExternalLink" /></a> e busque de novo — o
-        texto que você está editando fica aqui.
-      </p>
-
-      <p
-        v-if="isLoading"
-        class="state-message"
-      >
-        Carregando…
-      </p>
-      <p
-        v-else-if="errorMessage"
-        class="state-message state-message--error"
-      >
-        {{ errorMessage }}
-      </p>
-      <p
-        v-else-if="items.length === 0"
-        class="state-message"
-      >
-        Nenhuma imagem encontrada.
-      </p>
-      <template v-else>
-        <ul class="media-grid media-picker__grid">
-          <li
-            v-for="item in items"
-            :key="item.id"
-            class="media-tile"
-          >
-            <button
-              type="button"
-              class="media-tile__link media-picker__choice"
-              @click="choose(item)"
-            >
-              <span class="media-tile__frame">
-                <img
-                  :src="item.preview_url"
-                  alt=""
-                  loading="lazy"
-                  class="media-tile__image"
-                >
-              </span>
-              <span class="media-tile__alt">{{ item.alt }}</span>
-            </button>
-          </li>
-        </ul>
-        <PaginationControls
-          :current-page="currentPage"
-          :last-page="lastPage"
-          @change="load"
+        <ImageUploadForm
+          :key="uploadKey"
+          :upload="uploadForPurpose"
+          :submit-label="purpose === 'cover' ? 'Enviar e usar nesta página' : 'Enviar e pôr no texto'"
+          @uploaded="handleUploaded"
         />
-      </template>
+      </div>
+
+      <div
+        v-else
+        :id="`${uid}-panel-library`"
+        role="tabpanel"
+        :aria-labelledby="`${uid}-tab-library`"
+      >
+        <form
+          class="filter-bar"
+          role="search"
+          @submit.prevent="load(1)"
+        >
+          <div class="filter-bar__field">
+            <label :for="`${uid}-search`">Buscar na biblioteca</label>
+            <input
+              :id="`${uid}-search`"
+              v-model="search"
+              type="search"
+              placeholder="Texto alternativo ou legenda"
+            >
+          </div>
+          <button
+            type="submit"
+            class="btn btn--primary"
+          >
+            <AppIcon :icon="Search" />
+            Buscar
+          </button>
+        </form>
+
+        <p
+          v-if="purpose === 'cover'"
+          class="field__hint"
+        >
+          Só aparecem as fotos que podem ir para o site. Clique na foto para usá-la.
+        </p>
+
+        <p
+          v-if="isLoading"
+          class="state-message"
+        >
+          Carregando…
+        </p>
+        <p
+          v-else-if="errorMessage"
+          class="state-message state-message--error"
+        >
+          {{ errorMessage }}
+        </p>
+        <p
+          v-else-if="items.length === 0"
+          class="state-message"
+        >
+          Nenhuma imagem encontrada.
+        </p>
+        <template v-else>
+          <ul class="media-grid media-picker__grid">
+            <li
+              v-for="item in items"
+              :key="item.id"
+              class="media-tile"
+            >
+              <button
+                type="button"
+                class="media-tile__link media-picker__choice"
+                @click="choose(item)"
+              >
+                <span class="media-tile__frame">
+                  <img
+                    :src="item.preview_url"
+                    alt=""
+                    loading="lazy"
+                    class="media-tile__image"
+                  >
+                </span>
+                <span class="media-tile__alt">{{ item.alt }}</span>
+              </button>
+            </li>
+          </ul>
+          <PaginationControls
+            :current-page="currentPage"
+            :last-page="lastPage"
+            @change="load"
+          />
+        </template>
+      </div>
     </template>
 
     <form
