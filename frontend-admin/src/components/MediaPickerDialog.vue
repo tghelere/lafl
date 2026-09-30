@@ -284,6 +284,13 @@ watch(
           :submit-label="purpose === 'cover' ? 'Enviar e usar nesta página' : 'Enviar e pôr no texto'"
           @uploaded="handleUploaded"
         />
+        <p
+          v-if="purpose === 'text'"
+          class="field__hint"
+        >
+          A foto fica guardada assim que é enviada. Na página do site, ela aparece quando você
+          clicar em Salvar.
+        </p>
       </div>
 
       <div

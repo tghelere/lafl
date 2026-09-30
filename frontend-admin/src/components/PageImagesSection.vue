@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ImagePlus, Images } from 'lucide-vue-next'
+import { ImagePlus, Images, Zap } from 'lucide-vue-next'
 import { nextTick, ref, watch } from 'vue'
 
 import AddPageImageDialog from '@/components/AddPageImageDialog.vue'
@@ -27,6 +27,8 @@ const props = defineProps<{
   pageUuid: string
   /** Muda quando a página é salva: as imagens do texto são as do conteúdo SALVO. */
   refreshKey: string | null
+  /** O texto acima tem alteração não salva — inclusive foto posta no texto e ainda não salva. */
+  textDirty?: boolean
 }>()
 
 const images = ref<PageImages | null>(null)
@@ -118,11 +120,17 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
     >
       Fotos desta página
     </h2>
+    <p class="save-mode save-mode--instant">
+      <AppIcon :icon="Zap" />
+      <span>
+        <strong>Aqui tudo vai para o site na hora</strong> — não precisa clicar em Salvar. A
+        exceção são as fotos dentro do texto, que vão junto com o texto.
+      </span>
+    </p>
     <p class="field__hint">
-      Cada mudança aqui vai para o site na hora, sem precisar salvar a página. As imagens são as
-      mesmas do acervo completo:
+      Todas as fotos enviadas, desta e das outras páginas, ficam guardadas no item do menu
       <RouterLink :to="{ name: 'media.index' }">
-        biblioteca de imagens
+        Imagens
       </RouterLink>
     </p>
 
@@ -265,7 +273,7 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
         Nenhuma foto escolhida.
       </p>
 
-      <template v-if="images.content.length > 0">
+      <template v-if="images.content.length > 0 || textDirty">
         <h3 class="page-images__group">
           Fotos dentro do texto — para mover, use o editor acima
         </h3>
@@ -273,7 +281,15 @@ function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
           No editor, arraste a foto para outro ponto do texto, ou clique nela e apague para tirar.
           Mudanças no texto só vão para o site quando você clicar em Salvar.
         </p>
+        <p
+          v-if="textDirty"
+          class="page-images__pending"
+        >
+          O texto tem alterações não salvas. Esta lista mostra as fotos do texto salvo: uma foto
+          posta agora aparece aqui depois do Salvar.
+        </p>
         <ul
+          v-if="images.content.length > 0"
           class="page-images__list"
           aria-label="Fotos dentro do texto"
         >

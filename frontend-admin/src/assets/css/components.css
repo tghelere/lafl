@@ -1855,3 +1855,36 @@ body.has-open-drawer {
   height: 1px;
   min-height: 0;
 }
+
+/* O que cada parte da tela de edição de página precisa para ir ao site (sessão 32): o texto
+   só com Salvar (ContentPageFormView.vue), as fotos na hora (PageImagesSection.vue). Mesma
+   forma nas duas, para a diferença ser lida pelo contraste do conteúdo, não por um enfeite. */
+.save-mode {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+}
+
+.save-mode .icon {
+  margin-top: 1px;
+}
+
+.save-mode--pending {
+  border-left-color: var(--color-accent);
+}
+
+.save-mode--pending .icon,
+.save-mode--instant .icon {
+  color: var(--color-accent);
+}
+
+.page-images__pending {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-heading);
+}

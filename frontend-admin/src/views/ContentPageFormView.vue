@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ExternalLink, Save } from 'lucide-vue-next'
+import { CircleAlert, ExternalLink, Save } from 'lucide-vue-next'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
@@ -276,6 +276,22 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
         class="card"
         @submit.prevent="handleSubmit"
       >
+        <!-- O que esta parte da tela precisa para ir ao site. As fotos, abaixo, dizem o
+             contrário — e é a diferença que a pessoa precisa enxergar (sessão 32). -->
+        <p
+          class="save-mode"
+          :class="{ 'save-mode--pending': isDirty }"
+        >
+          <AppIcon :icon="isDirty ? CircleAlert : Save" />
+          <span v-if="isDirty">
+            <strong>Há alterações no texto ainda não salvas.</strong> Elas só vão para o site
+            quando você clicar em Salvar, no fim do formulário.
+          </span>
+          <span v-else>
+            O título, o texto e a busca no Google só vão para o site quando você clica em Salvar.
+          </span>
+        </p>
+
         <div class="field">
           <label for="page-title">Título</label>
           <input
@@ -381,6 +397,15 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
         </div>
 
         <div class="page-form__actions">
+          <!-- `role="status"`: quem usa leitor de tela ouve quando o texto passa a ter alteração
+               não salva e quando volta a estar salvo. -->
+          <span
+            class="page-form__status"
+            :class="{ 'page-form__status--pending': isDirty }"
+            role="status"
+          >
+            {{ isDirty ? 'Alterações não salvas' : 'Tudo salvo' }}
+          </span>
           <button
             type="submit"
             class="btn btn--primary"
@@ -396,6 +421,7 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
       <PageImagesSection
         :page-uuid="record.id"
         :refresh-key="record.updated_at"
+        :text-dirty="isDirty"
       />
     </template>
   </AppLayout>
@@ -478,8 +504,25 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
+.page-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
 .page-form__actions .btn {
   width: 100%;
+}
+
+.page-form__status {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.page-form__status--pending {
+  color: var(--color-heading);
+  font-weight: var(--weight-semibold);
 }
 
 @media (min-width: 48rem) {
@@ -491,8 +534,10 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload))
     border-top: none;
   }
 
+  /* Na tela larga o botão vem primeiro, alinhado ao formulário; o estado fica ao lado. */
   .page-form__actions .btn {
     width: auto;
+    order: -1;
   }
 }
 
