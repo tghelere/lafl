@@ -279,9 +279,11 @@ final class ImportContentPackage
     }
 
     /**
+     * Público para App\Actions\Media\ImportPageMediaPackage, que grava só as imagens.
+     *
      * @param  array<string, mixed>  $data
      */
-    private function writeMedia(array $data, ?Media $existing): void
+    public function writeMedia(array $data, ?Media $existing): void
     {
         $media = $existing ?? new Media;
 
@@ -309,9 +311,12 @@ final class ImportContentPackage
     }
 
     /**
+     * Público para App\Actions\Media\ImportPageMediaPackage: a mesma conferência vale para
+     * quem só lê as imagens do pacote.
+     *
      * @return array{0: list<array<string, mixed>>, 1: list<array<string, mixed>>, 2: list<array<string, mixed>>}
      */
-    private function readAndVerify(string $dir): array
+    public function readAndVerify(string $dir): array
     {
         $manifest = $this->readManifest($dir.'/'.ContentPackage::MANIFEST);
 

@@ -647,6 +647,37 @@ produção só com `--substituir` e sabendo que sobrescreve o que a instituiçã
 Para trazer o conteúdo de produção para homologação (por exemplo, para testar com texto real),
 o caminho é o inverso — exportar de produção, importar em homologação com `--substituir`.
 
+### 10.2 Só as fotos, para um ambiente cujo texto não pode mudar
+
+Quando as páginas do ambiente já existem e foram editadas lá (homologação em uso), o §10.1
+sobrescreveria o texto ou pularia a página inteira. `midia:importar` lê o mesmo pacote de
+`conteudo:exportar`, mas grava **só** a biblioteca de imagens (registro, original e derivadas) e
+a capa e a galeria de cada página. Página casa pelo **slug**; a imagem mantém o **uuid** da
+origem, que é como o texto cita a foto (`/midia/{uuid}`), então nenhuma referência de texto
+precisa de remapeamento e o texto não é gravado. Nunca sobrescreve: imagem que já existe e
+página que já tem capa ou galeria ficam como estão. Foto marcada como de assistido não está no
+pacote.
+
+```bash
+php8.5 artisan midia:importar /var/tmp/PACOTE --simular     # o que seria feito
+php8.5 artisan midia:importar /var/tmp/PACOTE               # grava (transação)
+php8.5 artisan midia:importar /var/tmp/PACOTE --verificar   # banco, disco (SHA-256) e vínculos
+```
+
+Do desenvolvimento local para o servidor, de ponta a ponta (exporta, rsync, backup de `media` e
+`page_images`, importa, confere, restaura o backup se a conferência falhar):
+
+```bash
+SITE_AUTH='homologacao:SENHA' backend/scripts/midia/levar-fotos.sh --ambiente staging \
+  --host 2.25.223.146 --api https://api.homologacao-laf.softhing.com.br \
+  --site https://homologacao-laf.softhing.com.br
+```
+
+O script usa **uma** conexão SSH (reaproveitada com `ControlMaster`, sem mexer em
+`~/.ssh/config`) e para na primeira falha de conexão, por causa do fail2ban. O host vai pelo
+IP porque é assim que ele está no `known_hosts`. O backup fica em
+`/var/tmp/laf-midia-backup-<carimbo>/` no servidor; apagar quando não for mais preciso.
+
 ## 11. Homologação não é indexável
 
 Em `staging`, **toda** resposta do site sai com `X-Robots-Tag: noindex, nofollow` e o
