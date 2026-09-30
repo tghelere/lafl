@@ -2,7 +2,8 @@ import { type Page, expect, test } from '@playwright/test'
 
 import { openContentPageByTitle, unique } from '../../support/admin'
 import { AdminApi } from '../../support/api'
-import { createPage, deletePage, solidPng } from '../../support/fixtures'
+import { createPage, deletePage } from '../../support/fixtures'
+import { addPhotoFromSection } from '../../support/pageImages'
 import { gotoSite } from '../../support/site'
 import { storageStatePath } from '../../support/users'
 
@@ -14,14 +15,7 @@ import { storageStatePath } from '../../support/users'
 
 async function sendToGallery(page: Page, alt: string, cor: [number, number, number]): Promise<void> {
   const secao = page.locator('section.page-images')
-  await secao.getByLabel('Arquivo (JPEG, PNG ou WebP, até 10 MB)', { exact: true }).setInputFiles({
-    name: 'foto.png',
-    mimeType: 'image/png',
-    buffer: solidPng(500, 300, cor),
-  })
-  await secao.getByLabel('Texto alternativo').fill(alt)
-  await secao.getByRole('radio', { name: 'Não' }).check()
-  await secao.getByRole('button', { name: 'Enviar para a galeria' }).click()
+  await addPhotoFromSection(page, { alt, color: cor, width: 500, height: 300 })
   await expect(secao.getByRole('list', { name: 'Galeria' })).toContainText(alt)
 }
 

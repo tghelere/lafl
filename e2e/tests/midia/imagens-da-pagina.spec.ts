@@ -3,6 +3,7 @@ import { type Locator, expect, test } from '@playwright/test'
 import { openContentPageByTitle, unique } from '../../support/admin'
 import { AdminApi } from '../../support/api'
 import { createPage, deletePage, solidPng } from '../../support/fixtures'
+import { addPhotoFromSection } from '../../support/pageImages'
 import { gotoSite } from '../../support/site'
 import { storageStatePath } from '../../support/users'
 
@@ -43,15 +44,9 @@ test.describe('comunicacao', () => {
       await expect(secao.getByText('A galeria está vazia.')).toBeVisible()
 
       // 1. Enviar para a galeria, pela própria página.
-      await secao.getByLabel('Arquivo (JPEG, PNG ou WebP, até 10 MB)', { exact: true }).setInputFiles({
-        name: 'foto.png',
-        mimeType: 'image/png',
-        buffer: solidPng(800, 500, [30, 140, 60]),
-      })
-      await secao.getByLabel('Texto alternativo').fill(alt)
-      await secao.getByLabel('Legenda (opcional)').fill('Setembro de 2026')
-      await secao.getByRole('radio', { name: 'Não' }).check()
-      await secao.getByRole('button', { name: 'Enviar para a galeria' }).click()
+      // A primeira coisa da seção é o botão de adicionar, antes das listas.
+      await expect(secao.getByRole('button').first()).toHaveText('Adicionar foto')
+      await addPhotoFromSection(page, { alt, caption: 'Setembro de 2026', color: [30, 140, 60] })
 
       await expect(secao.getByText(/Imagem enviada e posta no fim da galeria/)).toBeVisible()
       const galeria = secao.getByRole('list', { name: 'Galeria' })
@@ -125,10 +120,18 @@ test.describe('comunicacao', () => {
 
       try {
         await openContentPageByTitle(page, titulo)
-        const envio = page.getByRole('button', { name: 'Enviar para a galeria' })
+        const envio = page.getByRole('button', { name: 'Adicionar foto' })
         await envio.scrollIntoViewIfNeeded()
         expect((await envio.boundingBox())!.height).toBeGreaterThanOrEqual(44)
         await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+
+        // O diálogo de envio também cabe, e a área de escolher a foto é alvo fácil de tocar.
+        await envio.click()
+        const dialogo = page.getByRole('dialog', { name: 'Adicionar foto a esta página' })
+        const caixa = (await dialogo.boundingBox())!
+        expect(caixa.x).toBeGreaterThanOrEqual(0)
+        expect(caixa.x + caixa.width).toBeLessThanOrEqual(360)
+        expect((await dialogo.locator('.image-upload__drop').boundingBox())!.height).toBeGreaterThanOrEqual(44)
       } finally {
         await deletePage(direcaoApi, pagina.id)
         await direcaoApi.dispose()

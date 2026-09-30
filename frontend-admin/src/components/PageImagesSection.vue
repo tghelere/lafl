@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { ImagePlus, Images } from 'lucide-vue-next'
-import { nextTick, reactive, ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 
+import AddPageImageDialog from '@/components/AddPageImageDialog.vue'
 import AppIcon from '@/components/AppIcon.vue'
-import MediaDeclarationField from '@/components/MediaDeclarationField.vue'
 import MediaPickerDialog from '@/components/MediaPickerDialog.vue'
 import NoticeBanner from '@/components/NoticeBanner.vue'
 import PageImageItem from '@/components/PageImageItem.vue'
-import { fetchPageImages, setPageCover, uploadImageToPage } from '@/services/pageImages'
+import { fetchPageImages, setPageCover } from '@/services/pageImages'
 import type { Media, PageImages } from '@/types/media'
 
 /**
  * "Imagens desta página": a porta da página para a mesma biblioteca de /admin/imagens (ver
  * docs/decisoes/0025-imagens-da-pagina.md). Lista só o que ESTA página usa — capa, galeria e
  * as imagens do texto salvo — e deixa enviar, substituir e corrigir o texto no mesmo lugar.
+ *
+ * Começa pelas ações (adicionar foto, escolher a capa), não pelas listas: quem abre a seção
+ * quase sempre veio fazer uma dessas duas coisas. O envio abre em diálogo
+ * (AddPageImageDialog.vue).
  *
  * Fica fora do formulário da página, com salvamento próprio: cada ação aqui já está no ar
  * quando termina, e não depende do "Salvar" do texto.
@@ -25,24 +29,10 @@ const props = defineProps<{
   refreshKey: string | null
 }>()
 
-const MAX_FILE_BYTES = 10240 * 1024
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-
 const images = ref<PageImages | null>(null)
 const isLoading = ref(true)
 const loadErrorMessage = ref<string | null>(null)
 const notice = ref<string | null>(null)
-
-const file = ref<File | null>(null)
-const fileInput = ref<HTMLInputElement | null>(null)
-const alt = ref('')
-const caption = ref('')
-const credit = ref('')
-const depictsAssistedMinor = ref<boolean | null>(null)
-const target = ref<'gallery' | 'cover'>('gallery')
-const isUploading = ref(false)
-const uploadErrorMessage = ref<string | null>(null)
-const fieldErrors = reactive<Record<string, string[]>>({})
 
 async function load(): Promise<void> {
   loadErrorMessage.value = null
@@ -106,78 +96,14 @@ async function chooseCover(media: Media): Promise<void> {
   }
 }
 
-function clearUploadErrors(): void {
-  uploadErrorMessage.value = null
-  Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key])
-}
+const addOpen = ref(false)
 
-function handleFileChange(event: Event): void {
-  const input = event.target as HTMLInputElement
-  const selected = input.files?.[0] ?? null
-  delete fieldErrors.file
-
-  if (selected && (!ACCEPTED_TYPES.includes(selected.type) || selected.size > MAX_FILE_BYTES)) {
-    fieldErrors.file = [
-      selected.size > MAX_FILE_BYTES ? 'A imagem não pode passar de 10 MB.' : 'A imagem precisa ser JPEG, PNG ou WebP.',
-    ]
-    input.value = ''
-    file.value = null
-
-    return
-  }
-
-  file.value = selected
-}
-
-async function upload(): Promise<void> {
-  isUploading.value = true
-  notice.value = null
-  clearUploadErrors()
-
-  try {
-    await uploadImageToPage(
-      props.pageUuid,
-      file.value,
-      {
-        alt: alt.value,
-        caption: caption.value,
-        credit: credit.value,
-        depicts_assisted_minor: depictsAssistedMinor.value,
-      },
-      target.value,
-    )
-    const sentTo = target.value
-
-    file.value = null
-    alt.value = ''
-    caption.value = ''
-    credit.value = ''
-    depictsAssistedMinor.value = null
-    target.value = 'gallery'
-
-    if (fileInput.value) {
-      fileInput.value.value = ''
-    }
-
-    onChanged(
-      sentTo === 'cover'
-        ? 'Imagem enviada e posta na capa. Ela já aparece no site.'
-        : 'Imagem enviada e posta no fim da galeria. Ela já aparece no site.',
-    )
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 422) {
-      const body = error.response.data as { errors?: Record<string, string[]> }
-      Object.assign(fieldErrors, body.errors ?? {})
-      uploadErrorMessage.value = 'Corrija os campos indicados.'
-    } else {
-      uploadErrorMessage.value =
-        axios.isAxiosError(error) && error.response?.status === 403
-          ? 'Você não tem permissão para enviar imagens.'
-          : 'Não foi possível enviar. Tente novamente.'
-    }
-  } finally {
-    isUploading.value = false
-  }
+function onUploaded(_media: Media, target: 'gallery' | 'cover'): void {
+  onChanged(
+    target === 'cover'
+      ? 'Imagem enviada e posta na capa. Ela já aparece no site.'
+      : 'Imagem enviada e posta no fim da galeria. Ela já aparece no site.',
+  )
 }
 </script>
 
@@ -199,6 +125,43 @@ async function upload(): Promise<void> {
         biblioteca de imagens
       </RouterLink>
     </p>
+
+    <div
+      v-if="images"
+      class="page-images__actions"
+    >
+      <button
+        type="button"
+        class="btn btn--primary"
+        @click="addOpen = true"
+      >
+        <AppIcon :icon="ImagePlus" />
+        Adicionar foto
+      </button>
+      <button
+        type="button"
+        class="btn btn--secondary"
+        @click="pickerOpen = true"
+      >
+        <AppIcon :icon="Images" />
+        {{ images.cover ? 'Trocar a capa por imagem da biblioteca' : 'Escolher a capa na biblioteca' }}
+      </button>
+    </div>
+    <AddPageImageDialog
+      :open="addOpen"
+      :page-uuid="pageUuid"
+      @uploaded="onUploaded"
+      @close="addOpen = false"
+    />
+    <MediaPickerDialog
+      :open="pickerOpen"
+      :editing="null"
+      purpose="cover"
+      :page-uuid="pageUuid"
+      @pick="chooseCover"
+      @uploaded="onChanged('Foto enviada e posta no lugar da anterior. O site já mostra a nova.')"
+      @close="pickerOpen = false"
+    />
 
     <NoticeBanner
       v-if="notice"
@@ -302,23 +265,6 @@ async function upload(): Promise<void> {
       >
         Esta página não tem capa.
       </p>
-      <button
-        type="button"
-        class="btn btn--secondary page-images__choose-cover"
-        @click="pickerOpen = true"
-      >
-        <AppIcon :icon="Images" />
-        {{ images.cover ? 'Trocar a capa por imagem da biblioteca' : 'Escolher a capa na biblioteca' }}
-      </button>
-      <MediaPickerDialog
-        :open="pickerOpen"
-        :editing="null"
-        purpose="cover"
-        :page-uuid="pageUuid"
-        @pick="chooseCover"
-        @uploaded="onChanged('Foto enviada e posta no lugar da anterior. O site já mostra a nova.')"
-        @close="pickerOpen = false"
-      />
 
       <template v-if="images.content.length > 0">
         <h3 class="page-images__group">
@@ -338,120 +284,6 @@ async function upload(): Promise<void> {
           />
         </ul>
       </template>
-
-      <form
-        class="page-images__upload"
-        @submit.prevent="upload"
-      >
-        <h3 class="page-images__group">
-          Enviar imagem
-        </h3>
-
-        <p
-          v-if="uploadErrorMessage"
-          class="field__error"
-          role="alert"
-        >
-          {{ uploadErrorMessage }}
-        </p>
-
-        <div class="field">
-          <label for="page-image-upload-file">Arquivo (JPEG, PNG ou WebP, até 10 MB)</label>
-          <input
-            id="page-image-upload-file"
-            ref="fileInput"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            @change="handleFileChange"
-          >
-          <span
-            v-if="fieldErrors.file"
-            class="field__error"
-          >{{ fieldErrors.file[0] }}</span>
-        </div>
-
-        <div class="field">
-          <label for="page-image-upload-alt">Texto alternativo</label>
-          <input
-            id="page-image-upload-alt"
-            v-model="alt"
-            type="text"
-            maxlength="255"
-          >
-          <span class="field__hint">Descreva a imagem para quem não pode vê-la.</span>
-          <span
-            v-if="fieldErrors.alt"
-            class="field__error"
-          >{{ fieldErrors.alt[0] }}</span>
-        </div>
-
-        <div class="field">
-          <label for="page-image-upload-caption">Legenda (opcional)</label>
-          <input
-            id="page-image-upload-caption"
-            v-model="caption"
-            type="text"
-            maxlength="500"
-          >
-          <span
-            v-if="fieldErrors.caption"
-            class="field__error"
-          >{{ fieldErrors.caption[0] }}</span>
-        </div>
-
-        <div class="field">
-          <label for="page-image-upload-credit">Crédito (opcional)</label>
-          <input
-            id="page-image-upload-credit"
-            v-model="credit"
-            type="text"
-            maxlength="255"
-          >
-          <span class="field__hint">Quem fotografou ou de onde veio a imagem. Aparece com a foto ampliada no site.</span>
-          <span
-            v-if="fieldErrors.credit"
-            class="field__error"
-          >{{ fieldErrors.credit[0] }}</span>
-        </div>
-
-        <MediaDeclarationField
-          v-model="depictsAssistedMinor"
-          :error="fieldErrors.depicts_assisted_minor?.[0]"
-        />
-
-        <fieldset class="field media-declaration">
-          <legend class="field__legend">
-            Para onde vai
-          </legend>
-          <label class="media-declaration__option">
-            <input
-              v-model="target"
-              type="radio"
-              name="page-image-target"
-              value="gallery"
-            >
-            Fim da galeria
-          </label>
-          <label class="media-declaration__option">
-            <input
-              v-model="target"
-              type="radio"
-              name="page-image-target"
-              value="cover"
-            >
-            Capa, no lugar da atual
-          </label>
-        </fieldset>
-
-        <button
-          type="submit"
-          class="btn btn--primary"
-          :disabled="isUploading"
-        >
-          <AppIcon :icon="ImagePlus" />
-          {{ isUploading ? 'Enviando…' : target === 'cover' ? 'Enviar para a capa' : 'Enviar para a galeria' }}
-        </button>
-      </form>
     </template>
   </section>
 </template>

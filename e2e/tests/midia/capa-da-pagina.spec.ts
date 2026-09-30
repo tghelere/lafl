@@ -1,8 +1,8 @@
-import { type Locator, type Page, expect, test } from '@playwright/test'
+import { type Locator, expect, test } from '@playwright/test'
 
 import { openContentPageByTitle, unique } from '../../support/admin'
 import { AdminApi } from '../../support/api'
-import { solidPng } from '../../support/fixtures'
+import { addPhotoFromSection } from '../../support/pageImages'
 import { gotoSite } from '../../support/site'
 import { storageStatePath } from '../../support/users'
 
@@ -21,19 +21,6 @@ async function imageLoaded(image: Locator): Promise<void> {
   await expect
     .poll(() => image.evaluate((node) => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth))
     .toBeGreaterThan(0)
-}
-
-async function uploadFromSection(page: Page, alt: string, destino: 'Fim da galeria' | 'Capa, no lugar da atual', cor: [number, number, number]): Promise<void> {
-  const secao = page.locator('section.page-images')
-  await secao.getByLabel('Arquivo (JPEG, PNG ou WebP, até 10 MB)', { exact: true }).setInputFiles({
-    name: 'foto.png',
-    mimeType: 'image/png',
-    buffer: solidPng(900, 600, cor),
-  })
-  await secao.getByLabel('Texto alternativo').fill(alt)
-  await secao.getByRole('radio', { name: 'Não' }).check()
-  await secao.getByRole('radio', { name: destino }).check()
-  await secao.getByRole('button', { name: /^Enviar para a/ }).click()
 }
 
 test.describe('comunicacao', () => {
@@ -55,7 +42,7 @@ test.describe('comunicacao', () => {
       await expect(secao.getByText('Esta página não tem capa.')).toBeVisible()
 
       // 1. Enviar uma foto nova direto para a capa.
-      await uploadFromSection(page, altEnviada, 'Capa, no lugar da atual', [200, 90, 40])
+      await addPhotoFromSection(page, { alt: altEnviada, destination: 'cover', color: [200, 90, 40], width: 900, height: 600 })
       await expect(secao.getByText('Imagem enviada e posta na capa. Ela já aparece no site.')).toBeVisible()
       await imageLoaded(secao.getByRole('list', { name: 'Capa' }).locator('img'))
 
@@ -65,7 +52,7 @@ test.describe('comunicacao', () => {
 
       // 2. Trocar por outra que já está na biblioteca (enviada antes, para a galeria).
       await openContentPageByTitle(page, 'Quem Somos')
-      await uploadFromSection(page, altBiblioteca, 'Fim da galeria', [40, 90, 200])
+      await addPhotoFromSection(page, { alt: altBiblioteca, destination: 'gallery', color: [40, 90, 200], width: 900, height: 600 })
       await expect(secao.getByText(/posta no fim da galeria/)).toBeVisible()
 
       await secao.getByRole('button', { name: 'Trocar a capa por imagem da biblioteca' }).click()
