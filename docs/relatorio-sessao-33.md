@@ -96,7 +96,32 @@ SITE_AUTH='homologacao:SENHA' backend/scripts/midia/levar-fotos.sh --ambiente st
   (pg_dump, psql e restauração) roda pela primeira vez quando for usada em homologação. Por
   isso ela faz backup antes de escrever e restaura se falhar.
 
+## Execução pelo usuário: falhou sem escrever
+
+O usuário rodou `levar-fotos.sh`. Conexão, rsync e backup funcionaram (homologação: 0 imagens e
+0 vínculos antes). A simulação falhou com `No arguments expected for "midia:importar"`: o
+comando novo está só nos commits locais, e o release no ar (`origin/main`) não o tem. O Laravel
+resolveu `midia:importar` como **abreviação** de `midia:importar-fotos-iniciais`, que recusou o
+argumento. Nada foi escrito, porque a falha veio antes da importação. O relatório original
+dizia que homologação rodava "o mesmo código", o que valia para o código antigo, não para o
+novo. Correção: o script agora confere que `midia:importar` existe com esse nome exato no
+release antes de qualquer passo.
+
+Um executor que carregaria as classes novas de `/var/tmp` sem deploy foi escrito e descartado.
+A camada de permissões barrou até o teste dele, por ser código não publicado rodando no
+servidor.
+
+**Caminho sem deploy:** as 24 fotos locais são exatamente o catálogo de
+`App\Support\Media\InitialPhotos`, com os mesmos arquivos (`backend/resources/initial-photos/`,
+que vão no release), as mesmas páginas e a mesma capa e galeria (19 vínculos). O comando já
+publicado `midia:importar-fotos-iniciais`, passo 2b do §9 de `docs/deploy.md` e previsto para
+homologação, produz o mesmo resultado. As únicas diferenças são o uuid das imagens, que nenhum
+texto cita, e as derivadas regeneradas pelo mesmo pipeline.
+
 ## Pendências
 
-- Rodar `levar-fotos.sh` em homologação (comando acima).
+- Homologação: rodar `midia:importar-fotos-iniciais` agora, ou `levar-fotos.sh` depois do
+  próximo deploy.
+- Trocar a senha da autenticação básica de homologação: ela foi colada em texto claro na
+  sessão.
 - Nada foi enviado ao remoto. Um push dispararia deploy.

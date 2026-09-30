@@ -115,6 +115,14 @@ restaurar() {
     echo '!! Backup restaurado.'
 }
 
+# O comando precisa existir COM ESTE NOME no release publicado. Sem a conferência, o Laravel
+# resolve `midia:importar` como abreviação de `midia:importar-fotos-iniciais` num release
+# anterior ao comando (aconteceu na sessão 33).
+if [[ "$MODO" == importar ]] && ! php8.5 artisan list --raw | grep -q '^midia:importar '; then
+    echo '!! Este release não tem o comando midia:importar (código ainda não publicado). Nada foi feito.' >&2
+    exit 1
+fi
+
 if [[ "$MODO" == restaurar ]]; then
     restaurar
     exit 0
