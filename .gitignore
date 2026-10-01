@@ -19,6 +19,8 @@ backend/public/hot
 backend/public/storage
 backend/storage/*.key
 backend/storage/app/public/
+# Lotes de importação (PDFs reais da instituição) — ver docs/importar-transparencia.md
+backend/storage/app/importacao/
 backend/storage/framework/cache/data/
 backend/storage/framework/sessions/
 backend/storage/framework/testing/
