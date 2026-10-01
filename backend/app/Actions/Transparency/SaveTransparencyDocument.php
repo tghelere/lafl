@@ -8,8 +8,10 @@ use App\Actions\Transparency\Data\TransparencyDocumentData;
 use App\Models\TransparencyDocument;
 use App\Support\Transparency\DocumentSlug;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
+use Throwable;
 
 final class SaveTransparencyDocument
 {
@@ -29,7 +31,24 @@ final class SaveTransparencyDocument
             ]);
         }
 
-        return DB::transaction(function () use ($data, $document): TransparencyDocument {
+        $storedPath = null;
+
+        try {
+            return $this->persist($data, $document, $storedPath);
+        } catch (Throwable $e) {
+            // Falha depois de gravar o arquivo: o rollback desfaz a linha, não o PDF. Apaga só
+            // o caminho que ESTA chamada acabou de criar — nunca um arquivo anterior.
+            if ($storedPath !== null) {
+                Storage::disk('local')->delete($storedPath);
+            }
+
+            throw $e;
+        }
+    }
+
+    private function persist(TransparencyDocumentData $data, TransparencyDocument $document, ?string &$storedPath): TransparencyDocument
+    {
+        return DB::transaction(function () use ($data, $document, &$storedPath): TransparencyDocument {
             if ($data->file !== null) {
                 $path = $data->file->store('transparency-documents', 'local');
 
@@ -37,6 +56,7 @@ final class SaveTransparencyDocument
                     throw new RuntimeException('Falha ao armazenar o arquivo do documento.');
                 }
 
+                $storedPath = $path;
                 $document->file_path = $path;
                 $document->file_size = $data->file->getSize();
             }
