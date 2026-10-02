@@ -61,7 +61,7 @@ onMounted(() => {
 
 <style scoped>
 .thank-you {
-  max-width: 34rem;
+  max-width: var(--measure);
   padding-block: var(--space-6);
 }
 </style>

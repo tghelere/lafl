@@ -39,6 +39,11 @@
 
   /* Layout */
   --container-max: 72rem;
+  /* Largura máxima de texto corrido. `none` de propósito: texto ocupa a largura útil do
+     .container, com as bordas esquerda e direita alinhadas às da imagem/grid da mesma seção
+     (antes: 68ch em .prose, 46rem/22ch/58ch na home). É o ÚNICO ponto de controle — nenhuma
+     página ou componente deve declarar max-width próprio em texto. */
+  --measure: none;
   --container-padding: clamp(1rem, 4vw, 2rem);
 
   /* Movimento — neutralizado inteiro em prefers-reduced-motion (ver base.css) */

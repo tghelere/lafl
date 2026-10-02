@@ -109,7 +109,7 @@ usePageSeo({
 
 <style scoped>
 .erro {
-  max-width: 44rem;
+  max-width: var(--measure);
   padding-block: var(--space-6);
 }
 

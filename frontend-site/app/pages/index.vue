@@ -154,7 +154,6 @@ const pillars = [
 
 <style scoped>
 .home__hero {
-  max-width: 46rem;
   padding-block: var(--space-6) var(--space-7);
 }
 
@@ -169,13 +168,12 @@ const pillars = [
 
 .home__hero h1 {
   margin-top: 0;
-  max-width: 22ch;
 }
 
 .home__lead {
   font-size: var(--text-lg);
   color: var(--color-text-muted);
-  max-width: 58ch;
+  max-width: var(--measure);
 }
 
 .home__hero-ctas {
@@ -236,13 +234,13 @@ const pillars = [
   border-bottom: 1px solid var(--color-border);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  max-width: 58ch;
+  max-width: var(--measure);
 }
 
 .home__ledger-note {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
-  max-width: 58ch;
+  max-width: var(--measure);
   margin-bottom: var(--space-5);
 }
 
