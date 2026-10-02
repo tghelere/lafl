@@ -1,4 +1,8 @@
+import { createHash } from 'node:crypto'
+
 import { expect, test } from '@playwright/test'
+
+import { ADMIN_URL, SITE_URL } from '../../support/env'
 
 import { readSubmissionRow } from '../../support/submissions'
 import { storageStatePath } from '../../support/users'
@@ -31,16 +35,59 @@ test.describe('painel — ícone e manifesto', () => {
       )
 
     expect(hrefs).toEqual([
-      { rel: 'icon', href: '/favicon.ico' },
-      { rel: 'icon', href: '/favicon.svg' },
-      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
-      { rel: 'manifest', href: '/manifest.webmanifest' },
+      { rel: 'icon', href: '/favicon.ico?v=2' },
+      { rel: 'icon', href: '/favicon.svg?v=2' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png?v=2' },
+      { rel: 'manifest', href: '/manifest.webmanifest?v=2' },
     ])
 
     for (const { href } of hrefs) {
       const response = await request.get(href!)
 
       expect(response.status(), `${href} respondeu ${response.status()}`).toBe(200)
+    }
+  })
+
+  test('painel e site declaram ícones diferentes, e os arquivos servidos têm conteúdo diferente', async ({
+    page,
+    request,
+  }) => {
+    const iconHrefs = (target: typeof page) =>
+      target
+        .locator('head link[rel="icon"]')
+        .evaluateAll((nodes) => nodes.map((node) => (node as HTMLLinkElement).href))
+
+    // Painel: login e uma página interna (a sessão é a do super_admin, só para esta parte).
+    await page.goto('/login')
+    const login = await iconHrefs(page)
+
+    const logged = await page.context().browser()!.newContext({
+      storageState: storageStatePath('super_admin'),
+      baseURL: ADMIN_URL,
+    })
+    const inner = await logged.newPage()
+    await inner.goto('/admin/paginas')
+    await expect(inner.locator('head link[rel="icon"]').first()).toBeAttached()
+    const internal = await iconHrefs(inner)
+    await logged.close()
+
+    expect(login.length).toBe(2)
+    expect(internal).toEqual(login)
+    for (const href of login) expect(new URL(href).origin).toBe(new URL(ADMIN_URL).origin)
+
+    // Site: home declara os ícones do site, na origem do site.
+    await page.goto(SITE_URL + '/')
+    const site = await iconHrefs(page)
+    expect(site.length).toBe(2)
+    for (const href of site) expect(new URL(href).origin).toBe(new URL(SITE_URL).origin)
+
+    for (let i = 0; i < 2; i++) {
+      const [adminBody, siteBody] = await Promise.all([
+        request.get(login[i]!).then((r) => r.body()),
+        request.get(site[i]!).then((r) => r.body()),
+      ])
+      const hash = (b: Buffer) => createHash('sha256').update(b).digest('hex')
+      expect(hash(adminBody), `ícone ${i} do painel igual ao do site`).not.toBe(hash(siteBody))
     }
   })
 
