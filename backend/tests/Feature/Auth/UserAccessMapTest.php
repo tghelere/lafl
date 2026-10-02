@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\Role;
 
-test('mapa de acesso de comunicacao só libera pages e a biblioteca de imagens', function (): void {
+test('mapa de acesso de comunicacao só libera pages, biblioteca de imagens e parceiros', function (): void {
     $user = userWithRole(Role::Comunicacao->value);
 
     $access = $this->actingAs($user)->getJson('/api/v1/auth/user')->json('data.access');
@@ -12,6 +12,7 @@ test('mapa de acesso de comunicacao só libera pages e a biblioteca de imagens',
     expect($access)->toBe([
         'pages' => true,
         'media' => true,
+        'partners' => true,
         'transparency-documents' => false,
         'users' => false,
         'audit-logs' => false,

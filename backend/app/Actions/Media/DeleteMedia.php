@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Media;
 
 use App\Models\Media;
+use App\Models\Partner;
 use App\Models\User;
 use App\Support\Media\MediaPaths;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,14 @@ final class DeleteMedia
                     (count($usages) === 1 ? 'Esta imagem está em uso na página ' : 'Esta imagem está em uso nas páginas ').
                     "{$where}. Tire-a da página antes de excluir.",
                 ],
+            ]);
+        }
+
+        $partner = Partner::query()->where('media_id', $media->id)->first();
+
+        if ($partner !== null) {
+            throw ValidationException::withMessages([
+                'media' => ["Esta imagem é a logo do parceiro {$partner->name}. Troque a logo no cadastro de parceiros ou exclua o parceiro antes."],
             ]);
         }
 

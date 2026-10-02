@@ -44,6 +44,15 @@ final class Images
         return self::upload((string) ob_get_clean(), 'desenho.png', 'image/png');
     }
 
+    public static function webp(int $width, int $height): UploadedFile
+    {
+        $image = self::canvas($width, $height);
+        ob_start();
+        imagewebp($image, null, 90);
+
+        return self::upload((string) ob_get_clean(), 'logo.webp', 'image/webp');
+    }
+
     public static function jpegBytes(int $width, int $height): string
     {
         $image = self::canvas($width, $height);

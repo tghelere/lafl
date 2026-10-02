@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\FormAuditController;
 use App\Http\Controllers\Api\V1\MediaController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\PageImageController;
+use App\Http\Controllers\Api\V1\PartnerController;
 use App\Http\Controllers\Api\V1\PartnershipInquiryController;
 use App\Http\Controllers\Api\V1\PickupRequestController;
 use App\Http\Controllers\Api\V1\ProgramApplicationController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Api\V1\Public\ContactMessageController as PublicContact
 use App\Http\Controllers\Api\V1\Public\InstitutionFactsController as PublicInstitutionFactsController;
 use App\Http\Controllers\Api\V1\Public\MediaController as PublicMediaController;
 use App\Http\Controllers\Api\V1\Public\PageController as PublicPageController;
+use App\Http\Controllers\Api\V1\Public\PartnerController as PublicPartnerController;
 use App\Http\Controllers\Api\V1\Public\PartnershipInquiryController as PublicPartnershipInquiryController;
 use App\Http\Controllers\Api\V1\Public\PickupRequestController as PublicPickupRequestController;
 use App\Http\Controllers\Api\V1\Public\ProgramApplicationController as PublicProgramApplicationController;
@@ -69,6 +71,9 @@ Route::prefix('public')->name('public.')->group(function (): void {
     // aqui é dado pessoal — são datas do estatuto e a contagem do acervo já público.
     Route::get('/institution-facts', [PublicInstitutionFactsController::class, 'show'])
         ->name('institution-facts.show');
+
+    // Parceiros ativos, na ordem do painel, para a grade da página de parceiros.
+    Route::get('/partners', [PublicPartnerController::class, 'index'])->name('partners.index');
 
     Route::get('/transparency-documents', [PublicTransparencyDocumentController::class, 'index'])
         ->name('transparency-documents.index');
@@ -133,6 +138,10 @@ Route::middleware($authenticated)->group(function (): void {
         ->name('content-markers.index');
     Route::apiResource('transparency-documents', TransparencyDocumentController::class)
         ->parameters(['transparency-documents' => 'transparencyDocument']);
+
+    // Parceiros da página pública. A logo vai em multipart, que o PHP só lê em POST: o painel
+    // atualiza com POST + `_method=PUT` (mesmo desenho de transparency-documents).
+    Route::apiResource('partners', PartnerController::class);
 
     // Biblioteca de imagens do conteúdo (ver docs/decisoes/0024-biblioteca-de-midia.md).
     // Substituir o arquivo é rota própria, em POST (multipart só é lido pelo PHP em POST), e

@@ -7,6 +7,7 @@ namespace App\Http\Resources;
 use App\Enums\FormSubmissionType;
 use App\Models\Media;
 use App\Models\Page;
+use App\Models\Partner;
 use App\Models\TransparencyDocument;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -48,6 +49,7 @@ final class UserResource extends JsonResource
         $map = [
             'pages' => $user->can('viewAny', Page::class),
             'media' => $user->can('viewAny', Media::class),
+            'partners' => $user->can('viewAny', Partner::class),
             'transparency-documents' => $user->can('viewAny', TransparencyDocument::class),
             'users' => $user->can('viewAny', User::class),
             // Alimenta o item "Auditoria" do menu e a seção "Histórico de acessos" do detalhe de
