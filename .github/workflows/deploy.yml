@@ -13,6 +13,16 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+    # Documentação e metadados não mudam o que vai ao servidor (o pacote nem leva .md — ver
+    # scripts/deploy/empacotar.sh), então não disparam CI nem deploy. O filtro vale só para
+    # push em branch; tag e execução manual sempre rodam.
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/dependabot.yml'
+      - 'LICENSE'
+      - '.gitignore'
   workflow_dispatch:
     inputs:
       ambiente:
@@ -33,11 +43,12 @@ on:
         type: boolean
         default: false
 
-# Uma publicação por vez, por ambiente. Sem isto, dois pushes seguidos na main viram dois
-# publicar.sh disputando o mesmo link `current` e a mesma tabela de migrations.
-concurrency:
-  group: deploy-${{ github.ref_type == 'tag' && 'production' || inputs.ambiente || 'staging' }}
-  cancel-in-progress: false
+# Concorrência é por job, não da execução inteira, para que um push novo cancele o CI e o
+# empacotamento da execução anterior (ver `concurrency` em ci.yml e em `empacotar`) SEM jamais
+# cancelar uma publicação em andamento: cancelar `publicar` no meio do rsync ou das migrations
+# deixaria o servidor numa release pela metade. O grupo de `publicar` serializa por ambiente
+# (dois publicar.sh disputariam o mesmo link `current` e a mesma tabela de migrations) e nunca
+# cancela quem está rodando; um deploy ainda na fila é substituído pelo mais novo.
 
 permissions:
   contents: read
@@ -105,6 +116,9 @@ jobs:
           && inputs.run_id == ''
           && needs.preparar.result == 'success'
           && needs.ci.result == 'success' }}
+    concurrency:
+      group: empacotar-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v7
         with:
@@ -148,6 +162,9 @@ jobs:
           && (needs.empacotar.result == 'success' || inputs.run_id != '') }}
     environment:
       name: ${{ needs.preparar.outputs.ambiente }}
+    concurrency:
+      group: publicar-${{ needs.preparar.outputs.ambiente }}
+      cancel-in-progress: false
     steps:
       # O pacote NÃO carrega `infra/` (ADR 0014), e os scripts de publicação são enviados
       # ao servidor a partir do repositório — então este job precisa do repositório. Sem
