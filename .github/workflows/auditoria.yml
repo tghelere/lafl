@@ -32,7 +32,7 @@ jobs:
           extensions: mbstring, intl
           coverage: none
       # --no-dev: ferramenta de desenvolvimento nunca vai ao servidor.
-      - run: composer audit --no-dev
+      - run: composer audit --no-dev --locked
 
   npm:
     name: npm audit (${{ matrix.projeto }})
