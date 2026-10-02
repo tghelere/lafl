@@ -140,6 +140,25 @@ const router = createRouter({
       component: () => import('@/views/MediaDetailView.vue'),
       meta: { title: 'Editar imagem', section: SECTION.media },
     },
+    // Parceiros da página pública — mesmo raciocínio: rotas próprias, antes das genéricas.
+    {
+      path: '/admin/parceiros',
+      name: 'partners.index',
+      component: () => import('@/views/PartnerListView.vue'),
+      meta: { title: 'Parceiros', section: SECTION.partners },
+    },
+    {
+      path: '/admin/parceiros/novo',
+      name: 'partners.create',
+      component: () => import('@/views/PartnerFormView.vue'),
+      meta: { title: 'Novo parceiro', section: SECTION.partners },
+    },
+    {
+      path: '/admin/parceiros/:uuid',
+      name: 'partners.edit',
+      component: () => import('@/views/PartnerFormView.vue'),
+      meta: { title: 'Editar parceiro', section: SECTION.partners },
+    },
     // Gestão de usuários — mesmo raciocínio de transparência: rotas próprias, registradas
     // antes das genéricas só por organização.
     {

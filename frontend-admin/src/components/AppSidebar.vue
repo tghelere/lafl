@@ -133,7 +133,7 @@ const GROUPS: NavGroup[] = [
   },
   {
     label: 'Conteúdo',
-    requires: ['pages', 'media'],
+    requires: ['pages', 'media', 'partners'],
     items: [
       {
         label: 'Páginas',
@@ -148,6 +148,13 @@ const GROUPS: NavGroup[] = [
         section: SECTION.media,
         requires: 'media',
         icon: RESOURCE_ICONS.media!,
+      },
+      {
+        label: 'Parceiros',
+        to: { name: 'partners.index' },
+        section: SECTION.partners,
+        requires: 'partners',
+        icon: RESOURCE_ICONS.partners!,
       },
     ],
   },

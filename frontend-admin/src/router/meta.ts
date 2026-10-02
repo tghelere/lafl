@@ -43,6 +43,7 @@ export const SECTION = {
   dashboard: 'dashboard',
   pages: 'pages',
   media: 'media',
+  partners: 'partners',
   transparency: 'transparency',
   users: 'users',
   audit: 'audit',

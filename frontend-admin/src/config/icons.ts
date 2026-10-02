@@ -1,5 +1,6 @@
 import {
   Ban,
+  Building2,
   CircleCheck,
   CircleDashed,
   CircleMinus,
@@ -37,6 +38,7 @@ export const RESOURCE_ICONS: Record<string, Component> = {
   'pickup-requests': Truck,
   pages: FileText,
   media: Images,
+  partners: Building2,
   'transparency-documents': ScrollText,
   users: Users,
   'audit-logs': ShieldCheck,

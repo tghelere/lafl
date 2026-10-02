@@ -80,6 +80,10 @@ usePageSeo({
       <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
     </article>
 
+    <!-- Só a página de parceiros tem a grade de logos, abaixo do texto editável. Sem parceiro
+         cadastrado o componente não desenha nada. -->
+    <AppParceiros v-if="slug === 'como-ajudar/parceiros'" />
+
     <!-- A galeria que a equipe monta no painel ("Imagens desta página"). As páginas de seção
          com layout próprio (bazar, educação infantil…) a mostram com título delas. -->
     <AppGaleria :imagens="page.images.gallery" titulo="Fotos" rotulo="Fotos da página" />
