@@ -15,7 +15,7 @@ on:
 jobs:
   backend:
     name: backend (Pint, Larastan, Pest)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       # Banco real (Postgres), não SQLite — nunca mais SQLite em teste nenhum, local ou CI
@@ -64,7 +64,7 @@ jobs:
         working-directory: backend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -100,16 +100,16 @@ jobs:
 
   frontend-admin:
     name: frontend-admin (lint, build)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     defaults:
       run:
         working-directory: frontend-admin
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -121,16 +121,16 @@ jobs:
 
   frontend-site:
     name: frontend-site (build)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     defaults:
       run:
         working-directory: frontend-site
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -141,7 +141,7 @@ jobs:
 
   e2e:
     name: e2e (Playwright, pilha completa)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     services:
       # Terceiro banco, só da bateria (ver CLAUDE.md, "Os três bancos"): ela roda
@@ -176,7 +176,7 @@ jobs:
           --health-retries=10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -185,7 +185,7 @@ jobs:
           extensions: pdo_pgsql, pgsql, mbstring, intl, exif, gd, bcmath, zip, redis
           coverage: none
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -210,7 +210,7 @@ jobs:
         run: npm ci
 
       - name: Cache do navegador do Playwright
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
@@ -230,7 +230,7 @@ jobs:
 
       - name: Publicar trace, capturas e vídeo da falha
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-artefatos
           path: |
