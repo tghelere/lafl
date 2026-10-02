@@ -56,7 +56,7 @@ vive no `content`. Ver `docs/decisoes/0025-imagens-da-pagina.md`.
 Só entra no site com autorização registrada. Depoimento extraído de avaliação pública do
 Google **não** pode ser publicado sem consentimento do autor.
 
-**`partners`** — parceiros e apoiadores
+**`partners`** — parceiros e apoiadores (implementado: ver `docs/decisoes/0029-parceiros-e-ampliacao-no-minimo-da-pagina.md`)
 `uuid`, `name`, `logo_id`, `url`, `type` (enum), `display_order`
 
 **`institution_stats`** — números da home

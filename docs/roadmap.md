@@ -807,6 +807,12 @@ filha órfã é maior do que quando isso foi escrito. A tela de admin para pági
 resolver (validar em cascata ou migrar para `parent_id`) antes que alguém use a tela para
 excluir ou renomear uma página-mãe de verdade, não depois.
 
+## Sessão 36
+
+- [x] Favicon do painel versionado (`?v=2`); [x] cadastro de parceiros (painel, API, grade no
+      site); [x] ampliação nunca menor que na página. Ver `docs/relatorio-sessao-36.md`.
+- [ ] Parceiros: reordenar arrastando (hoje é campo de ordem); logo em SVG exigiria sanitização.
+
 ## Fase 2 — bloqueada
 
 - [ ] Cadastro de assistidos (`assisted_minors`, `guardians`, `guardianships`, `consents`,
