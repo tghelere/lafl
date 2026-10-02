@@ -117,7 +117,7 @@ consome apenas endpoints públicos, evitando o problema.
   rota autenticada com Policy
 - Chave de criptografia de campo **separada** do `APP_KEY`, fora do repositório
 - Backups criptografados, testados, com chave guardada em local distinto do dump
-- Dependências auditadas (`composer audit`, `npm audit`) em CI
+- Dependências auditadas (`composer audit`, `npm audit`) semanalmente e a cada push na main (`.github/workflows/auditoria.yml`); avisa, não bloqueia o deploy
 
 ## Performance
 
@@ -194,5 +194,5 @@ O servidor **não recebe o repositório**: recebe um pacote com só o que execut
 `scripts/deploy/empacotar.sh` — ver `docs/decisoes/0014-pacote-de-deploy-minimo.md`. Nada é
 buildado no servidor.
 
-CI: Pint, PHPStan, Pest, `composer audit`, `npm audit`, build dos dois frontends, bateria de
-ponta a ponta (Playwright).
+CI: Pint, PHPStan, Pest, build dos dois frontends, bateria de ponta a ponta (Playwright).
+A auditoria de dependências é um workflow à parte (`auditoria.yml`) e não bloqueia o deploy.

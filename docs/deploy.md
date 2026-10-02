@@ -396,8 +396,10 @@ que responda naquele IP receberia o pacote e o comando de deploy.
 | Conferir que a reversão automática funciona | *Run workflow* → **forçar falha de saúde** (nunca em produção) |
 
 Em todos os casos a publicação só acontece **depois de todos os jobs do CI passarem** — Pint,
-Larastan, Pest, `composer audit`, lint e build dos dois frontends, `npm audit` e a bateria de
-ponta a ponta. A única exceção é a promoção por `run_id`, e ela é exceção porque o artefato
+Larastan, Pest, lint e build dos dois frontends e a bateria de ponta a ponta. A auditoria de
+dependências (`composer audit`, `npm audit --omit=dev`) **não** bloqueia: roda em
+`auditoria.yml` (push na main + segunda-feira) e fica vermelha sozinha; exceções sem correção
+ficam, com motivo, em `scripts/ci/npm-audit.mjs`. A única exceção é a promoção por `run_id`, e ela é exceção porque o artefato
 promovido veio de uma execução em que tudo isso já passou.
 
 O que acontece no servidor, em ordem (`infra/publicar.sh`):

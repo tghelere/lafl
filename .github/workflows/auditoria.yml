@@ -1,0 +1,53 @@
+# Auditoria de dependências — AVISA, não bloqueia o deploy.
+#
+# Fica fora do deploy.yml/ci.yml de propósito: aviso de segurança é publicado a qualquer hora,
+# sobre um commit que não mudou, e derrubar o deploy por isso impedia código já testado de
+# chegar ao servidor (deploys #27 e #28). Este workflow pode ficar vermelho; nada depende dele.
+# Atualização de segurança de verdade chega pelo Dependabot (.github/dependabot.yml).
+
+name: Auditoria
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 11 * * 1'   # segunda-feira, 11:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  composer:
+    name: composer audit
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl
+          coverage: none
+      # --no-dev: ferramenta de desenvolvimento nunca vai ao servidor.
+      - run: composer audit --no-dev
+
+  npm:
+    name: npm audit (${{ matrix.projeto }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        projeto: [frontend-admin, frontend-site]
+    defaults:
+      run:
+        working-directory: ${{ matrix.projeto }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      # --omit=dev e exceções documentadas (com motivo) em scripts/ci/npm-audit.mjs.
+      - run: node ../scripts/ci/npm-audit.mjs

@@ -14,7 +14,7 @@ on:
 
 jobs:
   backend:
-    name: backend (Pint, Larastan, Pest, composer audit)
+    name: backend (Pint, Larastan, Pest)
     runs-on: ubuntu-latest
 
     env:
@@ -98,11 +98,8 @@ jobs:
       - name: Pest
         run: php artisan test
 
-      - name: composer audit
-        run: composer audit
-
   frontend-admin:
-    name: frontend-admin (lint, build, npm audit)
+    name: frontend-admin (lint, build)
     runs-on: ubuntu-latest
 
     defaults:
@@ -121,10 +118,9 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      - run: npm audit
 
   frontend-site:
-    name: frontend-site (build, npm audit)
+    name: frontend-site (build)
     runs-on: ubuntu-latest
 
     defaults:
@@ -142,7 +138,6 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npm audit
 
   e2e:
     name: e2e (Playwright, pilha completa)

@@ -1,0 +1,33 @@
+# Só atualizações de SEGURANÇA: open-pull-requests-limit: 0 desliga as atualizações de versão
+# rotineiras, e o Dependabot continua abrindo PR para avisos de segurança. Agrupado e semanal.
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      seguranca:
+        applies-to: security-updates
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /frontend-admin
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      seguranca:
+        applies-to: security-updates
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /frontend-site
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      seguranca:
+        applies-to: security-updates
+        patterns: ['*']

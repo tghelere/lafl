@@ -11,7 +11,7 @@
       cifra de campo customizada (`FieldEncrypted`)
 - [x] Autenticação: login, logout, usuário atual, troca de senha autenticada
 - [x] Scaffold do painel admin (Vue 3 + Vite + Pinia + Router) e do site público (Nuxt 4)
-- [x] CI (Pint, Larastan, Pest, `composer audit`, `npm audit`, build dos dois frontends)
+- [x] CI (Pint, Larastan, Pest, build dos dois frontends)
 - [x] ADRs 0001–0012 em `docs/decisoes/`
 - [x] Entidade `pages` ponta a ponta: migration, model, Action, FormRequest, Policy,
       Resources público/admin, endpoints de leitura pública e CRUD administrativo, testes Pest
