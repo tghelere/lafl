@@ -21,6 +21,15 @@
 // - cada troca é anunciada ("Imagem 2 de 4: …") numa região aria-live, porque a imagem nova
 //   não recebe foco.
 //
+// Tamanho (sessão 36): a imagem aberta NUNCA é menor do que aparecia na página. A largura com
+// que cada imagem aparece é medida no momento de abrir (antes de a página ser travada) e vira o
+// piso; o teto é o palco, que é a tela inteira menos os controles. Entre os dois, a imagem
+// cresce até ocupar o palco sem cortar, na proporção. Quando o piso não cabe na altura do palco
+// (foto em pé numa tela baixa), o palco rola — a imagem não encolhe. A derivada carregada é a
+// menor que já cobre esse tamanho (ou a maior que existir), e a imagem recebe a largura
+// explicitamente: sem isso o navegador a desenha no tamanho NATURAL do arquivo, e uma derivada
+// de 640px ficava pequena no meio de um palco de 1200px.
+//
 // Pré-carga: quando a imagem ATUAL termina de carregar, as vizinhas (anterior e próxima) são
 // pedidas em baixa prioridade, na mesma derivada que seria escolhida ao abri-las. Esperar a atual
 // é o que garante que a pré-carga nunca compita com ela pela conexão.
@@ -33,6 +42,8 @@ type Item = {
   fontes: Fonte[]
   largura: number
   altura: number
+  /** Largura, em px CSS, com que a imagem aparece na página no momento de abrir. */
+  paginaLargura: number
   alt: string
   legenda: string | null
   credito: string | null
@@ -61,9 +72,19 @@ const anuncio = computed(() => {
 })
 
 /**
- * A maior derivada que cabe na tela: a imagem aparece do tamanho que o palco permite (sem
- * passar da proporção), e a derivada escolhida é a maior cuja largura não passa desse tamanho
- * em pixels do aparelho. Nenhuma coube (tela menor que a menor derivada): a menor.
+ * A largura, em px CSS, com que a imagem aparece aberta: a que ocupa o palco sem cortar, mas
+ * nunca menos do que aparecia na página, e nunca mais do que a largura do palco.
+ */
+function larguraExibida(item: Item): number {
+  const { largura, altura } = espaco.value
+  const cabeNoPalco = Math.min(largura, altura * (item.largura / item.altura))
+
+  return Math.min(largura, Math.max(item.paginaLargura, cabeNoPalco))
+}
+
+/**
+ * A derivada a carregar: a MENOR que já cobre a largura exibida em pixels do aparelho, ou a
+ * maior que existir se nenhuma cobre — a imagem aumenta ao abrir, e a versão maior vem junto.
  *
  * Serve à imagem atual e às vizinhas: a pré-carga pede exatamente o que a abertura escolheria.
  */
@@ -73,13 +94,9 @@ function escolherFonte(item: Item): Fonte | null {
     return null
   }
 
-  const { largura, altura, densidade } = espaco.value
-  const proporcao = item.largura / item.altura
-  const exibida = Math.min(largura, altura * proporcao)
-  const alvo = exibida * densidade
-  const cabem = item.fontes.filter((fonte) => fonte.largura <= alvo)
+  const alvo = larguraExibida(item) * espaco.value.densidade
 
-  return cabem.length > 0 ? cabem[cabem.length - 1]! : item.fontes[0]!
+  return item.fontes.find((fonte) => fonte.largura >= alvo) ?? item.fontes[item.fontes.length - 1]!
 }
 
 const escolhida = computed<Fonte | null>(() => (atual.value ? escolherFonte(atual.value) : null))
@@ -139,6 +156,7 @@ function lerItem(link: HTMLAnchorElement): Item | null {
   return {
     link,
     fontes: lerFontes(img, link),
+    paginaLargura: img.getBoundingClientRect().width,
     largura: Number(img.getAttribute('width')) || img.naturalWidth || 1,
     altura: Number(img.getAttribute('height')) || img.naturalHeight || 1,
     alt: img.getAttribute('alt') ?? '',
@@ -152,11 +170,10 @@ function grupoDe(link: HTMLAnchorElement): string {
 }
 
 function medir(): void {
-  const caixa = palco.value?.getBoundingClientRect()
-
+  // clientWidth/clientHeight: o que sobra para a imagem, sem a calha da barra de rolagem.
   espaco.value = {
-    largura: caixa?.width ?? window.innerWidth,
-    altura: caixa?.height ?? window.innerHeight,
+    largura: palco.value?.clientWidth ?? window.innerWidth,
+    altura: palco.value?.clientHeight ?? window.innerHeight,
     densidade: window.devicePixelRatio || 1,
   }
 }
@@ -356,7 +373,9 @@ onBeforeUnmount(() => {
           :key="escolhida.url"
           class="ampliacao__imagem"
           :src="escolhida.url"
+          :style="{ width: `${larguraExibida(atual)}px` }"
           :data-largura="escolhida.largura"
+          :data-pagina="Math.round(atual.paginaLargura)"
           @load="atualCarregada = true"
           :width="atual.largura"
           :height="atual.altura"
@@ -402,14 +421,23 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .ampliacao {
-  width: min(100vw - 2rem, 80rem);
-  height: min(100dvh - 2rem, 60rem);
+  /* A tela inteira, em qualquer largura: a imagem é o que importa, e uma moldura de 1rem ou
+     mais em volta tirava dela justamente o espaço que a ampliação existe para dar. O espaço
+     interno é só o dos controles, e respeita as áreas seguras (entalhe, barra de gestos) com
+     env(safe-area-inset-*) — hoje o site não usa `viewport-fit=cover`, então valem 0, e o max()
+     deixa isto certo no dia em que passar a usar. */
+  width: 100vw;
+  height: 100dvh;
   max-width: none;
   max-height: none;
-  margin: auto;
-  padding: var(--space-4);
+  margin: 0;
+  padding:
+    max(var(--space-3), env(safe-area-inset-top))
+    max(var(--space-3), env(safe-area-inset-right))
+    max(var(--space-3), env(safe-area-inset-bottom))
+    max(var(--space-3), env(safe-area-inset-left));
   border: 0;
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   background: #111;
   color: #f4f1ec;
 }
@@ -439,17 +467,22 @@ onBeforeUnmount(() => {
 
 .ampliacao__palco {
   display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 0;
+  /* Rola quando a imagem, no tamanho mínimo que tinha na página, é maior que o palco. A calha
+     fica reservada para a largura não mudar quando a barra aparece. */
+  overflow: auto;
+  scrollbar-gutter: stable;
   touch-action: pan-y;
 }
 
+/* A largura vem do estilo em linha (larguraExibida). `margin: auto` centraliza sem o corte do
+   `justify-content: center`, que esconderia o início de uma imagem maior que o palco. */
 .ampliacao__imagem {
-  width: auto;
+  display: block;
+  flex: none;
+  max-width: none;
   height: auto;
-  max-width: 100%;
-  max-height: 100%;
+  margin: auto;
   object-fit: contain;
   user-select: none;
 }
@@ -507,23 +540,8 @@ onBeforeUnmount(() => {
   font-size: var(--text-xs);
 }
 
-/* Celular: a tela toda, sem borda nem raio. O espaço interno respeita as áreas seguras
-   (entalhe, barra de gestos) com env(safe-area-inset-*). Hoje o site não usa
-   `viewport-fit=cover`, então o navegador já mantém a página dentro da área segura e esses
-   valores são 0; o max() deixa isto certo no dia em que o site passar a usar. */
+/* Celular: botões de navegação dividem a linha e usam o rótulo curto. */
 @media (max-width: 47.99rem) {
-  .ampliacao {
-    width: 100vw;
-    height: 100dvh;
-    margin: 0;
-    padding:
-      max(var(--space-3), env(safe-area-inset-top))
-      max(var(--space-3), env(safe-area-inset-right))
-      max(var(--space-3), env(safe-area-inset-bottom))
-      max(var(--space-3), env(safe-area-inset-left));
-    border-radius: 0;
-  }
-
   .ampliacao__navegacao {
     gap: var(--space-2);
   }

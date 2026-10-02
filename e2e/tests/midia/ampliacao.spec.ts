@@ -110,20 +110,33 @@ function ampliacao(page: Page) {
 }
 
 /**
- * Confere a regra da derivada contra o tamanho REAL do palco nesta janela: a escolhida é a
- * maior cuja largura não passa do tamanho em que a imagem aparece (em pixels do aparelho).
+ * A derivada que a abertura escolhe (AppAmpliacao.vue, `escolherFonte`): a MENOR que cobre a
+ * largura exibida em pixels do aparelho — o palco sem cortar, nunca menos que na página — ou a
+ * maior que existir. `pagina` é a largura com que a imagem aparecia na página.
  */
+async function derivadaEscolhida(page: Page, widths: number[], ratio: number, pagina: number): Promise<number> {
+  const palco = await page.locator('.ampliacao__palco').evaluate((node) => ({
+    largura: node.clientWidth,
+    altura: node.clientHeight,
+    densidade: window.devicePixelRatio,
+  }))
+  const exibida = Math.min(palco.largura, Math.max(pagina, Math.min(palco.largura, palco.altura * ratio)))
+  const alvo = exibida * palco.densidade
+  const ordenadas = [...widths].sort((a, b) => a - b)
+
+  return ordenadas.find((w) => w >= alvo) ?? ordenadas[ordenadas.length - 1]!
+}
+
+/** Largura com que a imagem da ampliação aparecia na página, medida pelo próprio componente. */
+async function larguraNaPagina(page: Page): Promise<number> {
+  return Number(await ampliacao(page).locator('img').getAttribute('data-pagina'))
+}
+
 async function expectLargestThatFits(page: Page, widths: number[], ratio: number): Promise<void> {
   const imagem = ampliacao(page).locator('img')
   await expect(imagem).toBeVisible()
 
-  const { largura, altura, densidade } = await page.locator('.ampliacao__palco').evaluate((node) => {
-    const caixa = node.getBoundingClientRect()
-    return { largura: caixa.width, altura: caixa.height, densidade: window.devicePixelRatio }
-  })
-  const alvo = Math.min(largura, altura * ratio) * densidade
-  const cabem = widths.filter((w) => w <= alvo)
-  const esperada = cabem.length > 0 ? Math.max(...cabem) : Math.min(...widths)
+  const esperada = await derivadaEscolhida(page, widths, ratio, await larguraNaPagina(page))
 
   await expect(imagem).toHaveAttribute('data-largura', String(esperada))
   await expect.poll(() => imagem.evaluate((node) => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth)).toBe(esperada)
@@ -365,19 +378,10 @@ test.describe('celular — 360px', () => {
 })
 
 test.describe('pré-carga da vizinha — 1280px', () => {
-  test.use({ viewport: { width: 1280, height: 800 } })
-
-  /** A derivada que a abertura escolheria para uma foto, contra o palco real desta janela. */
-  async function derivadaEscolhida(page: Page, widths: number[], ratio: number): Promise<number> {
-    const palco = await page.locator('.ampliacao__palco').evaluate((node) => {
-      const caixa = node.getBoundingClientRect()
-      return { largura: caixa.width, altura: caixa.height, densidade: window.devicePixelRatio }
-    })
-    const alvo = Math.min(palco.largura, palco.altura * ratio) * palco.densidade
-    const cabem = widths.filter((w) => w <= alvo)
-
-    return cabem.length > 0 ? Math.max(...cabem) : Math.min(...widths)
-  }
+  // Alta de propósito: a foto em pé só pede uma derivada maior que a miniatura da página (640)
+  // quando o palco é alto o bastante. Com a ampliação nunca menor que a página, numa janela de
+  // 800px de altura as duas coincidem, o navegador serve do cache e não há pedido para medir.
+  test.use({ viewport: { width: 1280, height: 1200 } })
 
   /**
    * Segura por 1,5 s todo pedido da vizinha e anota os endereços. Se a pré-carga bloqueasse a
@@ -409,6 +413,7 @@ test.describe('pré-carga da vizinha — 1280px', () => {
   test('pede a próxima na derivada que seria escolhida, sem bloquear a atual', async ({ page }) => {
     await gotoSite(page, `/${slug}`)
     const vizinha = await segurarVizinha(page, criada.mediaIds[1]!)
+    const paginaDaVizinha = await page.getByRole('link', { name: `Ampliar imagem: ${galeria[1].alt}` }).locator('img').evaluate((n) => n.getBoundingClientRect().width)
     const miniatura = await page.getByRole('link', { name: `Ampliar imagem: ${galeria[1].alt}` }).locator('img').evaluate((n) => (n as HTMLImageElement).currentSrc)
 
     await page.getByRole('link', { name: `Ampliar imagem: ${galeria[0].alt}` }).click()
@@ -417,7 +422,7 @@ test.describe('pré-carga da vizinha — 1280px', () => {
     await expect(ampliacao(page).locator('img')).toBeVisible()
     await expect.poll(() => atualCarregada(page)).toBe(true)
 
-    const esperada = await derivadaEscolhida(page, [400, 640, 960], 1000 / 1400)
+    const esperada = await derivadaEscolhida(page, [400, 640, 960], 1000 / 1400, paginaDaVizinha)
     // Premissa: a miniatura da página NÃO é a derivada que a ampliação escolhe para a segunda
     // foto. Senão o navegador serviria do cache e nenhum pedido apareceria.
     expect(miniatura, 'a miniatura já é a derivada escolhida; o teste precisa de outra foto').not.toContain(`/${esperada}.webp`)
@@ -436,12 +441,13 @@ test.describe('pré-carga da vizinha — 1280px', () => {
   test('pede também a anterior, na derivada certa', async ({ page }) => {
     await gotoSite(page, `/${slug}`)
     const vizinha = await segurarVizinha(page, criada.mediaIds[1]!)
+    const paginaDaVizinha = await page.getByRole('link', { name: `Ampliar imagem: ${galeria[1].alt}` }).locator('img').evaluate((n) => n.getBoundingClientRect().width)
 
     // Abre a última: a anterior é a segunda, a mesma foto do teste acima.
     await page.getByRole('link', { name: `Ampliar imagem: ${galeria[2].alt}` }).click()
     await expect.poll(() => atualCarregada(page)).toBe(true)
 
-    const esperada = await derivadaEscolhida(page, [400, 640, 960], 1000 / 1400)
+    const esperada = await derivadaEscolhida(page, [400, 640, 960], 1000 / 1400, paginaDaVizinha)
     await expect.poll(() => vizinha.de(esperada).length).toBe(1)
 
     await page.keyboard.press('ArrowLeft')
