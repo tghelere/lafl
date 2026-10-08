@@ -45,9 +45,9 @@ use App\Enums\PageStatus;
  * Contagem e idade NUNCA são digitadas aqui: entram como marcador de App\Enums\ContentMarker
  * (`{{documentos_transparencia}}`, `{{idade_bazar}}` e os demais), resolvido só na leitura
  * pública. "Cerca de 70 documentos" envelhecia a cada upload; o marcador não. Ano de
- * acontecimento ("o bazar existe desde 1968") e valor de documento (o repasse de
- * R$ 2.819.892,84, as 15 turmas do plano de trabalho) continuam literais — não são cálculo,
- * são o que o documento diz.
+ * acontecimento ("o bazar existe desde 1968") continua literal. Valor que muda com frequência
+ * (repasse da prefeitura, nº do termo ou do plano de trabalho, nº de turmas) NÃO entra no
+ * texto do site, por pedido do financeiro: fica só nos anexos da transparência.
  *
  * Nenhum texto aqui foi aprovado pelo Lar Anália Franco — esse status é de controle interno
  * (ver docs/roadmap.md), nunca publicado no conteúdo da página.
@@ -139,9 +139,9 @@ final class InitialPages
             [
                 'slug' => 'educacao-infantil',
                 'title' => 'Educação Infantil',
-                'meta_description' => 'CEI Anália Franco: creche e pré-escola do Lar Anália Franco para crianças de 1 a 5 anos, 15 turmas, período integral, conveniada com a Prefeitura de Londrina.',
+                'meta_description' => 'CEI Anália Franco: creche e pré-escola do Lar Anália Franco para crianças de 1 a 5 anos, período integral, conveniada com a Prefeitura de Londrina.',
                 'content' => <<<'HTML'
-                    <p>O Centro de Educação Infantil Anália Franco é a creche e pré-escola do Lar Anália Franco, para crianças de 1 a 5 anos, em 15 turmas (C1 a P5, plano de trabalho do Termo de Colaboração 06/2022, exercício 2026). Funciona em período integral, das 7h30 às 17h30, com convênio junto à Secretaria Municipal de Educação de Londrina.</p><p>O CEI Anália Franco foi criado em 2002 e tem autorização de funcionamento renovada até janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra poliesportiva do terreno.</p><p>As páginas desta seção detalham a proposta pedagógica, a alimentação e a estrutura física do CEI, além de como fazer a <a href="/educacao-infantil/matricula">matrícula</a>.</p>
+                    <p>O Centro de Educação Infantil Anália Franco é a creche e pré-escola do Lar Anália Franco, para crianças de 1 a 5 anos, Funciona em período integral, das 7h30 às 17h30, com convênio junto à Secretaria Municipal de Educação de Londrina.</p><p>O CEI Anália Franco foi criado em 2002 e tem autorização de funcionamento renovada até janeiro de 2028. A rotina inclui aulas de inglês, educação física, horta e uso da quadra poliesportiva do terreno.</p><p>As páginas desta seção detalham a proposta pedagógica, a alimentação e a estrutura física do CEI, além de como fazer a <a href="/educacao-infantil/matricula">matrícula</a>.</p>
                     HTML,
             ],
             [
@@ -352,7 +352,7 @@ final class InitialPages
                 'title' => 'Transparência',
                 'meta_description' => 'O acervo de prestação de contas do Lar Anália Franco — balanços, atas e editais — organizado e público.',
                 'content' => <<<'HTML'
-                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas, editais e relatórios — hoje com {{documentos_transparencia}}.</p><p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o que precisa.</p><p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro de Educação Infantil Anália Franco, também exige prestação de contas periódica. O repasse municipal previsto para 2026 é de R$ 2.819.892,84 (Termo de Colaboração 06/2022).</p><p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por ano e por tipo.</p>
+                    <p>O Lar Anália Franco mantém um acervo de prestação de contas — balanços, atas, editais e relatórios — hoje com {{documentos_transparencia}}.</p><p>Reunimos esses documentos nesta página para que qualquer pessoa consiga localizar o que precisa.</p><p>O convênio com a Secretaria Municipal de Educação de Londrina, que sustenta o Centro de Educação Infantil Anália Franco, também exige prestação de contas periódica.</p><p>Acesse o <a href="/transparencia/documentos">acervo de documentos</a>, com filtro por ano e por tipo.</p>
                     HTML,
             ],
         ];

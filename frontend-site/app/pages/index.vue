@@ -69,8 +69,8 @@ const pillars = [
         O Lar Anália Franco atende crianças na educação infantil e prepara uma escola de
         contraturno para crianças e adolescentes de 6 a 15 anos, com início de turmas previsto
         para 2027. A creche é
-        custeada pelo Termo de Colaboração com a Prefeitura de Londrina — R$ 2.819.892,84
-        previstos para 2026 — e é o bazar beneficente que cobre o que esse convênio não cobre.
+        custeada pelo Termo de Colaboração com a Prefeitura de Londrina, e o bazar beneficente
+        cobre o que esse convênio não cobre.
         Esta página reúne as três frentes e a prestação de contas que sustenta cada uma delas.
       </p>
       <div class="home__hero-ctas">
@@ -98,16 +98,6 @@ const pillars = [
         <NuxtLink to="/transparencia">Transparência</NuxtLink>.
       </p>
       <div class="ledger">
-        <LedgerLine
-          value="15"
-          label="Turmas de educação infantil em período integral"
-          date="Plano de trabalho 2026"
-        />
-        <LedgerLine
-          value="R$ 2.819.892,84"
-          label="Repasse do Termo de Colaboração com o Município"
-          date="2026"
-        />
         <template v-if="marcos">
           <LedgerLine
             :value="String(marcos.bazaar_opened.year)"

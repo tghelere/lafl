@@ -18,11 +18,10 @@ test.describe('home sem API', () => {
 
     expect(resposta?.status()).toBe(200)
 
-    // Só as duas linhas fixas (turmas e repasse do convênio, sem depender da API) continuam
-    // como LedgerLine. As outras duas (fundação e bazar) não renderizam sem os números que
-    // precisam — teria sobrado uma linha truncada (valor ou rótulo sem data) — e dão lugar à
-    // frase alternativa abaixo.
-    await expect(page.locator('.ledger__item')).toHaveCount(2)
+    // Não há mais linha fixa no registro: as duas (fundação e bazar) não renderizam sem os
+    // números que precisam — teria sobrado uma linha truncada (valor ou rótulo sem data) — e
+    // dão lugar à frase alternativa abaixo.
+    await expect(page.locator('.ledger__item')).toHaveCount(0)
     await expect(page.locator('.ledger__fallback')).toBeVisible()
 
     await expect(

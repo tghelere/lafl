@@ -31,13 +31,13 @@ async function contagemDoAcervo(): Promise<number> {
  * normal.
  */
 test.describe('home — fundação e tempo de bazar', () => {
-  test('com a API de pé, a home mostra as quatro linhas de registro, não a frase alternativa', async ({ page }) => {
+  test('com a API de pé, a home mostra as duas linhas de registro, não a frase alternativa', async ({ page }) => {
     await gotoSite(page, '/')
 
     await expect(page.locator('.ledger__fallback')).toHaveCount(0)
 
     const itens = page.locator('.ledger__item')
-    await expect(itens).toHaveCount(4)
+    await expect(itens).toHaveCount(2)
 
     await expect(page.getByText('Fundação da associação')).toBeVisible()
     await expect(page.getByText('Bazar beneficente em funcionamento desde')).toBeVisible()
