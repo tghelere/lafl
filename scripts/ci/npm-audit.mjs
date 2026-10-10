@@ -12,6 +12,23 @@ const EXCECOES = {
   // servidor de produção verifica assinatura com ele. A "correção" que o npm sugere
   // (nuxt@3.15.1, --force) é rebaixamento de major. Revisar quando houver node-forge > 1.4.0.
   'GHSA-86w9-cpqp-85rv': 'node-forge sem versão corrigida; só no nuxt dev (listhen), fora do .output',
+
+  // simple-git (3 avisos) e @simple-git/argv-parser: a correção existe (simple-git >= 4.0.2),
+  // mas @nuxt/devtools@3.4.2 — a última estável — fixa ^3.36.0 e faz `import Git from 'simple-git'`,
+  // export que a 4.x removeu. Testado com `overrides`: `nuxt prepare` quebra com "does not provide
+  // an export named 'default'". Só chega via nuxt → @nuxt/devtools (DevTools do `nuxt dev`, que roda
+  // git na máquina do desenvolvedor); não está em .output (conferido em 2026-10-10). Revisar quando
+  // sair @nuxt/devtools 4 estável ou uma 3.x com simple-git >= 4.0.2.
+  'GHSA-v5rq-49vh-5v5c': 'simple-git/argv-parser: só @nuxt/devtools (nuxt dev), fora do .output; 4.x incompatível com o devtools',
+  'GHSA-x6jw-m9v5-85vh': 'simple-git: só @nuxt/devtools (nuxt dev), fora do .output; 4.x incompatível com o devtools',
+  'GHSA-g4wm-2vf7-vfgr': 'simple-git: só @nuxt/devtools (nuxt dev), fora do .output; 4.x incompatível com o devtools',
+  'GHSA-858h-whjf-mvg5': 'simple-git: só @nuxt/devtools (nuxt dev), fora do .output; 4.x incompatível com o devtools',
+
+  // braces: DoS por padrão `{}` aninhado em excesso. Última versão publicada (3.0.3) é a
+  // vulnerável — não existe correção. Só chega via nuxt → nitropack → globby → fast-glob →
+  // micromatch, que expande globs de config do próprio projeto em tempo de build; não está
+  // em .output (conferido em 2026-10-10) e nenhuma entrada de usuário chega a ele.
+  'GHSA-vfj7-8cjw-p6xm': 'braces sem versão corrigida; só glob de build (nitropack), fora do .output',
 }
 
 const r = spawnSync('npm', ['audit', '--omit=dev', '--json'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
