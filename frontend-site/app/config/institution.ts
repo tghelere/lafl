@@ -84,8 +84,8 @@ export function jsonLdStreetAddress(location: InstitutionLocation): string {
  * mensagem própria do contexto de coleta — a mensagem muda por página, o número não.
  */
 export const institutionContact = {
-  whatsappNumber: '5543999500183',
-  whatsappPhone: '(43) 99950-0183',
+  whatsappNumber: '5543999950183',
+  whatsappPhone: '(43) 99995-0183',
   whatsappMessage: 'Olá! Gostaria de falar com o Lar Anália Franco.',
 } as const
 

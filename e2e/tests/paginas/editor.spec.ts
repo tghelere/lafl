@@ -36,7 +36,7 @@ test.describe('comunicacao', () => {
     {
       descricao: 'com link externo',
       titulo: 'Visite a Loja',
-      precisaConter: ['href="https://wa.me/5543999500183', 'target="_blank"', 'rel="noopener noreferrer"'],
+      precisaConter: ['href="https://wa.me/5543999950183', 'target="_blank"', 'rel="noopener noreferrer"'],
     },
     {
       descricao: 'com lista',

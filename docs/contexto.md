@@ -30,7 +30,7 @@ de endereço, o que afeta seeder, `/contato` e qualquer marcação schema.org fu
   (43) 3325-8060. Terreno de aproximadamente 33.000 m² `[CONFIRMAR]` — mesma pesquisa de
   fonte única dos demais números tratados como não confirmados neste documento.
 - **Bazar:** Rua Rosa Siqueira, 152 — Jd. Aeroporto, Londrina/PR — (43) 3322-2373 e
-  (43) 99950-0183 (WhatsApp).
+  (43) 99995-0183 (WhatsApp).
 
 Recebeu a **Medalha Ouro Verde** da Câmara Municipal de Londrina em 2016, a maior honraria do
 município.
@@ -163,7 +163,7 @@ Frase do vice-presidente que resume o peso do bazar: sem ele, a operação não 
 um dia.
 
 **Agendamento de coleta — confirmado pelo cliente em 13/09/2026:** hoje já é feito por
-telefone e WhatsApp. O WhatsApp (43) 99950-0183 é o canal principal da página
+telefone e WhatsApp. O WhatsApp (43) 99995-0183 é o canal principal da página
 `/bazar/agendar-coleta`; o formulário do site é caminho secundário, para fora do horário de
 atendimento, e notifica automaticamente o setor do bazar.
 

@@ -278,7 +278,7 @@ final class InitialPages
                 'title' => 'Visite a Loja',
                 'meta_description' => 'O Bazar Beneficente funciona em endereço próprio, na Rua Rosa Siqueira, 152, Jd. Aeroporto, em Londrina/PR — separado da sede do Lar Anália Franco.',
                 'content' => <<<'HTML'
-                    <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou <a target="_blank" href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
+                    <p>O Bazar Beneficente funciona em endereço próprio, separado da sede do Lar Anália Franco: Rua Rosa Siqueira, 152, Jd. Aeroporto, Londrina/PR. Telefone (43) 3322-2373 ou <a target="_blank" href="https://wa.me/5543999950183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." rel="noopener noreferrer">WhatsApp (43) 99995-0183</a>.</p>
                     HTML,
             ],
             [
@@ -286,7 +286,7 @@ final class InitialPages
                 'title' => 'O Que Aceitamos',
                 'meta_description' => 'O Bazar Beneficente do Lar Anália Franco recebe doações de itens para revenda na loja física da instituição.',
                 'content' => <<<'HTML'
-                    <p>O Bazar Beneficente recebe doações de itens para revenda na loja física da instituição.</p><p>A lista detalhada do que é aceito — e do que não é — está em confirmação com a equipe do bazar. Para <a href="/bazar/agendar-coleta">agendar uma coleta</a>, o jeito mais rápido é pelo <a target="_blank" href="https://wa.me/5543999500183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." rel="noopener noreferrer">WhatsApp (43) 99950-0183</a>.</p>
+                    <p>O Bazar Beneficente recebe doações de itens para revenda na loja física da instituição.</p><p>O bazar aceita de doação: móveis (sem a necessidade de reformas), eletros (funcionando ou não), roupas, calçados, brinquedos, livros, utensílios de decoração e cozinha.</p><p>Para <a href="/bazar/agendar-coleta">agendar uma coleta</a>, o jeito mais rápido é pelo <a target="_blank" href="https://wa.me/5543999950183?text&#61;Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20coleta%20de%20doa%C3%A7%C3%A3o%20para%20o%20Bazar%20Beneficente." rel="noopener noreferrer">WhatsApp (43) 99995-0183</a>.</p>
                     HTML,
             ],
             [

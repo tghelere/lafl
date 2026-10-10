@@ -38,7 +38,7 @@ test.describe('páginas que dependem da API, com a API fora do ar', () => {
         'tel:+554333258060',
       )
       const whatsapp = contato.getByRole('link', { name: 'WhatsApp' })
-      await expect(whatsapp).toHaveAttribute('href', /^https:\/\/wa\.me\/5543999500183\?text=/)
+      await expect(whatsapp).toHaveAttribute('href', /^https:\/\/wa\.me\/5543999950183\?text=/)
       await expect(whatsapp).toHaveAttribute('target', '_blank')
     })
   }
