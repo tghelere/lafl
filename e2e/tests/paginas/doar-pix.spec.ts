@@ -67,7 +67,7 @@ test.describe('/doar — formas de doação', () => {
     expect(Math.abs(a.height - b.height)).toBeLessThanOrEqual(1)
 
     const y = async (card: typeof pixCard, selector: string) => (await card.locator(selector).boundingBox())!.y
-    expect(Math.abs((await y(pixCard, 'h2')) - (await y(bankCard, 'h2')))).toBeLessThanOrEqual(1)
+    expect(Math.abs((await y(pixCard, 'h3')) - (await y(bankCard, 'h3')))).toBeLessThanOrEqual(1)
     expect(Math.abs((await y(pixCard, '.donate__footer')) - (await y(bankCard, '.donate__footer')))).toBeLessThanOrEqual(1)
 
     await expect(pixCard.locator('.donate__footer')).toHaveText('Recebedor: Lar Anália Franco de Londrina')
