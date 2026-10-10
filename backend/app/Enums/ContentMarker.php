@@ -31,6 +31,7 @@ enum ContentMarker: string
     case BazaarAge = 'idade_bazar';
     case CeiAge = 'idade_cei';
     case TransparencyDocumentCount = 'documentos_transparencia';
+    case DonationMethods = 'formas_de_doacao';
 
     /**
      * O marcador como se escreve no conteúdo da página.
@@ -51,6 +52,7 @@ enum ContentMarker: string
             self::BazaarAge => 'Tempo de funcionamento do bazar',
             self::CeiAge => 'Tempo de funcionamento do CEI Anália Franco',
             self::TransparencyDocumentCount => 'Documentos publicados em Transparência',
+            self::DonationMethods => 'Cartões de doação (Pix e transferência bancária)',
         };
     }
 
@@ -65,8 +67,18 @@ enum ContentMarker: string
             self::HeadquartersAge => 'headquarters_inaugurated',
             self::BazaarAge => 'bazaar_opened',
             self::CeiAge => 'cei_created',
-            self::TransparencyDocumentCount => null,
+            self::TransparencyDocumentCount, self::DonationMethods => null,
         };
+    }
+
+    /**
+     * Marcador que o servidor NÃO troca por texto: o site (Nuxt) o troca por um componente, porque
+     * os dados vêm de frontend-site/app/config/institution.ts. Sai cru da API pública, de
+     * propósito — se o painel apagar o marcador, o componente simplesmente não aparece.
+     */
+    public function isRenderedBySite(): bool
+    {
+        return $this === self::DonationMethods;
     }
 
     /**

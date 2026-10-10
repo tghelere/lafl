@@ -13,6 +13,19 @@ if (error.value) {
 
 const page = computed(() => (data.value && 'data' in data.value ? data.value.data : null))
 
+// O texto do CMS traz o marcador {{formas_de_doacao}} (o servidor o deixa cru, de propósito:
+// ver App\Enums\ContentMarker::isRenderedBySite). Aqui ele vira os cartões de Pix e
+// transferência. Sem marcador (apagado pelo painel), `after` é null e nada de cartão aparece.
+const MARKER = /(?:<p>\s*)?\{\{\s*formas_de_doacao\s*\}\}(?:\s*<\/p>)?/
+const parts = computed(() => {
+  const content = page.value?.content ?? ''
+  const match = MARKER.exec(content)
+
+  if (!match) return { before: content, after: null as string | null }
+
+  return { before: content.slice(0, match.index), after: content.slice(match.index + match[0].length) }
+})
+
 usePageSeo({
   title: () => page.value?.meta_title || page.value?.title || 'Doar — Lar Anália Franco',
   description: () => page.value?.meta_description || undefined,
@@ -31,13 +44,14 @@ usePageSeo({
     <article class="prose">
       <h1>{{ page.title }}</h1>
 
-      <!-- O Pix vem de app/config/institution.ts, não do CMS: fica logo abaixo do título,
-           antes do texto, que só explica o resto (transferência, itens). -->
-      <AppDoacaoPix />
-
       <!-- Mesma observação de [...slug].vue: conteúdo do CMS, sanitizado no backend ao
-           salvar (ver docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md). -->
-      <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
+           salvar (ver docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md). Os cartões
+           ficam no lugar do marcador {{formas_de_doacao}}; dados de app/config/institution.ts. -->
+      <div class="page-content" data-grupo-ampliacao="texto" v-html="parts.before" />
+      <template v-if="parts.after !== null">
+        <AppFormasDeDoacao />
+        <div class="page-content" data-grupo-ampliacao="texto" v-html="parts.after" />
+      </template>
     </article>
   </template>
 </template>

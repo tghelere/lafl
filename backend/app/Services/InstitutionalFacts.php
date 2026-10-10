@@ -40,6 +40,10 @@ final class InstitutionalFacts
      */
     public function value(ContentMarker $marker): string
     {
+        if ($marker->isRenderedBySite()) {
+            return 'dois cartões, com Pix e transferência bancária';
+        }
+
         $milestone = $marker->milestone();
 
         return $milestone !== null

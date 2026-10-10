@@ -21,6 +21,9 @@ use App\Services\InstitutionalFacts;
  *   recebesse "73 anos", o primeiro salvamento gravaria esse texto no banco e o cálculo
  *   morreria em silêncio — a página seguiria dizendo 73 para sempre.
  *
+ * Marcador que o site renderiza (ContentMarker::isRenderedBySite) também sai cru: quem o troca é
+ * o Nuxt.
+ *
  * Marcador desconhecido fica como está, cru. Ele não deveria existir (App\Actions\Content\
  * AssertContentMarkersAreKnown recusa ao salvar), e se um dia existir é melhor que apareça
  * do que sumir com o trecho.
@@ -42,7 +45,9 @@ final class ResolveContentMarkers
             function (array $matches): string {
                 $marker = ContentMarker::tryFrom($matches[1]);
 
-                return $marker !== null ? $this->facts->value($marker) : $matches[0];
+                return $marker !== null && ! $marker->isRenderedBySite()
+                    ? $this->facts->value($marker)
+                    : $matches[0];
             },
             $content,
         );
