@@ -98,6 +98,20 @@ conteúdo público é cacheado por 10 minutos (`cache:clear` para ver na hora).
   proporção real (retrato 0,56 e 4:3 conferidos). Nada precisou de correção. Os botões de cópia
   são cobertos pelo e2e (o clipboard real do navegador não é lido).
 
+## Ajuste visual dos cartões de /doar (`19f1ec6`)
+
+- **Mudou (`AppFormasDeDoacao.vue`):** títulos dos cartões passam a `h3` (26 px) com ícone de 20 px
+  centralizado na linha; botões "Copiar" das linhas (chave Pix, agência, conta, CNPJ) ficam
+  compactos (36 px, ícone de copiar + texto, mesma largura mínima), alinhados à direita;
+  "Copiar código Pix" segue primário em largura total. Todas as linhas (inclusive "Banco", sem
+  botão) têm 56 px de altura fixa, valor e botão alinhados no centro.
+- **Conferido no navegador (375 e 1280 px):** cartões de mesma altura (408 px no desktop), títulos
+  e rodapés na mesma linha, linhas de 56 px, botões de 36 px com a mesma borda direita, sem
+  estouro horizontal no celular, Pix primeiro.
+- **Testes:** o e2e do desktop agora confere altura igual das linhas e dos botões e o alinhamento à
+  direita; o seletor do título passou de `h2` para `h3`. **Migração de dados:** nenhuma.
+- **Decisão:** o título ficou `h3` direto sob o `h1` (pulando o nível 2), como pedido.
+
 ## Conferência humana
 
 - Rodar `php artisan migrate` em produção e `cache:clear`; se a migração pular /doar (texto

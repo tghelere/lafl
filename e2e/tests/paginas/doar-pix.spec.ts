@@ -70,6 +70,15 @@ test.describe('/doar — formas de doação', () => {
     expect(Math.abs((await y(pixCard, 'h3')) - (await y(bankCard, 'h3')))).toBeLessThanOrEqual(1)
     expect(Math.abs((await y(pixCard, '.donate__footer')) - (await y(bankCard, '.donate__footer')))).toBeLessThanOrEqual(1)
 
+    // Linhas de altura igual (com ou sem botão) e botões "Copiar" da mesma altura, à direita.
+    const alturas = await page.locator('.donate__row').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().height)))
+    expect(new Set(alturas).size).toBe(1)
+    const botoes = await page.locator('.donate__copy').evaluateAll((els) =>
+      els.map((el) => ({ h: Math.round(el.getBoundingClientRect().height), r: Math.round(el.getBoundingClientRect().right) })),
+    )
+    expect(new Set(botoes.map((b) => b.h)).size).toBe(1)
+    expect(new Set(botoes.slice(1).map((b) => b.r)).size).toBe(1)
+
     await expect(pixCard.locator('.donate__footer')).toHaveText('Recebedor: Lar Anália Franco de Londrina')
     await expect(bankCard.locator('.donate__footer')).toHaveText('Favorecido: Lar Anália Franco de Londrina')
     await expect(pixCard.locator('.pix__qr--wide svg')).toBeVisible()
