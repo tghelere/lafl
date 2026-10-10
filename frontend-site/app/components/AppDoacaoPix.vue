@@ -154,7 +154,7 @@ const status = computed(() =>
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-5);
-  margin-top: var(--space-7);
+  margin-block: var(--space-6) var(--space-7);
 }
 
 .pix__title {

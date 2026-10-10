@@ -187,7 +187,10 @@ existem.
 
 **PIX e transferência bancária — confirmados pelo cliente em 10/09/2026:**
 
-- PIX (chave CNPJ): 78.614.096/0001-75 — nome exibido: LAR ANALIA FRANCO DE LONDRINA
+- PIX (chave CNPJ): 78.614.096/0001-75 — nome exibido: LAR ANALIA FRANCO DE LONDRINA.
+  Desde 10/10/2026 a chave e o payload "copia e cola" (CRC 717A) vivem em
+  `frontend-site/app/config/institution.ts` (`pix`) e `/doar` os mostra num card com QR Code;
+  o texto da página no CMS não repete a chave. Mudou a chave? Regerar o payload e o CRC.
 - Transferência: Banco do Brasil (001), agência 2755-3, conta corrente 4963-8
 
 **Removido em 10/09/2026, por instrução do cliente:** menção a Nota Paraná e a qualquer

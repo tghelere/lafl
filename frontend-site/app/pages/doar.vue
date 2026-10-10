@@ -30,11 +30,14 @@ usePageSeo({
 
     <article class="prose">
       <h1>{{ page.title }}</h1>
+
+      <!-- O Pix vem de app/config/institution.ts, não do CMS: fica logo abaixo do título,
+           antes do texto, que só explica o resto (transferência, itens). -->
+      <AppDoacaoPix />
+
       <!-- Mesma observação de [...slug].vue: conteúdo do CMS, sanitizado no backend ao
            salvar (ver docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md). -->
       <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
     </article>
-
-    <AppDoacaoPix />
   </template>
 </template>

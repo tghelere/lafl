@@ -64,7 +64,7 @@ já é o limite do que cabe em desktop sem quebrar.
 | `/bazar/sua-compra-vira-educacao` | SSG | CMS | — |
 | **Como ajudar** | | | |
 | `/como-ajudar` | SSG | CMS | — |
-| `/como-ajudar/doar` | SSG | CMS (PIX, QR) | — |
+| `/como-ajudar/doar` | SSR | CMS (texto) + Pix/QR de `institution.ts` | — |
 | `/como-ajudar/doar-itens` | — | Redirect 301 → `/bazar/agendar-coleta` | — |
 | `/como-ajudar/voluntariado` | SSR | CMS + form | **Sim** |
 | `/como-ajudar/parceiros` | SSG | CMS | — |

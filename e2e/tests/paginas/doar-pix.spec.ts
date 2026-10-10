@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { pix, pixKeyFormatted } from '../../../frontend-site/app/config/institution'
-import { gotoSite, serverHtml } from '../../support/site'
+import { gotoSite, serverHtml, serverPageContent } from '../../support/site'
 
 /** Troca navigator.clipboard.writeText por um registro — Firefox não permite ler a área real. */
 async function captureClipboard(page: import('@playwright/test').Page): Promise<void> {
@@ -24,6 +24,18 @@ test.describe('/doar — Doe por Pix', () => {
     expect(html).toContain('data-testid="doe-por-pix"')
     expect(html).toMatch(/<svg[^>]*aria-label="QR Code do Pix[^"]*"[\s\S]*?<path fill="#000000"/)
     expect(html).toContain('fill="#ffffff"')
+  })
+
+  test('o card vem logo abaixo do título, antes do texto do CMS, que não repete a chave', async () => {
+    const html = await serverHtml('/doar')
+
+    expect(html.indexOf('<h1')).toBeLessThan(html.indexOf('data-testid="doe-por-pix"'))
+    expect(html.indexOf('data-testid="doe-por-pix"')).toBeLessThan(html.indexOf('class="page-content"'))
+
+    const text = await serverPageContent('/doar')
+
+    expect(text).not.toContain('78.614.096')
+    expect(text).toContain('não recebe nem guarda dados de pagamento')
   })
 
   test('desktop: QR visível e os botões copiam o código e a chave certos', async ({ page }) => {
