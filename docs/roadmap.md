@@ -426,8 +426,8 @@
       jurídico".
 - [ ] `/bazar/visite-a-loja` não tem horário de funcionamento nem mapa — `[LACUNA]`, pendente
       de confirmação com a administração do bazar
-- [ ] `/como-ajudar/doar` publica a chave PIX e os dados bancários como texto (confirmados em
-      10/09/2026, ver `docs/contexto.md`) — ainda não tem QR code
+- [x] `/como-ajudar/doar`: Pix (com QR Code) e transferência em dois cartões, vindos de
+      `institution.ts` via marcador `{{formas_de_doacao}}` (ver `docs/contexto.md`)
 - [ ] `/educacao-infantil/dia-da-crianca` tem conteúdo muito magro (dois parágrafos genéricos)
       — não há nenhum fato confirmado sobre a edição do evento em `docs/contexto.md`; revisar
       assim que houver informação real, ou considerar remover a página até lá
@@ -812,6 +812,13 @@ excluir ou renomear uma página-mãe de verdade, não depois.
 - [x] Favicon do painel versionado (`?v=2`); [x] cadastro de parceiros (painel, API, grade no
       site); [x] ampliação nunca menor que na página. Ver `docs/relatorio-sessao-36.md`.
 - [ ] Parceiros: reordenar arrastando (hoje é campo de ordem); logo em SVG exigiria sanitização.
+
+## /doar — cartões de doação
+
+- [x] Marcador `{{formas_de_doacao}}`, cartões Pix e Transferência, migração do texto do CMS e
+      e2e (`e2e/tests/paginas/doar-pix.spec.ts`).
+- [ ] Observação: o CNPJ aparece duas vezes na página (chave Pix e linha CNPJ da transferência)
+      — é o mesmo número por pedido; a "chave Pix" em si aparece uma única vez.
 
 ## Fase 2 — bloqueada
 
