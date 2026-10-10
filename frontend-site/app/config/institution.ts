@@ -92,3 +92,26 @@ export const institutionContact = {
 export function whatsappHref(message: string = institutionContact.whatsappMessage): string {
   return `https://wa.me/${institutionContact.whatsappNumber}?text=${encodeURIComponent(message)}`
 }
+
+/**
+ * Pix da instituição — chave CNPJ e o payload "copia e cola" (BR Code estático, EMV) que o QR
+ * de /doar desenha. Fonte única: o QR, o botão de copiar e a chave exibida leem daqui.
+ *
+ * O payload é fixo e foi validado (CRC16-CCITT 717A; e2e/tests/unitario/pix-payload.spec.ts
+ * recalcula). Sem valor embutido: a pessoa digita no app. Se a chave ou o nome do recebedor
+ * mudarem, o payload precisa ser regerado com novo CRC — o teste acusa se esquecerem.
+ * Dados de docs/contexto.md ("PIX e transferência bancária").
+ */
+export const pix = {
+  /** Só dígitos — é o valor da chave, o que vai para a área de transferência. */
+  key: '78614096000175',
+  payload:
+    '00020126360014BR.GOV.BCB.PIX0114786140960001755204000053039865802BR5917LAR ANALIA FRANCO6008LONDRINA62140510DOACAOSITE6304717A',
+  /** Nome como o app do banco o exibe ao conferir o recebedor. */
+  receiverName: 'Lar Anália Franco de Londrina',
+} as const
+
+/** "78.614.096/0001-75" — a chave como a pessoa lê. */
+export function pixKeyFormatted(): string {
+  return pix.key.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5')
+}

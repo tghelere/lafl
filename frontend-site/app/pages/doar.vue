@@ -34,5 +34,7 @@ usePageSeo({
            salvar (ver docs/decisoes/0010-html-do-cms-sanitizado-no-backend.md). -->
       <div class="page-content" data-grupo-ampliacao="texto" v-html="page.content" />
     </article>
+
+    <AppDoacaoPix />
   </template>
 </template>
