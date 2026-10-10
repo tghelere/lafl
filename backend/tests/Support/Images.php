@@ -22,12 +22,16 @@ final class Images
      */
     public static function jpegWithExif(int $width, int $height, int $orientation = 1): UploadedFile
     {
-        $bytes = self::jpegBytes($width, $height);
+        return self::upload(self::withExif(self::jpegBytes($width, $height), $orientation), 'IMG_20260929_foto da Maria.jpg', 'image/jpeg');
+    }
 
+    /**
+     * Insere o mesmo bloco EXIF de jpegWithExif() num JPEG qualquer gerado pelo teste.
+     */
+    public static function withExif(string $jpegBytes, int $orientation): string
+    {
         // SOI (FFD8) + APP1 + o resto do JPEG que o GD gerou (que começa com o próprio SOI).
-        $withExif = "\xFF\xD8".self::app1Exif($orientation).substr($bytes, 2);
-
-        return self::upload($withExif, 'IMG_20260929_foto da Maria.jpg', 'image/jpeg');
+        return "\xFF\xD8".self::app1Exif($orientation).substr($jpegBytes, 2);
     }
 
     public static function jpeg(int $width, int $height, string $name = 'foto.jpg'): UploadedFile

@@ -28,5 +28,13 @@
              definida, então bastaria uma linha esquecida aqui para o .env.testing parar de
              fazer efeito silenciosamente. -->
         <env name="APP_ENV" value="testing"/>
+        <!-- Limite do PROCESSO de testes, não da aplicação: a suíte inteira roda num processo
+             só, e o que os testes anteriores deixam alocado (container, rotas, factories) se
+             acumula — ~80 MB ao chegar no seeder, que processa as 24 fotos iniciais. Com o
+             padrão de 128M do CLI, `php artisan test` estourava ali de forma intermitente.
+             O processador de imagem em si tem orçamento próprio, medido e documentado em
+             App\Services\Media\ImageProcessor::MAX_PIXELS; produção usa o memory_limit de
+             infra/provisionar.sh, não este. -->
+        <ini name="memory_limit" value="512M"/>
     </php>
 </phpunit>
