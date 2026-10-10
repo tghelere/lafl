@@ -112,13 +112,13 @@ const status = computed(() => (copied.value ? messages[copied.value] : ''))
 <template>
   <div ref="root" class="donate" :class="{ 'donate--manual': manual }" data-testid="formas-de-doacao">
     <section class="card donate__card" aria-labelledby="pix-titulo" data-testid="doe-por-pix">
-      <h3 id="pix-titulo" class="donate__title">
+      <h2 id="pix-titulo" class="donate__title">
         <svg class="donate__icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 2.5 21.5 12 12 21.5 2.5 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
           <path d="M8.5 12 12 8.5l3.5 3.5-3.5 3.5z" fill="currentColor" />
         </svg>
         Doe por Pix
-      </h3>
+      </h2>
 
       <div class="donate__body">
         <div class="pix__qr-row">
@@ -167,12 +167,12 @@ const status = computed(() => (copied.value ? messages[copied.value] : ''))
     </section>
 
     <section class="card donate__card" aria-labelledby="transferencia-titulo" data-testid="doe-por-transferencia">
-      <h3 id="transferencia-titulo" class="donate__title">
+      <h2 id="transferencia-titulo" class="donate__title">
         <svg class="donate__icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 10 12 4l9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 20h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         Transferência bancária
-      </h3>
+      </h2>
 
       <div class="donate__body">
         <div class="donate__row">
@@ -220,6 +220,9 @@ const status = computed(() => (copied.value ? messages[copied.value] : ''))
 }
 
 .donate__title {
+  /* h2 na hierarquia, mas com o tamanho e o peso de h3 do design system (base.css). */
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
   display: flex;
   align-items: center;
   gap: var(--space-2);

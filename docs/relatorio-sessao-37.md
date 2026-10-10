@@ -110,7 +110,10 @@ conteúdo público é cacheado por 10 minutos (`cache:clear` para ver na hora).
   estouro horizontal no celular, Pix primeiro.
 - **Testes:** o e2e do desktop agora confere altura igual das linhas e dos botões e o alinhamento à
   direita; o seletor do título passou de `h2` para `h3`. **Migração de dados:** nenhuma.
-- **Decisão:** o título ficou `h3` direto sob o `h1` (pulando o nível 2), como pedido.
+- **Decisão inicial:** o título ficou `h3` direto sob o `h1` (pulando o nível 2), como pedido.
+- **Correção posterior:** a tag voltou a `h2`, para não pular nível na hierarquia, mantendo o visual
+  (26 px, peso semibold, espaçamento) com `font-size`/`font-weight` explícitos em `.donate__title`.
+  e2e ajustado para `h2`; a nota de hierarquia saiu do roadmap.
 
 ## Conferência humana
 
