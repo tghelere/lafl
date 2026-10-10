@@ -111,6 +111,20 @@ export const pix = {
   receiverName: 'Lar Anália Franco de Londrina',
 } as const
 
+/**
+ * Transferência bancária (TED/DOC) — ao lado do Pix, mesma fonte única: o card de /doar lê daqui.
+ * Valores como a pessoa digita no app do banco; o CNPJ é o mesmo da chave Pix (`pix.key`).
+ */
+export const bankTransfer = {
+  bank: 'Banco do Brasil',
+  bankCode: '001',
+  agency: '2755-3',
+  account: '4963-8',
+  accountType: 'Conta corrente',
+  beneficiary: 'LAR ANALIA FRANCO DE LONDRINA',
+  cnpj: '78.614.096/0001-75',
+} as const
+
 /** "78.614.096/0001-75" — a chave como a pessoa lê. */
 export function pixKeyFormatted(): string {
   return pix.key.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5')
