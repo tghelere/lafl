@@ -817,8 +817,16 @@ excluir ou renomear uma página-mãe de verdade, não depois.
 
 - [x] Marcador `{{formas_de_doacao}}`, cartões Pix e Transferência, migração do texto do CMS e
       e2e (`e2e/tests/paginas/doar-pix.spec.ts`).
+- [x] Cartões nunca somem: sem o marcador no texto do CMS, vêm logo após o texto (e2e cobre).
 - [ ] Observação: o CNPJ aparece duas vezes na página (chave Pix e linha CNPJ da transferência)
       — é o mesmo número por pedido; a "chave Pix" em si aparece uma única vez.
+
+## Sessão 37
+
+- [x] Valores voláteis, WhatsApp/itens do bazar, ImageProcessor, galerias 4:3, fotos do bazar,
+      auditoria npm, Pix e transferência. Ver `docs/relatorio-sessao-37.md`.
+- [ ] Em produção, se a migração de /doar pular por texto editado, o corpo antigo (lista de PIX)
+      permanece ao lado dos cartões até alguém editar no painel — decisão de conteúdo do Lar.
 
 ## Fase 2 — bloqueada
 

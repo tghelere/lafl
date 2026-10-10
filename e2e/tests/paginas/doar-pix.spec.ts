@@ -154,7 +154,7 @@ test.describe('/doar — formas de doação', () => {
   test('sem o marcador no texto do CMS, os cartões vêm logo após o texto', async () => {
     const api = await AdminApi.as('super_admin')
     const lista = await api.get('/api/v1/pages', { search: 'Doar', per_page: 100 })
-    const paginas = ((await lista.json()) as { data: { id: string; slug: string; title: string; content: string; status: string }[] }).data
+    const paginas = ((await lista.json()) as { data: { id: string; slug: string; title: string; content: string; status: string; meta_title: string | null; meta_description: string | null }[] }).data
     const doar = paginas.find((candidata) => candidata.slug === 'como-ajudar/doar')!
 
     expect(doar.content).toContain('{{formas_de_doacao}}')
@@ -164,8 +164,8 @@ test.describe('/doar — formas de doação', () => {
         slug: doar.slug,
         title: doar.title,
         content,
-        meta_title: null,
-        meta_description: null,
+        meta_title: doar.meta_title,
+        meta_description: doar.meta_description,
         status: doar.status,
       })
 
