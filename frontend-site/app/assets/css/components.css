@@ -257,6 +257,16 @@
   cursor: zoom-in;
 }
 
+/* Miniatura de listagem (AppImagem `recorte`): todas na mesma proporção, qualquer que seja a
+   foto. O recorte é do centro, sem distorcer e sem faixa vazia; a ampliação mostra a inteira. */
+.midia-recortada {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center;
+}
+
 /* O contorno é o global (base.css); aqui só o raio acompanha o da imagem. */
 .midia-ampliavel:focus-visible,
 .page-content a[data-ampliar]:focus-visible {

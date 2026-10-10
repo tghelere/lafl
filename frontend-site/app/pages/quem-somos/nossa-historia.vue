@@ -74,7 +74,7 @@ usePageSeo({
 
       <div v-for="(par, indice) in pares" :key="indice" class="registro-epoca__par">
         <figure v-for="imagem in par" :key="imagem.src">
-          <AppImagem :imagem="imagem" contexto="metade" grupo="galeria" />
+          <AppImagem :imagem="imagem" contexto="metade" grupo="galeria" recorte />
           <figcaption v-if="imagem.caption">{{ imagem.caption }}</figcaption>
         </figure>
       </div>

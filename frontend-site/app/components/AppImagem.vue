@@ -22,9 +22,21 @@ const props = withDefaults(
     prioridade?: boolean
     /** Grupo de ampliação (ex.: "galeria"). Presente = a imagem abre ampliada. */
     grupo?: string
+    /**
+     * Miniatura de listagem: recortada em 4:3 (object-fit: cover, centro), qualquer que seja a
+     * foto. As dimensões do <img> passam a ser as do recorte; a proporção real segue no link
+     * (`data-largura`/`data-altura`) para a ampliação mostrar a foto inteira.
+     */
+    recorte?: boolean
   }>(),
-  { prioridade: false },
+  { prioridade: false, recorte: false },
 )
+
+const LARGURA_RECORTE = 800
+const ALTURA_RECORTE = 600
+
+const largura = computed(() => (props.recorte ? LARGURA_RECORTE : props.imagem.width))
+const altura = computed(() => (props.recorte ? ALTURA_RECORTE : props.imagem.height))
 
 const SIZES: Record<typeof props.contexto, string> = {
   cheia: '100vw',
@@ -42,14 +54,17 @@ const SIZES: Record<typeof props.contexto, string> = {
     data-ampliar
     :data-grupo="grupo"
     :data-credito="imagem.credit || undefined"
+    :data-largura="recorte ? imagem.width : undefined"
+    :data-altura="recorte ? imagem.height : undefined"
     :aria-label="`Ampliar imagem: ${imagem.alt}`"
   >
     <img
+      :class="{ 'midia-recortada': recorte }"
       :src="imagem.src"
       :srcset="imagem.srcset"
       :sizes="SIZES[contexto]"
-      :width="imagem.width"
-      :height="imagem.height"
+      :width="largura"
+      :height="altura"
       :alt="imagem.alt"
       :loading="prioridade ? undefined : 'lazy'"
       :fetchpriority="prioridade ? 'high' : undefined"
@@ -58,11 +73,12 @@ const SIZES: Record<typeof props.contexto, string> = {
   </a>
   <img
     v-else
+    :class="{ 'midia-recortada': recorte }"
     :src="imagem.src"
     :srcset="imagem.srcset"
     :sizes="SIZES[contexto]"
-    :width="imagem.width"
-    :height="imagem.height"
+    :width="largura"
+    :height="altura"
     :alt="imagem.alt"
     :loading="prioridade ? undefined : 'lazy'"
     :fetchpriority="prioridade ? 'high' : undefined"

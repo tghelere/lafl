@@ -157,8 +157,9 @@ function lerItem(link: HTMLAnchorElement): Item | null {
     link,
     fontes: lerFontes(img, link),
     paginaLargura: img.getBoundingClientRect().width,
-    largura: Number(img.getAttribute('width')) || img.naturalWidth || 1,
-    altura: Number(img.getAttribute('height')) || img.naturalHeight || 1,
+    // Miniatura recortada: o link guarda a proporção real; o <img> tem a do recorte.
+    largura: Number(link.dataset.largura) || Number(img.getAttribute('width')) || img.naturalWidth || 1,
+    altura: Number(link.dataset.altura) || Number(img.getAttribute('height')) || img.naturalHeight || 1,
     alt: img.getAttribute('alt') ?? '',
     legenda: legenda || null,
     credito: link.dataset.credito || null,

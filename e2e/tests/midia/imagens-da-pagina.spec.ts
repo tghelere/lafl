@@ -88,7 +88,8 @@ test.describe('comunicacao', () => {
       await gotoSite(page, `/${slug}`)
       await imageLoaded(noSite)
       await expect(noSite).toHaveAttribute('srcset', new RegExp(`/midia/${mediaId}/1280\\.webp 1280w`))
-      await expect(noSite).toHaveAttribute('width', '1300')
+      // A miniatura é recortada em 4:3; a largura real da foto fica no link, para a ampliação.
+      await expect(noSite.locator('xpath=..')).toHaveAttribute('data-largura', '1300')
 
       // 4. Tirar da galeria: some do site e continua na biblioteca.
       await openContentPageByTitle(page, titulo)
