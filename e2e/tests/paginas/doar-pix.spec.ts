@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { bankTransfer, pix, pixKeyFormatted } from '../../../frontend-site/app/config/institution'
+import { AdminApi } from '../../support/api'
 import { gotoSite, serverHtml } from '../../support/site'
 
 /** Troca navigator.clipboard.writeText por um registro — Firefox não permite ler a área real. */
@@ -148,5 +149,43 @@ test.describe('/doar — formas de doação', () => {
     expect(await copied(page)).toEqual([pix.payload])
 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  })
+
+  test('sem o marcador no texto do CMS, os cartões vêm logo após o texto', async () => {
+    const api = await AdminApi.as('super_admin')
+    const lista = await api.get('/api/v1/pages', { search: 'Doar', per_page: 100 })
+    const paginas = ((await lista.json()) as { data: { id: string; slug: string; title: string; content: string; status: string }[] }).data
+    const doar = paginas.find((candidata) => candidata.slug === 'como-ajudar/doar')!
+
+    expect(doar.content).toContain('{{formas_de_doacao}}')
+
+    const salvar = (content: string) =>
+      api.put(`/api/v1/pages/${doar.id}`, {
+        slug: doar.slug,
+        title: doar.title,
+        content,
+        meta_title: null,
+        meta_description: null,
+        status: doar.status,
+      })
+
+    try {
+      expect((await salvar('<p>Texto sem marcador algum.</p>')).ok()).toBe(true)
+
+      const html = await serverHtml('/doar')
+      const texto = html.indexOf('Texto sem marcador algum.')
+
+      expect(texto).toBeGreaterThan(-1)
+      expect(texto).toBeLessThan(html.indexOf('data-testid="formas-de-doacao"'))
+      expect(html).toContain('data-testid="doe-por-pix"')
+      expect(html).toContain('data-testid="doe-por-transferencia"')
+    } finally {
+      expect((await salvar(doar.content)).ok()).toBe(true)
+      await api.dispose()
+    }
+
+    // Restaurado: de volta ao caso com marcador, com o texto do bazar DEPOIS dos cartões.
+    const html = await serverHtml('/doar')
+    expect(html.indexOf('data-testid="formas-de-doacao"')).toBeLessThan(html.indexOf('Doações de itens para o Bazar'))
   })
 })

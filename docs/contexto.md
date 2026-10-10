@@ -194,8 +194,9 @@ existem.
   ANALIA FRANCO DE LONDRINA, CNPJ 78.614.096/0001-75 — em `institution.ts` (`bankTransfer`).
 - `/doar` mostra Pix e transferência em dois cartões lado a lado, no lugar do marcador
   `{{formas_de_doacao}}` do texto da página no CMS (o servidor deixa o marcador cru; o Nuxt o
-  troca pelos cartões). O texto do CMS não repete chave nem dados bancários; se o painel apagar
-  o marcador, os cartões somem.
+  troca pelos cartões). O texto do CMS não repete chave nem dados bancários; se o marcador
+  faltar (migração pulada, ou apagado no painel), os cartões vêm logo após o texto — a página nunca
+  fica sem as formas de doar.
 
 **Removido em 10/09/2026, por instrução do cliente:** menção a Nota Paraná e a qualquer
 destinação de Imposto de Renda (fundo da criança e do adolescente, FMDCA, lei de incentivo).
