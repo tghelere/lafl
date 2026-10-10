@@ -199,15 +199,17 @@ test('marcador desconhecido que já esteja no banco vai cru para o site, não so
         ->assertJsonPath('data.content', '<p>{{coisa_que_nao_existe}}</p>');
 });
 
-test('todo marcador declarado resolve para algo diferente de si mesmo', function (): void {
+test('todo marcador declarado resolve para algo diferente de si mesmo, salvo o que o site renderiza', function (): void {
     $conteudo = implode(' ', ContentMarker::placeholders());
 
     Page::factory()->published()->create(['slug' => 'todos', 'content' => $conteudo]);
 
     $resolvido = $this->getJson('/api/v1/public/pages/todos')->json('data.content');
 
-    foreach (ContentMarker::placeholders() as $placeholder) {
-        expect($resolvido)->not->toContain($placeholder);
+    foreach (ContentMarker::cases() as $marker) {
+        $marker->isRenderedBySite()
+            ? expect($resolvido)->toContain($marker->placeholder())
+            : expect($resolvido)->not->toContain($marker->placeholder());
     }
 });
 

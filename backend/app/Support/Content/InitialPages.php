@@ -327,7 +327,7 @@ final class InitialPages
                 'title' => 'Doar',
                 'meta_description' => 'Doe para o Lar Anália Franco via PIX ou transferência bancária.',
                 'content' => <<<'HTML'
-                    <p>A doação vai direto do seu banco para a conta do Lar Anália Franco: o site não recebe nem guarda dados de pagamento. Doe por Pix, no quadro acima, ou por transferência bancária:</p><ul><li><p><strong>Transferência:</strong> Banco do Brasil (001), agência 2755-3, conta corrente 4963-8</p></li></ul><p>Doações de itens para o Bazar Beneficente também sustentam diretamente a instituição.</p>
+                    <p>O Lar Anália Franco ainda não processa doações em dinheiro diretamente pelo site. Doe por PIX ou transferência bancária:</p><p>{{formas_de_doacao}}</p><p>Doações de itens para o Bazar Beneficente também sustentam diretamente a instituição.</p>
                     HTML,
             ],
             [
