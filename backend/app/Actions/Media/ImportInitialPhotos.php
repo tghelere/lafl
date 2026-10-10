@@ -51,14 +51,19 @@ final class ImportInitialPhotos
     ) {}
 
     /**
+     * @param  list<string>|null  $only  Importa só estas chaves do catálogo; sem isto, o catálogo todo (o que o comando faz). A migração de deploy passa o lote novo, para não trazer de volta uma foto antiga que a equipe tirou pelo painel.
      * @return array{created: list<string>, skipped: list<string>, missing_page: array<string, string>, cover_kept: array<string, string>}
      */
-    public function handle(): array
+    public function handle(?array $only = null): array
     {
         $result = ['created' => [], 'skipped' => [], 'missing_page' => [], 'cover_kept' => []];
         $touchedSlugs = [];
 
-        foreach (InitialPhotos::all() as $key => $photo) {
+        foreach (InitialPhotos::catalog() as $key => $photo) {
+            if ($only !== null && ! in_array($key, $only, true)) {
+                continue;
+            }
+
             if (Media::query()->where('origin_key', $key)->exists()) {
                 $result['skipped'][] = $key;
 

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Activity;
 
 /**
- * `midia:importar-fotos-iniciais` com as 24 fotos de verdade de resources/initial-photos. É
+ * `midia:importar-fotos-iniciais` com as 31 fotos de verdade de resources/initial-photos. É
  * o mais lento da suíte de mídia (processa todas), então cada teste importa uma vez só.
  */
 beforeEach(function (): void {
@@ -39,17 +39,17 @@ test('todo arquivo do catálogo existe, e toda foto do catálogo tem arquivo', f
         glob(InitialPhotos::directory().'/*.jpg') ?: [],
     );
 
-    expect($files)->toEqualCanonicalizing(array_keys(InitialPhotos::all()));
+    expect($files)->toEqualCanonicalizing(array_keys(InitialPhotos::catalog()));
 });
 
 test('importa as fotos, põe cada uma no lugar e, rodando de novo, não duplica nada', function (): void {
     $this->seed(ContentPagesSeeder::class);
 
     $this->artisan('midia:importar-fotos-iniciais')
-        ->expectsOutputToContain('24 importada(s), 0 já existente(s), 0 sem página.')
+        ->expectsOutputToContain('31 importada(s), 0 já existente(s), 0 sem página.')
         ->assertSuccessful();
 
-    expect(Media::query()->count())->toBe(24)
+    expect(Media::query()->count())->toBe(31)
         ->and(Media::query()->where('depicts_assisted_minor', true)->count())->toBe(0);
 
     // A galeria na ordem do catálogo, que é a ordem que o site mostrava.
@@ -58,6 +58,8 @@ test('importa as fotos, põe cada uma no lugar e, rodando de novo, não duplica 
         'Entrada do Bazar Beneficente, com toldo azul e carrinhos de compra ao lado',
         'Setor de móveis do bazar, com sofás, poltronas e utensílios à venda',
         'Salão do bazar com araras de roupas, manequins e chapéus expostos',
+        // O lote de 9 de outubro de 2026 vem depois, na ordem em que foi enviado.
+        ...array_map(static fn (array $photo): string => $photo['alt'], array_values(InitialPhotos::additions())),
     ]);
 
     // A capa do bazar é a entrada (o cartão de "O que fazemos"), não a primeira da galeria.
@@ -85,15 +87,15 @@ test('importa as fotos, põe cada uma no lugar e, rodando de novo, não duplica 
     $placa = Media::query()->where('origin_key', 'placa-inauguracao')->firstOrFail();
     expect(Storage::disk('local')->exists(MediaPaths::derivative($placa, 640)))->toBeTrue();
 
-    expect(Activity::query()->where('log_name', 'media')->where('event', 'imported')->count())->toBe(24);
+    expect(Activity::query()->where('log_name', 'media')->where('event', 'imported')->count())->toBe(31);
 
     $before = PageImage::query()->count();
 
     $this->artisan('midia:importar-fotos-iniciais')
-        ->expectsOutputToContain('0 importada(s), 24 já existente(s)')
+        ->expectsOutputToContain('0 importada(s), 31 já existente(s)')
         ->assertSuccessful();
 
-    expect(Media::query()->count())->toBe(24)
+    expect(Media::query()->count())->toBe(31)
         ->and(PageImage::query()->count())->toBe($before);
 });
 
@@ -121,7 +123,7 @@ test('sem a página de destino, a foto não entra, e o comando diz o que fazer',
         ->expectsOutputToContain('conteudo:importar-inicial')
         ->assertFailed();
 
-    // As quatro do bazar ficaram de fora inteiras, e as outras entraram.
+    // As onze do bazar (quatro originais e sete do lote) ficaram de fora inteiras, e as outras entraram.
     expect(Media::query()->where('origin_key', 'like', 'bazar-%')->pluck('origin_key')->sort()->values()->all())
         ->toBe(['bazar-deposito', 'bazar-leitura'])
         ->and(Media::query()->count())->toBe(20);

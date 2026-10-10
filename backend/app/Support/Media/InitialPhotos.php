@@ -55,6 +55,81 @@ final class InitialPhotos
     }
 
     /**
+     * O catálogo inteiro: as fotos iniciais mais os lotes que o Lar enviou depois. É o que
+     * `midia:importar-fotos-iniciais` percorre.
+     *
+     * @return array<string, Photo>
+     */
+    public static function catalog(): array
+    {
+        return [...self::all(), ...self::additions()];
+    }
+
+    /**
+     * Fotos que o Lar enviou depois do lançamento, em lotes. Ficam FORA de `all()` de propósito:
+     * `all()` é o conjunto que existiu como arquivo fixo em `public/fotos/`, e é ele que
+     * App\Actions\Media\ResolveLegacyPhotoUrl usa para redirecionar endereços antigos. Foto de
+     * lote nunca teve endereço antigo, então não pode responder 301 por ele.
+     *
+     * Chegam a produção por uma migração de dados que importa só as chaves do lote
+     * (database/migrations/2026_10_10_120000_add_bazar_photos_batch_two.php). Entram como
+     * vieram, sem seleção estética, no fim da galeria.
+     *
+     * @return array<string, Photo>
+     */
+    public static function additions(): array
+    {
+        $bazar = [['page' => 'bazar', 'role' => PageImageRole::Gallery]];
+
+        // Lote de 9 de outubro de 2026: 7 fotos do WhatsApp do bazar. O texto alternativo
+        // descreve o que aparece, inclusive o forro escuro da primeira.
+        return [
+            'bazar-roupas-corredor' => [
+                'section' => 'bazar',
+                'alt' => 'Corredor do salão do bazar com araras de roupas coloridas e manequins, sob um forro escuro e manchado',
+                'caption' => null,
+                'places' => $bazar,
+            ],
+            'bazar-vitrine-brinquedos' => [
+                'section' => 'bazar',
+                'alt' => 'Vitrine iluminada do bazar com bichos de pelúcia, bonecas e brinquedos nas prateleiras, ao lado de um carrinho de compras',
+                'caption' => null,
+                'places' => $bazar,
+            ],
+            'bazar-moveis-sofas' => [
+                'section' => 'bazar',
+                'alt' => 'Galpão do bazar com sofás, poltronas, mesas e armários expostos à venda',
+                'caption' => null,
+                'places' => $bazar,
+            ],
+            'bazar-roupas-infantis' => [
+                'section' => 'bazar',
+                'alt' => 'Balcão do bazar com roupas infantis penduradas em cabides, manequim ao lado e prateleira de sapatos ao fundo',
+                'caption' => null,
+                'places' => $bazar,
+            ],
+            'bazar-araras-fantasias' => [
+                'section' => 'bazar',
+                'alt' => 'Salão do bazar com araras de roupas, fantasias coloridas à esquerda e algumas araras ainda vazias',
+                'caption' => null,
+                'places' => $bazar,
+            ],
+            'bazar-salao-vista-geral' => [
+                'section' => 'bazar',
+                'alt' => 'Vista geral do salão do bazar, com fileiras de araras de roupas, manequins e janelas altas',
+                'caption' => null,
+                'places' => $bazar,
+            ],
+            'bazar-livros-bancos' => [
+                'section' => 'bazar',
+                'alt' => 'Cantinho de livros do bazar, com estantes de madeira cheias e bancos de metal para espera',
+                'caption' => null,
+                'places' => $bazar,
+            ],
+        ];
+    }
+
+    /**
      * @return array<string, Photo>
      */
     public static function all(): array

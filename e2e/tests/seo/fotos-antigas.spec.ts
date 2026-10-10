@@ -46,7 +46,8 @@ test.beforeAll(async () => {
 
   const after = ((await (await api.get('/api/v1/media', { per_page: 60 })).json()) as { data: Listed[] }).data
   imported = after.map((m) => m.id).filter((id) => !before.has(id))
-  expect(imported).toHaveLength(24)
+  // 24 fotos iniciais mais as 7 do lote do bazar (InitialPhotos::additions), que não têm endereço antigo.
+  expect(imported).toHaveLength(31)
 })
 
 test.afterAll(async () => {

@@ -54,6 +54,19 @@ Sete delas não estavam em página nenhuma e ficam só na biblioteca: `fachada-s
 `recanto-da-amizade`, `recanto-vista`, `recepcao`, `horta-kids-vista`, `bazar-deposito` e
 `bazar-leitura`.
 
+### Lotes enviados depois do lançamento
+
+Fotos que o Lar manda depois entram em `InitialPhotos::additions()`, com o arquivo em
+`backend/resources/initial-photos/`, e **não** em `all()`: `all()` é o que existiu em
+`public/fotos/` e alimenta os redirecionamentos 301 dos endereços antigos. Cada lote ganha uma
+migração de dados (a primeira é `2026_10_10_120000_add_bazar_photos_batch_two.php`, com 7 fotos
+do bazar) que chama `ImportInitialPhotos` **só com as chaves do lote**. Assim o deploy
+(`migrate --force`) acrescenta as fotos no fim da galeria sem tocar no que já está lá, sem
+sobrescrever o que o painel mudou e sem trazer de volta uma foto original que a equipe excluiu.
+Rodar de novo não duplica (`origin_key`), e sem a página de destino a migração não grava nada.
+Antes de importar um lote, comparar cada foto com as existentes por hash perceptual: as
+publicadas são webp, então comparar bytes não serve.
+
 Como `InitialPages`, o catálogo é só semente. Depois do lançamento, o que vale é o banco (ADR
 0023), e as fotos chegam a produção pelo pacote de conteúdo, não pelo comando.
 
