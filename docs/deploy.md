@@ -22,14 +22,41 @@ e `docs/protecao-de-dados.md` (chaves e retenção).
 | | |
 |---|---|
 | VPS | Hostinger, `2.25.223.146`, Ubuntu 24.04 LTS, **nos Estados Unidos** |
-| Homologação | site `homologacao-laf.softhing.com.br`, API `api.homologacao-laf…`, painel `painel.homologacao-laf…` |
-| Produção | **não existe** — só é criada quando o lançamento for decidido (ver §10) |
+| Site público | `laranaliafrancolondrina.org.br` (`www.` → raiz, 301), API `api.laranaliafrancolondrina.org.br`, painel `painel.laranaliafrancolondrina.org.br` |
+| Ambiente que serve o site | **`staging`** — nome interno; ver o aviso abaixo |
+| Domínio antigo | `homologacao-laf.softhing.com.br` e os subdomínios `api.`/`painel.` respondem 301 para o host equivalente do domínio novo, com caminho e query |
+| Produção (`production`) | **não existe** — e não é mais o caminho do lançamento (ver abaixo) |
 | Publicação automática | ligada para `staging`, desligada para `production` |
 
+> **O ambiente `staging` É o site da instituição (sessão 38).** O lançamento não criou o
+> ambiente `production` do §10: o Lar já usava o painel da homologação, e recriar significaria
+> levar conteúdo e contas de um banco para outro. A homologação foi promovida no lugar —
+> mesmo banco, mesmas chaves, mesmo `.env` — e passou a responder no domínio definitivo, sem
+> autenticação básica e indexável. O nome `staging` ficou em diretórios, banco, systemd, Redis
+> e no workflow (push na `main` publica aqui) porque trocá-lo é renomear tudo isso sem ganho
+> algum. Consequências que não são óbvias:
+>
+> - **Push na `main` publica no site público.** Não há mais homologação entre a `main` e a
+>   instituição; o CI completo (inclusive a bateria de ponta a ponta) é a única rede.
+> - `/etc/laf/staging.conf` tem `PUBLICO=1`, e **`criar-ambiente.sh --ambiente staging` se
+>   recusa a rodar** por causa disso: ele recolocaria senha, noindex e os hosts antigos.
+>   Qualquer mudança de Nginx ou de `site.env`/`painel-config.js` deste ambiente é feita à mão
+>   e registrada aqui.
+> - Os três hosts do Nginx (`/etc/nginx/sites-available/laf-staging-{site,api,painel}.conf`)
+>   e o de redirecionamento do domínio antigo (`laf-staging-dominio-antigo.conf`) foram
+>   escritos à mão na sessão 38 e **não saem mais de `infra/modelos/`**.
+> - `NUXT_PUBLIC_ENVIRONMENT` está **vazia** em `shared/site.env`: é ela, e não o nome do
+>   ambiente, que liga o noindex (§11). `APP_ENV` continua `staging` no `.env` da API.
+> - `MAIL_ALWAYS_TO` continua preenchido e `MAIL_MAILER=log`: nenhum e-mail sai da máquina
+>   (pendência abaixo).
+> - Backup diário com retenção de **7 dias** (o padrão de homologação) — agora guarda dado de
+>   produção; a política do §14 precisa ser decidida para este ambiente.
+
 Onde estão os segredos deste ambiente: as três chaves e a senha do banco só existem em
-`/var/www/laf/staging/shared/.env`, no servidor; a senha da autenticação básica do site
-existe só como hash em `/etc/nginx/laf-staging.htpasswd`. Nenhum dos dois é recuperável a
-partir do repositório — a cópia de trabalho vive no cofre de senhas.
+`/var/www/laf/staging/shared/.env`, no servidor, e não são recuperáveis a partir do
+repositório — a cópia de trabalho vive no cofre de senhas. A autenticação básica do site foi
+removida na sessão 38 (o arquivo `/etc/nginx/laf-staging.htpasswd` foi apagado; uma cópia está
+no backup da migração, `/var/backups/laf/migracao-dominio-20261020/`).
 
 **A máquina fica nos Estados Unidos**, não no Brasil — o data center brasileiro do provedor
 estava indisponível na contratação. Isso não é detalhe de infraestrutura: torna todo dado
@@ -543,6 +570,12 @@ alteração no site.
 
 ## 10. Criar o ambiente de produção, quando chegar a hora
 
+> **O lançamento não seguiu este caminho** (sessão 38, ver §0): o domínio definitivo passou a
+> ser servido pelo ambiente `staging`, com o banco que a instituição já usava. Esta seção fica
+> como referência para o dia em que se quiser separar de novo um ambiente de homologação — e
+> aí o domínio `laranaliafrancolondrina.org.br` já está tomado pelo `staging`, o que exige
+> planejar a troca antes de rodar qualquer coisa daqui.
+
 Produção **não é criada junto com homologação**, de propósito: ela só existe quando o
 lançamento for decidido. Quando for:
 
@@ -670,9 +703,9 @@ Do desenvolvimento local para o servidor, de ponta a ponta (exporta, rsync, back
 `page_images`, importa, confere, restaura o backup se a conferência falhar):
 
 ```bash
-SITE_AUTH='homologacao:SENHA' backend/scripts/midia/levar-fotos.sh --ambiente staging \
-  --host 2.25.223.146 --api https://api.homologacao-laf.softhing.com.br \
-  --site https://homologacao-laf.softhing.com.br
+backend/scripts/midia/levar-fotos.sh --ambiente staging \
+  --host 2.25.223.146 --api https://api.laranaliafrancolondrina.org.br \
+  --site https://laranaliafrancolondrina.org.br
 ```
 
 O script usa **uma** conexão SSH (reaproveitada com `ControlMaster`, sem mexer em
@@ -681,6 +714,10 @@ IP porque é assim que ele está no `known_hosts`. O backup fica em
 `/var/tmp/laf-midia-backup-<carimbo>/` no servidor; apagar quando não for mais preciso.
 
 ## 11. Homologação não é indexável
+
+> Desde a sessão 38 o ambiente `staging` deste servidor é o site público e **é indexável**
+> (`NUXT_PUBLIC_ENVIRONMENT` vazia, sem autenticação básica — ver §0). O que segue descreve o
+> mecanismo, que continua valendo para qualquer homologação que venha a existir.
 
 Em `staging`, **toda** resposta do site sai com `X-Robots-Tag: noindex, nofollow` e o
 `robots.txt` bloqueia o site inteiro — página, arquivo estático, PDF, 404, tudo. Homologação

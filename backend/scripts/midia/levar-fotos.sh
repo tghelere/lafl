@@ -5,11 +5,11 @@
 # páginas nem em nenhuma outra tabela. Ver docs/deploy.md §10.2.
 #
 #   backend/scripts/midia/levar-fotos.sh --ambiente staging --host 2.25.223.146 \
-#       [--chave ~/.ssh/laf-deploy] [--api https://api.homologacao-laf.softhing.com.br] \
-#       [--site https://homologacao-laf.softhing.com.br] [--pacote /caminho/conteudo-AAAAMMDD-HHMMSS]
+#       [--chave ~/.ssh/laf-deploy] [--api https://api.laranaliafrancolondrina.org.br] \
+#       [--site https://laranaliafrancolondrina.org.br] [--pacote /caminho/conteudo-AAAAMMDD-HHMMSS]
 #
-# A autenticação básica do site de homologação vai por variável, nunca por argumento (não fica
-# no histórico do shell): SITE_AUTH='homologacao:SENHA'.
+# Site atrás de autenticação básica (o público de hoje não tem): a credencial vai por variável,
+# nunca por argumento (não fica no histórico do shell): SITE_AUTH='usuario:SENHA'.
 #
 # Roda da raiz do repositório, com o docker compose de desenvolvimento no ar (é de onde sai o
 # pacote, via `conteudo:exportar`, a menos que --pacote seja passado).

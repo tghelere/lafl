@@ -99,9 +99,10 @@ npm run test:e2e
 ## Estado do projeto
 
 Projeto em fase inicial — nada foi implementado ainda. Ao criar estrutura nova, siga
-`@docs/arquitetura.md`. Pendências conhecidas: domínio ainda não registrado (o cookie mode do
-Sanctum exige front e API sob o mesmo domínio raiz), sem multi-idioma, sem gateway de
-pagamento no escopo atual.
+`@docs/arquitetura.md`. **No ar para o público** em `laranaliafrancolondrina.org.br` (API em
+`api.`, painel em `painel.`), servido pelo ambiente que no servidor se chama `staging` — push
+na `main` publica no site da instituição (ver `docs/deploy.md` §0). Pendências conhecidas: sem
+multi-idioma, sem gateway de pagamento no escopo atual.
 
 ## Detalhamento
 

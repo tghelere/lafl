@@ -124,6 +124,17 @@ COMPARTILHADO="${BASE}/shared"
 CONF_AMBIENTE="/etc/laf/${AMBIENTE}.conf"
 HTPASSWD="/etc/nginx/laf-${AMBIENTE}.htpasswd"
 
+# O ambiente `staging` deste servidor virou o site público no domínio definitivo (sessão 38,
+# ver docs/deploy.md §0): sem senha, indexável, com redirecionamentos que este script não
+# conhece. Rodar o script por cima dele recolocaria a autenticação básica, o noindex e os
+# hosts de homologação — o site da instituição sairia do ar para o público e da busca.
+# `PUBLICO=1` em /etc/laf/<ambiente>.conf é a marca disso; quem a pôs foi a migração à mão.
+if [[ -f "$CONF_AMBIENTE" ]] && grep -qx 'PUBLICO=1' "$CONF_AMBIENTE"; then
+  erro "${CONF_AMBIENTE} marca este ambiente como o site público (PUBLICO=1)."
+  echo '  Este script o reconfiguraria como homologação. Ver docs/deploy.md §0.' >&2
+  exit 1
+fi
+
 # `openssl rand -base64 32` mais o prefixo `base64:` é exatamente o que
 # `php artisan key:generate` produz — e não exige uma release no servidor para rodar.
 chave_nova() { printf 'base64:%s' "$(openssl rand -base64 32)"; }

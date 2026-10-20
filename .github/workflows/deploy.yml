@@ -1,8 +1,13 @@
 # Publicação automática — ver docs/deploy.md e docs/tarefas/07b.
 #
-#   push na main  → homologação, e só se TODOS os jobs do CI passarem
-#   tag v*        → produção, com o mesmo pacote (ver "Promoção", abaixo)
+#   push na main  → ambiente `staging`, e só se TODOS os jobs do CI passarem. Desde a sessão
+#                   38 é ele que serve o site público, em laranaliafrancolondrina.org.br (ver
+#                   docs/deploy.md §0): push na main publica para a instituição.
+#   tag v*        → ambiente `production`, que não existe (publicação desligada por variável)
 #   botão         → qualquer um dos dois, à mão
+#
+# Nada aqui conhece o domínio: DEPLOY_HOST é o IP, e o host que a checagem de saúde confere
+# vem de /etc/laf/<ambiente>.conf, no servidor.
 #
 # O servidor nunca recebe o repositório: o CI roda os testes, gera o pacote mínimo da
 # ADR 0014 e envia só ele, por rsync. Nada é buildado lá.
