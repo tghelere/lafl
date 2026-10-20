@@ -352,6 +352,13 @@
       sessão 22 deixou registrada — o 503 é do SSR, fora do `page.route()` do Playwright — foi
       fechada reaproveitando a terceira instância do site do item acima
       (`e2e/tests/site-sem-api/pagina-sem-api.spec.ts`). Ver `docs/relatorio-sessao-23.md`.
+- [x] **Site no ar no domínio definitivo** — sessão 38. A homologação, que o Lar já usava,
+      passou a responder em `laranaliafrancolondrina.org.br` (`www` → raiz, `api.`, `painel.`),
+      sem senha e indexável. O domínio antigo redireciona com 301, e o banco, as chaves e a
+      release foram mantidos. O ambiente continua se chamando `staging` no servidor, e push na
+      `main` publica no site público. Ver
+      `docs/decisoes/0030-homologacao-promovida-a-site-publico.md` e
+      `docs/relatorio-sessao-38.md`.
 
 ## Em andamento
 
@@ -361,6 +368,12 @@
       está listado como pendência em "Painel administrativo (Vue)".
 
 ## Pendente
+
+- [ ] **Pendências do lançamento (sessão 38)**, todas dependentes de decisão ou conta externa:
+      e-mail desligado (`MAIL_MAILER=log` com `MAIL_ALWAYS_TO`: formulário novo não avisa
+      ninguém, só aparece no painel); Umami não configurado; Search Console por cadastrar;
+      retenção do backup ainda em 7 dias com dado de produção; `APP_ENV=staging` a reavaliar.
+      Detalhe em `docs/relatorio-sessao-38.md` §10.
 
 ### Backend — entidades da Fase 1 restantes
 
