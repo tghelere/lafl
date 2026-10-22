@@ -95,6 +95,6 @@ return [
     |
     */
 
-    'consent_terms_version' => env('FORM_CONSENT_TERMS_VERSION', '2026-09-18'),
+    'consent_terms_version' => env('FORM_CONSENT_TERMS_VERSION', '2026-10-22'),
 
 ];

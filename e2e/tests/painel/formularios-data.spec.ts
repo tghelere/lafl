@@ -19,8 +19,7 @@ import { storageStatePath } from '../../support/users'
  *
  * Por que isto não pode ser teste de componente com a API simulada: os dois defeitos possíveis
  * aqui só existem na pilha completa. O primeiro é de fuso — a coluna é montada pela API em
- * America/Sao_Paulo a partir de um `timestamptz` gravado em UTC por um servidor que roda nos
- * Estados Unidos; com a resposta simulada, o valor esperado viria do próprio teste e a conta
+ * America/Sao_Paulo a partir de um `timestamptz` gravado em UTC; com a resposta simulada, o valor esperado viria do próprio teste e a conta
  * nunca seria feita. O segundo é o filtro De/Até, que é uma cláusula SQL contra o Postgres: a
  * versão antiga usava `whereDate` sobre a coluna UTC e devolveria o dia errado para tudo que
  * chega depois das 21h de Londrina, sem erro nenhum aparente.

@@ -21,7 +21,8 @@ e `docs/protecao-de-dados.md` (chaves e retenção).
 
 | | |
 |---|---|
-| VPS | Hostinger, `2.25.223.146`, Ubuntu 24.04 LTS, **nos Estados Unidos** |
+| VPS | Hostinger, região Brasil – Campinas (SP), `200.141.22.161`, hostname `srv1982616`, Ubuntu 24.04 LTS |
+| Chave de host SSH (ed25519) | `SHA256:yKeeVzuADiEPpDaGJTfRqamdfwQmUYTO/JF/MdSOkeo` — é a que vai no segredo `DEPLOY_KNOWN_HOSTS` |
 | Site público | `laranaliafrancolondrina.org.br` (`www.` → raiz, 301), API `api.laranaliafrancolondrina.org.br`, painel `painel.laranaliafrancolondrina.org.br` |
 | Ambiente que serve o site | **`staging`** — nome interno; ver o aviso abaixo |
 | Domínio antigo | `homologacao-laf.softhing.com.br` e os subdomínios `api.`/`painel.` respondem 301 para o host equivalente do domínio novo, com caminho e query |
@@ -58,12 +59,61 @@ repositório — a cópia de trabalho vive no cofre de senhas. A autenticação 
 removida na sessão 38 (o arquivo `/etc/nginx/laf-staging.htpasswd` foi apagado; uma cópia está
 no backup da migração, `/var/backups/laf/migracao-dominio-20261020/`).
 
-**A máquina fica nos Estados Unidos**, não no Brasil — o data center brasileiro do provedor
-estava indisponível na contratação. Isso não é detalhe de infraestrutura: torna todo dado
-enviado pelos formulários do site uma **transferência internacional** sob a LGPD, que
-`/politica-de-privacidade` precisa declarar e declara. Ver `docs/protecao-de-dados.md`,
-"Transferência internacional". Trocar a região do servidor é mudança de política pública, não
-só de infra: exige atualizar aquela página e subir `FORM_CONSENT_TERMS_VERSION`.
+**A máquina fica no Brasil** (região Campinas da Hostinger) desde a sessão 43. De setembro a
+22/10/2026 ela ficou em Boston (`2.25.223.146`), porque o data center brasileiro do provedor
+estava indisponível na contratação, e isso fazia de todo envio de formulário uma transferência
+internacional sob a LGPD, declarada em `/politica-de-privacidade`. Com a mudança, a política
+deixou de falar em transferência internacional e a versão do termo subiu para `2026-10-22`
+(ver `docs/protecao-de-dados.md`, "Onde os dados ficam"). **Trocar a região do servidor é
+mudança de política pública, não só de infra:** exige atualizar aquela página e subir
+`FORM_CONSENT_TERMS_VERSION` — no repositório **e** no `shared/.env` do servidor, antes do push,
+porque o `publicar.sh` faz `config:cache` a partir dele.
+
+### Migração de servidor (Boston → Campinas, outubro de 2026)
+
+Feita em seis etapas, uma sessão cada, porque reinstalar o VPS em outra região **apaga tudo**,
+inclusive backups e snapshots do provedor. Serve de roteiro para a próxima troca de máquina:
+
+1. **Backup completo, baixado para fora do servidor** (sessão 39): banco (`pg_dump` + globais),
+   `storage`, os quatro arquivos de ambiente, release em uso, Nginx, Let's Encrypt inteiro,
+   units, pool do FPM, backups existentes, chaves autorizadas e versões instaladas, com
+   `SHA256SUMS`.
+2. **Provar que o backup restaura** antes de destruir a origem (sessão 40): restauração num
+   Postgres descartável, contagem por tabela e decifração de todos os campos `FieldEncrypted`
+   com as chaves do backup.
+3. **Base da máquina nova** (sessão 41): `provisionar.sh`, chaves autorizadas iguais às da
+   origem, conferência de versões contra o inventário da etapa 1.
+4. **Restaurar a aplicação a partir do backup**, não com `criar-ambiente.sh` (sessão 42):
+   banco, ambiente, release, certificados e Nginx, com dono e permissão conferidos entrada a
+   entrada; testes pelo IP novo com `curl --resolve`. O SSR só funciona quando
+   `api.` resolve para a própria máquina — antes da virada do DNS, só com entrada temporária em
+   `/etc/hosts`, removida no fim.
+5. **Virar o DNS e trocar os segredos `DEPLOY_HOST` e `DEPLOY_KNOWN_HOSTS`** antes de qualquer
+   push; `resolvectl flush-caches` no servidor logo depois da virada.
+6. **Conferência final** (sessão 43): units, logs, `certbot renew --dry-run`, backup
+   restaurável, testes externos pelo DNS real, política de privacidade.
+
+Relatórios: `docs/relatorio-sessao-39.md` a `docs/relatorio-sessao-43.md`.
+
+**Pendências deixadas pela migração:**
+
+- [ ] **`provisionar.sh` aceitar mais de uma chave por usuário.** O `deploy` tem a chave do
+      GitHub Actions **e** a pessoal (como em Boston), e a segunda foi acrescentada à mão porque
+      o script só aceita uma (sessão 41).
+- [ ] **`rsync -a --chown=root:root`** (ou `--no-o --no-g`) em toda cópia para `/root`: o
+      `rsync -a` preserva o uid local 1000, que no servidor é o `deploy` — foi assim que
+      `/root/laf-infra` nasceu com o dono errado nas duas máquinas (sessão 41).
+- [ ] **Remover os hosts do domínio antigo** quando não houver mais tráfego para eles:
+      desabilitar e apagar `/etc/nginx/sites-{enabled,available}/laf-staging-dominio-antigo.conf`
+      (`nginx -t` antes do reload) e `certbot delete --cert-name` para
+      `homologacao-laf.softhing.com.br`, `api.homologacao-laf.softhing.com.br` e
+      `painel.homologacao-laf.softhing.com.br`. Até lá, os três renovam sozinhos (o DNS deles
+      também aponta para cá; `--dry-run` passou na sessão 43).
+- [ ] **O log de auditoria guardar o tipo do formulário no próprio registro de log.** Hoje
+      `FormAuditEntryResource` deduz o tipo do `subject`; depois que o registro é excluído (ou
+      expurgado por retenção), a entrada `Registro excluído` aparece com tipo "—".
+- [ ] `StartLimitIntervalSec` está em `[Service]` em `infra/modelos/laf-{site,queue,scheduler}@.service`
+      e o systemd o ignora; pertence a `[Unit]` (sessão 42).
 
 Pendência conhecida deste ambiente: **Resend não configurado**. O `.env` está com
 `MAIL_MAILER=log`, então nenhum e-mail sai da máquina — o conteúdo renderizado vai para
@@ -704,7 +754,7 @@ Do desenvolvimento local para o servidor, de ponta a ponta (exporta, rsync, back
 
 ```bash
 backend/scripts/midia/levar-fotos.sh --ambiente staging \
-  --host 2.25.223.146 --api https://api.laranaliafrancolondrina.org.br \
+  --host 200.141.22.161 --api https://api.laranaliafrancolondrina.org.br \
   --site https://laranaliafrancolondrina.org.br
 ```
 

@@ -11,7 +11,7 @@
 // `VERSAO` precisa ser igual a FORM_CONSENT_TERMS_VERSION (ver backend/config/forms.php): é
 // o que cada envio de formulário grava em consent_terms_version, e é o que diz qual texto a
 // pessoa aceitou. Mudou o texto de forma relevante, muda a data nos dois lugares.
-const VERSAO = '2026-09-18'
+const VERSAO = '2026-10-22'
 
 usePageSeo({
   title: 'Política de Privacidade — Lar Anália Franco',
@@ -234,26 +234,16 @@ usePageSeo({
         individualmente, e esta página será atualizada antes disso.
       </p>
 
-      <h2>Onde os dados ficam, e a transferência internacional</h2>
+      <h2>Onde os dados ficam</h2>
       <p>
-        O servidor que hospeda este site e guarda o que você envia fica nos
-        <strong>Estados Unidos</strong>. A instituição contratou hospedagem pretendendo usar o
-        data center brasileiro do provedor, que está indisponível; os Estados Unidos foram a
-        alternativa disponível.
-      </p>
-      <p>
-        Na prática, isso significa que os seus dados são armazenados e processados fora do
-        Brasil, o que caracteriza <strong>transferência internacional de dados</strong> nos
-        termos da LGPD (art. 33). Os Estados Unidos não são reconhecidos pela Autoridade
-        Nacional de Proteção de Dados como país de nível de proteção adequado, e a
-        transferência se apoia no consentimento que você dá ao enviar o formulário — informado,
-        específico e destacado, que é exatamente o que este parágrafo existe para ser.
+        O servidor que hospeda este site e guarda o que você envia fica no
+        <strong>Brasil</strong>, no data center brasileiro do provedor de hospedagem. Os seus
+        dados são armazenados e processados no país: a hospedagem não envolve transferência
+        internacional de dados.
       </p>
       <p>
         Vale o que está escrito acima: os campos sensíveis viajam e ficam armazenados
-        criptografados, e a chave que os abre não fica no banco de dados. A instituição
-        pretende trazer a hospedagem para o Brasil quando o data center nacional do provedor
-        voltar a estar disponível, e esta página será atualizada quando isso acontecer.
+        criptografados, e a chave que os abre não fica no banco de dados.
       </p>
 
       <h2>Seus direitos</h2>

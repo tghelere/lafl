@@ -11,9 +11,9 @@ use DateTimeInterface;
  * Tradução entre o UTC em que todo timestamp é gravado (ver config/app.php) e o fuso de quem
  * lê e filtra — `America/Sao_Paulo`, declarado em config/institution.php.
  *
- * Não é preciosismo: o servidor fica nos Estados Unidos (ver docs/protecao-de-dados.md,
- * "Transferência internacional"), então o "hoje" do servidor não é o "hoje" de quem usa o
- * painel. Das 21h à meia-noite de Londrina o UTC já está no dia seguinte — um formulário
+ * Não é preciosismo: o relógio do servidor e o da aplicação estão em UTC (ver
+ * config/app.php), então o "hoje" do servidor não é o "hoje" de quem usa o painel. Das 21h
+ * à meia-noite de Londrina o UTC já está no dia seguinte — um formulário
  * recebido às 22h de segunda apareceria como terça, e o filtro "De 2026-09-28" deixaria de
  * fora as três primeiras horas daquele dia local.
  *

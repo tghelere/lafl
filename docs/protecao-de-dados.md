@@ -213,27 +213,28 @@ decisão da instituição, fora do alcance desta trava.
 Marcar uma imagem já cadastrada exige confirmação forte: a tela pede a frase "tirar do site"
 digitada, e a API recusa a marcação sem `confirm_marking`.
 
-## Transferência internacional
+## Onde os dados ficam
 
-**O servidor fica nos Estados Unidos** (Hostinger; `whois` do IP devolve `country: US`). Não foi
-escolha de arquitetura: o data center brasileiro do provedor está indisponível, e essa foi a
-alternativa. Vale para homologação e, enquanto a situação não mudar, valerá para produção.
+**O servidor fica no Brasil** (Hostinger, região Campinas/SP, `200.141.22.161`) desde
+22/10/2026 (sessão 43). A hospedagem não envolve transferência internacional de dados, e
+`/politica-de-privacidade` diz isso na seção "Onde os dados ficam" (versão `2026-10-22`).
 
-Isso é **transferência internacional de dados** (LGPD art. 33). Consequências práticas, não
-formais:
+Histórico: até 22/10/2026 o servidor ficou nos Estados Unidos (Boston), porque o data center
+brasileiro do provedor estava indisponível na contratação. Nesse período todo envio de
+formulário era **transferência internacional** (LGPD art. 33), apoiada no consentimento do
+titular (art. 33, VIII), e a política tinha seção própria sobre isso. Os registros com
+`consent_terms_version` anterior a `2026-10-22` foram aceitos sob aquele texto.
 
-- Os Estados Unidos não constam de decisão de adequação da ANPD. A transferência se apoia no
-  consentimento do titular (art. 33, VIII), que precisa ser **específico e destacado** — é por
-  isso que `/politica-de-privacidade` tem seção própria sobre isso, e não uma linha perdida no
-  meio de outro parágrafo.
-- Consentimento como base de transferência é o fundamento mais frágil dos disponíveis: é
-  revogável, e não cobre tratamento sem consentimento. **Nenhum dado de assistido pode ir para
-  esse servidor** enquanto o domínio de assistidos existir só no papel — quando existir, a
-  decisão de onde ele roda volta à mesa, e a resposta provavelmente não é "no mesmo lugar".
-- A cifra de campo (`FieldEncrypted`) e a chave fora do banco continuam sendo a única proteção
-  que independe de jurisdição. Isso é argumento a favor de cifrar mais campos, não de relaxar.
-- Voltar a hospedagem para o Brasil é mudança de política pública: exige atualizar
-  `/politica-de-privacidade` e subir `FORM_CONSENT_TERMS_VERSION`.
+O que continua valendo:
+
+- **Mudar a região do servidor é mudança de política pública**, não só de infra: exige
+  atualizar `/politica-de-privacidade` e subir `FORM_CONSENT_TERMS_VERSION` (no repositório e
+  no `shared/.env` do servidor — ver `docs/deploy.md` §0). Voltar para fora do Brasil traria de
+  volta a transferência internacional e a seção que a declara.
+- **Nenhum dado de assistido vai para este servidor** enquanto o domínio de assistidos existir
+  só no papel: quando existir, onde ele roda é decisão própria, não herança do site público.
+- A cifra de campo (`FieldEncrypted`) e a chave fora do banco continuam sendo a proteção que
+  independe de jurisdição e de provedor.
 
 ## Resposta a incidente
 

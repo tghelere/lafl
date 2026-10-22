@@ -665,7 +665,8 @@ produção**, não para homologação.
       - "nenhuma ferramenta de medição de audiência está ativa" — vale enquanto
         `NUXT_PUBLIC_UMAMI_*` estiver vazia no `site.env`. Ligar o Umami exige atualizar a
         política **e** subir a versão, antes de ligar;
-      - "o servidor fica nos Estados Unidos" — muda quando a hospedagem voltar para o Brasil.
+      - "o servidor que hospeda este site fica no Brasil" — vale enquanto a hospedagem
+        estiver na região Brasil do provedor (desde a sessão 43; antes, Estados Unidos).
 - [ ] **Retenção das cópias de segurança em produção.** A política diz que uma cópia pode
       conter registro já apagado até ser descartada, sem prometer prazo — porque produção ainda
       não tem política de retenção definida (homologação usa 7 dias, ver
